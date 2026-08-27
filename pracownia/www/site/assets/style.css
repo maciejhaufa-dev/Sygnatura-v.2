@@ -1,0 +1,324 @@
+/* Studio Sygnatura — arkusz wspólny */
+:root{
+  --ink:#2A211C; --cream:#FAF8F5; --brown:#6B4530; --kraft:#C4A582;
+  --accent:#1F3A32; --accent-soft:#EFF3F1; --line:#E4DED5; --muted:#6B5D53;
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{max-width:1360px;margin:0 auto}
+
+/* ---------- NAV ---------- */
+header.nav{position:sticky;top:0;z-index:60;background:rgba(250,248,245,.97);
+  border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.navin{display:flex;align-items:center;justify-content:space-between;padding:18px 54px;gap:20px}
+.brand img{height:36px}
+.menu{display:flex;gap:28px;list-style:none;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase}
+.menu a{text-decoration:none;padding-bottom:4px;border-bottom:1px solid transparent}
+.menu a:hover,.menu a.on{border-color:var(--accent);color:var(--accent)}
+.navcta{border:1px solid var(--accent);color:var(--accent);padding:11px 20px;font-size:11px;
+  letter-spacing:.15em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.navcta:hover{background:var(--accent);color:#fff}
+.burger{display:none;background:none;border:1px solid var(--line);padding:9px 12px;cursor:pointer;font-size:15px}
+
+/* ---------- typografia ---------- */
+h1,h2,h3,h4{font-family:var(--serif);font-weight:400;line-height:1.22}
+.tag{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:16px;display:flex;align-items:center;gap:11px}
+.tag::before{content:"";width:26px;height:1px;background:var(--accent)}
+.tag.c{justify-content:center}
+h2{font-size:36px;max-width:720px}
+.sub{font-size:16.5px;line-height:1.8;color:#4A403A;font-weight:300;max-width:660px;margin-top:18px}
+.sec{padding:88px 54px}
+.sec.tight{padding:64px 54px}
+.alt{background:#F4F0EA}
+.dark{background:var(--ink);color:#fff}
+.dark h2{color:#fff}.dark .sub{color:#C9BEB4}
+
+/* ---------- przyciski ---------- */
+.btn{display:inline-block;padding:15px 30px;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn1{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn1:hover{background:transparent;color:var(--accent)}
+.dark .btn1:hover,.hero .btn1:hover{color:#fff}
+.btn2{border-color:var(--accent);color:var(--accent)}
+.btn2:hover{background:var(--accent);color:#fff}
+.btnl{border-color:rgba(255,255,255,.45);color:#fff}
+.btnl:hover{background:#fff;color:var(--ink)}
+.btns{display:flex;gap:13px;flex-wrap:wrap;margin-top:32px}
+
+/* ---------- HERO strony glownej ---------- */
+.hero{position:relative;height:640px;display:flex;align-items:center;overflow:hidden;background:#1C130D}
+.hero .bg{position:absolute;inset:0;background-size:cover;background-position:center right}
+.hero .veil{position:absolute;inset:0;background:linear-gradient(95deg,
+  rgba(28,19,13,.94) 0%,rgba(28,19,13,.82) 38%,rgba(28,19,13,.24) 66%,rgba(28,19,13,0) 88%)}
+.hero .inner{position:relative;padding:0 54px;max-width:660px;color:#fff}
+.eyebrow{display:inline-flex;align-items:center;gap:11px;font-size:11px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--kraft);margin-bottom:24px}
+.eyebrow::before{content:"";width:38px;height:1px;background:var(--kraft)}
+.hero h1{font-size:54px;letter-spacing:-.5px}
+.hero h1 em{font-style:italic;color:var(--kraft)}
+.hero .lead{margin-top:22px;font-size:16.5px;line-height:1.8;color:#E9E2D8;max-width:490px;font-weight:300}
+
+/* ---------- naglowek podstrony ---------- */
+.phead{background:var(--accent);color:#fff;padding:62px 54px 58px}
+.phead .tag{color:var(--kraft)}.phead .tag::before{background:var(--kraft)}
+.phead h1{font-size:44px;max-width:800px}
+.phead p{margin-top:16px;max-width:640px;font-size:16px;line-height:1.8;
+  color:rgba(255,255,255,.82);font-weight:300}
+.crumb{padding:14px 54px;font-size:11.5px;letter-spacing:.1em;color:#8A7B69;
+  border-bottom:1px solid var(--line);text-transform:uppercase}
+.crumb a{text-decoration:none}.crumb a:hover{color:var(--accent)}
+
+/* ---------- pasek liczb ---------- */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);background:var(--accent);color:#fff}
+.strip div{padding:24px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.16)}
+.strip div:last-child{border:0}
+.strip b{display:block;font-family:var(--serif);font-size:21px;font-weight:400;margin-bottom:5px}
+.strip span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.72}
+
+/* ---------- karty produktow ---------- */
+.grid{display:grid;gap:24px;margin-top:40px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.gfeat{grid-template-columns:1.4fr 1fr 1fr}
+.card{background:var(--cream);border:1px solid var(--line);display:flex;flex-direction:column;
+  text-decoration:none;color:inherit;transition:.18s}
+.card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.ph{height:220px;background:linear-gradient(140deg,#DED5C7,#C9BCA9);position:relative;
+  display:flex;align-items:center;justify-content:center}
+.card.big .ph{height:300px}
+.ph::after{content:attr(data-ph);font-size:10px;letter-spacing:.22em;color:#8A7B69;text-align:center;padding:0 12px}
+.badge{position:absolute;top:0;left:0;background:var(--accent);color:#fff;font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;padding:8px 14px}
+.bd{padding:22px 24px 26px;flex:1;display:flex;flex-direction:column}
+.bd h3{font-size:20px;margin-bottom:8px}
+.bd p{font-size:13.5px;line-height:1.7;color:var(--muted);font-weight:300;flex:1}
+.price{margin-top:16px;padding-top:14px;border-top:1px solid #EBE5DC;display:flex;
+  justify-content:space-between;align-items:baseline}
+.price b{font-family:var(--serif);font-size:23px;font-weight:400;color:var(--brown)}
+.price span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+
+/* ---------- panele / listy ---------- */
+.two{display:grid;grid-template-columns:1.15fr .85fr;gap:64px;align-items:start;margin-top:38px}
+.two p{font-size:16px;line-height:1.9;color:#4A403A;margin-bottom:16px;font-weight:300}
+.two p strong{font-weight:600;color:var(--ink)}
+.panel{background:var(--accent-soft);border:1px solid #E1E7E3;padding:32px 30px}
+.panel h4{font-size:19px;margin-bottom:16px;color:var(--brown)}
+.panel ul{list-style:none;font-size:14.5px;line-height:1.6;color:#4E463F}
+.panel li{padding:10px 0;border-bottom:1px solid #E1E7E3}
+.panel li:last-child{border:0}
+.panel li b{display:block;font-weight:600;color:var(--ink);margin-bottom:2px}
+.quote{border-left:2px solid var(--accent);padding:4px 0 4px 24px;margin-top:30px;
+  font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.65;color:var(--brown)}
+.quote small{display:block;font-size:12.5px;font-style:normal;letter-spacing:.1em;
+  text-transform:uppercase;color:#8A7B69;margin-top:8px}
+
+/* ---------- kroki ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:40px;counter-reset:s}
+.step{border-top:2px solid var(--accent);padding-top:18px}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--serif);
+  font-size:26px;color:var(--kraft);display:block;margin-bottom:8px}
+.step h4{font-size:17px;margin-bottom:7px}
+.step p{font-size:13.5px;line-height:1.7;color:var(--muted);font-weight:300}
+
+/* ---------- osoba (rzemioslo) ---------- */
+.person{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;margin-bottom:64px}
+.person:last-child{margin-bottom:0}
+.person .txt h3{font-size:28px;margin-bottom:6px}
+.person .role{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:18px;display:block}
+.person .txt p{font-size:16px;line-height:1.9;color:#4A403A;font-weight:300;margin-bottom:14px}
+.person .pic{height:420px;background:linear-gradient(140deg,#DED5C7,#BFB09B);
+  display:flex;align-items:center;justify-content:center}
+.person .pic::after{content:attr(data-ph);font-size:10.5px;letter-spacing:.22em;color:#7C6E5D;text-align:center;padding:0 16px}
+.person.rev .txt{order:2}.person.rev .pic{order:1}
+
+/* ---------- karta produktu ---------- */
+.pgrid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:start}
+.gal .main{height:460px;background:linear-gradient(140deg,#DED5C7,#C9BCA9);
+  display:flex;align-items:center;justify-content:center}
+.gal .main::after{content:attr(data-ph);font-size:11px;letter-spacing:.22em;color:#8A7B69}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.thumbs div{height:86px;background:linear-gradient(140deg,#E4DBCE,#CFC2AF)}
+.pinfo h1{font-size:38px}
+.pinfo .from{font-family:var(--serif);font-size:34px;color:var(--brown);margin:18px 0 4px}
+.pinfo .note{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.pinfo .desc{font-size:16px;line-height:1.9;color:#4A403A;font-weight:300;margin:22px 0}
+.specs{width:100%;border-collapse:collapse;margin:26px 0 4px;font-size:14.5px}
+.specs td{padding:11px 0;border-bottom:1px solid var(--line);color:#4E463F}
+.specs td:first-child{color:#8A7B69;width:44%;font-size:13px;letter-spacing:.04em}
+.opts{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+.opt{border:1px solid var(--line);padding:9px 16px;font-size:12.5px;color:#4E463F;background:#fff}
+.opt.sel{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* ---------- zestaw ---------- */
+.bundle{border:1px solid var(--accent);background:var(--accent-soft);padding:30px 32px;margin-top:44px;
+  display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}
+.bundle h4{font-size:21px;margin-bottom:8px;color:var(--brown)}
+.bundle p{font-size:14.5px;line-height:1.75;color:#4E463F;font-weight:300;max-width:640px}
+.bundle .sum{text-align:right;white-space:nowrap}
+.bundle .old{color:#9A8B7C;text-decoration:line-through;font-size:15px}
+.bundle .new{font-family:var(--serif);font-size:30px;color:var(--brown);display:block;margin:2px 0 10px}
+
+/* ---------- pasek "napisz do nas" ---------- */
+.freeband{background:var(--ink);color:#fff;padding:66px 54px;text-align:center}
+.freeband h3{font-size:30px;max-width:760px;margin:0 auto}
+.freeband p{margin:16px auto 28px;max-width:560px;color:#C9BEB4;font-size:15.5px;
+  line-height:1.8;font-weight:300}
+.freeband .pill{display:inline-block;border:1px solid var(--kraft);color:var(--kraft);
+  font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;padding:7px 16px;margin-bottom:20px}
+
+/* ---------- wynajem: zasady ---------- */
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);margin-top:38px}
+.rules div{padding:30px 28px;border-right:1px solid var(--line)}
+.rules div:nth-child(3n){border-right:0}
+.rules div:nth-child(n+4){border-top:1px solid var(--line)}
+.rules h4{font-size:18px;margin-bottom:9px;color:var(--brown)}
+.rules p{font-size:14px;line-height:1.75;color:var(--muted);font-weight:300}
+
+.occs{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:34px;border:1px solid var(--line)}
+.occ{padding:24px 26px;border-right:1px solid var(--line)}
+.occ:nth-child(3n){border-right:0}
+.occ:nth-child(n+4){border-top:1px solid var(--line)}
+.occ h4{font-size:17px;margin-bottom:7px;color:var(--brown)}
+.occ p{font-size:13.5px;line-height:1.7;color:var(--muted);font-weight:300}
+
+/* ---------- katalog wynajmu ---------- */
+.rent{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px}
+.ritem{border:1px solid var(--line);background:#fff}
+.ritem .rp{height:150px;background:linear-gradient(140deg,#E4DBCE,#CFC2AF)}
+.ritem .rb{padding:16px 18px 18px}
+.ritem h4{font-size:16.5px;margin-bottom:5px}
+.ritem p{font-size:12.5px;color:var(--muted);line-height:1.6;font-weight:300}
+.ritem .rprice{margin-top:12px;padding-top:11px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--accent);
+  letter-spacing:.08em;text-transform:uppercase}
+.ritem .rprice b{font-family:var(--serif);font-size:19px;color:var(--brown);text-transform:none;letter-spacing:0}
+
+/* ---------- pakiety wynajmu ---------- */
+.pkgs{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.pkg{border:1px solid var(--line);background:#fff;display:flex;flex-direction:column}
+.pkg.hot{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.pkg .pkgph{height:170px;background:linear-gradient(140deg,#DED5C7,#C9BCA9);position:relative;
+  display:flex;align-items:center;justify-content:center}
+.pkg .pkgph::after{content:attr(data-ph);font-size:9.5px;letter-spacing:.2em;color:#8A7B69;text-align:center;padding:0 14px}
+.pkg .pkgbd{padding:24px 24px 26px;display:flex;flex-direction:column;flex:1}
+.pkg h3{font-size:22px;margin-bottom:4px}
+.pkg .style{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.pkg ul{list-style:none;font-size:13.5px;line-height:1.55;color:#4E463F;flex:1}
+.pkg li{padding:8px 0;border-bottom:1px solid #F0EBE3;display:flex;justify-content:space-between;gap:12px}
+.pkg li:last-child{border:0}
+.pkg li span{color:#9A8B7C;font-size:12.5px;white-space:nowrap}
+.pkg .pkgprice{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+.pkg .pkgprice .old{color:#9A8B7C;text-decoration:line-through;font-size:14px}
+.pkg .pkgprice b{font-family:var(--serif);font-size:29px;font-weight:400;color:var(--brown);display:block;margin:2px 0}
+.pkg .pkgprice em{font-style:normal;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+
+/* ---------- mini kalendarz ---------- */
+.cal{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calhead b{font-family:var(--serif);font-size:15px;font-weight:400}
+.calnav{display:flex;gap:5px}
+.calnav button{border:1px solid var(--line);background:#fff;width:26px;height:26px;cursor:pointer;
+  font-size:13px;line-height:1;color:var(--accent);padding:0}
+.calnav button:hover{border-color:var(--accent)}
+.calnav button:disabled{opacity:.3;cursor:default}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.calgrid i{font-style:normal;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:#A89887;text-align:center;padding-bottom:4px}
+.calgrid button{border:1px solid transparent;background:#F4F0EA;font-size:12px;padding:6px 0;
+  cursor:pointer;color:#4E463F;font-family:var(--sans)}
+.calgrid button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.calgrid button.busy{background:var(--accent);color:rgba(255,255,255,.55);cursor:not-allowed}
+.calgrid button.past{background:transparent;color:#CFC5B8;cursor:not-allowed}
+.calgrid button.sel{background:var(--brown);color:#fff;border-color:var(--brown)}
+.calgrid span{padding:6px 0}
+.callegend{display:flex;gap:16px;margin-top:11px;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:#8A7B69;flex-wrap:wrap}
+.callegend em{font-style:normal;display:inline-flex;align-items:center;gap:6px}
+.callegend i{width:11px;height:11px;display:inline-block;background:#F4F0EA;border:1px solid var(--line)}
+.callegend i.b{background:var(--accent);border-color:var(--accent)}
+.calpick{margin-top:12px;font-size:13px;color:var(--brown);min-height:20px}
+.calpick b{font-weight:600}
+
+/* ---------- formularz ---------- */
+.form{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:32px;max-width:760px}
+.form .full{grid-column:1/-1}
+.form label{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:#8A7B69;margin-bottom:7px}
+.form input,.form textarea,.form select{width:100%;border:1px solid var(--line);background:#fff;
+  padding:13px 14px;font-family:var(--sans);font-size:14.5px;color:var(--ink)}
+.form textarea{min-height:130px;resize:vertical}
+.form input:focus,.form textarea:focus,.form select:focus{outline:none;border-color:var(--accent)}
+.legal{font-size:12px;line-height:1.7;color:#8A7B69;margin-top:14px;max-width:760px}
+
+/* ---------- FAQ ---------- */
+.faq{margin-top:34px;max-width:860px}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{padding:18px 0;cursor:pointer;font-family:var(--serif);font-size:19px;list-style:none;
+  display:flex;justify-content:space-between;gap:20px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--accent);font-size:22px;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq p{padding:0 0 20px;font-size:15px;line-height:1.85;color:#4A403A;font-weight:300;max-width:720px}
+
+/* ---------- stopka ---------- */
+footer{background:#1A1A1A;color:#8C8078;padding:52px 54px 34px}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;padding-bottom:34px;
+  border-bottom:1px solid #2C2C2C}
+footer h5{font-family:var(--serif);color:#E8E1D8;font-size:17px;font-weight:400;margin-bottom:14px}
+footer ul{list-style:none;font-size:13.5px;line-height:2.1}
+footer a{text-decoration:none}footer a:hover{color:var(--kraft)}
+footer .fabout{font-size:13.5px;line-height:1.85;max-width:330px}
+.fbot{display:flex;justify-content:space-between;padding-top:24px;font-size:12px;
+  letter-spacing:.06em;flex-wrap:wrap;gap:10px}
+
+/* ---------- RWD ---------- */
+@media(max-width:1000px){
+  .navin{padding:14px 22px;flex-wrap:wrap}
+  .burger{display:block}
+  .menu{display:none;order:3;width:100%;flex-direction:column;gap:0;padding-top:8px}
+  .menu.open{display:flex}
+  .menu li{border-top:1px solid var(--line)}
+  .menu a{display:block;padding:14px 2px;border:0}
+  .navcta{padding:9px 15px;font-size:10.5px}
+
+  .hero{display:block;height:auto}
+  .hero .bg{position:relative;inset:auto;height:290px;background-position:64% 42%}
+  .hero .veil{height:290px;background:linear-gradient(to bottom,
+     rgba(28,19,13,.28) 0%,rgba(28,19,13,.10) 42%,rgba(28,19,13,.74) 84%,#1C130D 100%)}
+  .hero .inner{padding:26px 22px 48px;max-width:100%}
+  .hero h1{font-size:33px}
+  .btns{flex-direction:column}.btns .btn{text-align:center}
+
+  .sec,.sec.tight,.freeband,.phead,footer{padding-left:22px;padding-right:22px}
+  .sec{padding-top:56px;padding-bottom:56px}
+  .phead{padding-top:44px;padding-bottom:42px}
+  .phead h1{font-size:31px}
+  .crumb{padding:12px 22px}
+  h2{font-size:26px}
+  .strip{grid-template-columns:1fr 1fr}
+  .strip div{border-bottom:1px solid rgba(255,255,255,.16);padding:18px 12px}
+  .g3,.g2,.gfeat,.steps,.rent,.rules,.occs,.two,.pgrid,.person,.form{grid-template-columns:1fr}
+  .occ{border-right:0;border-bottom:1px solid var(--line)}
+  .occ:last-child{border-bottom:0}
+  .occ:nth-child(n+4){border-top:0}
+  .two,.pgrid,.person{gap:30px}
+  .person{margin-bottom:44px}
+  .person.rev .txt{order:1}.person.rev .pic{order:2}
+  .person .pic{height:280px}
+  .gal .main{height:300px}
+  .pinfo h1{font-size:29px}
+  .rules div{border-right:0;border-bottom:1px solid var(--line)}
+  .rules div:last-child{border-bottom:0}
+  .rules div:nth-child(n+4){border-top:0}
+  .bundle{grid-template-columns:1fr;gap:18px}
+  .bundle .sum{text-align:left}
+  .freeband h3{font-size:24px}
+  .fgrid{grid-template-columns:1fr 1fr;gap:26px}
+  .fbot{flex-direction:column}
+}
