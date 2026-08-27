@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" width="1000" height="720" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="1000" height="720" fill="#fdfcfa"/>
+  <text x="40" y="46" font-size="24" font-weight="700" fill="#1F3B4D">SZOPKA WARSTWOWA — przekrój poziomy (widok z góry)</text>
+  <text x="40" y="72" font-size="14" fill="#666">Ramka 20 × 20 cm, głębokość wewnętrzna 40 mm. Skala poglądowa.</text>
+
+  <!-- ===== main cross-section ===== -->
+  <g transform="translate(60,110)">
+    <!-- outer frame body -->
+    <rect x="0" y="0" width="620" height="300" fill="#8B5E3C" stroke="#5c3d24" stroke-width="2"/>
+    <!-- inner cavity -->
+    <rect x="18" y="18" width="584" height="264" fill="#fff8ec" stroke="#c9b79c" stroke-width="1"/>
+
+    <!-- back panel (plecki) -->
+    <rect x="18" y="18" width="14" height="264" fill="#6b4a2f"/>
+    <text x="10" y="300" font-size="11" fill="#5c3d24" transform="rotate(-90 10,300)"></text>
+
+    <!-- LED strip positions: top and bottom inner perimeter, facing inward -->
+    <g>
+      <rect x="40" y="24" width="540" height="10" fill="#ffd27a" stroke="#e0a63c" stroke-width="1"/>
+      <rect x="40" y="266" width="540" height="10" fill="#ffd27a" stroke="#e0a63c" stroke-width="1"/>
+      <!-- light rays inward -->
+      <g stroke="#f3c15a" stroke-width="1.2" opacity="0.75">
+        <line x1="90" y1="36" x2="120" y2="80"/><line x1="190" y1="36" x2="220" y2="80"/>
+        <line x1="300" y1="36" x2="330" y2="80"/><line x1="410" y1="36" x2="440" y2="80"/>
+        <line x1="510" y1="36" x2="540" y2="80"/>
+        <line x1="90" y1="264" x2="120" y2="220"/><line x1="190" y1="264" x2="220" y2="220"/>
+        <line x1="300" y1="264" x2="330" y2="220"/><line x1="410" y1="264" x2="440" y2="220"/>
+        <line x1="510" y1="264" x2="540" y2="220"/>
+      </g>
+    </g>
+
+    <!-- diffuser -->
+    <rect x="52" y="40" width="8" height="220" fill="#e8f1f7" stroke="#a9c4d6" stroke-width="1.5"/>
+
+    <!-- layers L0..L4 -->
+    <g>
+      <rect x="96"  y="40" width="7" height="220" fill="#d9b98c" stroke="#a9855a" stroke-width="1"/>
+      <rect x="196" y="40" width="7" height="220" fill="#d9b98c" stroke="#a9855a" stroke-width="1"/>
+      <rect x="296" y="40" width="7" height="220" fill="#d9b98c" stroke="#a9855a" stroke-width="1"/>
+      <rect x="396" y="40" width="7" height="220" fill="#d9b98c" stroke="#a9855a" stroke-width="1"/>
+      <rect x="496" y="40" width="7" height="220" fill="#d9b98c" stroke="#a9855a" stroke-width="1"/>
+    </g>
+
+    <!-- spacers between layers (corner blocks) -->
+    <g fill="#bda27f" stroke="#8d7454" stroke-width="0.8">
+      <rect x="103" y="44" width="93" height="12"/><rect x="103" y="244" width="93" height="12"/>
+      <rect x="203" y="44" width="93" height="12"/><rect x="203" y="244" width="93" height="12"/>
+      <rect x="303" y="44" width="93" height="12"/><rect x="303" y="244" width="93" height="12"/>
+      <rect x="403" y="44" width="93" height="12"/><rect x="403" y="244" width="93" height="12"/>
+    </g>
+
+    <!-- front glazing optional -->
+    <rect x="580" y="30" width="6" height="240" fill="#eaf6ff" stroke="#9dc0d8" stroke-width="1" stroke-dasharray="4 3"/>
+
+    <!-- labels with leader lines -->
+    <g font-size="12" fill="#1F3B4D">
+      <line x1="25" y1="18" x2="25" y2="-30" stroke="#999" stroke-width="1"/>
+      <text x="-8" y="-36">plecki 6 mm</text>
+
+      <line x1="56" y1="40" x2="56" y2="-10" stroke="#999" stroke-width="1"/>
+      <text x="18" y="-16" fill="#2a6f97" font-weight="600">dyfuzor</text>
+
+      <line x1="99"  y1="260" x2="99"  y2="330" stroke="#999" stroke-width="1"/><text x="86" y="345">L0</text>
+      <line x1="199" y1="260" x2="199" y2="330" stroke="#999" stroke-width="1"/><text x="186" y="345">L1</text>
+      <line x1="299" y1="260" x2="299" y2="330" stroke="#999" stroke-width="1"/><text x="286" y="345">L2</text>
+      <line x1="399" y1="260" x2="399" y2="330" stroke="#999" stroke-width="1"/><text x="386" y="345">L3</text>
+      <line x1="499" y1="260" x2="499" y2="330" stroke="#999" stroke-width="1"/><text x="486" y="345">L4</text>
+
+      <line x1="583" y1="270" x2="583" y2="330" stroke="#999" stroke-width="1"/>
+      <text x="540" y="345" font-size="11" fill="#777">szyba (opcja)</text>
+
+      <line x1="310" y1="29" x2="310" y2="-10" stroke="#e0a63c" stroke-width="1"/>
+      <text x="240" y="-16" fill="#c98a12" font-weight="600">taśma LED (góra + dół)</text>
+    </g>
+
+    <!-- dimension line for depth -->
+    <g stroke="#1F3B4D" stroke-width="1.2">
+      <line x1="18" y1="380" x2="602" y2="380"/>
+      <line x1="18" y1="374" x2="18" y2="386"/>
+      <line x1="602" y1="374" x2="602" y2="386"/>
+    </g>
+    <text x="270" y="400" font-size="13" font-weight="600" fill="#1F3B4D">głębokość wewnętrzna 40 mm</text>
+
+    <!-- gap callout -->
+    <g stroke="#B00020" stroke-width="1">
+      <line x1="103" y1="150" x2="196" y2="150"/>
+      <line x1="103" y1="145" x2="103" y2="155"/>
+      <line x1="196" y1="145" x2="196" y2="155"/>
+    </g>
+    <text x="108" y="142" font-size="11" fill="#B00020" font-weight="600">6 mm</text>
+  </g>
+
+  <!-- ===== legend / layer list ===== -->
+  <g transform="translate(720,110)">
+    <rect x="0" y="0" width="240" height="300" fill="#f4f1ec" stroke="#d8d2c8"/>
+    <text x="14" y="26" font-size="14" font-weight="700" fill="#1F3B4D">WARSTWY</text>
+    <g font-size="12" fill="#333">
+      <text x="14" y="54" font-weight="600">L0</text><text x="44" y="54">niebo + gwiazdy</text>
+      <text x="14" y="80" font-weight="600">L1</text><text x="44" y="80">stajnia, belki, drzewa</text>
+      <text x="14" y="106" font-weight="600">L2</text><text x="44" y="106">zwierzęta, zagroda</text>
+      <text x="14" y="132" font-weight="600">L3</text><text x="44" y="132">Maryja, Józef, gwiazda</text>
+      <text x="14" y="158" font-weight="600">L4</text><text x="44" y="158">żłóbek, owce, trawa</text>
+    </g>
+    <line x1="14" y1="176" x2="226" y2="176" stroke="#c9c2b6"/>
+    <text x="14" y="200" font-size="12" font-weight="700" fill="#1F3B4D">MATERIAŁ</text>
+    <g font-size="11.5" fill="#444">
+      <text x="14" y="222">warstwy: sklejka 3 mm</text>
+      <text x="14" y="242">rama: sklejka 10 mm</text>
+      <text x="14" y="262">plecki: sklejka 6 mm</text>
+      <text x="14" y="282">dystanse: 6 mm (odpad)</text>
+    </g>
+  </g>
+
+  <!-- ===== bottom: front view of LED routing ===== -->
+  <g transform="translate(60,540)">
+    <text x="0" y="-12" font-size="15" font-weight="700" fill="#1F3B4D">ROZMIESZCZENIE LED (widok od frontu, warstwy zdjęte)</text>
+    <rect x="0" y="0" width="300" height="150" fill="#fff8ec" stroke="#8B5E3C" stroke-width="6"/>
+    <rect x="16" y="10" width="268" height="9" fill="#ffd27a" stroke="#e0a63c"/>
+    <rect x="16" y="131" width="268" height="9" fill="#ffd27a" stroke="#e0a63c"/>
+    <text x="150" y="80" font-size="12" fill="#999" text-anchor="middle">strefa warstw</text>
+    <text x="320" y="26" font-size="12" fill="#333">taśma góra i dół, skierowana</text>
+    <text x="320" y="44" font-size="12" fill="#333">do środka — nie od tyłu</text>
+    <text x="320" y="70" font-size="12" fill="#B00020" font-weight="600">NIE oświetlaj od tyłu:</text>
+    <text x="320" y="88" font-size="12" fill="#333">gubisz cienie i głębię,</text>
+    <text x="320" y="106" font-size="12" fill="#333">widać punkty diod</text>
+    <text x="320" y="132" font-size="12" fill="#2a6f97" font-weight="600">3× AAA = 4,5 V → taśma 5 V</text>
+    <text x="320" y="150" font-size="12" fill="#2a6f97">albo 2× AA = 3 V → drucik LED</text>
+  </g>
+</svg>

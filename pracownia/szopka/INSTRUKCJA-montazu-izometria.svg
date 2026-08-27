@@ -1,0 +1,358 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1760" width="1240" height="1760" font-family="Segoe UI, Arial, sans-serif">
+<defs>
+  <marker id="ar" markerWidth="11" markerHeight="11" refX="9" refY="4" orient="auto">
+    <path d="M0,0 L9,4 L0,8 z" fill="#1F3B4D"/>
+  </marker>
+  <marker id="arO" markerWidth="11" markerHeight="11" refX="9" refY="4" orient="auto">
+    <path d="M0,0 L9,4 L0,8 z" fill="#E8901A"/>
+  </marker>
+  <marker id="arR" markerWidth="11" markerHeight="11" refX="9" refY="4" orient="auto">
+    <path d="M0,0 L9,4 L0,8 z" fill="#B00020"/>
+  </marker>
+</defs>
+
+<rect width="1240" height="1760" fill="#fdfcfa"/>
+<text x="45" y="52" font-size="26" font-weight="700" fill="#1F3B4D">SZOPKA WARSTWOWA — instrukcja montażu</text>
+<text x="45" y="78" font-size="14" fill="#666">Ramka 20 × 20 cm · korpus sklejka 3 mm · listwa sosnowa 20×20 · drucik 20 LED / 2 m</text>
+
+<!-- ================= HERO: ISOMETRIC CUTAWAY ================= -->
+<g transform="translate(60,110)">
+  <text x="0" y="0" font-size="18" font-weight="700" fill="#1F3B4D">WIDOK IZOMETRYCZNY Z WYRWANIEM — dolna ścianka zdjęta</text>
+
+  <g transform="translate(30,40)">
+    <!-- BACK PANEL (white painted) -->
+    <g>
+      <polygon points="88,204 288,204 288,4 88,4" fill="#ffffff" stroke="#b9b2a6" stroke-width="1.6"/>
+      <text x="150" y="-8" font-size="11.5" fill="#8a8378">plecki BIAŁE MATOWE</text>
+    </g>
+
+    <!-- LED wire drawn BEHIND layers first (gap 1, deepest) -->
+    <!-- gap plane f=0.80 : origin ox=20+80*0.8=84 ; oy=240-46*0.8=203  (local, minus 0? use direct) -->
+    <g stroke="#E8901A" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <polyline points="100,196 100,20 130,20 130,196 160,196 160,20 190,20"/>
+    </g>
+    <g fill="#FFD166" stroke="#C97A0B" stroke-width="0.8">
+      <circle cx="100" cy="150" r="5"/><circle cx="100" cy="70" r="5"/>
+      <circle cx="130" cy="60" r="5"/><circle cx="130" cy="140" r="5"/>
+      <circle cx="160" cy="110" r="5"/>
+    </g>
+
+    <!-- LAYER L0 (back) -->
+    <g>
+      <polygon points="72,220 272,220 272,20 72,20" fill="#e7cfa6" fill-opacity="0.92" stroke="#a9855a" stroke-width="1.6"/>
+      <!-- stars cut -->
+      <g fill="#fff6df" stroke="#c9a86e" stroke-width="0.6">
+        <circle cx="110" cy="55" r="4"/><circle cx="150" cy="40" r="3"/><circle cx="200" cy="58" r="4.5"/>
+        <circle cx="235" cy="42" r="3"/><circle cx="175" cy="70" r="3"/>
+      </g>
+      <text x="60" y="236" font-size="12" font-weight="700" fill="#7a5c3a">L0</text>
+    </g>
+
+    <!-- wire gap 2 -->
+    <g stroke="#E8901A" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <polyline points="216,214 216,38 186,38 186,214 156,214 156,120"/>
+    </g>
+    <g fill="#FFD166" stroke="#C97A0B" stroke-width="0.8">
+      <circle cx="216" cy="170" r="5"/><circle cx="216" cy="90" r="5"/>
+      <circle cx="186" cy="80" r="5"/><circle cx="186" cy="160" r="5"/>
+    </g>
+
+    <!-- LAYER L1 -->
+    <g>
+      <polygon points="56,236 256,236 256,36 56,36" fill="#e2c79a" fill-opacity="0.93" stroke="#a9855a" stroke-width="1.6"/>
+      <!-- stable roof silhouette -->
+      <polygon points="96,150 156,105 216,150 216,236 96,236" fill="#d3b485" stroke="#9c7c50" stroke-width="1.2"/>
+      <polygon points="120,236 120,175 145,175 145,236" fill="#fff3d6" stroke="#9c7c50" stroke-width="0.9"/>
+      <text x="44" y="252" font-size="12" font-weight="700" fill="#7a5c3a">L1</text>
+    </g>
+
+    <!-- wire gap 3 -->
+    <g stroke="#E8901A" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <polyline points="56,230 56,54 86,54 86,230 116,230"/>
+    </g>
+    <g fill="#FFD166" stroke="#C97A0B" stroke-width="0.8">
+      <circle cx="56" cy="186" r="5"/><circle cx="56" cy="106" r="5"/>
+      <circle cx="86" cy="96" r="5"/><circle cx="86" cy="176" r="5"/>
+    </g>
+
+    <!-- LAYER L2 -->
+    <g>
+      <polygon points="40,252 240,252 240,52 40,52" fill="#dbc18f" fill-opacity="0.93" stroke="#a9855a" stroke-width="1.6"/>
+      <!-- fence -->
+      <g stroke="#9c7c50" stroke-width="2.4">
+        <line x1="52" y1="252" x2="52" y2="212"/><line x1="72" y1="252" x2="72" y2="212"/>
+        <line x1="92" y1="252" x2="92" y2="212"/><line x1="44" y1="222" x2="100" y2="222"/>
+      </g>
+      <!-- animal silhouette -->
+      <path d="M150 252 L150 224 Q160 214 176 216 L200 216 L200 252 Z" fill="#c9ad7d" stroke="#9c7c50" stroke-width="1.1"/>
+      <text x="28" y="268" font-size="12" font-weight="700" fill="#7a5c3a">L2</text>
+    </g>
+
+    <!-- wire gap 4 -->
+    <g stroke="#E8901A" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <polyline points="200,246 200,70 170,70 170,246 140,246 140,268"/>
+    </g>
+    <g fill="#FFD166" stroke="#C97A0B" stroke-width="0.8">
+      <circle cx="200" cy="200" r="5"/><circle cx="200" cy="122" r="5"/>
+      <circle cx="170" cy="112" r="5"/><circle cx="170" cy="192" r="5"/>
+    </g>
+
+    <!-- LAYER L3 -->
+    <g>
+      <polygon points="24,268 224,268 224,68 24,68" fill="#d6b884" fill-opacity="0.94" stroke="#a9855a" stroke-width="1.6"/>
+      <!-- Mary & Joseph silhouettes -->
+      <path d="M96 268 L96 214 Q104 196 116 214 L116 268 Z" fill="#c2a26f" stroke="#96774c" stroke-width="1.1"/>
+      <path d="M146 268 L146 206 Q155 186 166 206 L166 268 Z" fill="#c2a26f" stroke="#96774c" stroke-width="1.1"/>
+      <polygon points="131,150 136,166 152,166 139,176 144,192 131,182 118,192 123,176 110,166 126,166" fill="#fff0c9" stroke="#c9a86e" stroke-width="0.8"/>
+      <text x="12" y="284" font-size="12" font-weight="700" fill="#7a5c3a">L3</text>
+    </g>
+
+    <!-- LAYER L4 front + snow drift -->
+    <g>
+      <polygon points="8,284 208,284 208,84 8,84" fill="#d0b07a" fill-opacity="0.95" stroke="#a9855a" stroke-width="1.6"/>
+      <!-- manger -->
+      <path d="M86 284 L86 252 L134 252 L134 284 Z" fill="#bd9b64" stroke="#96774c" stroke-width="1.2"/>
+      <!-- snow drift bottom -->
+      <path d="M8 284 Q48 262 88 276 Q130 290 168 268 Q192 256 208 266 L208 284 Z" fill="#ffffff" stroke="#cfc6b6" stroke-width="1.2"/>
+      <text x="-4" y="300" font-size="12" font-weight="700" fill="#7a5c3a">L4</text>
+      <text x="96" y="303" font-size="10.5" fill="#7b8794">listwa „zaspa" zasłania dolne diody</text>
+    </g>
+
+    <!-- FRAME: top wall (iso) -->
+    <g>
+      <polygon points="0,84 88,4 296,4 208,84" fill="#e0b878" stroke="#8d6a3f" stroke-width="1.8"/>
+      <polygon points="0,84 88,4 88,14 0,94" fill="#c99a5e" stroke="#8d6a3f" stroke-width="1"/>
+      <text x="150" y="40" font-size="11.5" fill="#7a5c3a" transform="rotate(-42 150,40)">listwa sosnowa (góra)</text>
+    </g>
+    <!-- FRAME: left wall -->
+    <g>
+      <polygon points="0,84 0,284 88,204 88,4" fill="#e8c48c" fill-opacity="0.55" stroke="#8d6a3f" stroke-width="1.8"/>
+      <text x="18" y="185" font-size="11.5" fill="#7a5c3a" transform="rotate(-42 18,185)">ścianka L — BIAŁA w środku</text>
+    </g>
+    <!-- FRAME: right wall (cut away - show only sliver) -->
+    <g>
+      <polygon points="208,84 208,284 296,204 296,4" fill="#e8c48c" fill-opacity="0.18" stroke="#b99c6e" stroke-width="1.2" stroke-dasharray="6 4"/>
+      <text x="240" y="150" font-size="11" fill="#a4906e" transform="rotate(-42 240,150)">wyrwanie</text>
+    </g>
+
+    <!-- BOTTOM OPEN indicator -->
+    <g>
+      <polygon points="8,284 208,284 296,204 96,204" fill="none" stroke="#B00020" stroke-width="2.4" stroke-dasharray="9 6"/>
+      <text x="70" y="330" font-size="13" font-weight="700" fill="#B00020">DÓŁ OTWARTY — montujesz tędy, zamykasz na końcu</text>
+    </g>
+
+    <!-- combs (side rails) -->
+    <g>
+      <polygon points="4,286 92,206 92,196 4,276" fill="#c7a978" stroke="#8d6a3f" stroke-width="1.2"/>
+      <text x="-30" y="352" font-size="11.5" fill="#7a5c3a">grzebień dolny (widoczny)</text>
+    </g>
+
+    <!-- callouts -->
+    <g font-size="12" fill="#1F3B4D">
+      <line x1="150" y1="150" x2="392" y2="120" stroke="#E8901A" stroke-width="1.3" marker-end="url(#arO)"/>
+      <text x="400" y="112" font-weight="700" fill="#C97A0B">drucik LED — zygzak pionowy</text>
+      <text x="400" y="130" fill="#666">jeden odcinek w KAŻDEJ szczelinie,</text>
+      <text x="400" y="147" fill="#666">naprzemiennie lewa / prawa ścianka</text>
+
+      <line x1="188" y1="46" x2="392" y2="30" stroke="#1F3B4D" stroke-width="1.2" marker-end="url(#ar)"/>
+      <text x="400" y="26" font-weight="700">światło z GÓRY i BOKÓW</text>
+      <text x="400" y="44" fill="#666">2 diody u góry na szczelinę</text>
+
+      <line x1="120" y1="276" x2="392" y2="250" stroke="#1F3B4D" stroke-width="1.2" marker-end="url(#ar)"/>
+      <text x="400" y="244" font-weight="700">dół: tylko 1 dioda „doświetlająca"</text>
+      <text x="400" y="262" fill="#666">schowana za zaspą — nie świeci w oczy</text>
+
+      <line x1="60" y1="240" x2="392" y2="330" stroke="#1F3B4D" stroke-width="1.2" marker-end="url(#ar)"/>
+      <text x="400" y="336" font-weight="700">grzebienie boczne (2 szt.)</text>
+      <text x="400" y="354" fill="#666">wpusty 3,2 mm + otwory ⌀5 mm na drut</text>
+    </g>
+  </g>
+</g>
+
+<!-- ================= STEP GRID ================= -->
+<g transform="translate(45,560)">
+  <line x1="0" y1="0" x2="1150" y2="0" stroke="#ddd7cc" stroke-width="2"/>
+  <text x="0" y="34" font-size="19" font-weight="700" fill="#1F3B4D">KOLEJNOŚĆ MONTAŻU</text>
+</g>
+
+<!-- STEP 1 -->
+<g transform="translate(60,620)">
+  <circle cx="16" cy="16" r="16" fill="#1F3B4D"/><text x="16" y="22" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+  <text x="44" y="22" font-size="15" font-weight="700" fill="#1F3B4D">Pomaluj wnętrze na biało</text>
+  <g transform="translate(20,44)">
+    <polygon points="30,110 130,110 130,20 30,20" fill="#ffffff" stroke="#b9b2a6" stroke-width="1.5"/>
+    <polygon points="0,140 0,50 30,20 30,110" fill="#f2f0eb" stroke="#b9b2a6" stroke-width="1.5"/>
+    <polygon points="0,50 30,20 130,20 100,50" fill="#f7f5f0" stroke="#b9b2a6" stroke-width="1.5"/>
+    <g stroke="#9fb8c9" stroke-width="2" opacity="0.8">
+      <line x1="45" y1="40" x2="115" y2="40"/><line x1="45" y1="60" x2="115" y2="60"/>
+      <line x1="45" y1="80" x2="115" y2="80"/>
+    </g>
+    <text x="0" y="165" font-size="11.5" fill="#555">plecki + ścianki boczne + góra</text>
+    <text x="0" y="182" font-size="11.5" fill="#555">farba matowa, PRZED montażem</text>
+  </g>
+</g>
+
+<!-- STEP 2 -->
+<g transform="translate(360,620)">
+  <circle cx="16" cy="16" r="16" fill="#1F3B4D"/><text x="16" y="22" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+  <text x="44" y="22" font-size="15" font-weight="700" fill="#1F3B4D">Sklej korpus BEZ dolnej ścianki</text>
+  <g transform="translate(20,44)">
+    <polygon points="30,110 130,110 130,20 30,20" fill="#efe0c4" stroke="#a9855a" stroke-width="1.5"/>
+    <polygon points="0,140 0,50 30,20 30,110" fill="#e3cfa6" stroke="#a9855a" stroke-width="1.5"/>
+    <polygon points="0,50 30,20 130,20 100,50" fill="#e9d7b3" stroke="#a9855a" stroke-width="1.5"/>
+    <polygon points="0,140 100,140 130,110 30,110" fill="none" stroke="#B00020" stroke-width="2.2" stroke-dasharray="7 5"/>
+    <text x="8" y="165" font-size="11.5" font-weight="700" fill="#B00020">dół zostaje otwarty</text>
+    <text x="8" y="182" font-size="11.5" fill="#555">łączenie na palce, klej PVA</text>
+  </g>
+</g>
+
+<!-- STEP 3 -->
+<g transform="translate(660,620)">
+  <circle cx="16" cy="16" r="16" fill="#1F3B4D"/><text x="16" y="22" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+  <text x="44" y="22" font-size="15" font-weight="700" fill="#1F3B4D">Wklej grzebienie na ścianki</text>
+  <g transform="translate(20,44)">
+    <polygon points="30,110 130,110 130,20 30,20" fill="#efe0c4" stroke="#a9855a" stroke-width="1.2"/>
+    <polygon points="0,140 0,50 30,20 30,110" fill="#e3cfa6" stroke="#a9855a" stroke-width="1.2"/>
+    <!-- comb on left wall -->
+    <g>
+      <polygon points="4,132 34,102 34,92 4,122" fill="#c7a978" stroke="#8d6a3f" stroke-width="1.2"/>
+      <g fill="#fdfcfa" stroke="#8d6a3f" stroke-width="0.9">
+        <rect x="8" y="116" width="4" height="7" transform="rotate(-45 10,119)"/>
+        <rect x="15" y="109" width="4" height="7" transform="rotate(-45 17,112)"/>
+        <rect x="22" y="102" width="4" height="7" transform="rotate(-45 24,105)"/>
+      </g>
+    </g>
+    <!-- comb top -->
+    <polygon points="4,58 34,28 34,20 4,50" fill="#c7a978" stroke="#8d6a3f" stroke-width="1.2"/>
+    <text x="0" y="165" font-size="11.5" fill="#555">2 szt. — lewa i prawa ścianka</text>
+    <text x="0" y="182" font-size="11.5" fill="#555">wpusty 3,2 mm co 6 mm</text>
+  </g>
+</g>
+
+<!-- STEP 4 -->
+<g transform="translate(960,620)">
+  <circle cx="16" cy="16" r="16" fill="#E8901A"/><text x="16" y="22" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+  <text x="44" y="22" font-size="15" font-weight="700" fill="#1F3B4D">Przewlecz drut</text>
+  <g transform="translate(20,44)">
+    <polygon points="30,110 130,110 130,20 30,20" fill="#fffaf0" stroke="#c9bfae" stroke-width="1.2"/>
+    <g stroke="#E8901A" stroke-width="2.6" fill="none" stroke-linejoin="round">
+      <polyline points="42,104 42,30 58,30 58,104 74,104 74,30 90,30 90,104 106,104 106,30"/>
+    </g>
+    <g fill="#FFD166" stroke="#C97A0B" stroke-width="0.7">
+      <circle cx="42" cy="45" r="4"/><circle cx="58" cy="88" r="4"/><circle cx="74" cy="50" r="4"/>
+      <circle cx="90" cy="90" r="4"/><circle cx="106" cy="48" r="4"/>
+    </g>
+    <text x="0" y="140" font-size="11.5" fill="#555">zygzak pionowy w każdej</text>
+    <text x="0" y="157" font-size="11.5" fill="#555">szczelinie, przelot otworem ⌀5</text>
+    <text x="0" y="176" font-size="11.5" font-weight="700" fill="#B00020">TEST ŚWIECENIA teraz!</text>
+  </g>
+</g>
+
+<!-- STEP 5 -->
+<g transform="translate(60,880)">
+  <circle cx="16" cy="16" r="16" fill="#1F3B4D"/><text x="16" y="22" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+  <text x="44" y="22" font-size="15" font-weight="700" fill="#1F3B4D">Wsuwaj warstwy OD DOŁU</text>
+  <g transform="translate(20,44)">
+    <polygon points="30,110 130,110 130,20 30,20" fill="#f7f2e6" stroke="#c9bfae" stroke-width="1.2"/>
+    <polygon points="0,140 0,50 30,20 30,110" fill="#ece2cc" stroke="#c9bfae" stroke-width="1.2"/>
+    <!-- layer being inserted from below -->
+    <polygon points="18,178 118,178 118,150 18,150" fill="#dbc18f" stroke="#a9855a" stroke-width="1.5"/>
+    <line x1="68" y1="146" x2="68" y2="118" stroke="#1F3B4D" stroke-width="2.4" marker-end="url(#ar)"/>
+    <!-- inserted layers -->
+    <polygon points="24,116 124,116 124,26 24,26" fill="#e2c79a" fill-opacity="0.7" stroke="#a9855a" stroke-width="1.2"/>
+    <text x="0" y="205" font-size="11.5" fill="#555">kolejność: L0 → L1 → L2 → L3 → L4</text>
+    <text x="0" y="222" font-size="11.5" fill="#555">na wcisk w grzebienie, BEZ kleju</text>
+  </g>
+</g>
+
+<!-- STEP 6 -->
+<g transform="translate(360,880)">
+  <circle cx="16" cy="16" r="16" fill="#1F3B4D"/><text x="16" y="22" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+  <text x="44" y="22" font-size="15" font-weight="700" fill="#1F3B4D">Zamknij dolną listwę</text>
+  <g transform="translate(20,44)">
+    <polygon points="30,110 130,110 130,20 30,20" fill="#efe0c4" stroke="#a9855a" stroke-width="1.2"/>
+    <polygon points="0,140 0,50 30,20 30,110" fill="#e3cfa6" stroke="#a9855a" stroke-width="1.2"/>
+    <polygon points="0,140 100,140 130,110 30,110" fill="#e0b878" stroke="#8d6a3f" stroke-width="1.8"/>
+    <line x1="60" y1="186" x2="60" y2="150" stroke="#1F3B4D" stroke-width="2.4" marker-end="url(#ar)"/>
+    <!-- battery box -->
+    <rect x="140" y="150" width="52" height="30" rx="3" fill="#e8e4dc" stroke="#8a8378" stroke-width="1.3"/>
+    <text x="145" y="170" font-size="10" fill="#555">3×AA</text>
+    <text x="0" y="212" font-size="11.5" fill="#555">listwa na wcisk lub 2 magnesy</text>
+    <text x="0" y="229" font-size="11.5" font-weight="700" fill="#B00020">musi być zdejmowana (baterie!)</text>
+  </g>
+</g>
+
+<!-- LIGHT DIRECTION PANEL -->
+<g transform="translate(680,880)">
+  <rect x="0" y="0" width="480" height="270" rx="8" fill="#f4f1ec" stroke="#d8d2c8"/>
+  <text x="20" y="30" font-size="16" font-weight="700" fill="#1F3B4D">KIERUNEK ŚWIATŁA — masz rację</text>
+
+  <!-- good -->
+  <g transform="translate(20,50)">
+    <rect x="0" y="0" width="200" height="140" fill="#f1fff4" stroke="#2e7d32" stroke-width="1.8"/>
+    <text x="8" y="18" font-size="12" font-weight="700" fill="#2e7d32">GÓRA + BOKI = naturalne</text>
+    <g fill="#FFD166" stroke="#C97A0B" stroke-width="0.7">
+      <circle cx="50" cy="34" r="5"/><circle cx="100" cy="30" r="5"/><circle cx="150" cy="34" r="5"/>
+      <circle cx="24" cy="70" r="5"/><circle cx="176" cy="70" r="5"/>
+    </g>
+    <g stroke="#f3c15a" stroke-width="1.3" opacity="0.85">
+      <line x1="50" y1="40" x2="66" y2="86"/><line x1="100" y1="36" x2="100" y2="86"/>
+      <line x1="150" y1="40" x2="134" y2="86"/>
+      <line x1="30" y1="74" x2="70" y2="96"/><line x1="170" y1="74" x2="130" y2="96"/>
+    </g>
+    <path d="M20 128 Q60 110 100 122 Q140 132 180 116 L180 128 Z" fill="#fff" stroke="#cfc6b6"/>
+    <path d="M70 122 L70 96 L130 96 L130 122 Z" fill="#d3b485" stroke="#96774c"/>
+    <text x="8" y="138" font-size="10" fill="#2e7d32">cień pada w dół — jak w naturze</text>
+  </g>
+
+  <!-- bad -->
+  <g transform="translate(250,50)">
+    <rect x="0" y="0" width="200" height="140" fill="#fff1f1" stroke="#B00020" stroke-width="1.8"/>
+    <text x="8" y="18" font-size="12" font-weight="700" fill="#B00020">TYLKO DÓŁ = efekt „horror"</text>
+    <g fill="#FFD166" stroke="#C97A0B" stroke-width="0.7">
+      <circle cx="60" cy="118" r="5"/><circle cx="100" cy="120" r="5"/><circle cx="140" cy="118" r="5"/>
+    </g>
+    <g stroke="#f3c15a" stroke-width="1.3" opacity="0.85">
+      <line x1="60" y1="112" x2="60" y2="60"/><line x1="100" y1="114" x2="100" y2="56"/>
+      <line x1="140" y1="112" x2="140" y2="60"/>
+    </g>
+    <path d="M70 100 L70 60 L130 60 L130 100 Z" fill="#c9ad7d" stroke="#96774c"/>
+    <g stroke="#8a7a5e" stroke-width="1" opacity="0.6">
+      <line x1="76" y1="58" x2="70" y2="26"/><line x1="124" y1="58" x2="130" y2="26"/>
+    </g>
+    <text x="8" y="138" font-size="10" fill="#B00020">cienie lecą w górę — nienaturalnie</text>
+  </g>
+
+  <text x="20" y="218" font-size="12.5" fill="#333" font-weight="600">Podział diod na szczelinę (5 szt.):</text>
+  <text x="20" y="238" font-size="12" fill="#444">• 2 u góry  • 2 na bokach (górna połowa)  • 1 na dole za zaspą</text>
+  <text x="20" y="258" font-size="11.5" fill="#7b8794" font-style="italic">Dolna dioda tylko doświetla pierwszy plan — nigdy nie jest głównym źródłem.</text>
+</g>
+
+<!-- BOTTOM NOTE -->
+<g transform="translate(60,1190)">
+  <rect x="0" y="0" width="1100" height="120" rx="8" fill="#fff8e6" stroke="#e8c98a"/>
+  <text x="22" y="32" font-size="15" font-weight="700" fill="#8a6410">DLACZEGO OD DOŁU, A NIE OD GÓRY</text>
+  <text x="22" y="58" font-size="12.5" fill="#5c4a1e">1. Dolna krawędź jest najmniej widoczna — ramka stoi na półce, patrzysz na nią z góry.</text>
+  <text x="22" y="78" font-size="12.5" fill="#5c4a1e">2. Tam chowasz koszyk baterii i nadmiar drutu — wszystko brzydkie ląduje w jednym miejscu.</text>
+  <text x="22" y="98" font-size="12.5" fill="#5c4a1e">3. Grawitacja pracuje dla Ciebie: warstwy wsunięte od dołu opierają się o grzebień, nie wypadają podczas klejenia.</text>
+</g>
+
+<!-- CHECK STRIP -->
+<g transform="translate(60,1350)">
+  <text x="0" y="0" font-size="17" font-weight="700" fill="#1F3B4D">KONTROLA PRZED ZAMKNIĘCIEM</text>
+  <g font-size="13" fill="#333">
+    <rect x="0" y="18" width="15" height="15" fill="#fff" stroke="#1F3B4D" stroke-width="1.6"/>
+    <text x="26" y="31">Drut przewleczony przez wszystkie 4 szczeliny, przeloty w otworach grzebienia</text>
+    <rect x="0" y="48" width="15" height="15" fill="#fff" stroke="#1F3B4D" stroke-width="1.6"/>
+    <text x="26" y="61">Włączone światło — patrzysz OD FRONTU: żadna dioda nie widoczna jako punkt</text>
+    <rect x="0" y="78" width="15" height="15" fill="#fff" stroke="#1F3B4D" stroke-width="1.6"/>
+    <text x="26" y="91">Każda warstwa ma własną poświatę — widać 5 osobnych planów, nie jedną sylwetkę</text>
+    <rect x="0" y="108" width="15" height="15" fill="#fff" stroke="#1F3B4D" stroke-width="1.6"/>
+    <text x="26" y="121">Koszyk baterii wychodzi swobodnie, włącznik dostępny bez rozbierania</text>
+    <rect x="0" y="138" width="15" height="15" fill="#fff" stroke="#1F3B4D" stroke-width="1.6"/>
+    <text x="26" y="151">Zrób ZDJĘCIE telefonem — płaskie miejsca widać na zdjęciu lepiej niż na żywo</text>
+  </g>
+</g>
+
+<text x="60" y="1580" font-size="11.5" fill="#999">Rysunek poglądowy — proporcje warstw i grubości przerysowane dla czytelności.</text>
+</svg>

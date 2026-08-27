@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 1180" width="1020" height="1180" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="1020" height="1180" fill="#fdfcfa"/>
+  <text x="40" y="44" font-size="23" font-weight="700" fill="#1F3B4D">PROWADZENIE DRUTU LED MIĘDZY WARSTWAMI</text>
+  <text x="40" y="68" font-size="13.5" fill="#666">Konstrukcja: boczne grzebienie dystansowe z nacięciami. Drut wężykiem — jeden odcinek w każdej szczelinie.</text>
+
+  <!-- ============ A: TOP VIEW ZIGZAG ============ -->
+  <g transform="translate(50,110)">
+    <text x="0" y="-8" font-size="16" font-weight="700" fill="#1F3B4D">A. WIDOK Z GÓRY — trasa drutu (wężyk)</text>
+    <rect x="0" y="10" width="620" height="250" fill="#fff8ec" stroke="#8B5E3C" stroke-width="7"/>
+
+    <!-- layers as vertical bars -->
+    <g fill="#d9b98c" stroke="#a9855a" stroke-width="1">
+      <rect x="70"  y="40" width="7" height="190"/>
+      <rect x="170" y="40" width="7" height="190"/>
+      <rect x="270" y="40" width="7" height="190"/>
+      <rect x="370" y="40" width="7" height="190"/>
+      <rect x="470" y="40" width="7" height="190"/>
+    </g>
+    <g font-size="11" fill="#7a5c3a" text-anchor="middle">
+      <text x="73" y="248">L0</text><text x="173" y="248">L1</text><text x="273" y="248">L2</text>
+      <text x="373" y="248">L3</text><text x="473" y="248">L4</text>
+    </g>
+
+    <!-- LED wire zigzag: segment in each gap -->
+    <path d="M 40 55 L 40 215 
+             L 123 215 L 123 55
+             L 223 55 L 223 215
+             L 323 215 L 323 55
+             L 423 55 L 423 215
+             L 520 215"
+          fill="none" stroke="#e8a317" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- diodes -->
+    <g fill="#ffcf5c" stroke="#d99400" stroke-width="0.7">
+      <circle cx="40" cy="80" r="4.5"/><circle cx="40" cy="135" r="4.5"/><circle cx="40" cy="190" r="4.5"/>
+      <circle cx="123" cy="80" r="4.5"/><circle cx="123" cy="135" r="4.5"/><circle cx="123" cy="190" r="4.5"/>
+      <circle cx="223" cy="80" r="4.5"/><circle cx="223" cy="135" r="4.5"/><circle cx="223" cy="190" r="4.5"/>
+      <circle cx="323" cy="80" r="4.5"/><circle cx="323" cy="135" r="4.5"/><circle cx="323" cy="190" r="4.5"/>
+      <circle cx="423" cy="80" r="4.5"/><circle cx="423" cy="135" r="4.5"/><circle cx="423" cy="190" r="4.5"/>
+    </g>
+
+    <!-- gap labels -->
+    <g font-size="11.5" fill="#B00020" font-weight="600" text-anchor="middle">
+      <text x="123" y="32">szczelina 1</text>
+      <text x="223" y="32">2</text>
+      <text x="323" y="32">3</text>
+      <text x="423" y="32">4</text>
+    </g>
+
+    <text x="540" y="60" font-size="12" fill="#333">wejście drutu</text>
+    <text x="540" y="80" font-size="12" fill="#333">z koszyka baterii</text>
+    <line x1="520" y1="215" x2="560" y2="235" stroke="#999"/>
+    <text x="500" y="285" font-size="12" fill="#2a6f97" font-weight="600">Jeden odcinek drutu w KAŻDEJ szczelinie = każda warstwa podświetlona od tyłu przez następną</text>
+  </g>
+
+  <!-- ============ B: SIDE COMB ============ -->
+  <g transform="translate(50,450)">
+    <text x="0" y="-8" font-size="16" font-weight="700" fill="#1F3B4D">B. GRZEBIEŃ DYSTANSOWY (2 szt. — lewa i prawa ścianka wewnętrzna)</text>
+    <text x="0" y="14" font-size="12.5" fill="#666">Sklejka 3 mm. Zastępuje klejone klocki — trzyma odstępy równo i prowadzi drut.</text>
+
+    <!-- comb body -->
+    <g transform="translate(0,30)">
+      <path d="M 0 60 L 500 60 L 500 130 L 0 130 Z" fill="#e5cfa8" stroke="#a9855a" stroke-width="2"/>
+      <!-- slots for layers -->
+      <g fill="#fdfcfa" stroke="#a9855a" stroke-width="1.5">
+        <rect x="30"  y="60" width="7" height="34"/>
+        <rect x="130" y="60" width="7" height="34"/>
+        <rect x="230" y="60" width="7" height="34"/>
+        <rect x="330" y="60" width="7" height="34"/>
+        <rect x="430" y="60" width="7" height="34"/>
+      </g>
+      <!-- notches for wire -->
+      <g fill="#ffe9b8" stroke="#e0a63c" stroke-width="1.5">
+        <circle cx="83" cy="112" r="7"/>
+        <circle cx="183" cy="112" r="7"/>
+        <circle cx="283" cy="112" r="7"/>
+        <circle cx="383" cy="112" r="7"/>
+      </g>
+      <g font-size="10.5" fill="#7a5c3a" text-anchor="middle">
+        <text x="33" y="54">L0</text><text x="133" y="54">L1</text><text x="233" y="54">L2</text>
+        <text x="333" y="54">L3</text><text x="433" y="54">L4</text>
+      </g>
+      <text x="520" y="80" font-size="12" fill="#1F3B4D" font-weight="600">wpust 3,2 mm</text>
+      <text x="520" y="98" font-size="11.5" fill="#666">na warstwę</text>
+      <text x="520" y="122" font-size="12" fill="#c98a12" font-weight="600">otwór ⌀ 5 mm</text>
+      <text x="520" y="140" font-size="11.5" fill="#666">przelot drutu</text>
+
+      <!-- dimension -->
+      <g stroke="#1F3B4D" stroke-width="1">
+        <line x1="37" y1="160" x2="130" y2="160"/>
+        <line x1="37" y1="155" x2="37" y2="165"/><line x1="130" y1="155" x2="130" y2="165"/>
+      </g>
+      <text x="60" y="178" font-size="11.5" fill="#1F3B4D" font-weight="600">6 mm</text>
+    </g>
+  </g>
+
+  <!-- ============ C: WRONG vs RIGHT diode orientation ============ -->
+  <g transform="translate(50,720)">
+    <text x="0" y="-8" font-size="16" font-weight="700" fill="#1F3B4D">C. KIERUNEK DIOD — to decyduje, czy widać punkty</text>
+
+    <!-- wrong -->
+    <g transform="translate(0,20)">
+      <rect x="0" y="0" width="300" height="170" fill="#fff1f1" stroke="#B00020" stroke-width="2"/>
+      <text x="12" y="24" font-size="13" font-weight="700" fill="#B00020">ŹLE — dioda skierowana do widza</text>
+      <rect x="40" y="50" width="7" height="100" fill="#d9b98c" stroke="#a9855a"/>
+      <rect x="150" y="50" width="7" height="100" fill="#d9b98c" stroke="#a9855a"/>
+      <circle cx="100" cy="100" r="7" fill="#fff3b0" stroke="#d99400"/>
+      <g stroke="#e8a317" stroke-width="1.5" opacity="0.9">
+        <line x1="107" y1="100" x2="250" y2="70"/>
+        <line x1="107" y1="100" x2="250" y2="100"/>
+        <line x1="107" y1="100" x2="250" y2="130"/>
+      </g>
+      <text x="200" y="160" font-size="11.5" fill="#B00020">widać ostry punkt</text>
+    </g>
+
+    <!-- right -->
+    <g transform="translate(340,20)">
+      <rect x="0" y="0" width="300" height="170" fill="#f1fff4" stroke="#2e7d32" stroke-width="2"/>
+      <text x="12" y="24" font-size="13" font-weight="700" fill="#2e7d32">DOBRZE — dioda skierowana w bok / w tył</text>
+      <rect x="40" y="50" width="7" height="100" fill="#d9b98c" stroke="#a9855a"/>
+      <rect x="150" y="50" width="7" height="100" fill="#d9b98c" stroke="#a9855a"/>
+      <circle cx="100" cy="100" r="7" fill="#fff3b0" stroke="#d99400"/>
+      <g stroke="#e8a317" stroke-width="1.5" opacity="0.9">
+        <line x1="96" y1="94" x2="50" y2="60"/>
+        <line x1="96" y1="106" x2="50" y2="140"/>
+      </g>
+      <path d="M 47 60 Q 90 100 47 140" fill="none" stroke="#ffd27a" stroke-width="6" opacity="0.6"/>
+      <text x="160" y="160" font-size="11.5" fill="#2e7d32">światło odbite = miękkie</text>
+    </g>
+  </g>
+
+  <!-- ============ D: FRAME CONSTRUCTION ============ -->
+  <g transform="translate(50,950)">
+    <text x="0" y="-8" font-size="16" font-weight="700" fill="#1F3B4D">D. RAMA — Twój pomysł: korpus 3 mm + listwa sosnowa z rowkiem</text>
+    <rect x="0" y="10" width="620" height="150" fill="#fff8ec" stroke="#c9b79c"/>
+    <!-- pine listwa -->
+    <rect x="0" y="10" width="620" height="26" fill="#e0b878" stroke="#a9855a" stroke-width="1.5"/>
+    <rect x="0" y="134" width="620" height="26" fill="#e0b878" stroke="#a9855a" stroke-width="1.5"/>
+    <!-- groove -->
+    <rect x="0" y="30" width="620" height="6" fill="#c49a5e" stroke="#8d7454" stroke-width="0.8"/>
+    <rect x="0" y="134" width="620" height="6" fill="#c49a5e" stroke="#8d7454" stroke-width="0.8"/>
+    <!-- 3mm box body -->
+    <rect x="0" y="36" width="8" height="98" fill="#d9b98c" stroke="#a9855a"/>
+    <text x="640" y="28" font-size="12" fill="#1F3B4D" font-weight="600">listwa sosnowa 20×20</text>
+    <text x="640" y="46" font-size="11.5" fill="#666">rowek 3,2 mm — korpus wchodzi</text>
+    <text x="640" y="70" font-size="12" fill="#c98a12" font-weight="600">✔ Bardzo dobry pomysł</text>
+    <text x="640" y="88" font-size="11.5" fill="#666">tanio, sztywno, ładne lico</text>
+    <text x="140" y="100" font-size="12" fill="#999">wnętrze — grzebienie + warstwy</text>
+  </g>
+</svg>
