@@ -2,10 +2,16 @@
 
 Tu idzie wszystko nowe z sesji v.2.
 
-- Katalogi `pracownia/`, `uploads/` i pliki planu w korzeniu = **baza z v.1**. Nie kasujemy, nie nadpisujemy. Odniesienie / inspiracja.
+- Katalogi `pracownia/`, `uploads/` i pliki planu w korzeniu = **baza z v.1**. Nie kasujemy, nie nadpisujemy.
+- `Kontekst-WORKFLOW.md` = dziennik ustaleń (nie transkrypt).
+- Obrazy z czatu na GitHub dopiero po commit+push na gałąź sesji.
 
-- `Kontekst-WORKFLOW.md` = dziennik ustaleń (zamiast transkryptu 6500 akapitów).
+| Folder | Co tam jest |
+|---|---|
+| **www/** | Działająca strona + koszyk + SQLite (`python3 www/serwer.py`) + `regulamin.html` |
+| **landing/** | Jedna karta „wkrótce” — pod pustą domenę, **nie** podpinać DNS teraz |
+| **foto-realne/** | Twoje zdjęcia produktów (bez duplikatów) |
+| **wizytowki/** | szkice; kanon 90×50 w `WIZYTOWKA/` w korzeniu repo |
+| **korespondencja/** | Stopka mail (HTML), podglądy PNG |
 
-- `stopka/` = podpis mailowy (HTML bez obrazka do Zimbry + PNG do PDF/strony).
-
-Obrazy wygenerowane w czacie są plikami w tym folderze. Na GitHub są dopiero po `git push` na gałąź sesji.
+Baza v.1 (`pracownia/`) nietknięta.

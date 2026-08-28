@@ -143,6 +143,26 @@ Zdjęcia referencyjne (serwetnik, krzyżówka, obręcz, misie). Pakiet „do dom
 
 ---
 
+### 28.08 zamknięcie sesji (commit+push)
+
+Stan na gałęzi `arena/01a044f6-sygnatura-v-2`: `etap-2/` (www, landing, dziennik), `WIZYTOWKA/` 90×50. DNS/MX/Pages nietknięte. Uploadów z telefonu w korzeniu repo **nie** commitujemy (nie idą na WWW). Wrócimy: laser (szopka → metryczka), szept 1–2.
+
+### 28.08 — laser, regulamin, landing
+
+Kolejność stołu: **szopka 20×20** (CIECIE: L0–L3 + żłóbek; owce/wół nie z obecnych SVG) → **metryczka** 6 pierścieni (spec jest, SVG brak). Prezenty: **1–2** szperaczom, nie seria.
+
+Regulamin: `etap-2/www/regulamin.html` — DN na wstępie, art. 38 pkt 3 (brak odstąpienia przy personalizacji), rękojmia zostaje, checkbox przed Zamów w `shop.js`. Link w stopce.
+
+Landing: `etap-2/landing/index.html` (zieleń + sygnet WEKTORY3). **DNS/Pages/MX nie ruszane.**
+
+Wizytówka 90×50 zaakceptowana (`WIZYTOWKA/`); QR na breloczek, nie na kartę.
+
+### 28.08 wieczór — wizytówki, nie nju
+
+Numer nju 9 zł: **nie drukować tel. na wizytówce**, dopóki karta nie jest w ręku. Wizytówka 85×55: znak WEKTORY3, mail, strona, Poznań. Szkic: `etap-2/wizytowki/index.html`.
+
+---
+
 ## 5. Następny krok po zadaniu 1
 
 Checklista 26 dni, Faza 1: starter na kartę, test wypału logo, metryczka, pieczątki, nicki social, sobota 29.08 strona na Pages.
