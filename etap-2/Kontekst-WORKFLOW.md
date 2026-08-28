@@ -135,6 +135,14 @@ Szczegółowe kliknięcia: w rozmowie + poniżej skrót.
 
 ---
 
+### Sesja 2026-08-28 (telefon)
+
+Zdjęcia referencyjne (serwetnik, krzyżówka, obręcz, misie). Pakiet „do domu” — TAK. Nazwa: **Krzyżówka na ścianę** / kafelki (nie Scrabble). Zdjęcia z telefonu na WWW nie idą.
+
+**28.08 WWW look:** `etap-2/www/` — index, do-domu, krzyzowka, misie, serwetniki, makrama, kontakt. Mobile-first, placeholdery. Deploy Pages z kompa później.
+
+---
+
 ## 5. Następny krok po zadaniu 1
 
 Checklista 26 dni, Faza 1: starter na kartę, test wypału logo, metryczka, pieczątki, nicki social, sobota 29.08 strona na Pages.
