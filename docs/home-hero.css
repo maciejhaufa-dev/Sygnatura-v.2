@@ -1,0 +1,31 @@
+/* Start — nadpisuje shop.css: zielone menu, splash, hover */
+#splash{position:fixed;inset:0;z-index:200;background:#1A4731;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+#splash img{width:min(28vw,140px);height:auto;margin-bottom:22px;animation:sygIn 1.1s ease both}
+#splash .wm{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2rem,6vw,3.2rem);letter-spacing:.32em;font-weight:400}
+#splash .wm .syg{color:#E8D9B8}#splash .wm .nat{color:#4A8B70}
+@keyframes sygIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+
+header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
+.navin{padding:14px 36px}
+.brand{display:none}
+.menu{font-size:15px;letter-spacing:.12em;gap:22px;flex:1;justify-content:center}
+.menu a{color:#C4A582;border-bottom:0}
+.menu a:hover,.menu a.on{color:#E8D9B8;border-color:transparent}
+.navcta,.cartlink{border:1px solid #E8D9B8;color:#E8D9B8;transition:background .25s,color .25s,border-color .25s}
+.navcta:hover,.cartlink:hover{background:#E8D9B8;color:#1A4731}
+.burger{border-color:#C4A582;color:#E8D9B8;background:transparent}
+.btn,.btn1,.btn2,.btnl,.navcta,.cartlink{transition:background .25s,color .25s,border-color .25s,transform .2s}
+.btn1:hover{background:#C4A582;border-color:#C4A582;color:#1A130D;transform:translateY(-1px)}
+.btnl:hover{background:#E8D9B8;color:#1A130D;border-color:#E8D9B8}
+.hero{height:78vh;min-height:520px}
+.hero .inner{max-width:780px}
+.hero .word{font-family:Georgia,'Times New Roman',serif;font-size:clamp(3.2rem,8vw,6.2rem);line-height:.92;letter-spacing:.08em;margin:8px 0 18px}
+.hero .word .syg{color:#E8D9B8}.hero .word .nat{color:#7A9A86}
+.hero .sygnet-hero{width:88px;height:auto;margin-bottom:8px}
+.cta-note{display:block;margin-top:10px;font-size:12px;letter-spacing:.08em;color:rgba(232,217,184,.75)}
+.strip{display:none}
+@media(max-width:1000px){
+  .hero .word{font-size:2.6rem}
+}
