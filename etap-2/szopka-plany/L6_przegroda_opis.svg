@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="222mm" height="233mm" viewBox="0 0 222 233">
+  <rect width="222" height="233" fill="#fff"/>
+  
+    <rect width="222" height="233" fill="#fff"/>
+    <g transform="translate(14,14)">
+      <rect width="194" height="189" fill="none" stroke="#ccc" stroke-width="0.4"/>
+      
+    <rect width="194" height="189" fill="#000"/>
+    <rect x="62" y="158" width="70" height="22" fill="#fff"/>
+    <circle cx="16" cy="170" r="3" fill="#fff"/>
+    <circle cx="178" cy="170" r="3" fill="#fff"/>
+    
+    </g>
+    <text x="111.0" y="227" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#333">L6 — przegroda, wycięcie koszyka</text>
+    
+</svg>

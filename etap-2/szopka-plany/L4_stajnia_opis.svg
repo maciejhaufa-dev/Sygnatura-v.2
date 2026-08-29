@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="222mm" height="233mm" viewBox="0 0 222 233">
+  <rect width="222" height="233" fill="#fff"/>
+  
+    <rect width="222" height="233" fill="#fff"/>
+    <g transform="translate(14,14)">
+      <rect width="194" height="189" fill="none" stroke="#ccc" stroke-width="0.4"/>
+      
+    <path fill="#000" d="
+      M8 178 L8 78 L97 18 L186 78 L186 178
+      L148 178 L148 92
+      A51 58 0 0 0 46 92
+      L46 178 Z"/>
+    <rect x="22" y="88" width="16" height="22" fill="#fff"/>
+    <rect x="156" y="88" width="16" height="22" fill="#fff"/>
+    <polygon points="97,18 97,48 88,78 106,78" fill="#000"/>
+    
+    </g>
+    <text x="111.0" y="227" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#333">L4 — stajnia, dach góruje, łuk na niebo</text>
+    
+</svg>

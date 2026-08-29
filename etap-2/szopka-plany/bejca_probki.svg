@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="296mm" height="58mm" viewBox="0 0 296 58">
+  <rect width="296" height="58" fill="#fff"/>
+  <rect width="296" height="58" fill="#fff"/>
+<text x="8" y="10" font-family="Georgia" font-size="5" fill="#333">Bejca / farba — propozycja A</text>
+<rect x="8" y="14" width="28" height="22" fill="#C4A574" stroke="#ccc" stroke-width="0.3"/>
+<text x="22.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L1 ziemia</text>
+<rect x="40" y="14" width="28" height="22" fill="#F4EFE6" stroke="#ccc" stroke-width="0.3"/>
+<text x="54.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L1 owce farba</text>
+<rect x="72" y="14" width="28" height="22" fill="#6B4530" stroke="#ccc" stroke-width="0.3"/>
+<text x="86.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L2 orzech</text>
+<rect x="104" y="14" width="28" height="22" fill="#F7F2EA" stroke="#ccc" stroke-width="0.3"/>
+<text x="118.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L2 chmury</text>
+<rect x="136" y="14" width="28" height="22" fill="#4A3224" stroke="#ccc" stroke-width="0.3"/>
+<text x="150.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L3 ciemniej</text>
+<rect x="168" y="14" width="28" height="22" fill="#B8956A" stroke="#ccc" stroke-width="0.3"/>
+<text x="182.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L4 miód</text>
+<rect x="200" y="14" width="28" height="22" fill="#1A1612" stroke="#ccc" stroke-width="0.3"/>
+<text x="214.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L5 heban</text>
+<rect x="232" y="14" width="28" height="22" fill="#F5F5F0" stroke="#ccc" stroke-width="0.3"/>
+<text x="246.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">L7 biel mat</text>
+<rect x="264" y="14" width="28" height="22" fill="#6B4530" stroke="#ccc" stroke-width="0.3"/>
+<text x="278.0" y="52" text-anchor="middle" font-family="Georgia" font-size="3.2" fill="#333">rama znak</text>
+</svg>

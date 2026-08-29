@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="222mm" height="233mm" viewBox="0 0 222 233">
+  <rect width="222" height="233" fill="#fff"/>
+  
+    <rect width="222" height="233" fill="#fff"/>
+    <g transform="translate(14,14)">
+      <rect width="194" height="189" fill="none" stroke="#ccc" stroke-width="0.4"/>
+      
+    <rect x="4" y="4" width="186" height="181" fill="#000"/>
+    <rect x="62" y="150" width="70" height="28" fill="#fff"/>
+    <rect x="64" y="152" width="66" height="18" fill="#000"/>
+    <rect x="88" y="170" width="18" height="6" fill="#000"/>
+    
+    </g>
+    <text x="111.0" y="227" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#333">L7 — plecki + klapka</text>
+    
+</svg>
