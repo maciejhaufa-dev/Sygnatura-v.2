@@ -1,6 +1,5 @@
-/* Splash: pełna butelkowa zieleń + kremowa karta (jak wizytówka na stole).
-   Hero: bez zmian z arkusza startowego (ciemne zdjęcie).
-   50% krem tylko na sekcji NASZ WARSZTAT. */
+/* Splash: zieleń + karta. Hero: Cześć (sosna) po prawej, krem/brąz po lewej.
+   Warsztat: prawdziwa krzyżówka + mocniejszy welon. */
 
 #splash{
   position:fixed;inset:0;z-index:200;
@@ -29,41 +28,67 @@ header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
 .navcta:hover,.cartlink:hover{background:#E8D9B8;color:#1A4731}
 .burger{border-color:#C4A582;color:#E8D9B8;background:transparent}
 
-/* hero zostaje z index.html — tu tylko wysokość z 29.08, bez kremowego welonu */
-.hero{height:78vh;min-height:520px}
-.hero .bg{background-attachment:fixed}
-.hero .veil{background:linear-gradient(95deg,
-  rgba(28,19,13,.94) 0%,rgba(28,19,13,.82) 38%,rgba(28,19,13,.24) 66%,rgba(28,19,13,0) 88%)}
-.hero .inner{max-width:780px;color:#fff}
-.hero .word{font-family:Georgia,'Times New Roman',serif;font-size:clamp(3.2rem,8vw,6.2rem);line-height:.92;letter-spacing:.08em;margin:8px 0 18px}
-.hero .word .syg{color:#E8D9B8}
-.hero .word .nat{color:#7A9A86}
+.hero{height:82vh;min-height:540px;background:#4A3728}
+.hero .bg{
+  background-image:url('assets/hero-czesc-sosna.jpg');
+  background-size:cover;
+  background-position:78% 48%;
+  background-attachment:scroll;
+}
+/* lewo: pełny krem/brąz pod opis; prawo: Cześć bez zasłony */
+.hero .veil{
+  background:linear-gradient(90deg,
+    #FAF8F5 0%,
+    #FAF8F5 28%,
+    rgba(250,248,245,.82) 42%,
+    rgba(250,248,245,.28) 62%,
+    rgba(250,248,245,0) 78%);
+}
+.hero .inner{max-width:560px;color:#4A3728}
+.hero .eyebrow{color:#6B4530}
+.hero .eyebrow::before{background:#6B4530}
+.hero .word{
+  font-family:'Montserrat',sans-serif;font-weight:300;
+  font-size:clamp(2.4rem,6.5vw,4.8rem);line-height:1;
+  letter-spacing:.22em;text-transform:uppercase;margin:10px 0 20px;
+}
+.hero .word .syg{color:#8B6248}   /* SYG zauważalnie jaśniej */
+.hero .word .nat{color:#4A3728}   /* NATURA 100% orzech z księgi */
 .hero .sygnet-hero{width:88px;height:auto;margin-bottom:8px}
-.hero .lead{color:#E9E2D8;max-width:520px}
-.hero .btn1{background:var(--accent);border-color:var(--accent);color:#fff}
-.hero .btnl{border-color:rgba(255,255,255,.45);color:#fff}
-.cta-note{display:block;margin-top:10px;font-size:12px;letter-spacing:.08em;color:rgba(232,217,184,.75)}
+.hero .lead{color:#4A3728;max-width:34rem}
+.hero .btn1{background:#6B4530;border-color:#6B4530;color:#FAF8F5}
+.hero .btnl{border-color:#6B4530;color:#6B4530}
+.cta-note{display:block;margin-top:10px;font-size:12px;letter-spacing:.08em;color:#6B4530}
 
 .strip{display:none}
 
-/* 50% tylko tutaj — NASZ WARSZTAT */
 .story-band{
   position:relative;color:#2A211C;
-  background:#1C130D url('assets/foto-warsztat.jpg') center/cover no-repeat fixed;
+  background:#FAF8F5 url('assets/foto-krzyzowka.jpg') center/cover no-repeat fixed;
   padding:100px 54px 110px;
 }
 .story-band::before{
-  content:"";position:absolute;inset:0;background:#FAF8F5;opacity:.5;pointer-events:none;
+  content:"";position:absolute;inset:0;background:#FAF8F5;opacity:.78;pointer-events:none;
 }
 .story-band .wrap{position:relative;z-index:1;max-width:720px}
-.story-band h2{color:#1A130D;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:.08em;text-transform:uppercase}
+.story-band h2{color:#4A3728;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:.08em;text-transform:uppercase}
 .story-band p{font-size:17.5px;line-height:1.85;margin-top:16px;font-weight:300;color:#2A211C}
 .story-band .tag{color:#6B4530}
 .story-band .tag::before{background:#6B4530}
 
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap');
+
 @media(max-width:1000px){
-  .hero .bg,.story-band{background-attachment:scroll}
-  .hero .inner{padding:26px 22px 48px}
-  .hero .word{font-size:2.6rem}
-  .story-band{padding:64px 22px}
+  .hero{height:auto;min-height:0}
+  .hero .bg{position:relative;height:280px;background-position:70% 45%;background-attachment:scroll}
+  .hero .veil{
+    height:auto;min-height:0;
+    background:linear-gradient(to bottom,
+      rgba(250,248,245,0) 0%,
+      rgba(250,248,245,.55) 40%,
+      #FAF8F5 72%);
+  }
+  .hero .inner{padding:8px 22px 42px;max-width:100%;color:#4A3728}
+  .hero .word{font-size:2.2rem;letter-spacing:.16em}
+  .story-band{background-attachment:scroll;padding:64px 22px}
 }
