@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warsztat — baza zamówień — Studio Sygnatura</title>
+  <link rel="stylesheet" href="shop.css">
+  <style>
+    body{font-family:Georgia,serif;background:#FAF8F5;color:#2A211C;margin:0;padding:24px}
+    a{color:#1F3A32}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin:16px 0 36px;background:#fff}
+    th,td{border-bottom:1px solid #E4DED5;padding:10px 8px;text-align:left;vertical-align:top}
+    th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#1F3A32}
+    .ok{color:#1A4731}
+    .err{color:#8B2E2E}
+  </style>
+</head>
+<body>
+  <p><a href="index.html">← serwis</a></p>
+  <h1>Warsztat — SQLite</h1>
+  <p id="st">Sprawdzam /api/health…</p>
+  <h2>Licznik sygnatur</h2>
+  <pre id="seq"></pre>
+  <h2>Zapytania</h2>
+  <div id="inq"></div>
+  <h2>Zamówienia</h2>
+  <div id="ord"></div>
+  <script>
+    fetch("/api/health").then(r=>r.json()).then(d=>{
+      document.getElementById("st").innerHTML = d.ok
+        ? '<span class="ok">Baza podpięta.</span> Plik: data/zamowienia.sqlite'
+        : '<span class="err">API stoi, baza?</span>';
+    }).catch(()=>{
+      document.getElementById("st").innerHTML = '<span class="err">Brak serwera.py — uruchom: python3 serwer.py</span>';
+    });
+    fetch("/api/warsztat").then(r=>r.json()).then(d=>{
+      document.getElementById("seq").textContent = JSON.stringify(d.seq, null, 2);
+      function tab(rows, cols){
+        if(!rows.length) return "<p>Pusto — złóż testowe zamówienie.</p>";
+        var h="<table><thead><tr>"+cols.map(c=>"<th>"+c+"</th>").join("")+"</tr></thead><tbody>";
+        rows.forEach(r=>{
+          h+="<tr>"+cols.map(c=>{
+            var v=r[c];
+            if(c==="items") v=JSON.stringify(v);
+            return "<td>"+String(v==null?"":v)+"</td>";
+          }).join("")+"</tr>";
+        });
+        return h+"</tbody></table>";
+      }
+      document.getElementById("inq").innerHTML = tab(d.inquiries, ["id","syg","email","name","topic","txt","created"]);
+      document.getElementById("ord").innerHTML = tab(d.orders, ["id","syg","email","name","sum","uw","items","created"]);
+    }).catch(()=>{});
+  </script>
+</body>
+</html>

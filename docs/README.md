@@ -1,1 +1,1 @@
-# GitHub Pages — nie edytuj tu ręcznie. Źródło: etap-2/www/
+# GitHub Pages — nie edytuj. Źródło: etap-2/www/
