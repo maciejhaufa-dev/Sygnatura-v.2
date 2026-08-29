@@ -143,6 +143,16 @@ Zdjęcia referencyjne (serwetnik, krzyżówka, obręcz, misie). Pakiet „do dom
 
 ---
 
+### 29.08 — WWW bez Woo
+
+Pages = wygląd. Baza zamówień = `serwer.py` + SQLite. Panel żony = warsztat (kategorie/produkty), nie WordPress. PayU później. WooCommerce **nie**. Tarcica: `etap-2/tarcica-Poznan.md`.
+
+### 29.08 — numer + szopka warstwy
+
+Telefon **510 76 70 76** (prosty, prepaid). Na stronę / wizytówkę dopiero na polecenie.
+
+Szopka — nowy tunel od frontu: L1 owce+plotek (góra pusta) → L2 rodzina+żłóbek+chmury w prześwitach → L3 wół/osioł (bez anioła) → L4 stajnia góruje, zostawia niebo → L5 gwiazdy → L6 przegroda+koszyk w dnie → L7 plecki białe + klapka. Anioł nie z L3. Korpus ~60 mm. Makiety: `etap-2/szopka-plany/` (PNG czarno-białe, nie pliki cięcia; zwierzęta do Inkscape).
+
 ### 28.08 zamknięcie sesji (commit+push)
 
 Stan na gałęzi `arena/01a044f6-sygnatura-v-2`: `etap-2/` (www, landing, dziennik), `WIZYTOWKA/` 90×50. DNS/MX/Pages nietknięte. Uploadów z telefonu w korzeniu repo **nie** commitujemy (nie idą na WWW). Wrócimy: laser (szopka → metryczka), szept 1–2.
