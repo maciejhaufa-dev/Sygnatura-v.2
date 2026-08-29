@@ -80,7 +80,7 @@ header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
 
 @media(max-width:1000px){
   .hero{height:auto;min-height:0}
-  .hero .bg{position:relative;height:280px;background-position:70% 45%;background-attachment:scroll}
+  .hero .bg{position:relative;height:280px;background-size:cover;background-position:70% 45%;background-attachment:scroll}
   .hero .veil{
     height:auto;min-height:0;
     background:linear-gradient(to bottom,
