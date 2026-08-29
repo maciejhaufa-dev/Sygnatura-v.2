@@ -28,7 +28,7 @@ header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
 .navcta:hover,.cartlink:hover{background:#E8D9B8;color:#1A4731}
 .burger{border-color:#C4A582;color:#E8D9B8;background:transparent}
 
-.hero{height:82vh;min-height:540px;background:#4A3728}
+.hero{height:82vh;min-height:540px;background:#4A3728;align-items:flex-start}
 .hero .bg{
   background-image:url('assets/hero-czesc-sosna.jpg');
   background-size:cover;
@@ -45,18 +45,24 @@ header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
     rgba(250,248,245,.12) 46%,
     rgba(250,248,245,0) 52%);
 }
-.hero .inner{max-width:560px;color:#4A3728}
-.hero .eyebrow{color:#6B4530}
+.hero .inner{
+  width:min(26.5rem,42vw);max-width:26.5rem;color:#4A3728;
+  padding-top:28px;display:flex;flex-direction:column;align-items:stretch;
+}
+.hero .eyebrow{color:#6B4530;margin-bottom:10px}
 .hero .eyebrow::before{background:#6B4530}
 .hero .word{
   font-family:'Montserrat',sans-serif;font-weight:300;
-  font-size:clamp(2.4rem,6.5vw,4.8rem);line-height:1;
-  letter-spacing:.22em;text-transform:uppercase;margin:10px 0 20px;
+  font-size:clamp(1.85rem,3.6vw,2.7rem);line-height:1;
+  letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px;
+  width:100%;
 }
 .hero .word .syg{color:#8B6248}   /* SYG zauważalnie jaśniej */
 .hero .word .nat{color:#4A3728}   /* NATURA 100% orzech z księgi */
-.hero .sygnet-hero{width:88px;height:auto;margin-bottom:8px}
-.hero .lead{color:#4A3728;max-width:34rem}
+.hero .sygnet-hero{width:100%;height:auto;margin:12px 0 16px}
+.hero .lead{color:#4A3728;max-width:100%}
+.hero .btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:22px}
+.hero .btns .btn{width:100%;text-align:center;box-sizing:border-box;padding:14px 10px}
 .hero .btn1{background:#6B4530;border-color:#6B4530;color:#FAF8F5}
 .hero .btnl{border-color:#6B4530;color:#6B4530}
 .cta-note{display:block;margin-top:10px;font-size:12px;letter-spacing:.08em;color:#6B4530}
