@@ -1,35 +1,38 @@
-# Prowadzenie za rączkę — od czego zaczynamy
+# Za rączkę — GitHub Pages (wygląd z internetu)
 
-## Skąd brać pliki?
+**Nie ściągaj ZIP. Nie edytuj plików.** Ja zmieniam kod tutaj. Ty włączasz Pages **raz** i oglądasz.
 
-**Nie ściągaj nic z GitHuba na dysk do edycji.**  
-Ja pracuję w workspace tej sesji. GitHub dostaje kopię po `commit` + `push`.  
-Ty na razie **tylko oglądasz stronę w przeglądarce**.
+## Krok 1 — włącz Pages (komputer, raz)
 
-| Gdzie | Po co |
-|---|---|
-| Ten czat / Arena | Ja zmieniam HTML |
-| GitHub Pages | Ty i rodzina oglądacie z internetu (wygląd, telefon) |
-| `python3 serwer.py` na Twoim PC | Później — prawdziwa baza. **Nie dziś.** |
-
-## Co dziś testujesz (i czego nie)
-
-**Tak:** czy na telefonie da się czytać, menu, koszyk, regulamin, podstrony.  
-**Nie:** czy zamówienie „doszło do nas”. Na Pages baza **nie działa**. To następny etap.
-
-## Jak otworzyć stronę z internetu
-
-Gdy napiszę, że Pages żyje — wtedy:
-
-1. Otwórz Chrome lub Safari **na telefonie**.
-2. W pasek adresu wpisz dokładnie (małe litery):
+1. Otwórz przeglądarkę na komputerze.
+2. Wejdź na: `https://github.com/maciejhaufa-dev/Sygnatura-v.2`
+3. U góry repo, **po prawej**, kliknij zakładkę **Settings** (Ustawienia).  
+   Jeśli nie widzisz Settings — zaloguj się na konto **maciejhaufa-dev**.
+4. W **lewym** menu, na dole sekcji, kliknij **Pages**.
+5. Na środku, **Build and deployment**:
+   - **Source:** wybierz **Deploy from a branch** (nie GitHub Actions).
+   - **Branch:** kliknij pierwszy spadek i wybierz **`arena/01a044f6-sygnatura-v-2`**.
+   - Drugi spadek (folder): wybierz **`/docs`**.
+6. Kliknij **Save**.
+7. Poczekaj **2 minuty**. Nie zamykaj, nie klikaj nic innego.
+8. Na tej samej stronie Pages pojawi się zielony pasek z adresem.  
+   Albo wpisz:
 
 `https://maciejhaufa-dev.github.io/Sygnatura-v.2/`
 
-3. Jeśli 404: poczekaj 2–3 minuty i odśwież. Nie zmieniaj nic w Settings.
+9. Jeśli 404: odśwież po kolejnych 2 minutach (Ctrl+Shift+R).
 
-**Domeny `studiosygnatura.pl` nie ruszamy.**
+**Nie ruszaj** nic w DNS, OVH, `studiosygnatura.pl`.
 
-## Żona
+## Krok 2 — oglądaj jak klient
 
-Dziś nic nie klika w panelu. Panel (jak kalkulator) robimy, gdy wygląd przejdziesz listą poprawek.
+1. Telefon w przeglądarce (Safari/Chrome).
+2. Ten sam adres z kroku 8.
+3. Przejdź: Start → Do domu → Metryczki → Koszyk → Regulamin.
+4. Napisz mi listę: co złe na telefonie (za małe, ucięte, dziwne menu).
+
+## Czego nie testować dziś
+
+Zamówienie **nie wpadnie do naszej bazy**. To Pages. Baza = następny etap na Twoim PC.
+
+Żona dziś nic nie klika w panelu.
