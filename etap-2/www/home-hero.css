@@ -28,37 +28,44 @@ header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
 .navcta:hover,.cartlink:hover{background:#E8D9B8;color:#1A4731}
 .burger{border-color:#C4A582;color:#E8D9B8;background:transparent}
 
-.hero{height:82vh;min-height:540px;background:#4A3728;align-items:flex-start}
-.hero .bg{
-  background-image:url('assets/hero-czesc-sosna.jpg');
-  background-size:cover;
-  /* ucinamy prawą sosnę i ścianę; Cześć zostaje w kadrze */
-  background-position:38% 47%;
-  background-attachment:scroll;
+/* Hero: 4 kolumny. 1 = krem+logo. 2–4 = zdjęcie. Cześć na osi kolumny 3. */
+.hero{
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+  height:82vh;min-height:560px;padding:0;overflow:hidden;
+  background:#FAF8F5;align-items:stretch;
 }
-/* krem tylko pod opis; gradient na białych kafelkach; napis Cześć bez welonu */
-.hero .veil{
+.hero .bg,.hero .veil,.hero .inner{display:none}
+.hero-col{
+  grid-column:1;z-index:2;background:#FAF8F5;color:#4A3728;
+  padding:28px 28px 36px 48px;
+  display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+}
+.hero-photo{
+  grid-column:2 / 5;position:relative;
+  /* oryginalne zdjęcie ze ściany — bez sosny; napis w środku pola 2–4 = kolumna 3 */
+  background:#FAF8F5 url('assets/hero-czesc.jpg') 50% 48% / cover no-repeat;
+}
+.hero-photo::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:rgba(250,248,245,.20); /* całun ecru 20% na całe zdjęcie */
+}
+.hero-photo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  /* od środka kolumny 2 (≈16,7% szer. zdjęcia) w lewo do kol. 1: 0→100% krem */
   background:linear-gradient(90deg,
     #FAF8F5 0%,
-    #FAF8F5 32%,
-    rgba(250,248,245,.45) 40%,
-    rgba(250,248,245,.12) 46%,
-    rgba(250,248,245,0) 52%);
-}
-.hero .inner{
-  width:min(26.5rem,42vw);max-width:26.5rem;color:#4A3728;
-  padding-top:28px;display:flex;flex-direction:column;align-items:stretch;
+    rgba(250,248,245,.7) 8%,
+    rgba(250,248,245,0) 16.7%);
 }
 .hero .eyebrow{color:#6B4530;margin-bottom:10px}
 .hero .eyebrow::before{background:#6B4530}
 .hero .word{
   font-family:'Montserrat',sans-serif;font-weight:300;
-  font-size:clamp(1.85rem,3.6vw,2.7rem);line-height:1;
-  letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px;
-  width:100%;
+  font-size:clamp(1.7rem,2.8vw,2.55rem);line-height:1;
+  letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px;width:100%;
 }
-.hero .word .syg{color:#8B6248}   /* SYG zauważalnie jaśniej */
-.hero .word .nat{color:#4A3728}   /* NATURA 100% orzech z księgi */
+.hero .word .syg{color:#8B6248}
+.hero .word .nat{color:#4A3728}
 .hero .sygnet-hero{width:100%;height:auto;margin:12px 0 16px}
 .hero .lead{color:#4A3728;max-width:100%}
 .hero .btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:22px}
