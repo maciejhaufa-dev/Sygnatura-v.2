@@ -42,8 +42,8 @@ header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
 }
 .hero-photo{
   grid-column:2 / 5;position:relative;
-  /* wygenerowane Cześć bez sosny / palców / lamp; napis na osi kol. 3 */
-  background:#FAF8F5 url('assets/hero-czesc.jpg') 50% 50% / cover no-repeat;
+  /* pomniejszone: cała brązowa rama + plexi + słupki; Cześć na osi kol. 3 */
+  background:#FAF8F5 url('assets/hero-czesc.jpg') 50% 50% / 74% auto no-repeat;
 }
 .hero-photo::before{
   content:"";position:absolute;inset:0;pointer-events:none;
@@ -51,15 +51,14 @@ header.nav{background:#1A4731;border-bottom:0;color:#E8D9B8}
 }
 .hero-photo::after{
   content:"";position:absolute;inset:0;pointer-events:none;
-  /* okno na całe Cześć; frez znika w krem ze wszystkich stron; lewo → kol. 1 */
+  /* gradient dopiero ZA ramą i plexi — frez w krem, napis i rama ostre */
   background:
-    linear-gradient(90deg, #FAF8F5 0%, rgba(250,248,245,.65) 12%, transparent 22%),
-    linear-gradient(90deg, transparent 78%, rgba(250,248,245,.55) 88%, #FAF8F5 100%),
-    linear-gradient(180deg, #FAF8F5 0%, transparent 16%, transparent 84%, #FAF8F5 100%),
-    radial-gradient(ellipse 52% 58% at 50% 50%,
-      transparent 0%, transparent 46%,
-      rgba(250,248,245,.28) 68%,
-      #FAF8F5 100%);
+    linear-gradient(90deg, #FAF8F5 0%, rgba(250,248,245,.55) 10%, transparent 20%),
+    radial-gradient(ellipse 64% 72% at 50% 50%,
+      transparent 0%,
+      transparent 62%,
+      rgba(250,248,245,.35) 78%,
+      #FAF8F5 92%);
 }
 .hero .eyebrow{color:#6B4530;margin-bottom:10px}
 .hero .eyebrow::before{background:#6B4530}
