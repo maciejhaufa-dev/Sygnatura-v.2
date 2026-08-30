@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dziennik — Sygnatura</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/sygnatura.css">
+</head>
+<body>
+<p class="note">Wysyłka w całej Polsce · projekt w cenie rzeczy</p>
+<header class="nav">
+  <div class="navin">
+    <nav class="nleft" id="nl">
+      <a href="sklep.html">Sklep</a>
+      <a href="index.html#realizacje">Realizacje</a>
+      <a class="on" href="dziennik.html">Dziennik</a>
+      <a href="o-nas.html">O nas</a>
+      <a href="kontakt.html">Kontakt</a>
+    </nav>
+    <a class="brand" href="index.html"><img src="img/logo-brown.png" alt="Sygnatura"></a>
+    <div class="nright">
+      <a href="o-nas.html">O nas</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a class="bag" href="sklep.html" aria-label="Koszyk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V7a3 3 0 016 0v1"/></svg>
+        <em>0</em>
+      </a>
+    </div>
+    <button class="burger" onclick="document.getElementById('nl').classList.toggle('open')" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<div class="featured">
+  <img src="img/ogien-domu.jpg" alt="Ognisko, herbata, drewno">
+  <div>
+    <p class="kicker">Dziennik · wrzesień 2026</p>
+    <h1>Po co nam ognisko w marce, która tnie laserem</h1>
+    <p style="margin-top:18px;color:var(--muted);font-size:17.5px;line-height:1.7">Nowoczesne narzędzie nie wyklucza ciepła. Wyklucza je pośpiech. Laser i CNC są po to, żeby ręka mogła zostać przy krawędzi, której nie da się przyspieszyć — szlifie, oleju, decyzji, że już wystarczy.</p>
+    <p style="margin-top:22px"><a class="link" href="#wpis">Czytaj dalej</a></p>
+  </div>
+</div>
+
+<section class="band" id="wpis">
+  <div style="max-width:68ch">
+    <p class="kicker">Wpis</p>
+    <h2>Światło między warstwami</h2>
+    <p style="margin:18px 0;color:var(--muted);font-size:17.5px;line-height:1.8">Metryczka ma sześć pierścieni nie dlatego, że sześć brzmi ładnie. Każda warstwa to kolejny plan: imię z daleka, data bliżej, waga i godzina dopiero gdy ktoś stanie pod ścianą. Światło nie jest „LED-em w ramce”. Jest tym, co rysuje cień w rzazie.</p>
+    <p style="margin:18px 0;color:var(--muted);font-size:17.5px;line-height:1.8">To jest też powód, dla którego nie sprzedajemy płaskiej bombki z imieniem za 32 zł. Rynek ma ją za 2,50. My nie wygramy z hurtownią. Wygramy tam, gdzie detal ma funkcję.</p>
+  </div>
+</section>
+
+<div class="posts">
+  <a class="tile" href="dziennik.html">
+    <div class="ph"><img src="img/warsztat-dlonie.jpg" alt=""></div>
+    <div class="meta"><div><h3>Dwie pary rąk</h3><p>On tnie. Ona mówi, kiedy przestać.</p></div></div>
+  </a>
+  <a class="tile" href="dziennik.html">
+    <div class="ph"><img src="img/warstwy-detal.jpg" alt=""></div>
+    <div class="meta"><div><h3>Sześć, nie dwa</h3><p>Hierarchia, nie ozdoba.</p></div></div>
+  </a>
+  <a class="tile" href="dziennik.html">
+    <div class="ph"><img src="img/paczka-kraft.jpg" alt=""></div>
+    <div class="meta"><div><h3>Jeden stempel</h3><p>Paczka ma być gotowa do wręczenia.</p></div></div>
+  </a>
+</div>
+
+<footer>
+  <div class="fgrid">
+    <div><h5>Sygnatura</h5><p class="fabout">Dziennik warsztatu. Nie blog o lifestyle’u — notatki z robienia rzeczy.</p></div>
+    <div><h5>Sklep</h5><ul><li><a href="sklep.html">Sklep</a></li><li><a href="produkt.html">Metryczka</a></li></ul></div>
+    <div><h5>Studio</h5><ul><li><a href="o-nas.html">O nas</a></li><li><a href="kontakt.html">Kontakt</a></li></ul></div>
+    <div><h5>Kontakt</h5><ul><li>kontakt@studiosygnatura.pl</li></ul></div>
+  </div>
+  <div class="fbot"><span>© 2026 Sygnatura</span><span>Layout v.3</span></div>
+</footer>
+</body>
+</html>

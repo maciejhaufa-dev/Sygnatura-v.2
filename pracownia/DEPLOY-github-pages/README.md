@@ -1,4 +1,10 @@
-# Studio Sygnatura — strona
+# ARCHIWUM v.2 — NIE PUBLIKOWAĆ
+
+Kierunek wyłączony 2026-08-30. Nowa strona: katalog `/sygnatura/` w korzeniu repo. Zobacz `dziennik-v.3.md`.
+
+---
+
+# Studio Sygnatura — strona (v.2, archiwum)
 
 Statyczna strona (czysty HTML, zero zależności). Każdy plik zawiera style,
 logo i skrypty wbudowane w środku, więc działa też po otwarciu z dysku.
