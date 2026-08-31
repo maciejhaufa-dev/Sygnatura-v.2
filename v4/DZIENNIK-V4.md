@@ -220,3 +220,18 @@ v4/
 - Pliki użytkownika regularnie trafiają na **origin/main** (TŁO NA HERO.png, las) — sprawdzać `git ls-tree origin/main` przy każdej nowej wzmiance o załączniku.
 - Po edycji sekcji CSS w build.py sprawdzać, czy `edit_file` faktycznie trafił (grep po klasie) — fuzzy match potrafi chybić przy dłuższych blokach.
 - Kadrowanie `cover`: dla ekranów szerszych niż 1,414 (proporcje zdjęcia) pełna szerokość jest w kadrze — tablica „Cześć" zawsze widoczna; na pionowym telefonie okno ~33% szerokości → pozycja `80% 30%` celuje w napis.
+
+## 16. STATUS (po sesji 8b, 31.08.2026 — poprawki hero po teście)
+
+- [x] **Menu NAD zdjęciem** (zdjęcie nie jest już „ucinane" pod spodem): header zmieniony z sticky na `absolute` (top, z-index 40) — hero zaczyna się od samej góry ekranu, zdjęcie biegnie za menu.
+- [x] **Tło = pełna szerokość zdjęcia (`background-size:100% auto`)**, kadr pionowy `center 22%` — koniec z cover (ucinał boki na szerokich ekranach i górę/dół na wąskich). Panel/logo nie zasłaniają napisu: na niskich ekranach (≤860 px wys.) kadr `center 28%` + ciaśniejszy panel; ultrawide `center 18%` + ciaśniejszy panel; telefon: pas zdjęcia pod nagłówkiem `background-position:0 112px`.
+- [x] **Panel po PRAWEJ, rozciągnięty poziomo:** `position:absolute; bottom; right` — szerokość `min(1140px, 100% - 8vw)`, **4 przyciski obok siebie** (`grid repeat(4,1fr)`; <1024: 2×2; <520: 1 kolumna).
+- [x] **Słowa „Pasja – Styl – Tradycja" normalną czcionką** (serif Cormorant Garamond 600, złote, wipe L→P zachowany) — usunięty Great Vibes ze wszystkich szablonów. Pisownia: Pasja / Styl / Tradycja (jak w wiadomości użytkownika).
+- [x] **Logo wyżej i większe:** `top:clamp(96px,15%,170px); left:clamp(24px,4vw,72px)` — na wysokości napisu „Cześć"; sygnet `clamp(110px,13vw,176px)` z cieniem drop-shadow; telefon: `top:120px` (na pasie zdjęcia), sygnet `clamp(46px,13vw,64px)` w rzędzie z napisem.
+- [x] **Retusz zdjęcia (`process_bg`):** GaussianBlur 1.1 (chowa rysy/odciski palców) + kompresja świateł powyżej 200 (gain 0.45 — refleksy przygaszone; efekt: piksele >220 spadły do 0,1%). Kolory poza tym nietknięte. Tunowalne: `blur`, `hi_knee`, `hi_gain`.
+- [x] `docs/` zsynchronizowany i pushnięty.
+
+### LEKCJE
+- Pillow ZNIKA z sandboxa po resecie środowiska (nie tylko procesy) — przed każdym buildem sprawdzać `python3 -c "import PIL"`, reinstalować `pip3 install --break-system-packages pillow`.
+- Serwer podglądu też nie przeżywa resetu — po starcie sesji restartować `python3 v4/serve.py 8080` (cwd = v4!).
+- `cover` z tym zdjęciem = zły wybór: napis „Cześć" (x 46–96% W) nigdy nie zmieści się w oknie pionowego telefonu; `100% auto` + pozycja pionowa daje pełną kontrolę.

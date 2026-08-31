@@ -7,7 +7,7 @@
 <title>Wybór zdjęcia hero — Studio Sygnatura</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
 <style>
 :root{
   --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
@@ -50,7 +50,8 @@ button{font-family:inherit}
 @keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
 
 /* ================= NAGŁÓWEK ================= */
-.site-head{position:sticky;top:0;z-index:40}
+/* nagłówek NAD zdjęciem hero (menu przykrywa górę zdjęcia — zdjęcie nie jest ucinane pod spodem) */
+.site-head{position:absolute;top:0;left:0;right:0;z-index:40}
 .topbar{display:flex;justify-content:flex-end;align-items:center;gap:4px;
   padding:8px clamp(14px,3.5vw,44px);background:rgba(251,247,240,.95);
   border-bottom:1px solid rgba(107,69,48,.16)}
@@ -67,46 +68,47 @@ button{font-family:inherit}
 .menu a.on{background:rgba(196,165,130,.2)}
 
 /* ================= HERO ================= */
-/* TŁO NA HERO użytkownika na cały ekran (bez obróbki); logo wyłania się z dołu PO LEWEJ obok „Cześć",
-   panel kremowy wjeżdża od dołu (cień + brązowa ramka jak w splashu) */
-.hero{flex:1;display:flex;flex-direction:column;min-height:calc(100svh - 111px);
+/* TŁO NA HERO użytkownika — pełna szerokość, bez cięcia boków (100% auto);
+   logo DUŻE po lewej na wysokości napisu „Cześć", panel u dołu PO PRAWEJ (rozciągnięty, 4 przyciski obok siebie) */
+.hero{flex:1;position:relative;display:flex;flex-direction:column;min-height:100svh;
   background-color:#CECBB6;background-image:url('assets/hero.jpg');
-  background-size:cover;background-position:center 40%;background-repeat:no-repeat}
-.hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:clamp(24px,4vw,64px);
-  margin-top:auto;padding:clamp(24px,4vh,48px) clamp(20px,4vw,72px) clamp(20px,3vh,36px);
-  position:relative;z-index:2}
-.brand{display:flex;flex-direction:column;align-items:flex-start;gap:14px;max-width:430px;
-  --sygW:clamp(76px,9vw,112px)}
-.brand-sygnet{width:var(--sygW);height:auto;
+  background-size:100% auto;background-position:center 22%;background-repeat:no-repeat}
+.brand{position:absolute;top:clamp(96px,15%,170px);left:clamp(24px,4vw,72px);z-index:2;
+  display:flex;flex-direction:column;align-items:flex-start;gap:clamp(12px,1.6vw,18px);
+  --sygW:clamp(110px,13vw,176px)}
+.brand-sygnet{width:var(--sygW);height:auto;filter:drop-shadow(0 10px 24px rgba(30,20,10,.28));
   opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 3.9s forwards}
 .brand-txt{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
-.brand-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847)}
-.brand-podpis{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--brunatny);
-  white-space:nowrap;opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.05s forwards}
-.panel{width:100%;max-width:640px;background:#FFFDF8;border:2px solid var(--brunatny);border-radius:0;
-  padding:clamp(24px,3.2vw,42px);box-shadow:0 34px 70px rgba(20,15,8,.42);
+.brand-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847);
+  filter:drop-shadow(0 6px 14px rgba(30,20,10,.30))}
+.brand-podpis{font-size:clamp(11px,1.2vw,14px);letter-spacing:.34em;text-transform:uppercase;color:var(--brunatny);
+  white-space:nowrap;text-shadow:0 1px 0 rgba(251,247,240,.65);
+  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.05s forwards}
+.panel{position:absolute;bottom:clamp(14px,2.6vh,30px);right:clamp(24px,4vw,72px);z-index:3;
+  width:min(1140px,calc(100% - clamp(48px,8vw,144px)));
+  background:#FFFDF8;border:2px solid var(--brunatny);border-radius:0;
+  padding:clamp(20px,2.6vw,36px);box-shadow:0 34px 70px rgba(20,15,8,.42);
   opacity:0;animation:panel-up .85s cubic-bezier(.22,.61,.36,1) 3.7s forwards}
 @keyframes panel-up{from{opacity:.4;transform:translateY(14%)}to{opacity:1;transform:none}}
-.slow-row{display:flex;align-items:baseline;gap:clamp(10px,1.6vw,18px);flex-wrap:wrap}
-.slowo{font-family:var(--script);color:var(--zloty);font-weight:400;
-  font-size:clamp(34px,4.6vw,52px);line-height:1.15;letter-spacing:.02em;
-  text-shadow:0 1px 0 rgba(107,69,48,.30),0 8px 22px rgba(20,15,8,.28);
-  padding-right:clamp(6px,1vw,12px);
+.slow-row{display:flex;align-items:baseline;gap:clamp(10px,1.4vw,16px);flex-wrap:wrap}
+.slowo{font-family:var(--serif);color:var(--zloty);font-weight:600;
+  font-size:clamp(26px,3.2vw,42px);line-height:1.1;letter-spacing:.05em;
+  text-shadow:0 1px 0 rgba(107,69,48,.25),0 6px 16px rgba(20,15,8,.18);
   opacity:0;animation:wipe .8s cubic-bezier(.22,.61,.36,1) forwards}
 .slowo.s1{animation-delay:4.3s}.slowo.s2{animation-delay:4.6s}.slowo.s3{animation-delay:4.9s}
-.slow-dash{color:var(--brunatny);font-size:clamp(20px,2.4vw,28px);font-weight:600;
+.slow-dash{color:var(--brunatny);font-size:clamp(18px,2.2vw,26px);font-weight:600;
   opacity:0;animation:rise-soft .6s cubic-bezier(.22,.61,.36,1) forwards}
 .slow-dash.d1{animation-delay:4.5s}.slow-dash.d2{animation-delay:4.8s}
-.hero-text{font-size:clamp(15px,1.55vw,17.5px);line-height:1.75;color:rgba(51,38,28,.96);
-  margin-top:clamp(12px,1.8vw,18px);
+.hero-text{font-size:clamp(14.5px,1.4vw,16.5px);line-height:1.65;color:rgba(51,38,28,.96);
+  margin-top:clamp(10px,1.4vw,14px);
   opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.2s forwards}
-.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:clamp(16px,2.2vw,24px)}
+.btn-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:clamp(14px,2vw,20px)}
 .btn-row .btn{opacity:0;animation:rise-soft .9s cubic-bezier(.22,.61,.36,1) forwards}
 .btn-row .btn:nth-child(1){animation-delay:5.5s}.btn-row .btn:nth-child(2){animation-delay:5.62s}
 .btn-row .btn:nth-child(3){animation-delay:5.74s}.btn-row .btn:nth-child(4){animation-delay:5.86s}
 @keyframes wipe{0%{clip-path:inset(0 100% 0 0);opacity:0}100%{clip-path:inset(0 -1% 0 0);opacity:1}}
-.btn{flex:1 1 0;width:100%;text-align:center;padding:14px 12px;border-radius:0;font-size:12px;font-weight:700;
-  letter-spacing:.16em;text-transform:uppercase;transition:all .25s;white-space:nowrap}
+.btn{width:100%;text-align:center;padding:13px 10px;border-radius:0;font-size:12px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;transition:all .25s}
 .btn-solid{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa)}
 .btn-solid:hover{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
 .btn-outline{background:transparent;color:var(--brunatny);border:1.5px solid var(--brunatny)}
@@ -133,14 +135,15 @@ button{font-family:inherit}
 
 /* ================= RESPONSYWNOŚĆ ================= */
 @media (max-width:1023px){
-  /* telefon/tablet pionowo: kadr na napis „Cześć" (x~56-93% W), logo nad panelem po lewej */
-  .hero{background-position:80% 30%}
-  .hero-inner{flex-direction:column;align-items:stretch;gap:18px;padding:18px 16px clamp(16px,3vh,26px)}
-  .brand{flex-direction:row;align-items:flex-start;gap:14px;--sygW:clamp(56px,16vw,84px)}
-  .brand-txt{gap:7px}
-  .brand-podpis{font-size:10.5px;letter-spacing:.28em}
-  .panel{max-width:100%}
-  .slowo{font-size:clamp(30px,9vw,40px)}
+  /* telefon/tablet: pas zdjęcia pełnej szerokości POD nagłówkiem — „Cześć" w całości;
+     logo na pasie po lewej (na wysokości napisu), panel rozciągnięty na dole */
+  .hero{background-position:0 112px}
+  .brand{top:120px;left:14px;flex-direction:row;align-items:flex-start;gap:12px;--sygW:clamp(46px,13vw,64px)}
+  .brand-txt{gap:6px}
+  .brand-podpis{font-size:10px;letter-spacing:.26em}
+  .panel{left:14px;right:14px;width:auto;padding:18px 16px}
+  .slowo{font-size:clamp(24px,6.4vw,32px)}
+  .btn-row{grid-template-columns:1fr 1fr}
 }
 @media (max-width:860px){
   .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
@@ -148,24 +151,32 @@ button{font-family:inherit}
   .menu a{padding:11px 12px}
   .burger{display:grid}
 }
-/* niskie ekrany desktopowe: ciaśniejszy panel, kadr zdjęcia wyżej, logo mniejsze */
+/* niskie ekrany desktopowe: ciaśniejszy panel + kadr zdjęcia tak, żeby „Cześć" mieściło się nad panelem */
 @media (min-width:1024px) and (max-height:860px){
-  .hero{background-position:center 30%}
-  .hero-inner{padding:20px clamp(20px,3vw,48px) 18px}
-  .brand{--sygW:clamp(68px,8vw,96px)}
-  .panel{padding:22px 30px}
-  .slowo{font-size:clamp(30px,4vw,42px)}
+  .hero{background-position:center 28%}
+  .brand{top:clamp(84px,12%,120px);--sygW:clamp(96px,11vw,150px)}
+  .panel{padding:14px 22px}
+  .slowo{font-size:clamp(24px,3vw,34px)}
+  .hero-text{font-size:13.5px;line-height:1.5}
+  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
+  .btn-row{gap:10px;margin-top:12px}
+  .slow-row{gap:10px}
 }
-/* bardzo szerokie monitory: kadr zdjęcia wyżej, żeby „Cześć" nie uciekło poza ekran */
+/* bardzo szerokie monitory: kadr zdjęcia niżej (więcej góry), ciaśniejszy panel */
 @media (min-width:1024px) and (min-aspect-ratio:21/10){
-  .hero{background-position:center 15%}
+  .hero{background-position:center 18%}
+  .panel{padding:14px 22px}
+  .slowo{font-size:clamp(24px,3vw,34px)}
+  .hero-text{font-size:13.5px;line-height:1.5}
+  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
 }
 @media (max-width:520px){
-  .btn{font-size:11px;letter-spacing:.12em;padding:13px 8px}
+  .btn{font-size:10.5px;letter-spacing:.1em;padding:12px 8px}
   .btn-row{grid-template-columns:1fr}
   .site-foot{flex-direction:column;gap:14px;padding:18px 16px}
   .foot-social{flex-direction:column;gap:10px}
   .splash-card{padding:26px 30px}
+  .brand{top:118px}
 }
 
 /* ================= PODSTRONY (stuby) ================= */
