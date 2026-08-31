@@ -95,9 +95,19 @@ def process_photo(src, dst, maxw=1920, q=72):
 
 
 # ---------------------------------------------------------------- litery logotypu
+def _solidify(mask):
+    """Wypełnia kreskowanie do pełnej litery: dylatacja domyka szpary między
+    kreskami (2–4 px), erozja wraca do obrysu. Dziury liter (np. A, R) są dużo
+    większe niż szpary, więc zostają nietknięte. mask: 'L' 0/255, tusz=255."""
+    d = mask.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.MaxFilter(5))
+    e = d.filter(ImageFilter.MinFilter(5)).filter(ImageFilter.MinFilter(5))
+    return e.point(lambda v: 255 if v >= 128 else 0)
+
+
 def build_letters():
-    """Tnie LOGOTYP_3000px_BW.png na 9 liter (SYGNATURA) → assets/letters/l0..l8.png.
-    Zwraca: listę kerningów (przerwy/h_ink), SUM_AR, RATIO (sygnet_mm/litera_mm)."""
+    """Tnie LOGOTYP_3000px_BW.png na 9 liter (SYGNATURA), wypełnia kreskowanie
+    do pełnych liter → assets/letters/l0..l8.png.
+    Zwraca: kerningi (przerwy/h_ink), SUM_AR, RATIO (sygnet_mm/litera_mm)."""
     src = os.path.join(LOGO_DIR, 'LOGOTYP_3000px_BW.png')
     g = Image.open(src).convert('L')
     W, H = g.size
@@ -120,15 +130,20 @@ def build_letters():
     y0, y1 = min(rows), max(rows)
     h_ink = y1 - y0 + 1
 
+    TARGET_H = 320  # wysokość wyjściowych PNG liter (powyżej rozmiaru na stronie)
+
     kerning = []           # przerwa między literą i a i+1, w jednostkach h_ink
     for i, (s, e) in enumerate(runs):
         crop = g.crop((s, y0, e + 1, y1 + 1))
-        tile = Image.new('RGBA', crop.size, (0, 0, 0, 0))
-        cr, dr = crop.load(), tile.load()
+        solid = _solidify(crop.point(lambda v: 0 if v >= 128 else 255))
+        nw = max(1, round(solid.width * TARGET_H / solid.height))
+        solid = solid.resize((nw, TARGET_H), Image.LANCZOS)
         col = LIGHT if i < 3 else BRUN   # SYG = pełny jaśniejszy brąz, NATURA = pełny
-        for yy in range(crop.size[1]):
-            for xx in range(crop.size[0]):
-                dr[xx, yy] = (col[0], col[1], col[2], max(0, 255 - cr[xx, yy]))
+        tile = Image.merge('RGBA', (
+            Image.new('L', solid.size, col[0]),
+            Image.new('L', solid.size, col[1]),
+            Image.new('L', solid.size, col[2]),
+            solid))
         tile.save(os.path.join(LETTERS_DIR, f'l{i}.png'))
         if i < len(runs) - 1:
             kerning.append((runs[i + 1][0] - e - 1) / h_ink)
@@ -285,13 +300,6 @@ button{font-family:inherit}
   .splash-card{padding:26px 30px}
 }
 
-/* ================= REDUCED MOTION ================= */
-@media (prefers-reduced-motion:reduce){
-  .fall,.plansza,.site-head,.site-foot,.splash-card,.splash-sygnet{animation:none!important}
-  .fall{opacity:1!important}
-  #splash{transition:none}
-}
-
 /* ================= PODSTRONY (stuby) ================= */
 body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .stub-head{background:var(--butelkowa);padding:16px clamp(16px,4vw,44px);display:flex;align-items:center}
@@ -419,8 +427,7 @@ INDEX = r'''<!DOCTYPE html>
 <script>
 (function(){
   var splash=document.getElementById('splash');
-  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var show=reduced?900:4800;
+  var show=4800;
   document.documentElement.style.overflow='hidden';
   setTimeout(function(){
     if(splash)splash.classList.add('hide');

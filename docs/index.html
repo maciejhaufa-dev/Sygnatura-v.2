@@ -135,13 +135,6 @@ button{font-family:inherit}
   .splash-card{padding:26px 30px}
 }
 
-/* ================= REDUCED MOTION ================= */
-@media (prefers-reduced-motion:reduce){
-  .fall,.plansza,.site-head,.site-foot,.splash-card,.splash-sygnet{animation:none!important}
-  .fall{opacity:1!important}
-  #splash{transition:none}
-}
-
 /* ================= PODSTRONY (stuby) ================= */
 body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .stub-head{background:var(--butelkowa);padding:16px clamp(16px,4vw,44px);display:flex;align-items:center}
@@ -249,8 +242,7 @@ body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 <script>
 (function(){
   var splash=document.getElementById('splash');
-  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var show=reduced?900:4800;
+  var show=4800;
   document.documentElement.style.overflow='hidden';
   setTimeout(function(){
     if(splash)splash.classList.add('hide');

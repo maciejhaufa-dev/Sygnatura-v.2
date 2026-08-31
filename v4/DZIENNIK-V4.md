@@ -146,7 +146,19 @@ v4/
 - **Podgląd roboczy:** `python3 serve.py 8080` (serwer **no-cache** — naprawia problem „nie odświeża się": wcześniej telefon dostawał 304 Not Modified). Publiczny adres podglądu sesji: `https://8080-iltxoxwpsn9ujvnw2mcr6.e2b.app/`. Meta `Cache-Control: no-store` dodane też do samych HTML.
 - Przypomnienie: w tym repo **pracujemy tylko na gałęzi `arena/01a056f0-sygnatura-v-2`** (zasada sesji).
 
-## 11. STATUS (po sesji 4, 31.08.2026)
+## 11. STATUS (po sesji 5, 31.08.2026)
+
+- [x] **Animacje naprawione:** usunięta reguła `prefers-reduced-motion`, która wyłączała animacje na telefonach z ustawieniem „ogranicz ruch" (stąd „mignie i już jest"). JS chowa splash zawsze po 4,8 s. UWAGA: jedyne, czego nie da się obejść z CSS, to systemowe „Usuń animacje" w Androidzie (skala animatora 0) — wtedy animacje nie zagrają nigdzie.
+- [x] **Litery pełne (koniec kreskowania):** źródłem kreskowania był `LOGOTYP_3000px_BW.png` z WEKTORY3 — to wersja z kreskowaniem 75% z decyzji v3. `build.py` wypełnia teraz kreski do pełnych liter (dylatacja+erozja, `_solidify`), dziury liter (A, R) zachowane (zweryfikowane: l4/l7/l8 mają enklawy).
+- [x] **Tło splasha = plik użytkownika:** `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` był w `uploads/` na gałęzi **main** na GitHubie (commit użytkownika b07db61), nie na gałęzi sesji. Pobrany przez `git show origin/main:...` do lokalnych uploads → build.py sam go wykrył i skonwertował do `assets/forest.jpg` (1920×1080).
+- [x] `docs/` przebudowany i pushnięty → GitHub Pages aktualizuje się samo (~1–2 min).
+
+### LEKCJE NA PRZYSZŁOŚĆ
+- Sprawdzać `origin/main` po nowe pliki użytkownika (`git fetch` + `git ls-tree`), nie tylko lokalne uploads — użytkownik wrzuca pliki też na main przez www.
+- Nie zakładać ustawień telefonu użytkownika (reduced-motion) — spec mówi „animacje mają być".
+- WEKTORY3/LOGOTYP = kreskowanie 75% (historyczne); strona używa wypełnionych liter z build.py.
+
+## 12. STATUS (po sesji 4, 31.08.2026)
 
 - [x] Serwer podglądu z no-cache (fix 304/„nie odświeża się") + meta no-store w HTML
 - [x] `docs/` z kompletną stroną wypchnięty na gałąź sesji
