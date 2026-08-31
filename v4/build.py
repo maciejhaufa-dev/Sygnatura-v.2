@@ -43,7 +43,8 @@ HERO_CANDIDATES = [
     'IMG_20260828_055623.jpg',   # 11
     'IMG_20260811_232511.jpg',   # 12
 ]
-DEFAULT_HERO = HERO_CANDIDATES[1]  # IMG_20260829_230704.jpg — decyzja użytkownika
+DEFAULT_HERO = HERO_CANDIDATES[1]  # historyczne (picker); obecnie hero = TŁO NA HERO.png poniżej
+HERO_TLO = 'TŁO NA HERO.png'       # KOŃCOWE TŁO HERO (decyzja użytkownika, sesja 8) — kompozycja: „Cześć" po prawej u góry, pusta ściana po lewej i na dole
 
 
 # ---------------------------------------------------------------- przygotowanie
@@ -90,6 +91,16 @@ def process_photo(src, dst, maxw=1920, q=72):
     im = ImageEnhance.Brightness(im).enhance(1.02)
     im = ImageEnhance.Color(im).enhance(0.96)
     im = im.filter(ImageFilter.GaussianBlur(0.5))
+    im.save(dst, 'JPEG', quality=q, optimize=True, progressive=True)
+    return im.size
+
+
+def process_bg(src, dst, maxw=2880, q=86):
+    """Tło hero BEZ obróbki — „tak jak jest" (tylko konwersja i przeskalowanie)."""
+    im = Image.open(src).convert('RGB')
+    w, h = im.size
+    if w > maxw:
+        im = im.resize((maxw, round(h * maxw / w)), Image.LANCZOS)
     im.save(dst, 'JPEG', quality=q, optimize=True, progressive=True)
     return im.size
 
@@ -176,7 +187,8 @@ CSS = r'''
 :root{
   --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
   --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C;
-  --serif:"Playfair Display","Cormorant Garamond",Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --serif:"Cormorant Garamond","Playfair Display",Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --script:"Great Vibes","Alex Brush","Brush Script MT",cursive;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -189,7 +201,7 @@ button{font-family:inherit}
 /* ================= SPLASH ================= */
 #splash{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
-  transition:opacity .9s ease,visibility .9s ease}
+  transition:opacity .8s ease,visibility .8s ease}
 #splash::before{content:"";position:absolute;inset:0;
   background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
   radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
@@ -199,8 +211,8 @@ button{font-family:inherit}
   border-radius:0;padding:clamp(28px,5vw,46px) clamp(34px,8vw,64px);
   box-shadow:0 42px 90px rgba(15,26,21,.45);
   --sygW:clamp(84px,20vw,126px);
-  animation:card-soft 1.1s cubic-bezier(.22,.61,.36,1) .35s both}
-.splash-sygnet{width:var(--sygW);height:auto;animation:rise-soft 1.2s cubic-bezier(.22,.61,.36,1) .95s both}
+  animation:card-soft 1.1s cubic-bezier(.22,.61,.36,1) .3s both}
+.splash-sygnet{width:var(--sygW);height:auto;animation:rise-soft 1.2s cubic-bezier(.22,.61,.36,1) .75s both}
 .splash-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/@@RATIO@@)}
 
 /* litery logotypu */
@@ -230,37 +242,48 @@ button{font-family:inherit}
 .menu a.on{background:rgba(196,165,130,.2)}
 
 /* ================= HERO ================= */
-/* zdjęcie „Cześć" na cały ekran (tło), plansza zakotwiczona NA DOLE (dolna ćwiartka kadru) */
-.hero{flex:1;display:flex;flex-direction:column;min-height:calc(100svh - 111px);background-color:var(--krem);
-  background-image:linear-gradient(rgba(250,246,239,.14),rgba(250,246,239,.26) 55%,rgba(250,246,239,.42)),url('assets/hero.jpg');
-  background-size:cover,cover;background-position:center 50%,center 50%;background-repeat:no-repeat,no-repeat}
-.hero-photo{display:none}
-.hero-center{display:flex;justify-content:center;margin-top:auto;padding:24px clamp(20px,4vw,48px) clamp(24px,3.5vh,40px)}
-.plansza{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(30px,4.5vw,60px);
-  align-items:center;width:100%;max-width:1000px;background:rgba(251,247,240,.97);
-  -webkit-backdrop-filter:blur(7px) saturate(1.05);backdrop-filter:blur(7px) saturate(1.05);
-  border:1.5px solid rgba(107,69,48,.55);border-radius:0;
-  padding:clamp(30px,4.5vw,54px);box-shadow:0 34px 70px rgba(38,29,20,.28);
-  animation:breathe 8s ease-in-out 4s infinite alternate}
-@keyframes breathe{from{transform:translateY(0)}to{transform:translateY(-3px)}}
-.plansza-left{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2vw,20px);
-  --sygW:clamp(96px,20vmin,158px)}
-.sygnet{width:var(--sygW);height:auto}
-.word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/@@RATIO@@)}
-.plansza-right{display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,1.8vw,18px)}
-.slowa{display:flex;flex-direction:column;gap:2px}
-.slowo{color:var(--zloty);font-style:italic;font-weight:600;font-size:clamp(23px,3.4vw,31px);
-  line-height:1.22;letter-spacing:.04em;
-  opacity:0;animation:wipe .9s cubic-bezier(.22,.61,.36,1) forwards}
-.slowo.s1{animation-delay:4.6s}.slowo.s2{animation-delay:5.1s}.slowo.s3{animation-delay:5.6s}
-.welcome{font-size:clamp(15.5px,1.8vw,18.5px);line-height:1.75;color:rgba(51,38,28,.94);
-  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 6.3s forwards}
-.btns{display:flex;gap:12px;flex-wrap:wrap;opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 6.8s forwards}
+/* TŁO NA HERO użytkownika na cały ekran (bez obróbki); logo wyłania się z dołu PO LEWEJ obok „Cześć",
+   panel kremowy wjeżdża od dołu (cień + brązowa ramka jak w splashu) */
+.hero{flex:1;display:flex;flex-direction:column;min-height:calc(100svh - 111px);
+  background-color:#CECBB6;background-image:url('assets/hero.jpg');
+  background-size:cover;background-position:center 40%;background-repeat:no-repeat}
+.hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:clamp(24px,4vw,64px);
+  margin-top:auto;padding:clamp(24px,4vh,48px) clamp(20px,4vw,72px) clamp(20px,3vh,36px);
+  position:relative;z-index:2}
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:14px;max-width:430px;
+  --sygW:clamp(76px,9vw,112px)}
+.brand-sygnet{width:var(--sygW);height:auto;
+  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 3.9s forwards}
+.brand-txt{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.brand-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/@@RATIO@@)}
+.brand-podpis{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--brunatny);
+  white-space:nowrap;opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.05s forwards}
+.panel{width:100%;max-width:640px;background:#FFFDF8;border:2px solid var(--brunatny);border-radius:0;
+  padding:clamp(24px,3.2vw,42px);box-shadow:0 34px 70px rgba(20,15,8,.42);
+  opacity:0;animation:panel-up .85s cubic-bezier(.22,.61,.36,1) 3.7s forwards}
+@keyframes panel-up{from{opacity:.4;transform:translateY(14%)}to{opacity:1;transform:none}}
+.slow-row{display:flex;align-items:baseline;gap:clamp(10px,1.6vw,18px);flex-wrap:wrap}
+.slowo{font-family:var(--script);color:var(--zloty);font-weight:400;
+  font-size:clamp(34px,4.6vw,52px);line-height:1.15;letter-spacing:.02em;
+  text-shadow:0 1px 0 rgba(107,69,48,.30),0 8px 22px rgba(20,15,8,.28);
+  padding-right:clamp(6px,1vw,12px);
+  opacity:0;animation:wipe .8s cubic-bezier(.22,.61,.36,1) forwards}
+.slowo.s1{animation-delay:4.3s}.slowo.s2{animation-delay:4.6s}.slowo.s3{animation-delay:4.9s}
+.slow-dash{color:var(--brunatny);font-size:clamp(20px,2.4vw,28px);font-weight:600;
+  opacity:0;animation:rise-soft .6s cubic-bezier(.22,.61,.36,1) forwards}
+.slow-dash.d1{animation-delay:4.5s}.slow-dash.d2{animation-delay:4.8s}
+.hero-text{font-size:clamp(15px,1.55vw,17.5px);line-height:1.75;color:rgba(51,38,28,.96);
+  margin-top:clamp(12px,1.8vw,18px);
+  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.2s forwards}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:clamp(16px,2.2vw,24px)}
+.btn-row .btn{opacity:0;animation:rise-soft .9s cubic-bezier(.22,.61,.36,1) forwards}
+.btn-row .btn:nth-child(1){animation-delay:5.5s}.btn-row .btn:nth-child(2){animation-delay:5.62s}
+.btn-row .btn:nth-child(3){animation-delay:5.74s}.btn-row .btn:nth-child(4){animation-delay:5.86s}
 @keyframes wipe{0%{clip-path:inset(0 100% 0 0);opacity:0}100%{clip-path:inset(0 -1% 0 0);opacity:1}}
-.btn{flex:1 1 0;text-align:center;padding:14px 12px;border-radius:0;font-size:12px;font-weight:700;
+.btn{flex:1 1 0;width:100%;text-align:center;padding:14px 12px;border-radius:0;font-size:12px;font-weight:700;
   letter-spacing:.16em;text-transform:uppercase;transition:all .25s;white-space:nowrap}
-.btn-solid{background:var(--brunatny);color:var(--krem);border:1.5px solid var(--brunatny)}
-.btn-solid:hover{background:transparent;color:var(--brunatny)}
+.btn-solid{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa)}
+.btn-solid:hover{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
 .btn-outline{background:transparent;color:var(--brunatny);border:1.5px solid var(--brunatny)}
 .btn-outline:hover{background:var(--brunatny);color:var(--krem)}
 
@@ -285,43 +308,38 @@ button{font-family:inherit}
 
 /* ================= RESPONSYWNOŚĆ ================= */
 @media (max-width:1023px){
-  .plansza{grid-template-columns:1fr;max-width:560px;gap:26px;padding:28px 22px;text-align:center}
-  .plansza-right{align-items:center}
-  .slowo{font-size:clamp(22px,6.4vw,28px)}
-  .btns{width:100%}
-  /* telefon: zdjęcie pełnej szerokości u góry („Cześć" w całości), jego dół rozpływa się w krem, plansza na dole ekranu */
-  .hero{min-height:calc(100svh - 57px);background-image:none}
-  .hero-photo{display:block;width:100%;aspect-ratio:@@HERO_AR@@;
-    background-image:linear-gradient(rgba(250,246,239,.10),rgba(250,246,239,.10) 40%,rgba(250,246,239,.45) 65%,rgba(250,246,239,.92) 84%,rgba(250,246,239,1) 94%),url('assets/hero.jpg');
-    background-size:100% 100%,100% auto;background-position:0 0,top center;background-repeat:no-repeat,no-repeat}
-  .picker-view{background-image:linear-gradient(rgba(250,246,239,.10),rgba(250,246,239,.10) 40%,rgba(250,246,239,.45) 65%,rgba(250,246,239,.92) 84%,rgba(250,246,239,1) 94%),url('assets/hero.jpg');
-    background-size:100% 100%,100% auto;background-position:0 0,top center;background-repeat:no-repeat,no-repeat}
+  /* telefon/tablet pionowo: kadr na napis „Cześć" (x~56-93% W), logo nad panelem po lewej */
+  .hero{background-position:80% 30%}
+  .hero-inner{flex-direction:column;align-items:stretch;gap:18px;padding:18px 16px clamp(16px,3vh,26px)}
+  .brand{flex-direction:row;align-items:flex-start;gap:14px;--sygW:clamp(56px,16vw,84px)}
+  .brand-txt{gap:7px}
+  .brand-podpis{font-size:10.5px;letter-spacing:.28em}
+  .panel{max-width:100%}
+  .slowo{font-size:clamp(30px,9vw,40px)}
 }
 @media (max-width:860px){
   .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
   .menu.open{display:flex}
   .menu a{padding:11px 12px}
   .burger{display:grid}
-  .hero-center{padding:18px 14px 24px}
 }
-/* niskie ekrany desktopowe: ciaśniejsza plansza i wyższy kadr zdjęcia, żeby „Cześć" mieściło się nad planszą */
+/* niskie ekrany desktopowe: ciaśniejszy panel, kadr zdjęcia wyżej, logo mniejsze */
 @media (min-width:1024px) and (max-height:860px){
-  .hero{background-position:center 48%,center 48%}
-  .plansza{padding:22px 32px;gap:24px}
-  .plansza-left{--sygW:clamp(84px,14vmin,116px);gap:12px}
-  .plansza-right{gap:12px}
-  .slowo{font-size:clamp(21px,3vw,28px)}
-  .welcome{font-size:15.5px;line-height:1.6}
+  .hero{background-position:center 30%}
+  .hero-inner{padding:20px clamp(20px,3vw,48px) 18px}
+  .brand{--sygW:clamp(68px,8vw,96px)}
+  .panel{padding:22px 30px}
+  .slowo{font-size:clamp(30px,4vw,42px)}
 }
 /* bardzo szerokie monitory: kadr zdjęcia wyżej, żeby „Cześć" nie uciekło poza ekran */
 @media (min-width:1024px) and (min-aspect-ratio:21/10){
-  .hero{background-position:center 30%,center 30%}
+  .hero{background-position:center 15%}
 }
 @media (max-width:520px){
   .btn{font-size:11px;letter-spacing:.12em;padding:13px 8px}
+  .btn-row{grid-template-columns:1fr}
   .site-foot{flex-direction:column;gap:14px;padding:18px 16px}
   .foot-social{flex-direction:column;gap:10px}
-  .plansza{padding:20px 14px}
   .splash-card{padding:26px 30px}
 }
 
@@ -348,8 +366,7 @@ body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .picker-head h1{font-size:22px;font-weight:600}
 .picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
 .picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
-  background-image:linear-gradient(rgba(250,246,239,.10),rgba(250,246,239,.10) 42%,rgba(250,246,239,.32) 56%,rgba(250,246,239,.78) 68%,rgba(250,246,239,.98) 75%,rgba(250,246,239,1) 79%),url('assets/hero.jpg');
-  background-size:cover,cover;background-position:center 50%,center 50%}
+  background:url('assets/hero.jpg') center 40%/cover no-repeat}
 .picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
   padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
 .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;
@@ -380,6 +397,9 @@ INDEX = r'''<!DOCTYPE html>
 <title>Studio Sygnatura — rzeczy z drewna, światła i detalu</title>
 <meta name="description" content="Studio Sygnatura — rodzinna pracownia. Rzeczy z drewna robione z pasją, stylem i tradycją: metryczki, numery, szyldy, dekoracje.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>@@CSS@@</style>
 </head>
 <body>
@@ -399,7 +419,8 @@ INDEX = r'''<!DOCTYPE html>
   </div>
   <nav class="menu" id="menu" aria-label="Menu główne">
     <a href="index.html" class="on">Start</a>
-    <a href="#" title="wkrótce">Rzemiosło</a>
+    <a href="warsztat.html">Rzemiosło</a>
+    <a href="galeria.html">Galeria</a>
     <a href="#" title="wkrótce">Metryczki</a>
     <a href="#" title="wkrótce">Numery i szyldy</a>
     <a href="#" title="wkrótce">Wynajem</a>
@@ -410,24 +431,26 @@ INDEX = r'''<!DOCTYPE html>
 </header>
 
 <main class="hero">
-  <div class="hero-photo" aria-hidden="true"></div>
-  <div class="hero-center">
-    <section class="plansza" aria-label="Studio Sygnatura">
-      <div class="plansza-left">
-        <img class="sygnet" src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura — litera S z gałązką w okręgu">
-        <div class="word" role="img" aria-label="Sygnatura">@@HERO_LETTERS@@</div>
+  <div class="hero-inner">
+    <div class="brand" aria-label="Studio Sygnatura">
+      <img class="brand-sygnet" src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura — litera S z gałązką w okręgu">
+      <div class="brand-txt">
+        <div class="brand-word" role="img" aria-label="Sygnatura">@@HERO_LETTERS@@</div>
+        <p class="brand-podpis">drewno · światło · detal</p>
       </div>
-      <div class="plansza-right">
-        <div class="slowa">
-          <p class="slowo">Pasją</p>
-          <p class="slowo">styl</p>
-          <p class="slowo">tradycja</p>
-        </div>
-        <p class="welcome">Zajrzyj do naszego świata, w którym drewno, światło i detal opowiadają Twoją historię — i zobacz, co możemy dla Ciebie stworzyć.</p>
-        <div class="btns">
-          <a class="btn btn-solid" href="kontakt.html">Zadaj pytanie</a>
-          <a class="btn btn-outline" href="sklep.html">Nasze realizacje</a>
-        </div>
+    </div>
+    <section class="panel" aria-label="Studio Sygnatura — zaproszenie">
+      <div class="slow-row" role="img" aria-label="Pasja, styl, tradycja">
+        <span class="slowo s1">PASJA</span><span class="slow-dash d1">–</span>
+        <span class="slowo s2">STYL</span><span class="slow-dash d2">–</span>
+        <span class="slowo s3">TRADYCJA</span>
+      </div>
+      <p class="hero-text">Kosmos pełen jest szlachetnych minerałów, ale drewno jest tylko na Ziemi. Odkryj niezwykły świat, w którym drewno, światło i głębia współtworzą teatr jakości i stylu. Każdy detal rodzi się z dłoni, które znają materiał, i z oka, które czuje estetykę. Tak ożywiamy wnętrza — dodajemy im duszę, ciepły blask i klimat, w którym dom staje się domem.</p>
+      <div class="btn-row">
+        <a class="btn btn-solid" href="warsztat.html">Sprawdź, jak pracujemy</a>
+        <a class="btn btn-solid" href="galeria.html">Poznaj nasze prace</a>
+        <a class="btn btn-solid" href="sklep.html">Znajdź coś dla siebie</a>
+        <a class="btn btn-solid" href="kontakt.html">Napisz do nas</a>
       </div>
     </section>
   </div>
@@ -454,13 +477,13 @@ INDEX = r'''<!DOCTYPE html>
 <script>
 (function(){
   var splash=document.getElementById('splash');
-  var show=4800;
+  var show=3800;
   document.documentElement.style.overflow='hidden';
   setTimeout(function(){
     if(splash)splash.classList.add('hide');
     document.documentElement.style.overflow='';
   },show);
-  setTimeout(function(){if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);},show+1200);
+  setTimeout(function(){if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);},show+700);
   var burger=document.getElementById('burger'),menu=document.getElementById('menu');
   if(burger&&menu){burger.addEventListener('click',function(){
     var open=menu.classList.toggle('open');
@@ -480,14 +503,17 @@ PICKER = r'''<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <title>Wybór zdjęcia hero — Studio Sygnatura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>@@CSS@@</style>
 </head>
 <body>
 <div class="picker-head">
   <h1>Wybierz zdjęcie hero (napis „Cześć" z ukosa)</h1>
-  <p>Kliknij miniaturę, żeby zobaczyć, jak zdjęcie wygląda w kadrze hero (na cały ekran, plansza z logo na dole). Napisz mi numer wybranego zdjęcia (1–12) — podmienię plik hero w index.html.</p>
+  <p>Kliknij miniaturę, żeby zobaczyć ujęcie w kadrze hero. Aktualne tło: TŁO NA HERO.png (Twoja kompozycja) — logo po lewej, panel u dołu.</p>
 </div>
-<div class="picker-view" id="view"><span class="pv-label" id="vlabel">Aktualne hero: 2 — IMG_20260829_230704.jpg (wybrane)</span></div>
+<div class="picker-view" id="view"><span class="pv-label" id="vlabel">Aktualne tło hero: TŁO NA HERO.png (wybrane przez Ciebie)</span></div>
 <div class="picker-grid" id="grid">@@ITEMS@@</div>
 <script>
 var files={@@FILES_JS@@};
@@ -517,6 +543,9 @@ STUB = r'''<!DOCTYPE html>
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <title>@@TITLE@@ — Studio Sygnatura</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>@@CSS@@</style>
 </head>
 <body class="stub">
@@ -541,8 +570,8 @@ STUB = r'''<!DOCTYPE html>
 
 
 def render_index(css, kerning, ratio):
-    splash = wordmark_html('sw', kerning, falling=True, delay_base=1.55, step=0.16)
-    hero = wordmark_html('hw', kerning)
+    splash = wordmark_html('sw', kerning, falling=True, delay_base=1.25, step=0.13)
+    hero = wordmark_html('hw', kerning, falling=True, delay_base=3.95, step=0.12)
     html = (INDEX.replace('@@CSS@@', css)
             .replace('@@SPLASH_LETTERS@@', splash)
             .replace('@@HERO_LETTERS@@', hero))
@@ -560,10 +589,13 @@ def render_stub(css, title, h1, text, extra=''):
 def main():
     ensure_assets()
 
-    print('> hero:')
-    process_photo(os.path.join(UPLOADS, DEFAULT_HERO),
-                  os.path.join(ASSETS, 'hero.jpg'))
-    print('   assets/hero.jpg <-', DEFAULT_HERO)
+    print('> tło hero:')
+    tlo_src = os.path.join(UPLOADS, HERO_TLO)
+    if os.path.exists(tlo_src):
+        process_bg(tlo_src, os.path.join(ASSETS, 'hero.jpg'))
+        print('   assets/hero.jpg <-', HERO_TLO, '(bez obróbki — „tak jak jest")')
+    else:
+        print(f'   UWAGA: brak {HERO_TLO} w uploads — zostawiam obecne assets/hero.jpg')
 
     print('> miniatury pickera:')
     for i, name in enumerate(HERO_CANDIDATES, 1):
@@ -606,6 +638,12 @@ def main():
     print(f'> hero-picker.html  {os.path.getsize(os.path.join(HERE, "hero-picker.html")) // 1024} kB')
 
     stubs = [
+        ('warsztat.html', 'Warsztat', 'Jak pracujemy',
+         'Budujemy tę stronę — pokażemy tu nasz warsztat: maszyny, proces, materiał i to, jak krok po kroku powstają nasze rzeczy.',
+         '<a class="btn btn-outline" href="index.html">Zobacz stronę główną</a>'),
+        ('galeria.html', 'Galeria', 'Nasze prace',
+         'Szykujemy galerię realizacji i bloga zza kulis. Zajrzyj tu niebawem — będzie na co popatrzeć.',
+         '<a class="btn btn-outline" href="index.html">Zobacz stronę główną</a>'),
         ('kontakt.html', 'Kontakt', 'Formularz kontaktowy',
          'Budujemy tę stronę. Tymczasem napisz do nas bezpośrednio — odpowiadamy szybko.',
          '<a class="btn btn-solid" href="mailto:kontakt@studiosygnatura.pl">kontakt@studiosygnatura.pl</a>'),

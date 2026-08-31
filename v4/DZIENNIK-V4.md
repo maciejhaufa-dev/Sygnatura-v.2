@@ -204,3 +204,19 @@ v4/
 
 ### LEKCJE
 - Po każdej edycji build.py: `tail v4/build.py` + pełny build + walidacja wygenerowanego HTML (gradienty, splash, tagi) — fuzzy edit potrafi nadpisać nie tam, gdzie trzeba.
+
+## 15. STATUS (po sesji 8, 31.08.2026 — nowe tło hero od użytkownika)
+
+- [x] **Nowe tło hero = plik użytkownika `TŁO NA HERO.png`** (3696×2613, 316 DPI; pobrany z origin/main — user znów wrzucił na GitHub, nie do sandboxa). Obróbka: BEZ korekt kolorów (`process_bg` — tylko konwersja RGB→JPEG, max 2880 px, q86) — „wypełnia całą stronę tak jak jest".
+  - Analiza kompozycji (PIL): pusta beżowa ściana x 0–46% i y 55–100%; tablica z „CZEŚĆ" x 46–96%, y 8–55% (napis x 56–93%, y 17–39%). Tło strony: `cover`, `center 40%` (desktop — pełna szerokość, tablica w kadrze), `80% 30%` na telefonie (kadr na napis), ultrawide `center 15%`.
+- [x] **Logo po lewej, wyłania się z dołu** (obok „Cześć"): sygnet (rise 3,9 s) + litery SYGNATURA spadają jedna po drugiej (softfall od 3,95 s, co 0,12 s — szybciej niż splash) + podpis „drewno · światło · detal" (5,05 s).
+- [x] **Panel kremowy wjeżdża od dołu** (3,7 s): jaśniejszy krem #FFFDF8, ramka brązowa 2 px jak w splashu, mocny cień, ostre rogi. W środku: złote **PASJA – STYL – TRADYCJA** obok siebie (czcionka kaligraficzna **Great Vibes** z Google Fonts, wipe L→P 4,3/4,6/4,9 s), tekst „Kosmos pełen jest szlachetnych minerałów… dom staje się domem." (5,2 s), **4 przyciski** butelkowa zieleń + złoty tekst: Sprawdź, jak pracujemy → warsztat.html · Poznaj nasze prace → galeria.html · Znajdź coś dla siebie → sklep.html · Napisz do nas → kontakt.html (5,5–5,86 s).
+- [x] **Nowe podstrony:** `warsztat.html`, `galeria.html` (stuby jak kontakt/sklep); menu: Rzemiosło → warsztat.html, dodana pozycja Galeria.
+- [x] **Splash skrócony o ~1 s:** 4,8 s → **3,8 s** (karta 0,3 s, sygnet 0,75 s, litery od 1,25 s co 0,13 s, fade 0,8 s, usunięcie +700 ms).
+- [x] **Czcionki webowe włączone** (Google Fonts: Great Vibes + Cormorant Garamond, latin-ext, display=swap; fallback cursive/serif) — sandbox nie potrzebuje sieci, czcionki ładuje przeglądarka użytkownika.
+- [x] `docs/` zsynchronizowany (warsztat, galeria, nowe hero.jpg) i pushnięty.
+
+### LEKCJE
+- Pliki użytkownika regularnie trafiają na **origin/main** (TŁO NA HERO.png, las) — sprawdzać `git ls-tree origin/main` przy każdej nowej wzmiance o załączniku.
+- Po edycji sekcji CSS w build.py sprawdzać, czy `edit_file` faktycznie trafił (grep po klasie) — fuzzy match potrafi chybić przy dłuższych blokach.
+- Kadrowanie `cover`: dla ekranów szerszych niż 1,414 (proporcje zdjęcia) pełna szerokość jest w kadrze — tablica „Cześć" zawsze widoczna; na pionowym telefonie okno ~33% szerokości → pozycja `80% 30%` celuje w napis.
