@@ -20,6 +20,13 @@
 
 ## 2. SPECYFIKACJA STRONY V4 (uzgodniona z użytkownikiem)
 
+> **Zmiany z sesji 2 (31.08.2026, uwagi użytkownika po pierwszym teście):**
+> 1. **Splash „Ssssss"** — mechanizm sprite+calc zawiódł w przeglądarce (wszystkie litery pokazywały 1. literę). ROZWIĄZANE: litery jako osobne pliki PNG (`assets/letters/l0..l8.png`), kerning przez margin w em (font-size wrappera = wysokość litery). Zero calc na pozycjach.
+> 2. **Prostokąty OSTRE** — zero zaokrągleń (border-radius:0 na planszy, splash-card, przyciskach, stubach). „Prostokąt to prostokąt."
+> 3. **Hero = napis „Cześć" Z UKOSA, nie całe ujęcie z szafką.** W uploads są zdjęcia z serii 28–29.08 (2 sesje: poranna 05:55 i wieczorna 23:05). Domyślne hero: `IMG_20260829_230633.jpg` (tablica ujęta od krawędzi — z ukosa). **Wybór ujęcia: `hero-picker.html`** — 12 miniatur, klik = podgląd w kadrze hero; użytkownik podaje numer → podmieniamy `assets/hero.jpg` + `background-position`. (UWAGA: WA0000 to ujęcie „z szafką" — wykluczone z pickera.)
+> 4. **Plansza 1 kolumna na telefonie** — próg podniesiony: 2 kolumny tylko ≥1024 px; niżej 1 kolumna (wcześniej 860 px).
+> 5. **Napisy „Pasją / styl / tradycja" statyczne, widoczne od razu** — żadnych sekwencyjnych wyłonień/ukrywania treści. Animacje = spokojna harmonia: miękki opad liter w splashu (0.9 s, stagger 0.12 s, z widocznością — start opacity .25→1, translateY tylko .7 em) + subtelny „oddech" planszy (3 px / 8 s) + łagodne przejście po splashu. Wszystko wyłączane przy prefers-reduced-motion, treść zawsze widoczna (noscript też).
+
 ### 2.1. Splash screen (3 sekundy, po wejściu w link)
 - **Tło:** zamglony starodrzew (zdjęcie użytkownika — patrz §5!), pod delikatnym welonem butelkowej zieleni **10%** (rgba(31,58,50,.10)) + lekka winieta.
 - **Centralnie wyłania się prostokąt:** kremowe tło, **wyraźna brązowa obwódka** 2 px (#6B4530), pojawia się ~0,25 s (scale+fade).
@@ -42,8 +49,8 @@
 
 ## 3. TECHNIKA
 
-- **Build:** `/v4/build.py` — `python3 build.py` generuje `index.html`, `kontakt.html`, `sklep.html` (kolorowanie zdjęć, sprite logotypu, podmiana tokenów). Wymaga: pillow (instalacja w sandboxie: `pip install --break-system-packages pillow`).
-- **Logotyp jako sprite:** litery wycinane z `pracownia/logo/WEKTORY3/LOGOTYP_3000px_BW.png` (dokładne litery z księgi znaku, zachowany oryginalny odstęp między literami), kolor #6B4530. Sprite: `assets/wordmark.png` (1632×160, 9 liter). Litery skalowane przez `calc(var(--lh) * --ar)` — spójne proporcje w każdym rozmiarze.
+- **Build:** `/v4/build.py` — `python3 build.py` generuje `index.html`, `kontakt.html`, `sklep.html`, `hero-picker.html` (kolorowanie zdjęć, litery logotypu, miniatury pickera). Wymaga: pillow (instalacja w sandboxie: `pip install --break-system-packages pillow`).
+- **Logotyp:** litery wycinane z `pracownia/logo/WEKTORY3/LOGOTYP_3000px_BW.png` (dokładne litery z księgi znaku) do **osobnych PNG** `assets/letters/l0..l8.png`, kolor #6B4530. Kerning (przerwy w em = oryginalne odstępy z księgi): `[0.332, 0.322, 0.502, 0.417, 0.241, 0.414, 0.536, 0.370]`. RATIO (sygnet/litera) = 5.0847. Skalowanie: font-size wrappera = `calc(var(--sygW)/RATIO)`, litery `height:1em; width:auto` — proporcje księgi znaku zawsze zachowane, zero sprite/calc na pozycjach (koniec błędu „Ssssss").
 - **Czcionki:** **systemowe szeryfowe** (sandbox nie ma internetu → brak Google Fonts). Stack zaczyna się od `"Playfair Display","Cormorant Garamond"` — gdy będzie sieć, wystarczy dodać `<link>` Google Fonts (latin-ext) i nic więcej się nie zmienia.
 - **Ikony:** inline SVG (koszyk, konto, hamburger, IG, FB, Pinterest).
 - **Podgląd:** `python3 -m http.server 8080 --bind 0.0.0.0` w katalogu `/v4` (live preview sesji).
@@ -67,25 +74,26 @@ v4/
 ├── index.html          # strona główna: splash + hero + menu + footer (zbudowana)
 ├── kontakt.html        # stub formularza (mailto)
 ├── sklep.html          # stub sklepu/realizacji
+├── hero-picker.html    # wybór zdjęcia hero (12 miniatur, klik = podgląd w kadrze)
 ├── DZIENNIK-V4.md      # ten plik
 └── assets/
     ├── forest.jpg      # tło splasha — zamglony starodrzew (OBECNIE ZAMENNIK — patrz §5)
-    ├── hero.jpg        # hero „Cześć" (obrobione IMG-20260826-WA0000.jpg)
-    ├── hero-alt.jpg    # wariant (IMG_20260829_231012.jpg) do szybkiej podmiany
+    ├── hero.jpg        # hero: IMG_20260829_230633.jpg (domyślne; picker = wybór innego)
     ├── sygnet.svg      # S z listkami w okręgu (kopia z WEKTORY3)
     ├── favicon.svg     # to samo co sygnet
-    └── wordmark.png    # sprite logotypu SYGNATURA (generowany przez build.py)
+    ├── letters/        # l0..l8.png — litery logotypu SYGNATURA (brąz #6B4530)
+    └── thumbs/         # t1..t12.jpg — miniatury kandydatów hero (dla pickera)
 ```
 
-**Podmiana hero:** w `build.py` zamień ścieżkę w `process_photo(...)` (lub zamień plik `assets/hero.jpg`) → `python3 build.py`. W CSS tło hero to `.hero{background:...url('assets/hero.jpg')...}`.
+**Podmiana hero:** ustaw `DEFAULT_HERO` w `build.py` (lista `HERO_CANDIDATES`, numer = picker) → `python3 build.py`. Kadrowanie: `.hero{background:...url('assets/hero.jpg') 62% 42%/cover...}` — dla innych ujęć może wymagać innej pozycji.
 
 ---
 
 ## 5. ZDJĘCIA — WAŻNE INFORMACJE
 
 1. **LAS (splash):** załącznik użytkownika `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` **NIE dotarł do sandboxa** (przeszukano cały dysk — pliku nie ma). **Wygenerowano zamiennik** `assets/forest.jpg` (1376×768, zamglony starodrzew, zielono-biały klimat). **Gdy użytkownik podeśle oryginał: nadpisz `assets/forest.jpg`** (najlepiej poziomy kadr, ~1920 px szer.) — nic więcej nie trzeba zmieniać.
-2. **HERO („Cześć"):** użyto `../uploads/IMG-20260826-WA0000.jpg` (jedyne pewne zdjęcie szyldu „Cześć" w repo, 1600×1200; wg v3: szyld bez ramy, z odbiciem okna w rogu). Obróbka: balans bieli, miękka krzywa tonów, wygładzenie refleksów, kremowy woal w CSS maskuje tło/ścianę. **Wariant** `IMG_20260829_231012.jpg` obrobiony jako `assets/hero-alt.jpg`. **DO POTWIERDZENIA: które ujęcie to „Cześć z ukosa, bez ramki".**
-3. Zdjęcia `IMG_20260828_*` i `IMG_20260829_*` (12 szt.) to najpewniej **mozaika „scrabble"** z wątku v3 — nie użyte w stronie.
+2. **HERO:** `IMG-20260826-WA0000.jpg` = ujęcie „Cześć" Z SZAFKĄ — **wykluczone** (uwaga użytkownika). Właściwe ujęcia „napis z ukosa" to seria **28–29.08.2026** w `../uploads/` (28.08 rano 05:55 — 7 zdjęć; 29.08 wieczorem 23:05 — 4 zdjęcia). Domyślne hero = `IMG_20260829_230633.jpg` (tablica od krawędzi, „z ukosa"). **Wybór: `hero-picker.html`.** Dodatkowo w uploads jest `IMG_20260811_232511.jpg` (pionowe, ukośny jasny pas — też kandydat, nr 12 w pickerze).
+3. Zdjęcia `IMG_20260828_*` / `IMG_20260829_*` to najpewniej tablica/napis + prawdopodobnie mozaika „scrabble" — bez pewności; picker rozstrzyga.
 4. Zrzuty ekranów Pinterest i pozostałe pliki w `../uploads/` — materiały z v3.
 
 ---
@@ -101,7 +109,7 @@ v4/
 ## 7. TODO / DO USTALENIA
 
 1. ☐ **Las** — użytkownik podeśle oryginalny plik → nadpisz `assets/forest.jpg`.
-2. ☐ **Hero** — potwierdzić ujęcie (WA0000 vs 231012 vs inne).
+2. ☐ **Hero** — użytkownik wybiera ujęcie w `hero-picker.html` (1–12) → ustaw `DEFAULT_HERO` + ewentualnie `background-position`.
 3. ☐ **E-mail** — potwierdzić `kontakt@studiosygnatura.pl` (literówka w wiadomości).
 4. ☐ **Menu** — podpiąć docelowe podstrony (Rzemiosło, Metryczki, Numery i szyldy, Wynajem, Współpraca, Dla firm).
 5. ☐ **Przyciski** — „Zadaj pytanie" → docelowo formularz z klauzulą PKE (Formspree?), „Nasze realizacje" → sklep.
@@ -125,11 +133,9 @@ v4/
 
 ---
 
-## 9. STATUS PO SESJI 1 (31.08.2026)
+## 9. STATUS (po sesji 2, 31.08.2026)
 
-- [x] Struktura `/v4`, build.py, `index.html` (splash + hero + menu + footer), stuby `kontakt.html` i `sklep.html`
-- [x] Sprite logotypu z księgi znaku (9 liter, podział Syg/Natura)
-- [x] Obróbka hero „Cześć" + wariant alternatywny
-- [x] Zamiennik lasu (oryginał nie dotarł)
-- [x] Serwer podglądu (port 8080, live preview)
-- [ ] **Czeka:** test użytkownika na telefonie → akceptacja / uwagi żony → iteracja
+- [x] Poprawki wg uwag użytkownika: litery jako osobne PNG (fix „Ssssss"), ostre rogi, 1 kolumna <1024 px, napisy statyczne + spokojne animacje
+- [x] Nowe hero domyślne (230633) + `hero-picker.html` (12 miniatur)
+- [x] Dziennik zaktualizowany, commit w repo
+- [ ] **Czeka:** test użytkownika na telefonie → wybór zdjęcia hero z pickera (numer 1–12) → dalsze uwagi
