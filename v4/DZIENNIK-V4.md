@@ -177,3 +177,18 @@ v4/
 - [x] `docs/` z kompletną stroną wypchnięty na gałąź sesji
 - [x] Instrukcja Pages: `v4/PAGES-instrukcja.md`
 - [ ] **Czeka:** użytkownik włącza Pages (1 klik) → test na telefonie → dalsze uwagi
+
+## 13. STATUS (po sesji 7, 31.08.2026 — korekta hero po teście)
+
+- [x] **Splash: użytkownik potwierdził — „wyszedł teraz idealnie".** NIE ruszać (litery spadają jedna po drugiej z odstępami, 4,8 s).
+- [x] **Hero wraca do zdjęcia na cały ekran (żądanie: „przywrócić Cześć na całej stronie"):**
+  - Desktop (≥1024 px): `.hero{min-height:calc(100svh - 111px)}` ze zdjęciem jako tło `center 50%/cover` + delikatny kremowy welon (0.14→0.42 ku dołowi). Plansza NIE jest już centrowana pionowo — `margin-top:auto` kotwiczy ją **na dole kadru** (dolna ćwiartka), a „Cześć" (region x 25–60%, y 18–45% zdjęcia) jest odsłonięte nad nią.
+  - Reguły pomocnicze: niskie ekrany desktopowe `(max-height:860px)` — kadr wyżej (p=48%) + ciaśniejsza plansza (sygnet ≤116px, padding 22/32), żeby „Cześć" zawsze mieściło się nad planszą; bardzo szerokie `(min-aspect-ratio:21/10)` — kadr p=30%.
+  - Telefon (≤1023 px): zdjęcie **pełnej szerokości u góry** (`.hero-photo`, aspect-ratio liczony z hero.jpg = 1920/1440, tło `top center/100% auto` — „Cześć" w całości, bez przycinania boków), plansza dociśnięta do **dołu ekranu** (`margin-top:auto`, min-height:calc(100svh - 57px)).
+  - Picker hero: podgląd kadru zaktualizowany (cover center 50% / mobile top 100% auto).
+- [x] **Bez gradientu foto→krem (na razie):** użytkownik powiedział „najpierw spróbuj przywrócić Cześć na całej stronie i tylko przesuń ten prostokąt"; alternatywa (gradient dołu zdjęcia w krem) zostaje jako plan B, jeśli twarda krawędź zdjęcia na telefonie będzie mu przeszkadzać.
+- [x] `docs/` zsynchronizowany i pushnięty.
+
+### LEKCJE
+- „Dalej wypełnia cały ekran" = wróć do pełnoekranowego tła hero (pas z sesji 6 był mylący dla użytkownika).
+- Geometrycznie: `cover` na poziomym 4:3 zdjęciu na pionowym telefonie NIGDY nie pokaże całego napisu x 25–60% (okno ma tylko ~35% szerokości) — telefon musi zostać przy `100% auto` u góry, a plansza na dole ekranu.

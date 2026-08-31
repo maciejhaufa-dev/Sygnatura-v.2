@@ -230,11 +230,12 @@ button{font-family:inherit}
 .menu a.on{background:rgba(196,165,130,.2)}
 
 /* ================= HERO ================= */
-.hero{flex:1;display:flex;flex-direction:column;background:var(--krem)}
-/* pas zdjęcia: „Cześć" widoczne w całości (pełna szerokość, kadr górny) */
-.hero-photo{height:clamp(220px,34vh,400px);width:100%;
-  background:linear-gradient(rgba(250,246,239,.30),rgba(250,246,239,.44)),url('assets/hero.jpg') center 30%/100% auto no-repeat}
-.hero-center{flex:1;display:flex;align-items:center;justify-content:center;padding:30px 20px 48px}
+/* zdjęcie „Cześć" na cały ekran (tło), plansza zakotwiczona NA DOLE (dolna ćwiartka kadru) */
+.hero{flex:1;display:flex;flex-direction:column;min-height:calc(100svh - 111px);background-color:var(--krem);
+  background-image:linear-gradient(rgba(250,246,239,.14),rgba(250,246,239,.26) 55%,rgba(250,246,239,.42)),url('assets/hero.jpg');
+  background-size:cover,cover;background-position:center 50%,center 50%;background-repeat:no-repeat,no-repeat}
+.hero-photo{display:none}
+.hero-center{display:flex;justify-content:center;margin-top:auto;padding:24px clamp(20px,4vw,48px) clamp(24px,3.5vh,40px)}
 .plansza{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(30px,4.5vw,60px);
   align-items:center;width:100%;max-width:1000px;background:rgba(251,247,240,.97);
   -webkit-backdrop-filter:blur(7px) saturate(1.05);backdrop-filter:blur(7px) saturate(1.05);
@@ -288,14 +289,31 @@ button{font-family:inherit}
   .plansza-right{align-items:center}
   .slowo{font-size:clamp(22px,6.4vw,28px)}
   .btns{width:100%}
+  /* telefon: zdjęcie pełnej szerokości u góry („Cześć" w całości), plansza dociśnięta do dołu ekranu */
+  .hero{min-height:calc(100svh - 57px);background-image:none}
+  .hero-photo{display:block;width:100%;aspect-ratio:@@HERO_AR@@;
+    background:url('assets/hero.jpg') top center/100% auto no-repeat}
+  .picker-view{background:url('assets/hero.jpg') top center/100% auto no-repeat}
 }
 @media (max-width:860px){
-  .hero-photo{height:clamp(190px,30vh,300px)}
   .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
   .menu.open{display:flex}
   .menu a{padding:11px 12px}
   .burger{display:grid}
-  .hero-center{padding:18px 14px 28px}
+  .hero-center{padding:18px 14px 24px}
+}
+/* niskie ekrany desktopowe: ciaśniejsza plansza i wyższy kadr zdjęcia, żeby „Cześć" mieściło się nad planszą */
+@media (min-width:1024px) and (max-height:860px){
+  .hero{background-position:center 48%,center 48%}
+  .plansza{padding:22px 32px;gap:24px}
+  .plansza-left{--sygW:clamp(84px,14vmin,116px);gap:12px}
+  .plansza-right{gap:12px}
+  .slowo{font-size:clamp(21px,3vw,28px)}
+  .welcome{font-size:15.5px;line-height:1.6}
+}
+/* bardzo szerokie monitory: kadr zdjęcia wyżej, żeby „Cześć" nie uciekło poza ekran */
+@media (min-width:1024px) and (min-aspect-ratio:21/10){
+  .hero{background-position:center 30%,center 30%}
 }
 @media (max-width:520px){
   .btn{font-size:11px;letter-spacing:.12em;padding:13px 8px}
@@ -328,7 +346,7 @@ body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .picker-head h1{font-size:22px;font-weight:600}
 .picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
 .picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
-  background:linear-gradient(rgba(250,246,239,.30),rgba(250,246,239,.44)),url('assets/hero.jpg') center 30%/100% auto no-repeat}
+  background:linear-gradient(rgba(250,246,239,.14),rgba(250,246,239,.26) 55%,rgba(250,246,239,.42)),url('assets/hero.jpg') center 50%/cover no-repeat}
 .picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
   padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
 .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;
@@ -464,7 +482,7 @@ PICKER = r'''<!DOCTYPE html>
 <body>
 <div class="picker-head">
   <h1>Wybierz zdjęcie hero (napis „Cześć" z ukosa)</h1>
-  <p>Kliknij miniaturę, żeby zobaczyć ujęcie w kadrze hero u góry. Napisz mi numer wybranego zdjęcia (1–12) — podmienię plik hero w index.html.</p>
+  <p>Kliknij miniaturę, żeby zobaczyć, jak zdjęcie wygląda w kadrze hero (na cały ekran, plansza z logo na dole). Napisz mi numer wybranego zdjęcia (1–12) — podmienię plik hero w index.html.</p>
 </div>
 <div class="picker-view" id="view"><span class="pv-label" id="vlabel">Aktualne hero: 2 — IMG_20260829_230704.jpg (wybrane)</span></div>
 <div class="picker-grid" id="grid">@@ITEMS@@</div>
@@ -559,6 +577,10 @@ def main():
     print(f'   kerning(em): {[round(k,4) for k in kerning]}  ratio={ratio:.4f}')
 
     css = CSS.replace('@@RATIO@@', f'{ratio:.4f}')
+    with Image.open(os.path.join(ASSETS, 'hero.jpg')) as him:
+        hw, hh = him.size
+    css = css.replace('@@HERO_AR@@', f'{hw}/{hh}')
+    print(f'   hero.jpg {hw}x{hh}  ->  aspect-ratio {hw}/{hh}')
 
     index = render_index(css, kerning, ratio)
     with open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8') as f:
