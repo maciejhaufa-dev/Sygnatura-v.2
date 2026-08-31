@@ -139,10 +139,16 @@ v4/
 
 ---
 
-## 9. STATUS (po sesji 3, 31.08.2026)
+## 10. DEPLOY (stan na 31.08.2026, sesja 4)
 
-- [x] Splash 4,8 s z czytelną sekwencją (tło → karta → sygnet → litery)
-- [x] SYG = pełny jaśniejszy brąz #8B6D5D (jeden ton od #6B4530)
-- [x] Hero = IMG_20260829_230704.jpg (decyzja użytkownika), kadr 55% 45%
-- [x] Auto-detekcja lasu użytkownika w build.py (PNG→JPEG)
-- [ ] **Czeka:** plik lasu w uploads (obecnie zamiennik) → test użytkownika na telefonie
+- **GitHub Pages:** strona skopiowana do **`/docs`** w repo (gałąź `arena/01a056f0-sygnatura-v-2`, pushnięta). Docelowy adres po włączeniu: `https://maciejhaufa-dev.github.io/Sygnatura-v.2/`. **Włączenie wymaga 1 kliknięcia użytkownika** (Settings → Pages → branch `arena/01a056f0-sygnatura-v-2` → `/docs`) — bot Arena nie ma uprawnień do API Pages (403: createRepository, create-pages-site). Instrukcja: `v4/PAGES-instrukcja.md`.
+- **Po każdej zmianie strony:** `python3 build.py` → zaktualizuj `docs/` (index/kontakt/sklep/404 + assets/) → commit + push → Pages przebuduje się samo.
+- **Podgląd roboczy:** `python3 serve.py 8080` (serwer **no-cache** — naprawia problem „nie odświeża się": wcześniej telefon dostawał 304 Not Modified). Publiczny adres podglądu sesji: `https://8080-iltxoxwpsn9ujvnw2mcr6.e2b.app/`. Meta `Cache-Control: no-store` dodane też do samych HTML.
+- Przypomnienie: w tym repo **pracujemy tylko na gałęzi `arena/01a056f0-sygnatura-v-2`** (zasada sesji).
+
+## 11. STATUS (po sesji 4, 31.08.2026)
+
+- [x] Serwer podglądu z no-cache (fix 304/„nie odświeża się") + meta no-store w HTML
+- [x] `docs/` z kompletną stroną wypchnięty na gałąź sesji
+- [x] Instrukcja Pages: `v4/PAGES-instrukcja.md`
+- [ ] **Czeka:** użytkownik włącza Pages (1 klik) → test na telefonie → dalsze uwagi
