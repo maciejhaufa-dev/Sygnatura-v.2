@@ -342,6 +342,7 @@ INDEX = r'''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <title>Studio Sygnatura — rzeczy z drewna, światła i detalu</title>
 <meta name="description" content="Studio Sygnatura — rodzinna pracownia. Rzeczy z drewna robione z pasją, stylem i tradycją: metryczki, numery, szyldy, dekoracje.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -443,6 +444,7 @@ PICKER = r'''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <title>Wybór zdjęcia hero — Studio Sygnatura</title>
 <style>@@CSS@@</style>
 </head>
@@ -478,6 +480,7 @@ STUB = r'''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <title>@@TITLE@@ — Studio Sygnatura</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <style>@@CSS@@</style>
