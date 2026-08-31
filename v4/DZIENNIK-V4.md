@@ -20,6 +20,12 @@
 
 ## 2. SPECYFIKACJA STRONY V4 (uzgodniona z użytkownikiem)
 
+> **Zmiany z sesji 3 (31.08.2026):**
+> 6. **Splash wydłużony do 4,8 s** z wyraźnie widoczną sekwencją: tło-las widoczny cały czas (welon 10%) → karta wyłania się 0,35 s → sygnet unosi się 0,95 s → litery spadają od 1,55 s (każda co 0,16 s, animacja 1 s) → ~2,3 s spokojnej pauzy → fade-out 0,9 s. (Wcześniej 3,0 s — użytkownik: „za krótki, nie widać tła, ładowania, pojawiania się napisów i logo".)
+> 7. **SYG = PEŁNY jaśniejszy brąz** (nie kreskowanie, nie obrys): #8B6D5D vs NATURA #6B4530 — jeden ton barwy, różnica minimalna, ale widoczna gołym okiem. Tunowalne: `LIGHT_FACTOR = 0.22` w build.py.
+> 8. **Hero = `IMG_20260829_230704.jpg` — DECYZJA UŻYTKOWNIKA** (numer podany wprost). Kadrowanie `55% 45%`.
+> 9. **Tło splasha = plik użytkownika** `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` — build.py **automatycznie go wykrywa** w `../uploads/` i konwertuje PNG→JPEG do `assets/forest.jpg`. Plik na razie **nie dotarł do sandboxa** (działa zamiennik); jak wyląduje w uploads — wystarczy `python3 build.py`.
+
 > **Zmiany z sesji 2 (31.08.2026, uwagi użytkownika po pierwszym teście):**
 > 1. **Splash „Ssssss"** — mechanizm sprite+calc zawiódł w przeglądarce (wszystkie litery pokazywały 1. literę). ROZWIĄZANE: litery jako osobne pliki PNG (`assets/letters/l0..l8.png`), kerning przez margin w em (font-size wrappera = wysokość litery). Zero calc na pozycjach.
 > 2. **Prostokąty OSTRE** — zero zaokrągleń (border-radius:0 na planszy, splash-card, przyciskach, stubach). „Prostokąt to prostokąt."
@@ -91,8 +97,8 @@ v4/
 
 ## 5. ZDJĘCIA — WAŻNE INFORMACJE
 
-1. **LAS (splash):** załącznik użytkownika `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` **NIE dotarł do sandboxa** (przeszukano cały dysk — pliku nie ma). **Wygenerowano zamiennik** `assets/forest.jpg` (1376×768, zamglony starodrzew, zielono-biały klimat). **Gdy użytkownik podeśle oryginał: nadpisz `assets/forest.jpg`** (najlepiej poziomy kadr, ~1920 px szer.) — nic więcej nie trzeba zmieniać.
-2. **HERO:** `IMG-20260826-WA0000.jpg` = ujęcie „Cześć" Z SZAFKĄ — **wykluczone** (uwaga użytkownika). Właściwe ujęcia „napis z ukosa" to seria **28–29.08.2026** w `../uploads/` (28.08 rano 05:55 — 7 zdjęć; 29.08 wieczorem 23:05 — 4 zdjęcia). Domyślne hero = `IMG_20260829_230633.jpg` (tablica od krawędzi, „z ukosa"). **Wybór: `hero-picker.html`.** Dodatkowo w uploads jest `IMG_20260811_232511.jpg` (pionowe, ukośny jasny pas — też kandydat, nr 12 w pickerze).
+1. **LAS (splash):** docelowy plik użytkownika = `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` (ma leżeć w `../uploads/`). Build wykrywa go automatycznie i konwertuje do `assets/forest.jpg` — jak tylko pojawi się w repo, uruchom `python3 build.py`. **Na dziś działa zamiennik** (wygenerowany, wyraźniejsze drzewa).
+2. **HERO — DECYZJA:** `IMG_20260829_230704.jpg` (użytkownik podał numer wprost, 31.08). Kadrowanie CSS: `55% 45%`. Poprzednie: 230633 (domyślne v2). `IMG-20260826-WA0000.jpg` = ujęcie „z szafką" — **wykluczone**. `hero-picker.html` zostaje jako narzędzie (miniatury 1–12).
 3. Zdjęcia `IMG_20260828_*` / `IMG_20260829_*` to najpewniej tablica/napis + prawdopodobnie mozaika „scrabble" — bez pewności; picker rozstrzyga.
 4. Zrzuty ekranów Pinterest i pozostałe pliki w `../uploads/` — materiały z v3.
 
@@ -133,9 +139,10 @@ v4/
 
 ---
 
-## 9. STATUS (po sesji 2, 31.08.2026)
+## 9. STATUS (po sesji 3, 31.08.2026)
 
-- [x] Poprawki wg uwag użytkownika: litery jako osobne PNG (fix „Ssssss"), ostre rogi, 1 kolumna <1024 px, napisy statyczne + spokojne animacje
-- [x] Nowe hero domyślne (230633) + `hero-picker.html` (12 miniatur)
-- [x] Dziennik zaktualizowany, commit w repo
-- [ ] **Czeka:** test użytkownika na telefonie → wybór zdjęcia hero z pickera (numer 1–12) → dalsze uwagi
+- [x] Splash 4,8 s z czytelną sekwencją (tło → karta → sygnet → litery)
+- [x] SYG = pełny jaśniejszy brąz #8B6D5D (jeden ton od #6B4530)
+- [x] Hero = IMG_20260829_230704.jpg (decyzja użytkownika), kadr 55% 45%
+- [x] Auto-detekcja lasu użytkownika w build.py (PNG→JPEG)
+- [ ] **Czeka:** plik lasu w uploads (obecnie zamiennik) → test użytkownika na telefonie

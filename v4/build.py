@@ -25,11 +25,13 @@ LOGO_DIR = os.path.abspath(os.path.join(HERE, '..', 'pracownia', 'logo', 'WEKTOR
 UPLOADS = os.path.abspath(os.path.join(HERE, '..', 'uploads'))
 
 BRUN = (107, 69, 48)  # #6B4530 z księgi znaku
+LIGHT_FACTOR = 0.22   # rozjaśnienie SYG (PEŁNA barwa, jeden ton — tunowalne)
+LIGHT = tuple(int(c + (255 - c) * LIGHT_FACTOR) for c in BRUN)  # jaśniejszy brąz dla SYG
 
 # Kandydaci hero (zdjęcia użytkownika z ../uploads) — kolejność = numer w pickerze
 HERO_CANDIDATES = [
-    'IMG_20260829_230633.jpg',   # 1 — domyślne: tablica z ukosa
-    'IMG_20260829_230704.jpg',   # 2
+    'IMG_20260829_230633.jpg',   # 1 — tablica z ukosa
+    'IMG_20260829_230704.jpg',   # 2 — WYBRANE PRZEZ UŻYTKOWNIKA (31.08.2026)
     'IMG_20260829_231012.jpg',   # 3
     'IMG_20260829_230548.jpg',   # 4
     'IMG_20260828_055508.jpg',   # 5
@@ -41,7 +43,7 @@ HERO_CANDIDATES = [
     'IMG_20260828_055623.jpg',   # 11
     'IMG_20260811_232511.jpg',   # 12
 ]
-DEFAULT_HERO = HERO_CANDIDATES[0]
+DEFAULT_HERO = HERO_CANDIDATES[1]  # IMG_20260829_230704.jpg — decyzja użytkownika
 
 
 # ---------------------------------------------------------------- przygotowanie
@@ -54,7 +56,16 @@ def ensure_assets():
             raise SystemExit(f'Brak pliku logo: {src}')
         shutil.copy(src, os.path.join(ASSETS, 'sygnet.svg'))
         shutil.copy(src, os.path.join(ASSETS, 'favicon.svg'))
-    if not os.path.exists(os.path.join(ASSETS, 'forest.jpg')):
+    # Tło splasha: jeśli w uploads pojawi się las od użytkownika — użyj go zamiast zamiennika
+    user_forest = os.path.join(UPLOADS, 'Green and White Atmospheric Forest Presentation_20260831_103357_0000.png')
+    if os.path.exists(user_forest):
+        print('> tło splasha: znaleziono plik lasu od użytkownika — konwertuję do forest.jpg')
+        im = Image.open(user_forest).convert('RGB')
+        w, h = im.size
+        if w > 1920:
+            im = im.resize((1920, round(h * 1920 / w)), Image.LANCZOS)
+        im.save(os.path.join(ASSETS, 'forest.jpg'), 'JPEG', quality=82, optimize=True, progressive=True)
+    elif not os.path.exists(os.path.join(ASSETS, 'forest.jpg')):
         raise SystemExit('Brak assets/forest.jpg — wrzuć zdjęcie zamglonego lasu do assets/')
 
 
@@ -114,9 +125,10 @@ def build_letters():
         crop = g.crop((s, y0, e + 1, y1 + 1))
         tile = Image.new('RGBA', crop.size, (0, 0, 0, 0))
         cr, dr = crop.load(), tile.load()
+        col = LIGHT if i < 3 else BRUN   # SYG = pełny jaśniejszy brąz, NATURA = pełny
         for yy in range(crop.size[1]):
             for xx in range(crop.size[0]):
-                dr[xx, yy] = (BRUN[0], BRUN[1], BRUN[2], max(0, 255 - cr[xx, yy]))
+                dr[xx, yy] = (col[0], col[1], col[2], max(0, 255 - cr[xx, yy]))
         tile.save(os.path.join(LETTERS_DIR, f'l{i}.png'))
         if i < len(runs) - 1:
             kerning.append((runs[i + 1][0] - e - 1) / h_ink)
@@ -161,7 +173,7 @@ button{font-family:inherit}
 /* ================= SPLASH ================= */
 #splash{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
-  transition:opacity .65s ease,visibility .65s ease}
+  transition:opacity .9s ease,visibility .9s ease}
 #splash::before{content:"";position:absolute;inset:0;
   background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
   radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
@@ -171,23 +183,22 @@ button{font-family:inherit}
   border-radius:0;padding:clamp(28px,5vw,46px) clamp(34px,8vw,64px);
   box-shadow:0 42px 90px rgba(15,26,21,.45);
   --sygW:clamp(84px,20vw,126px);
-  animation:card-soft 1.1s cubic-bezier(.22,.61,.36,1) .15s both}
-.splash-sygnet{width:var(--sygW);height:auto;animation:rise-soft 1.2s cubic-bezier(.22,.61,.36,1) .35s both}
+  animation:card-soft 1.1s cubic-bezier(.22,.61,.36,1) .35s both}
+.splash-sygnet{width:var(--sygW);height:auto;animation:rise-soft 1.2s cubic-bezier(.22,.61,.36,1) .95s both}
 .splash-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/@@RATIO@@)}
 
 /* litery logotypu */
 .lbox,.fall{display:inline-block;flex:none}
 .wl{height:1em;width:auto;display:block}
-.l0,.l1,.l2{opacity:.6}
-.fall{animation:softfall .9s cubic-bezier(.22,.61,.36,1) both}
+.fall{animation:softfall 1s cubic-bezier(.22,.61,.36,1) both}
 
 @keyframes card-soft{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes rise-soft{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes softfall{0%{opacity:.25;transform:translateY(-.7em)}100%{opacity:1;transform:none}}
+@keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
 
 /* ================= NAGŁÓWEK ================= */
 .site-head{position:absolute;top:0;left:0;right:0;z-index:40;
-  animation:veil-in 1.4s ease 3.05s both}
+  animation:veil-in 1.6s ease 4.9s both}
 @keyframes veil-in{from{opacity:.4}to{opacity:1}}
 .topbar{display:flex;justify-content:flex-end;align-items:center;gap:4px;
   padding:8px clamp(14px,3.5vw,44px);background:rgba(251,247,240,.95);
@@ -206,7 +217,7 @@ button{font-family:inherit}
 
 /* ================= HERO ================= */
 .hero{flex:1;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;
-  background:linear-gradient(rgba(250,246,239,.80),rgba(250,246,239,.86)),url('assets/hero.jpg') 62% 42%/cover no-repeat}
+  background:linear-gradient(rgba(250,246,239,.80),rgba(250,246,239,.86)),url('assets/hero.jpg') 55% 45%/cover no-repeat}
 .hero-center{flex:1;display:flex;align-items:center;justify-content:center;padding:140px 20px 44px}
 .plansza{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(30px,4.5vw,60px);
   align-items:center;width:100%;max-width:1000px;background:rgba(251,247,240,.86);
@@ -235,7 +246,7 @@ button{font-family:inherit}
 /* ================= STOPKA ================= */
 .site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
   background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px);
-  animation:veil-in 1.4s ease 3.05s both}
+  animation:veil-in 1.6s ease 4.9s both}
 .foot-social{display:flex;align-items:center;gap:14px}
 .foot-label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--zloty-soft)}
 .soc-icons{display:flex;gap:8px}
@@ -304,7 +315,7 @@ body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .picker-head h1{font-size:22px;font-weight:600}
 .picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
 .picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
-  background:linear-gradient(rgba(250,246,239,.78),rgba(250,246,239,.85)),url('assets/hero.jpg') 62% 42%/cover no-repeat}
+  background:linear-gradient(rgba(250,246,239,.78),rgba(250,246,239,.85)),url('assets/hero.jpg') 55% 45%/cover no-repeat}
 .picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
   padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
 .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;
@@ -408,13 +419,13 @@ INDEX = r'''<!DOCTYPE html>
 (function(){
   var splash=document.getElementById('splash');
   var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var show=reduced?700:3000;
+  var show=reduced?900:4800;
   document.documentElement.style.overflow='hidden';
   setTimeout(function(){
     if(splash)splash.classList.add('hide');
     document.documentElement.style.overflow='';
   },show);
-  setTimeout(function(){if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);},show+1000);
+  setTimeout(function(){if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);},show+1200);
   var burger=document.getElementById('burger'),menu=document.getElementById('menu');
   if(burger&&menu){burger.addEventListener('click',function(){
     var open=menu.classList.toggle('open');
@@ -440,7 +451,7 @@ PICKER = r'''<!DOCTYPE html>
   <h1>Wybierz zdjęcie hero (napis „Cześć" z ukosa)</h1>
   <p>Kliknij miniaturę, żeby zobaczyć ujęcie w kadrze hero u góry. Napisz mi numer wybranego zdjęcia (1–12) — podmienię plik hero w index.html.</p>
 </div>
-<div class="picker-view" id="view"><span class="pv-label" id="vlabel">Aktualne hero: 1 — IMG_20260829_230633.jpg</span></div>
+<div class="picker-view" id="view"><span class="pv-label" id="vlabel">Aktualne hero: 2 — IMG_20260829_230704.jpg (wybrane)</span></div>
 <div class="picker-grid" id="grid">@@ITEMS@@</div>
 <script>
 var files={@@FILES_JS@@};
@@ -493,7 +504,7 @@ STUB = r'''<!DOCTYPE html>
 
 
 def render_index(css, kerning, ratio):
-    splash = wordmark_html('sw', kerning, falling=True, delay_base=0.85, step=0.12)
+    splash = wordmark_html('sw', kerning, falling=True, delay_base=1.55, step=0.16)
     hero = wordmark_html('hw', kerning)
     html = (INDEX.replace('@@CSS@@', css)
             .replace('@@SPLASH_LETTERS@@', splash)
@@ -548,7 +559,7 @@ def main():
     picker = (PICKER.replace('@@CSS@@', css)
               .replace('@@ITEMS@@', ''.join(items))
               .replace('@@FILES_JS@@', ','.join(files_js))
-              .replace('@@DEFAULT_JS@@', '1'))
+              .replace('@@DEFAULT_JS@@', '2'))
     with open(os.path.join(HERE, 'hero-picker.html'), 'w', encoding='utf-8') as f:
         f.write(picker)
     print(f'> hero-picker.html  {os.path.getsize(os.path.join(HERE, "hero-picker.html")) // 1024} kB')
