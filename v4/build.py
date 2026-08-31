@@ -161,7 +161,7 @@ def wordmark_html(klass, kerning, falling=False, delay_base=0.0, step=0.12, anim
             style.append(f'margin-left:{kerning[i-1]:.5f}em')
         if falling:
             style.append(f'animation-delay:{delay_base + i * step:.2f}s')
-        st = f' style="{"".join(style)}"' if style else ''
+        st = f' style="{";".join(style)}"' if style else ''
         inner = f'<img class="wl {klass} l{i}" src="assets/letters/l{i}.png" alt="">'
         if falling:
             inner = f'<span class="fall"{st}>{inner}</span>'
@@ -180,7 +180,8 @@ CSS = r'''
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 img{display:block;max-width:100%}
 a{text-decoration:none;color:inherit}
 button{font-family:inherit}
@@ -205,16 +206,14 @@ button{font-family:inherit}
 /* litery logotypu */
 .lbox,.fall{display:inline-block;flex:none}
 .wl{height:1em;width:auto;display:block}
-.fall{animation:softfall 1s cubic-bezier(.22,.61,.36,1) both}
+.fall{opacity:0;animation:softfall .9s cubic-bezier(.22,.61,.36,1) forwards}
 
 @keyframes card-soft{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes rise-soft{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
 
 /* ================= NAGŁÓWEK ================= */
-.site-head{position:absolute;top:0;left:0;right:0;z-index:40;
-  animation:veil-in 1.6s ease 4.9s both}
-@keyframes veil-in{from{opacity:.4}to{opacity:1}}
+.site-head{position:sticky;top:0;z-index:40}
 .topbar{display:flex;justify-content:flex-end;align-items:center;gap:4px;
   padding:8px clamp(14px,3.5vw,44px);background:rgba(251,247,240,.95);
   border-bottom:1px solid rgba(107,69,48,.16)}
@@ -231,11 +230,13 @@ button{font-family:inherit}
 .menu a.on{background:rgba(196,165,130,.2)}
 
 /* ================= HERO ================= */
-.hero{flex:1;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;
-  background:linear-gradient(rgba(250,246,239,.80),rgba(250,246,239,.86)),url('assets/hero.jpg') 55% 45%/cover no-repeat}
-.hero-center{flex:1;display:flex;align-items:center;justify-content:center;padding:140px 20px 44px}
+.hero{flex:1;display:flex;flex-direction:column;background:var(--krem)}
+/* pas zdjęcia: „Cześć" widoczne w całości (pełna szerokość, kadr górny) */
+.hero-photo{height:clamp(220px,34vh,400px);width:100%;
+  background:linear-gradient(rgba(250,246,239,.30),rgba(250,246,239,.44)),url('assets/hero.jpg') center 30%/100% auto no-repeat}
+.hero-center{flex:1;display:flex;align-items:center;justify-content:center;padding:30px 20px 48px}
 .plansza{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(30px,4.5vw,60px);
-  align-items:center;width:100%;max-width:1000px;background:rgba(251,247,240,.86);
+  align-items:center;width:100%;max-width:1000px;background:rgba(251,247,240,.97);
   -webkit-backdrop-filter:blur(7px) saturate(1.05);backdrop-filter:blur(7px) saturate(1.05);
   border:1.5px solid rgba(107,69,48,.55);border-radius:0;
   padding:clamp(30px,4.5vw,54px);box-shadow:0 34px 70px rgba(38,29,20,.28);
@@ -248,9 +249,13 @@ button{font-family:inherit}
 .plansza-right{display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,1.8vw,18px)}
 .slowa{display:flex;flex-direction:column;gap:2px}
 .slowo{color:var(--zloty);font-style:italic;font-weight:600;font-size:clamp(23px,3.4vw,31px);
-  line-height:1.22;letter-spacing:.04em}
-.welcome{font-size:clamp(15.5px,1.8vw,18.5px);line-height:1.75;color:rgba(51,38,28,.94)}
-.btns{display:flex;gap:12px;flex-wrap:wrap}
+  line-height:1.22;letter-spacing:.04em;
+  opacity:0;animation:wipe .9s cubic-bezier(.22,.61,.36,1) forwards}
+.slowo.s1{animation-delay:4.6s}.slowo.s2{animation-delay:5.1s}.slowo.s3{animation-delay:5.6s}
+.welcome{font-size:clamp(15.5px,1.8vw,18.5px);line-height:1.75;color:rgba(51,38,28,.94);
+  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 6.3s forwards}
+.btns{display:flex;gap:12px;flex-wrap:wrap;opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 6.8s forwards}
+@keyframes wipe{0%{clip-path:inset(0 100% 0 0);opacity:0}100%{clip-path:inset(0 -1% 0 0);opacity:1}}
 .btn{flex:1 1 0;text-align:center;padding:14px 12px;border-radius:0;font-size:12px;font-weight:700;
   letter-spacing:.16em;text-transform:uppercase;transition:all .25s;white-space:nowrap}
 .btn-solid{background:var(--brunatny);color:var(--krem);border:1.5px solid var(--brunatny)}
@@ -260,8 +265,7 @@ button{font-family:inherit}
 
 /* ================= STOPKA ================= */
 .site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
-  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px);
-  animation:veil-in 1.6s ease 4.9s both}
+  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px)}
 .foot-social{display:flex;align-items:center;gap:14px}
 .foot-label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--zloty-soft)}
 .soc-icons{display:flex;gap:8px}
@@ -280,23 +284,24 @@ button{font-family:inherit}
 
 /* ================= RESPONSYWNOŚĆ ================= */
 @media (max-width:1023px){
-  .plansza{grid-template-columns:1fr;max-width:560px;gap:26px;padding:30px 24px;text-align:center}
+  .plansza{grid-template-columns:1fr;max-width:560px;gap:26px;padding:28px 22px;text-align:center}
   .plansza-right{align-items:center}
   .slowo{font-size:clamp(22px,6.4vw,28px)}
   .btns{width:100%}
 }
 @media (max-width:860px){
+  .hero-photo{height:clamp(190px,30vh,300px)}
   .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
   .menu.open{display:flex}
   .menu a{padding:11px 12px}
   .burger{display:grid}
-  .hero-center{padding:118px 14px 30px}
+  .hero-center{padding:18px 14px 28px}
 }
 @media (max-width:520px){
   .btn{font-size:11px;letter-spacing:.12em;padding:13px 8px}
   .site-foot{flex-direction:column;gap:14px;padding:18px 16px}
   .foot-social{flex-direction:column;gap:10px}
-  .plansza{padding:24px 16px}
+  .plansza{padding:20px 14px}
   .splash-card{padding:26px 30px}
 }
 
@@ -323,7 +328,7 @@ body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .picker-head h1{font-size:22px;font-weight:600}
 .picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
 .picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
-  background:linear-gradient(rgba(250,246,239,.78),rgba(250,246,239,.85)),url('assets/hero.jpg') 55% 45%/cover no-repeat}
+  background:linear-gradient(rgba(250,246,239,.30),rgba(250,246,239,.44)),url('assets/hero.jpg') center 30%/100% auto no-repeat}
 .picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
   padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
 .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;
@@ -384,6 +389,7 @@ INDEX = r'''<!DOCTYPE html>
 </header>
 
 <main class="hero">
+  <div class="hero-photo" aria-hidden="true"></div>
   <div class="hero-center">
     <section class="plansza" aria-label="Studio Sygnatura">
       <div class="plansza-left">

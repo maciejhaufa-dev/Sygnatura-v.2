@@ -146,7 +146,20 @@ v4/
 - **Podgląd roboczy:** `python3 serve.py 8080` (serwer **no-cache** — naprawia problem „nie odświeża się": wcześniej telefon dostawał 304 Not Modified). Publiczny adres podglądu sesji: `https://8080-iltxoxwpsn9ujvnw2mcr6.e2b.app/`. Meta `Cache-Control: no-store` dodane też do samych HTML.
 - Przypomnienie: w tym repo **pracujemy tylko na gałęzi `arena/01a056f0-sygnatura-v-2`** (zasada sesji).
 
-## 11. STATUS (po sesji 5, 31.08.2026)
+## 11. STATUS (po sesji 6, 31.08.2026 — po teście użytkownika)
+
+- [x] **Błąd splashu znaleziony i naprawiony:** inline style liter były łączone bez średnika (`margin-left:...emanimation-delay:...` → nieważna deklaracja) — dlatego animowała TYLKO 1. litera (jej style = sam delay, ważny), a pozostałe miały i brak odstępów, i brak opóźnienia. Fix: `";".join(style)`. Dodatkowo `.fall{opacity:0; ... forwards}` — litery niewidoczne do swojej kolejki, spływają jedna po drugiej (delay 1,55 s + 0,16 s × i).
+- [x] **Słowa „Pasją / styl / tradycja" — sekwencyjne wyłanianie od lewej do prawej:** animacja wipe (`clip-path: inset(0 100% 0 0) → inset(0)`) z opóźnieniami 4,6 / 5,1 / 5,6 s (start po splashu), potem welcome 6,3 s i przyciski 6,8 s (rise). Treść hidden (opacity 0) tylko do swojej kolejki.
+- [x] **„Cześć" widoczne nad planszą:** przebudowa hero — zamiast tła pod planszą jest **pas zdjęcia u góry** (`.hero-photo`, pełna szerokość, wysokość clamp(220px,34vh,400px); mobile clamp(190px,30vh,300px)), tło `center 30% / 100% auto` = pełna szerokość zdjęcia bez przycinania po bokach (napis w regionie x~25–60%, y~18–45% zdjęcia — analiza komponentów). Plansza (prostokąt z treścią) siedzi POD pasem — „pod tym napisem na prostokącie to co ustaliliśmy" ✓. Lekki kremowy welon na pasie (0.30–0.44), napis czytelny.
+- [x] Header z absolute → **sticky** w normalnym przepływie (menu naturalnie nad pasem zdjęcia), usunięte animacje veil-in header/footer.
+- [x] docs/ zsynchronizowany i pushnięty.
+
+### LEKCJE
+- Sklejanie stylów inline: ZAWSZE separator `;` między deklaracjami.
+- Pełnoekranowe `cover` na poziomym zdjęciu na pionowym telefonie pokazuje tylko ~35% szerokości — jeśli ma być widoczny cały napis, używaj `100% auto` (pełna szerokość) albo kadruj do kwadratu.
+- Testy użytkownika na telefonie > testy w sandboxie (nie mamy przeglądarki headless).
+
+## 12. STATUS (po sesji 5, 31.08.2026)
 
 - [x] **Animacje naprawione:** usunięta reguła `prefers-reduced-motion`, która wyłączała animacje na telefonach z ustawieniem „ogranicz ruch" (stąd „mignie i już jest"). JS chowa splash zawsze po 4,8 s. UWAGA: jedyne, czego nie da się obejść z CSS, to systemowe „Usuń animacje" w Androidzie (skala animatora 0) — wtedy animacje nie zagrają nigdzie.
 - [x] **Litery pełne (koniec kreskowania):** źródłem kreskowania był `LOGOTYP_3000px_BW.png` z WEKTORY3 — to wersja z kreskowaniem 75% z decyzji v3. `build.py` wypełnia teraz kreski do pełnych liter (dylatacja+erozja, `_solidify`), dziury liter (A, R) zachowane (zweryfikowane: l4/l7/l8 mają enklawy).
