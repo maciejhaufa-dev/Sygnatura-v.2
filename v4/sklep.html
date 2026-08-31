@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sklep — Studio Sygnatura</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<style>
+:root{
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C;
+  --serif:"Playfair Display","Cormorant Garamond",Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+
+/* ================= SPLASH ================= */
+#splash{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
+  transition:opacity .65s ease,visibility .65s ease}
+#splash::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
+  radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.splash-card{position:relative;display:flex;flex-direction:column;align-items:center;
+  gap:clamp(14px,2.6vw,22px);background:rgba(251,247,240,.97);border:2px solid var(--brunatny);
+  border-radius:14px;padding:clamp(28px,5vw,46px) clamp(34px,8vw,64px);
+  box-shadow:0 42px 90px rgba(15,26,21,.45);animation:card-in .6s cubic-bezier(.22,.75,.26,1) .25s both}
+.splash-sygnet{width:clamp(84px,20vw,126px);height:auto;animation:rise .85s cubic-bezier(.22,.75,.26,1) .5s both}
+.splash-word{display:flex;align-items:center;--lh:clamp(20px,4.6vmin,33px)}
+
+/* litery logotypu (sprite) */
+.wl{display:inline-block;height:var(--lh);width:calc(var(--lh)*var(--ar));
+  background-image:url('assets/wordmark.png');
+  background-size:calc(var(--lh)*10.19661) var(--lh);
+  background-repeat:no-repeat;background-position:calc(var(--lh)*var(--off)) 0}
+.l0,.l1,.l2{opacity:.6}
+.sw{opacity:0;animation:drop .55s cubic-bezier(.22,.85,.34,1.35) both}
+
+@keyframes card-in{from{opacity:0;transform:scale(.94) translateY(12px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes drop{0%{opacity:0;transform:translateY(-48px) scale(.92)}60%{opacity:1}80%{transform:translateY(3px) scale(1.03)}100%{opacity:1;transform:none}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+
+/* ================= NAGŁÓWEK ================= */
+.site-head{position:absolute;top:0;left:0;right:0;z-index:40;opacity:0;animation:fade-in .9s ease 3.2s forwards}
+.topbar{display:flex;justify-content:flex-end;align-items:center;gap:4px;
+  padding:8px clamp(14px,3.5vw,44px);background:rgba(251,247,240,.95);
+  border-bottom:1px solid rgba(107,69,48,.16)}
+.iconbtn{width:40px;height:40px;display:grid;place-items:center;color:var(--brunatny);
+  border-radius:9px;background:none;border:0;cursor:pointer}
+.iconbtn:hover{background:var(--krem-2)}
+.iconbtn svg{width:21px;height:21px}
+.burger{display:none}
+.menu{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2px;
+  background:var(--butelkowa);padding:10px clamp(10px,3vw,40px);box-shadow:0 14px 30px rgba(15,26,21,.28)}
+.menu a{color:var(--zloty);font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;
+  padding:9px 13px;border-radius:7px;transition:background .2s}
+.menu a:hover{background:rgba(196,165,130,.14)}
+.menu a.on{background:rgba(196,165,130,.2)}
+
+/* ================= HERO ================= */
+.hero{flex:1;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;
+  background:linear-gradient(rgba(250,246,239,.80),rgba(250,246,239,.86)),url('assets/hero.jpg') center 42%/cover no-repeat}
+.hero-center{flex:1;display:flex;align-items:center;justify-content:center;padding:140px 20px 44px}
+.plansza{opacity:0;animation:fade-in .9s ease 3.15s forwards;
+  display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(30px,4.5vw,60px);
+  align-items:center;width:100%;max-width:1000px;background:rgba(251,247,240,.86);
+  -webkit-backdrop-filter:blur(7px) saturate(1.05);backdrop-filter:blur(7px) saturate(1.05);
+  border:1.5px solid rgba(107,69,48,.55);border-radius:14px;
+  padding:clamp(30px,4.5vw,54px);box-shadow:0 34px 70px rgba(38,29,20,.28)}
+.plansza-left{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2vw,20px);
+  --sygW:clamp(96px,20vmin,158px)}
+.sygnet{width:var(--sygW);height:auto}
+.word{display:flex;align-items:center;--lh:calc(var(--sygW)/10.19661)}
+.plansza-right{display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,1.8vw,18px)}
+.slowa{display:flex;flex-direction:column;gap:2px}
+.slowo{color:var(--zloty);font-style:italic;font-weight:600;font-size:clamp(23px,3.4vw,31px);
+  line-height:1.22;letter-spacing:.04em;opacity:0;animation:rise .9s cubic-bezier(.22,.75,.26,1) forwards}
+.slowo.s1{animation-delay:3.5s}.slowo.s2{animation-delay:4.5s}.slowo.s3{animation-delay:5.5s}
+.welcome{font-size:clamp(15.5px,1.8vw,18.5px);line-height:1.75;color:rgba(51,38,28,.94);
+  opacity:0;animation:rise .9s cubic-bezier(.22,.75,.26,1) 6.3s forwards}
+.btns{display:flex;gap:12px;flex-wrap:wrap;opacity:0;animation:rise .9s cubic-bezier(.22,.75,.26,1) 6.9s forwards}
+.btn{flex:1 1 0;text-align:center;padding:14px 12px;border-radius:9px;font-size:12px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;transition:all .25s;white-space:nowrap}
+.btn-solid{background:var(--brunatny);color:var(--krem);border:1.5px solid var(--brunatny)}
+.btn-solid:hover{background:transparent;color:var(--brunatny)}
+.btn-outline{background:transparent;color:var(--brunatny);border:1.5px solid var(--brunatny)}
+.btn-outline:hover{background:var(--brunatny);color:var(--krem)}
+
+/* ================= STOPKA ================= */
+.site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
+  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px);
+  opacity:0;animation:fade-in .9s ease 3.5s forwards}
+.foot-social{display:flex;align-items:center;gap:14px}
+.foot-label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--zloty-soft)}
+.soc-icons{display:flex;gap:8px}
+.soc-icons a{width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(196,165,130,.45);
+  border-radius:50%;color:var(--zloty);transition:all .25s}
+.soc-icons a:hover{background:var(--zloty);color:var(--butelkowa)}
+.soc-icons svg{width:16px;height:16px}
+.foot-mid{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.copy{font-size:13px;letter-spacing:.04em}
+.regbtn{border:1px solid rgba(196,165,130,.6);color:var(--zloty);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;padding:5px 13px;border-radius:6px;transition:all .25s}
+.regbtn:hover{background:var(--zloty);color:var(--butelkowa)}
+.foot-right{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.foot-right a:hover{color:var(--zloty)}
+.foot-sep{opacity:.4}
+
+/* ================= RESPONSYWNOŚĆ ================= */
+@media (max-width:920px){
+  .menu a{font-size:12px;padding:8px 9px;letter-spacing:.1em}
+  .plansza{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+}
+@media (max-width:860px){
+  .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
+  .menu.open{display:flex}
+  .menu a{padding:11px 12px}
+  .burger{display:grid}
+  .hero-center{padding:120px 14px 30px}
+  .plansza{grid-template-columns:1fr;max-width:560px;gap:26px;padding:30px 24px;text-align:center}
+  .plansza-right{align-items:center}
+  .slowo{font-size:clamp(22px,6.4vw,28px)}
+  .btns{width:100%}
+}
+@media (max-width:520px){
+  .btn{font-size:11px;letter-spacing:.12em;padding:13px 8px}
+  .site-foot{flex-direction:column;gap:14px;padding:18px 16px}
+  .foot-social{flex-direction:column;gap:10px}
+}
+
+/* ================= REDUCED MOTION ================= */
+@media (prefers-reduced-motion:reduce){
+  .sw,.slowo,.welcome,.btns,.plansza,.site-head,.site-foot,.splash-card,.splash-sygnet{
+    animation:none!important;opacity:1!important;transform:none!important}
+  #splash{transition:none}
+}
+
+/* ================= PODSTRONY (stuby) ================= */
+body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
+.stub-head{background:var(--butelkowa);padding:16px clamp(16px,4vw,44px);display:flex;align-items:center}
+.stub-brand{display:flex;align-items:center;gap:14px;color:var(--zloty)}
+.stub-brand img{width:52px;height:52px}
+.stub-brand span{font-weight:700;font-size:15px;letter-spacing:.2em;text-transform:uppercase}
+.stub-main{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 18px;
+  background:var(--krem)}
+.stub-card{max-width:560px;width:100%;text-align:center;background:#fff;
+  border:1.5px solid rgba(107,69,48,.5);border-radius:14px;padding:clamp(30px,6vw,52px);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  box-shadow:0 24px 50px rgba(38,29,20,.16)}
+.stub-card h1{font-size:clamp(24px,5vw,34px);font-weight:600;color:var(--ink)}
+.stub-tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
+.stub-card p{color:rgba(51,38,28,.85);line-height:1.7;font-size:15.5px}
+.stub-card .btn{margin-top:8px}
+.back{color:var(--brunatny);font-size:13.5px;letter-spacing:.08em;border-bottom:1px solid transparent}
+.back:hover{border-color:var(--brunatny)}
+</style>
+</head>
+<body class="stub">
+<header class="stub-head">
+  <a href="index.html" class="stub-brand">
+    <img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura">
+    <span>Studio Sygnatura</span>
+  </a>
+</header>
+<main class="stub-main">
+  <div class="stub-card">
+    <h1>Sklep i realizacje</h1>
+    <p class="stub-tag">Wkrótce</p>
+    <p>Szykujemy naszą ofertę i galerię realizacji. Zajrzyj tu niebawem — będzie na co popatrzeć.</p>
+    <a class="btn btn-outline" href="index.html">Zobacz stronę główną</a>
+    <a class="back" href="index.html">← Wróć na stronę główną</a>
+  </div>
+</main>
+</body>
+</html>
