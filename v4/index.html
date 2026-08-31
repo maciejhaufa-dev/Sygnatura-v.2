@@ -124,11 +124,13 @@ button{font-family:inherit}
   .plansza-right{align-items:center}
   .slowo{font-size:clamp(22px,6.4vw,28px)}
   .btns{width:100%}
-  /* telefon: zdjęcie pełnej szerokości u góry („Cześć" w całości), plansza dociśnięta do dołu ekranu */
+  /* telefon: zdjęcie pełnej szerokości u góry („Cześć" w całości), jego dół rozpływa się w krem, plansza na dole ekranu */
   .hero{min-height:calc(100svh - 57px);background-image:none}
   .hero-photo{display:block;width:100%;aspect-ratio:1920/1440;
-    background:url('assets/hero.jpg') top center/100% auto no-repeat}
-  .picker-view{background:url('assets/hero.jpg') top center/100% auto no-repeat}
+    background-image:linear-gradient(rgba(250,246,239,.10),rgba(250,246,239,.10) 40%,rgba(250,246,239,.45) 65%,rgba(250,246,239,.92) 84%,rgba(250,246,239,1) 94%),url('assets/hero.jpg');
+    background-size:100% 100%,100% auto;background-position:0 0,top center;background-repeat:no-repeat,no-repeat}
+  .picker-view{background-image:linear-gradient(rgba(250,246,239,.10),rgba(250,246,239,.10) 40%,rgba(250,246,239,.45) 65%,rgba(250,246,239,.92) 84%,rgba(250,246,239,1) 94%),url('assets/hero.jpg');
+    background-size:100% 100%,100% auto;background-position:0 0,top center;background-repeat:no-repeat,no-repeat}
 }
 @media (max-width:860px){
   .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
@@ -181,7 +183,8 @@ body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .picker-head h1{font-size:22px;font-weight:600}
 .picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
 .picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
-  background:linear-gradient(rgba(250,246,239,.14),rgba(250,246,239,.26) 55%,rgba(250,246,239,.42)),url('assets/hero.jpg') center 50%/cover no-repeat}
+  background-image:linear-gradient(rgba(250,246,239,.10),rgba(250,246,239,.10) 42%,rgba(250,246,239,.32) 56%,rgba(250,246,239,.78) 68%,rgba(250,246,239,.98) 75%,rgba(250,246,239,1) 79%),url('assets/hero.jpg');
+  background-size:cover,cover;background-position:center 50%,center 50%}
 .picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
   padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
 .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;

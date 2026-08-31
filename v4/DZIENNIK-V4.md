@@ -192,3 +192,15 @@ v4/
 ### LEKCJE
 - „Dalej wypełnia cały ekran" = wróć do pełnoekranowego tła hero (pas z sesji 6 był mylący dla użytkownika).
 - Geometrycznie: `cover` na poziomym 4:3 zdjęciu na pionowym telefonie NIGDY nie pokaże całego napisu x 25–60% (okno ma tylko ~35% szerokości) — telefon musi zostać przy `100% auto` u góry, a plansza na dole ekranu.
+
+## 14. STATUS (po sesji 7b, 31.08.2026 — gradient w hero)
+
+- [x] **Hero z gradientem (plan B przyjęty):** zdjęcie „Cześć" dalej wypełnia cały ekran i jest odsłonięte u góry, ale jego **dół rozpływa się gradientem w gładki krem** — na kremie siedzi plansza z logo (nadal zakotwiczona na dole kadru, `margin-top:auto`).
+  - Desktop: gradient 5-stopniowy — 10% welonu do ~42% wysokości, potem 32%→78%→98%→**100% kremu przy ~79%** (twarda krawędź zdjęcia znika, przejście płynne, „Cześć" czytelne u góry).
+  - Telefon: pas zdjęcia pełnej szerokości z identycznym rozmyciem dołu (10% do 40%, potem 45%→92%→100% przy 94%) — dół pasa gładko przechodzi w kremowy obszar planszy.
+  - Picker hero: podgląd kadru zaktualizowany o ten sam gradient.
+- [x] UWAGA TECHNICZNA: po edycji fuzzy build.py miał zdublowany ogon (pętla stubów poza main() → NameError) — naprawione przez przycięcie do pojedynczego `if __name__ == '__main__': main()`. Po każdej edycji build.py sprawdzać `tail` pliku + czysty przebieg `python3 build.py`.
+- [x] `docs/` zsynchronizowany i pushnięty.
+
+### LEKCJE
+- Po każdej edycji build.py: `tail v4/build.py` + pełny build + walidacja wygenerowanego HTML (gradienty, splash, tagi) — fuzzy edit potrafi nadpisać nie tam, gdzie trzeba.
