@@ -250,3 +250,15 @@ v4/
 
 ### LEKCJE
 - Walidacja przez `html.count('cal-card')` łapie też reguły CSS — liczyć klasy tylko w części BODY (split '</style>').
+
+## 18. STATUS (po sesji 10b, 31.08.2026 — wynajem: terminarz i pakiety wg v3)
+
+- [x] **Kalendarz z v3 przywrócony:** zamiast statycznej siatki 6 miesięcy — **interaktywny terminarz per pakiet** (port `assets/kalendarz.js` z pracownia/www/site): nawigacja miesiącami ‹ ›, dni przeszłe zablokowane, zajęte brązowe+przekreślone, wybór daty → wypełnia formularz (rez-data/rez-pakiet) i scrolluje do niego. Dane: `RENTAL_ZAJETE` w build.py (per pakiet, demo z v3 — do podmiany na realne).
+- [x] **Pakiety wg stylistyki (6):** Klasyczny 270 zł (biel i złoto) · Leśny 285 zł (zieleń, mech) · Rustykalny 150 zł (juta) · Komunijny 150 zł (jasne drewno) · Firmowy 320 zł (logo, oznakowanie) · **Zestaw własny** à la carte (od 15 zł, rabat −10% od 5 pozycji). Uwaga: w v3 treści kart były przesunięte o jedną pozycję względem id (bug) — tu sparowane poprawnie wg nazw id.
+- [x] **Formularz zapytania** (#rezerwacja): termin+pakiet (readonly, z terminarza), imię, e-mail, telefon, okazja, uwagi; submit buduje mailto z tematem i treścią (data+pakiet+dane) i pokazuje potwierdzenie.
+- [x] **Katalog rozszerzony do 16 pozycji** — doszły elementy z v3: Panel z cytatem 149 zł, Ramka rzeźbiona 169 zł, Grawer okolicznościowy 89 zł.
+- [x] Sekcje #jak i #partnerzy bez zmian; hero CTA → #pakiety / #katalog; docs/ zsynchronizowany i pushnięty.
+- [ ] **Czeka:** realne terminy do RENTAL_ZAJETE + akceptacja cen/treści pakietów.
+
+### LEKCJE
+- Ekstrakcja kart z v3 przez split po data-pkg myli kolejność (h3 z sąsiedniej karty) — mapować wg id pakietu, nie po kolejności h3.

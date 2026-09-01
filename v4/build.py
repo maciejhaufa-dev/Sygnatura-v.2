@@ -13,8 +13,8 @@ Uwagi wcielone:
 """
 import os
 import math
+import json
 import shutil
-import calendar
 
 from PIL import Image, ImageStat, ImageEnhance, ImageFilter
 
@@ -48,17 +48,16 @@ DEFAULT_HERO = HERO_CANDIDATES[1]  # historyczne (picker); obecnie hero = TŁO N
 HERO_TLO = 'TŁO NA HERO.png'       # KOŃCOWE TŁO HERO (decyzja użytkownika, sesja 8) — kompozycja: „Cześć" po prawej u góry, pusta ściana po lewej i na dole
 
 # ---------------------------------------------------------------- wynajem (podstrona)
-# PRZYKŁADOWE rezerwacje — PODMIEŃ na realne terminy po pierwszych zapytaniach
-RENTAL_BOOKED = {
-    '2026-10': [10, 24], '2026-11': [7, 21], '2026-12': [12, 19],
-    '2027-1': [9, 23], '2027-2': [13, 20], '2027-3': [6, 20],
+# Terminarz wg v3: zajęte terminy PER PAKIET. PRZYKŁADOWE dane z v3 — PODMIEŃ na realne.
+# Klucz = id pakietu, wartość = lista dat 'RRRR-MM-DD'.
+RENTAL_ZAJETE = {
+    'klasyczny':  ['2026-08-29', '2026-08-30', '2026-09-05', '2026-09-12', '2026-09-19', '2026-10-03', '2026-10-10', '2026-10-17', '2026-11-07'],
+    'lesny':      ['2026-08-28', '2026-08-29', '2026-09-05', '2026-09-06', '2026-09-26', '2026-10-10', '2026-10-24', '2026-11-14'],
+    'rustykalny': ['2026-08-29', '2026-09-12', '2026-09-13', '2026-09-19', '2026-10-03', '2026-10-31'],
+    'komunijny':  ['2026-08-30', '2026-09-20', '2026-10-11', '2026-11-21'],
+    'firmowy':    ['2026-08-28', '2026-09-17', '2026-09-18', '2026-10-08', '2026-10-22', '2026-11-05', '2026-11-26'],
+    'wlasny':     ['2026-08-29', '2026-09-05', '2026-09-12', '2026-10-10'],
 }
-RENTAL_ASK = {
-    '2026-10': [3, 17], '2026-11': [14, 28], '2026-12': [5, 26],
-    '2027-1': [16, 30], '2027-2': [6, 27], '2027-3': [13, 27],
-}
-RENTAL_MONTHS = [(2026, 10), (2026, 11), (2026, 12), (2027, 1), (2027, 2), (2027, 3)]
-MONTHS_PL = {1: 'styczeń', 2: 'luty', 3: 'marzec', 10: 'październik', 11: 'listopad', 12: 'grudzień'}
 
 # katalog: (ikona, nazwa, opis, cena)
 PRODUCTS = [
@@ -75,6 +74,9 @@ PRODUCTS = [
     ('scrabble', 'Mozaika „scrabble"', 'Imiona w drewnianych kafelkach · składamy na ścianie lub stole', 'od 55 zł / doba'),
     ('swieczniki', 'Świeczniki', 'Drewniane, stabilne · komplet 12 szt. · świece w zestawie', 'od 30 zł / doba'),
     ('winietki', 'Winietki i plan dnia', 'Imienne oznaczenia stołów + tablica harmonogramu imprezy', 'od 30 zł / doba'),
+    ('panel_cytat', 'Panel z cytatem', 'Warstwowy panel z sentencją, imionami i datą — do powieszenia na ścianie', 'od 149 zł / doba'),
+    ('ramka', 'Ramka rzeźbiona', 'Na zdjęcie z uroczystości — rzeźbiona, z datą i okazją na dole', 'od 169 zł / doba'),
+    ('grawer', 'Grawer okolicznościowy', 'Tabliczka z dedykacją — jubileusz, rocznica albo pożegnanie pracownika', 'od 89 zł / doba'),
 ]
 
 ICONS_R = {
@@ -91,40 +93,71 @@ ICONS_R = {
     'scrabble': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="5" width="10" height="10"/><rect x="17" y="5" width="10" height="10"/><rect x="5" y="17" width="10" height="10"/><rect x="17" y="17" width="10" height="10"/></svg>',
     'swieczniki': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 6h6v9a3 3 0 0 1-6 0z"/><path d="M16 3v3"/><circle cx="16" cy="2.6" r="1.5"/><rect x="7" y="18" width="18" height="5"/></svg>',
     'winietki': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="8" y="6" width="16" height="20"/><path d="M11 12h10M11 16h10"/><path d="M16 26v4"/></svg>',
+    'panel_cytat': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="6" width="24" height="20"/><rect x="8" y="10" width="16" height="12"/><path d="M10 20h12M10 24h8"/></svg>',
+    'ramka': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="5" y="7" width="22" height="18"/><rect x="9" y="11" width="14" height="10"/><path d="M16 21l-3.2 4h6.4z"/><circle cx="12" cy="14.5" r="1.2"/></svg>',
+    'grawer': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="24"/><path d="M11 9h10M11 14h10M11 19h7"/><path d="M13 28h6"/></svg>',
 }
 
 PACKAGES = [
     {
-        'name': 'MINI', 'sub': 'kameralne przyjęcie do 50 gości', 'price': 'od 199 zł / doba', 'top': False,
+        'id': 'klasyczny', 'name': 'Pakiet Klasyczny', 'styl': 'biel i złoto — ponadczasowa elegancja', 'price': '270 zł / doba',
         'items': [
-            'Szyld powitalny z imionami (wymienna wkładka)',
-            'Tablica „rozpiska stołów" — plan sali',
-            'Numery stołów — 6 szt.',
-            'Serwetniki — 30 szt.',
-            'Lampki ciepłe 10 m + lampiony ×4',
-            'Tablice informacyjne: toaleta · parking · palarnia',
+            'Tablica powitalna — 1 szt.',
+            'Plan stołów — 1 szt.',
+            'Numery stolików — 10 szt.',
+            'Tabliczki na krzesła — 2 szt.',
+            'Litery przestrzenne — para',
+            'Wkładka personalizowana w cenie',
         ],
     },
     {
-        'name': 'STANDARD', 'sub': 'wesele lub firmówka do 120 gości', 'price': 'od 399 zł / doba', 'top': True,
+        'id': 'lesny', 'name': 'Pakiet Leśny', 'styl': 'zieleń, mech i naturalne drewno', 'price': '285 zł / doba',
         'items': [
-            'Wszystko z pakietu MINI (numery ×10, serwetniki ×60)',
-            'Lampki 20 m + lampiony ×8',
-            'Litery podświetlane MAŁE — inicjały lub imiona',
-            'Mozaika „scrabble" z imionami',
-            'Skrzynka na życzenia (koperty)',
-            'Świeczniki — 12 szt.',
+            'Tablica powitalna — 1 szt.',
+            'Plan stołów — 1 szt.',
+            'Numery stolików — 10 szt.',
+            'Skrzynka na koperty — 1 szt.',
+            'Ramka na zdjęcia — 1 szt.',
+            'Wkładka personalizowana w cenie',
         ],
     },
     {
-        'name': 'PREMIUM', 'sub': 'pełna oprawa sali + montaż', 'price': 'od 699 zł / doba', 'top': False,
+        'id': 'rustykalny', 'name': 'Pakiet Rustykalny', 'styl': 'juta, surowe drewno, wiejski klimat', 'price': '150 zł / doba',
         'items': [
-            'Wszystko z pakietu STANDARD',
-            'Litery podświetlane DUŻE — „LOVE" / nazwisko, 60 cm',
-            'Lampki 30 m + lampiony ×12',
-            'Personalizacja wszystkich grawerów w cenie',
-            'Montaż i demontaż po stronie Studia',
-            'Konsultacja aranżacji przestrzeni',
+            'Tablica z imieniem — 1 szt.',
+            'Oznaczenia stołów — 6 szt.',
+            'Dekoracja wejścia — 1 kpl.',
+            'Świeczniki drewniane — 6 szt.',
+            'Wkładka personalizowana w cenie',
+        ],
+    },
+    {
+        'id': 'komunijny', 'name': 'Pakiet Komunijny', 'styl': 'jasne drewno i delikatne detale', 'price': '150 zł / doba',
+        'items': [
+            'Tablica z imieniem — 1 szt.',
+            'Oznaczenia stołów — 6 szt.',
+            'Winietki imienne — 20 szt.',
+            'Dekoracja wejścia — 1 kpl.',
+            'Wkładka personalizowana w cenie',
+        ],
+    },
+    {
+        'id': 'firmowy', 'name': 'Pakiet Firmowy', 'styl': 'logo, oznakowanie i kierowanie gości', 'price': '320 zł / doba',
+        'items': [
+            'Tablica powitalna z logo — 1 szt.',
+            'Oznaczenia sal — 4 szt.',
+            'Numeracja stanowisk — 12 szt.',
+            'Znaki kierunkowe — 6 szt.',
+            'Wkładki z logo w cenie',
+        ],
+    },
+    {
+        'id': 'wlasny', 'name': 'Zestaw własny', 'styl': 'komponujesz z katalogu — à la carte', 'price': 'od 15 zł / doba',
+        'items': [
+            'Wybierasz pozycje z katalogu niżej',
+            'Cena = suma wybranych pozycji',
+            'Rabat −10% od 5 pozycji',
+            'Wkładka personalizowana w cenie',
         ],
     },
 ]
@@ -484,20 +517,36 @@ body.page{background:var(--krem)}
 .krok .num{display:block;font-size:26px;font-weight:700;color:var(--zloty);margin-bottom:8px}
 .krok b{color:var(--brunatny);font-size:15.5px}
 .krok p{margin-top:6px;font-size:13.5px;line-height:1.6;color:rgba(51,38,28,.8)}
-.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-top:28px}
-.cal-card{background:#fff;border:1px solid rgba(107,69,48,.45);padding:18px 16px;border-radius:0}
-.cal-card h3{text-align:center;font-size:18px;color:var(--brunatny);font-weight:600;margin-bottom:12px;text-transform:capitalize}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cal-dow{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);padding-bottom:2px}
-.cal-d{aspect-ratio:1;display:grid;place-items:center;font-size:12.5px;background:var(--krem-2);color:var(--ink)}
-.cal-d.e{background:transparent}
-.cal-d.we{background:#F6EFE1}
-.cal-d.a{background:var(--krem);outline:2px solid var(--zloty);color:var(--brunatny);font-weight:700}
-.cal-d.b{background:var(--brunatny);color:var(--krem)}
-.cal-d.b span{text-decoration:line-through;opacity:.95}
-.cal-leg{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:20px;font-size:13.5px;color:rgba(51,38,28,.85)}
-.cal-leg i{display:inline-block;width:14px;height:14px;margin-right:7px;vertical-align:-2px}
+/* terminarz v3 — interaktywny, per pakiet */
+.cal{background:var(--krem);border:1px solid rgba(107,69,48,.35);padding:12px;border-radius:0;margin-top:14px}
+.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:8px 12px}
+.calhead b{font-size:15px;text-transform:capitalize}
+.calnav button{background:none;border:0;color:var(--zloty);font-size:20px;cursor:pointer;padding:0 10px;line-height:1}
+.calnav button:disabled{opacity:.35;cursor:default}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.calgrid i{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase}
+.calgrid button{border:1px solid rgba(107,69,48,.28);background:#fff;color:var(--ink);font-size:13px;padding:6px 0;cursor:pointer;font-family:var(--serif);border-radius:0}
+.calgrid button:hover{border-color:var(--brunatny)}
+.calgrid button.busy{background:var(--brunatny);color:var(--krem);text-decoration:line-through;opacity:.9;cursor:not-allowed}
+.calgrid button.past{background:transparent;border-color:transparent;color:rgba(51,38,28,.28);cursor:not-allowed}
+.calgrid button.sel{background:var(--butelkowa);color:var(--zloty);font-weight:700;border-color:var(--butelkowa)}
+.callegend{margin-top:8px;font-size:12px;color:rgba(51,38,28,.7);display:flex;gap:16px;flex-wrap:wrap}
+.callegend em{font-style:normal}
+.callegend i{display:inline-block;width:12px;height:12px;border:1px solid rgba(107,69,48,.35);margin-right:6px;vertical-align:-1px;background:#fff}
+.callegend i.b{background:var(--brunatny);border-color:var(--brunatny)}
+.calpick{margin-top:8px;font-size:13px;color:var(--brunatny);min-height:20px}
+.calpick b{color:var(--butelkowa)}
 .cal-note{margin-top:12px;text-align:center;font-size:13px;color:rgba(51,38,28,.65)}
+/* formularz rezerwacji */
+.rez{background:#fff;border:1px solid rgba(107,69,48,.5);padding:clamp(24px,4vw,40px);border-radius:0;max-width:660px;margin:0 auto}
+.rez-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.rez-row{margin-bottom:14px}
+.rez-row label{display:block;font-size:13px;color:var(--brunatny);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase}
+.rez-row input,.rez-row textarea,.rez-row select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:var(--serif);font-size:15px;border-radius:0;color:var(--ink)}
+.rez-row input:focus,.rez-row textarea:focus,.rez-row select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
+.rez-row .rez-read{background:var(--krem-2);font-weight:600;color:var(--butelkowa)}
+#rez-info{text-align:center;margin:0 auto 18px;max-width:560px}
+#rez-ok{display:none;margin-top:16px;background:var(--butelkowa);color:var(--zloty);padding:16px;font-size:14px;line-height:1.65}
 .kat{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:28px}
 .kat-card{background:#fff;border:1px solid rgba(107,69,48,.45);padding:20px;border-radius:0;display:flex;flex-direction:column;gap:9px}
 .kat-ico{color:var(--brunatny)}
@@ -742,8 +791,8 @@ WYNAJEM = r'''<!DOCTYPE html>
     <h1>Wynajem dekoracji</h1>
     <p class="lead">Drewniane tablice, podświetlane litery i światło, które budują klimat przyjęcia. Ty wybierasz termin i zestaw — my grawerujemy napisy pod Twoje wydarzenie, dowozimy i montujemy.</p>
     <div class="hero-cta">
-      <a class="btn btn-solid" href="#kalendarz">Sprawdź wolne terminy</a>
-      <a class="btn btn-ghost" href="#zestawy">Zobacz zestawy</a>
+      <a class="btn btn-solid" href="#pakiety">Sprawdź wolne terminy</a>
+      <a class="btn btn-ghost" href="#katalog">Zobacz katalog</a>
     </div>
   </section>
 
@@ -758,29 +807,39 @@ WYNAJEM = r'''<!DOCTYPE html>
     </div>
   </section>
 
-  <section class="sec" id="kalendarz">
-    <h2 class="sec-h2 center">Kalendarz dostępności</h2>
-    <p class="sec-sub">Sezon 2026/2027 — październik–marzec (zapytania ślubne na 2027 już lecą). Termin rezerwuje zaliczka.</p>
-    @@CALENDAR@@
-    <div class="cal-leg">
-      <span><i style="background:var(--krem-2);border:1px solid rgba(107,69,48,.3)"></i>wolny</span>
-      <span><i style="background:var(--krem);outline:2px solid var(--zloty)"></i>zapytanie w toku</span>
-      <span><i style="background:var(--brunatny)"></i>zarezerwowany</span>
-    </div>
-    <p class="cal-note">Kalendarz ma charakter informacyjny — dostępność potwierdzamy w wiadomości zwrotnej. Soboty znikają najszybciej.</p>
-  </section>
-
   <section class="sec" id="katalog">
     <h2 class="sec-h2 center">Katalog produktów na wynajem</h2>
     <p class="sec-sub">Każdy element możesz wypożyczyć osobno — ceny za dobę, grawer w cenie. Wszystko powstaje w naszej pracowni, więc napisy dopasujemy do każdego wydarzenia.</p>
     @@CATALOG@@
   </section>
 
-  <section class="sec" id="zestawy">
-    <h2 class="sec-h2 center">Zestawy na wynajem</h2>
-    <p class="sec-sub">Trzy gotowe pakiety — od kameralnego przyjęcia po pełną oprawę sali. Zestaw wychodzi taniej niż suma pojedynczych elementów.</p>
+  <section class="sec" id="pakiety">
+    <h2 class="sec-h2 center">Pakiety ozdób — wybierz stylistykę</h2>
+    <p class="sec-sub">Każdy pakiet ma własny terminarz — kliknij datę, żeby sprawdzić dostępność i wysłać zapytanie. Zajęte dni są oznaczone na brązowo.</p>
     @@PACKAGES@@
-    <p class="cal-note">Kaucja zwrotna 300 zł przy każdym zestawie · wypożyczenie od 1 doby · brakujące elementy dobierzesz à la carte.</p>
+    <p class="cal-note">Kaucja zwrotna 300 zł przy każdym pakiecie · wypożyczenie od 1 doby · brakujące elementy dobierzesz z katalogu.</p>
+  </section>
+
+  <section class="sec" id="rezerwacja">
+    <h2 class="sec-h2 center">Zapytaj o termin</h2>
+    <p id="rez-info" class="cal-note">Wybierz datę w terminarzu przy pakiecie — pola wypełnią się same.</p>
+    <form class="rez" id="rez-form">
+      <div class="rez-grid">
+        <div class="rez-row"><label for="rez-data">Termin</label><input id="rez-data" class="rez-read" type="text" placeholder="wybierz datę w terminarzu" readonly></div>
+        <div class="rez-row"><label for="rez-pakiet">Pakiet</label><input id="rez-pakiet" class="rez-read" type="text" placeholder="wybierz pakiet" readonly></div>
+      </div>
+      <div class="rez-grid">
+        <div class="rez-row"><label for="rez-imie">Imię i nazwisko</label><input id="rez-imie" type="text" placeholder="Jak się do Ciebie zwracać" required></div>
+        <div class="rez-row"><label for="rez-mail">E-mail</label><input id="rez-mail" type="email" placeholder="adres@poczta.pl" required></div>
+      </div>
+      <div class="rez-grid">
+        <div class="rez-row"><label for="rez-tel">Telefon</label><input id="rez-tel" type="tel" placeholder="opcjonalnie"></div>
+        <div class="rez-row"><label for="rez-okazja">Okazja</label><select id="rez-okazja"><option>Wesele</option><option>Komunia / chrzest</option><option>Impreza firmowa</option><option>Urodziny / jubileusz</option><option>Inne</option></select></div>
+      </div>
+      <div class="rez-row"><label for="rez-uw">Uwagi</label><textarea id="rez-uw" rows="3" placeholder="Co ma być wygrawerowane, gdzie odbywa się impreza, czy potrzebny dowóz."></textarea></div>
+      <button class="btn btn-solid" type="submit" style="width:100%">Wyślij zapytanie</button>
+      <div id="rez-ok">Dziękujemy! Otworzyliśmy wiadomość w Twoim programie pocztowym — wyślij ją, a termin potwierdzimy w ciągu jednego dnia roboczego.</div>
+    </form>
   </section>
 
   <section class="partner-sec" id="partnerzy">
@@ -827,6 +886,109 @@ WYNAJEM = r'''<!DOCTYPE html>
     burger.setAttribute('aria-expanded',open?'true':'false');
   });}
 })();
+</script>
+<script>
+/* Terminarz wynajmu (port z v3) — zajete terminy per pakiet w ZAJETE */
+var ZAJETE = @@ZAJETE_JS@@;
+var MIES = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
+var DNI  = ['pn','wt','śr','cz','pt','so','nd'];
+function iso(y,m,d){ return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
+
+function Kalendarz(box){
+  var id   = box.dataset.pkg;
+  var busy = ZAJETE[id] || [];
+  var dzis = new Date(); dzis.setHours(0,0,0,0);
+  var rok  = dzis.getFullYear(), mies = dzis.getMonth();
+  var wybor = null;
+
+  function rysuj(){
+    var pierwszy = new Date(rok, mies, 1);
+    var przesun  = (pierwszy.getDay() + 6) % 7;
+    var ile      = new Date(rok, mies + 1, 0).getDate();
+    var wstecz   = (rok < dzis.getFullYear()) || (rok === dzis.getFullYear() && mies <= dzis.getMonth());
+    var h = '<div class="calhead"><b>' + MIES[mies] + ' ' + rok + '</b>'
+          + '<span class="calnav">'
+          + '<button type="button" data-go="-1"' + (wstecz ? ' disabled' : '') + '>&#8249;</button>'
+          + '<button type="button" data-go="1">&#8250;</button></span></div>'
+          + '<div class="calgrid">';
+    DNI.forEach(function(d){ h += '<i>' + d + '</i>'; });
+    for (var i = 0; i < przesun; i++) h += '<span></span>';
+    for (var d = 1; d <= ile; d++){
+      var data = iso(rok, mies, d);
+      var dt   = new Date(rok, mies, d);
+      var kl   = '';
+      if (dt < dzis)                    kl = 'past';
+      else if (busy.indexOf(data) > -1) kl = 'busy';
+      if (data === wybor)               kl = 'sel';
+      var blok = (kl === 'past' || kl === 'busy') ? ' disabled' : '';
+      var opis = kl === 'busy' ? ' title="Termin zajęty"' : '';
+      h += '<button type="button" class="' + kl + '" data-d="' + data + '"' + blok + opis + '>' + d + '</button>';
+    }
+    h += '</div>'
+      +  '<div class="callegend"><em><i></i> wolny</em><em><i class="b"></i> zajęty</em></div>'
+      +  '<div class="calpick">' + (wybor ? tekstWyboru(wybor) : 'Kliknij datę, żeby sprawdzić dostępność.') + '</div>';
+    box.innerHTML = h;
+    box.querySelectorAll('[data-go]').forEach(function(b){
+      b.onclick = function(){
+        mies += parseInt(b.dataset.go, 10);
+        if (mies > 11){ mies = 0; rok++; }
+        if (mies < 0){ mies = 11; rok--; }
+        rysuj();
+      };
+    });
+    box.querySelectorAll('[data-d]').forEach(function(b){
+      b.onclick = function(){ wybor = b.dataset.d; rysuj(); zapiszWybor(id, wybor); };
+    });
+  }
+  function tekstWyboru(d){
+    var cz = d.split('-');
+    return 'Wybrany termin: <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0] + '</b> — wolny.';
+  }
+  rysuj();
+}
+
+function zapiszWybor(pkg, data){
+  var fd = document.getElementById('rez-data');
+  var fp = document.getElementById('rez-pakiet');
+  if (fd) fd.value = data;
+  if (fp) fp.value = pkg;
+  var info = document.getElementById('rez-info');
+  if (info){
+    var cz = data.split('-');
+    info.innerHTML = 'Termin <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0]
+                   + '</b> — pakiet <b>' + pkg + '</b>. Wyślij zgłoszenie, żeby zablokować termin.';
+  }
+  var f = document.getElementById('rezerwacja');
+  if (f) f.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('[data-pkg]').forEach(Kalendarz);
+  var f = document.getElementById('rez-form');
+  if (f) f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var data    = document.getElementById('rez-data').value || 'data do ustalenia';
+    var pakiet  = document.getElementById('rez-pakiet').value || 'pakiet do ustalenia';
+    var imie    = document.getElementById('rez-imie').value;
+    var mail    = document.getElementById('rez-mail').value;
+    var tel     = document.getElementById('rez-tel').value;
+    var okazja  = document.getElementById('rez-okazja').value;
+    var uw      = document.getElementById('rez-uw').value;
+    var body = 'Zapytanie o wynajem dekoracji\n\nTermin: ' + data
+             + '\nPakiet: ' + pakiet
+             + '\nImię: ' + imie
+             + '\nE-mail: ' + mail
+             + (tel ? '\nTelefon: ' + tel : '')
+             + '\nOkazja: ' + okazja
+             + (uw ? '\nUwagi: ' + uw : '');
+    var link = 'mailto:kontakt@studiosygnatura.pl'
+             + '?subject=' + encodeURIComponent('Wynajem — ' + pakiet + ' — ' + data)
+             + '&body=' + encodeURIComponent(body);
+    var ok = document.getElementById('rez-ok');
+    if (ok) ok.style.display = 'block';
+    window.location.href = link;
+  });
+});
 </script>
 </body>
 </html>
@@ -883,33 +1045,6 @@ def render_stub(css, title, h1, text, extra=''):
             .replace('@@TEXT@@', text).replace('@@EXTRA@@', extra))
 
 
-def calendar_html():
-    """Kalendarz dostępności: 6 miesięcy sezonu, weekendy wyróżnione,
-    stany: wolny / zapytanie / zarezerwowany (dane: RENTAL_BOOKED / RENTAL_ASK)."""
-    dow = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
-    out = ['<div class="cal">']
-    for year, month in RENTAL_MONTHS:
-        fwd, ndays = calendar.monthrange(year, month)
-        key = f'{year}-{month}'
-        booked = set(RENTAL_BOOKED.get(key, ()))
-        ask = set(RENTAL_ASK.get(key, ()))
-        cells = [f'<div class="cal-dow">{d}</div>' for d in dow]
-        cells += ['<div class="cal-d e"></div>'] * fwd
-        for dnum in range(1, ndays + 1):
-            cls = 'cal-d'
-            if (fwd + dnum - 1) % 7 >= 5:
-                cls += ' we'
-            if dnum in booked:
-                cls += ' b'
-            elif dnum in ask:
-                cls += ' a'
-            cells.append(f'<div class="{cls}"><span>{dnum}</span></div>')
-        out.append(f'<div class="cal-card"><h3>{MONTHS_PL[month]} {year}</h3>'
-                   f'<div class="cal-grid">{"".join(cells)}</div></div>')
-    out.append('</div>')
-    return ''.join(out)
-
-
 def catalog_html():
     cards = []
     for key, name, desc, price in PRODUCTS:
@@ -922,21 +1057,21 @@ def catalog_html():
 def packages_html():
     cards = []
     for pkg in PACKAGES:
-        badge = '<div class="pak-badge">najczęściej wybierany</div>' if pkg['top'] else ''
         items = ''.join(f'<li>{it}</li>' for it in pkg['items'])
         cards.append(
-            f'<div class="pak-card{" top" if pkg["top"] else ""}">{badge}'
+            f'<div class="pak-card">'
             f'<div class="pak-name">{pkg["name"]}</div>'
-            f'<div class="pak-sub">{pkg["sub"]}</div>'
+            f'<div class="pak-sub">{pkg["styl"]}</div>'
             f'<div class="pak-price"><small>wypożyczenie</small>{pkg["price"]}</div>'
             f'<ul>{items}</ul>'
-            f'<a class="btn btn-solid" href="kontakt.html">Zapytaj o termin</a></div>')
+            f'<div class="cal" data-pkg="{pkg["id"]}"></div>'
+            f'<a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div>')
     return '<div class="pak">' + ''.join(cards) + '</div>'
 
 
 def render_wynajem(css):
     html = (WYNAJEM.replace('@@CSS@@', css)
-            .replace('@@CALENDAR@@', calendar_html())
+            .replace('@@ZAJETE_JS@@', json.dumps(RENTAL_ZAJETE, ensure_ascii=False))
             .replace('@@CATALOG@@', catalog_html())
             .replace('@@PACKAGES@@', packages_html()))
     for key in ('CART', 'USER', 'BURGER', 'IG', 'FB', 'PIN'):
