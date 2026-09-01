@@ -27,6 +27,17 @@
       {% if r['dni'] %} · szacunkowo za {{ r['dni'] }} dn.: {{ '%.0f'|format((suma - (suma*0.05 if pozycje|length >= 10 else 0)) * r['dni']) }} zł{% endif %}
     </td></tr>
     {% endif %}
+    {% if personalizacje %}
+    <tr><th>Produkty spersonalizowane (płatne z góry, bezzwrotne)</th><td>
+      <ul class="zwykla">
+        {% for pz in personalizacje %}
+        <li><b>{{ pz.nazwa }}</b> — {{ '%.0f'|format(pz.cena) }} zł{% if pz.opis %}<br><span class="mala">opis: {{ pz.opis }}</span>{% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% set suma = personalizacje|sum(attribute='cena') %}
+      <b>Suma: {{ '%.0f'|format(suma) }} zł</b>{% if personalizacje|length >= 3 %} · rabat −5%: {{ '%.0f'|format(suma*0.05) }} zł → <b>{{ '%.0f'|format(suma*0.95) }} zł</b>{% endif %}
+    </td></tr>
+    {% endif %}
     <tr><th>Priorytet (stały partner)</th><td>{% if r['priorytet'] %}★ tak{% else %}nie{% endif %}</td></tr>
     <tr><th>Aktualny status</th><td><b>{{ statusy[r['status']] }}</b></td></tr>
     <tr><th>Ostatnia zmiana</th><td class="mala">{{ r['zmieniono'] }}</td></tr>

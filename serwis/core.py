@@ -107,6 +107,7 @@ def push_do_sheets(db, rezerwacja):
         'data_do': rezerwacja['data_do'],
         'dni': rezerwacja['dni'],
         'pozycje': rezerwacja['pozycje'],
+        'personalizacje': rezerwacja['personalizacje'],
     }, ensure_ascii=False).encode('utf-8')
     try:
         req = urllib.request.Request(url['wartosc'].strip(), data=payload, headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -151,7 +152,46 @@ def pozycje_txt(rez):
     if rabat:
         linie.append('Rabat −5%% (od 10 pozycji): −%d zł' % rabat)
     linie.append('Szacunkowo za %d dn.: %.0f zł (kwota do potwierdzenia)' % (dni, (suma - rabat) * dni))
-    return '\n'.join(linie)
+    return '\n'.join(linie) + '\n'
+
+
+def personalizacje_txt(rez):
+    """Produkty spersonalizowane z opisami — płatne z góry, bezzwrotne."""
+    try:
+        pers = json.loads(rez['personalizacje'] or '[]')
+    except Exception:
+        pers = []
+    if not pers:
+        return ''
+    suma = sum(float(p.get('cena') or 0) for p in pers)
+    rabat = round(suma * 0.05) if len(pers) >= 3 else 0
+    linie = ['PRODUKTY SPERSONALIZOWANE (jednorazówki — płatne z góry, nie podlegają zwrotowi):']
+    for p in pers:
+        linie.append('• %s — %.0f zł' % (p.get('nazwa', ''), p.get('cena') or 0))
+        if p.get('opis'):
+            linie.append('    opis: %s' % p['opis'])
+    linie.append('Suma: %.0f zł' % suma)
+    if rabat:
+        linie.append('Rabat −5%% (od 3 produktów): −%d zł' % rabat)
+        linie.append('Do zapłaty z góry: %.0f zł' % (suma - rabat))
+    else:
+        linie.append('Do zapłaty z góry: %.0f zł' % suma)
+    return '\n'.join(linie) + '\n'
+
+
+def kwoty_txt(rez):
+    """Podsumowanie kwot (najem × doby + kaucja + personalizacja z góry)."""
+    kw = rez['kwoty'] if isinstance(rez, dict) and rez.get('kwoty') else None
+    if not kw:
+        return ''
+    linie = ['PODSUMOWANIE KWOT (szacunkowe):',
+             'Najem: %.0f zł (%s × %s dn.)' % (kw['najem'], kw['stawka_txt'], kw['dni']),
+             'Kaucja zwrotna (najem): 300 zł',
+             'Personalizacja (płatna z góry, bezzwrotna): %.0f zł' % kw['pers_netto'],
+             'RAZEM: %.0f zł' % kw['razem']]
+    if kw.get('pers_rabat'):
+        linie.insert(3, 'w tym rabat na personalizację −5%%: −%d zł' % kw['pers_rabat'])
+    return '\n'.join(linie) + '\n'
 
 
 def mail_klient_zapytanie(rez, dokumenty):
@@ -173,6 +213,8 @@ def mail_klient_zapytanie(rez, dokumenty):
         '%(telefon)s'
         '\nTREŚĆ TWOJEGO PYTANIA\n%(tresc)s\n'
         '%(pozycje)s'
+        '%(personalizacje)s'
+        '%(kwoty)s'
         '\nJAK DZIAŁAMY\n'
         '1. Twoje zapytanie jest widoczne w naszym kalendarzu jako „wysłano zapytanie" — '
         'termin nie jest zablokowany, dopóki nie wpłynie kaucja.\n'
@@ -180,6 +222,8 @@ def mail_klient_zapytanie(rez, dokumenty):
         '3. Rezerwacja staje się wiążąca po wpłacie KAUCJI za zestaw w terminie 7 dni. '
         'Po zaksięgowaniu wpłaty status zmienia się na „zarezerwowany" i termin blokujemy na sztywno.\n'
         '4. Zapłacone = zarezerwowane.\n'
+        '5. Produkty spersonalizowane są wykonywane na zamówienie: płatne z góry i nie podlegają zwrotowi — po imprezie zostają u Ciebie.\n'
+        '6. Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.\n'
         '\n%(procedura)s\n'
         '\nPozdrawiamy,\n'
         'Studio Sygnatura\n'
@@ -190,6 +234,8 @@ def mail_klient_zapytanie(rez, dokumenty):
         'telefon': ('Telefon: %s\n' % rez['telefon']) if rez['telefon'] else '',
         'tresc': (rez['tresc'].strip() or '(brak treści)'),
         'pozycje': pozycje_txt(rez),
+        'personalizacje': personalizacje_txt(rez),
+        'kwoty': kwoty_txt(rez),
         'procedura': procedura_txt(dokumenty),
     }
 
@@ -207,6 +253,8 @@ def mail_studio_zapytanie(rez):
         '%(telefon)s'
         '\nTreść:\n%(tresc)s\n'
         '%(pozycje)s'
+        '%(personalizacje)s'
+        '%(kwoty)s'
         '\nPanel admina: /admin (zmień status po weryfikacji).'
     ) % {
         'sygnatura': rez['sygnatura'], 'utworzono': rez['utworzono'], 'zakres': zakres_txt(rez),
@@ -214,6 +262,8 @@ def mail_studio_zapytanie(rez):
         'telefon': ('Telefon: %s\n' % rez['telefon']) if rez['telefon'] else '',
         'tresc': (rez['tresc'].strip() or '(brak treści)'),
         'pozycje': pozycje_txt(rez),
+        'personalizacje': personalizacje_txt(rez),
+        'kwoty': kwoty_txt(rez),
     }
 
 

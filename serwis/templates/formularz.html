@@ -40,6 +40,23 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
 .opcje .etyk{font-weight:700;color:var(--brunatny)}
 .opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
 #pole-syg{display:none;margin-top:10px}
+/* personalizacja */
+.pers-sekcja{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.pers-sekcja>label{text-transform:none;letter-spacing:0;font-size:15px;font-weight:700;color:var(--brunatny)}
+.pers-it{border:1px solid rgba(107,69,48,.35);background:#fff;padding:10px 12px;margin-top:10px}
+.pers-it b{display:block;font-size:15px;color:var(--ink)}
+.pers-it .meta{font-size:13px;color:rgba(51,38,28,.65);margin-bottom:6px}
+.pers-it .meta .cena{color:var(--butelkowa);font-weight:700}
+.pers-it .meta .bez{color:#8c2f2f;font-weight:700}
+.pers-it textarea{min-height:58px;margin-top:4px}
+.pers-link{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
+/* podsumowanie kwot */
+.kwoty{background:var(--butelkowa);color:var(--krem);padding:18px 20px;margin-bottom:16px}
+.kwoty h3{margin:0 0 10px;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--zloty)}
+.kwoty .linia{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:3px 0;color:rgba(251,247,240,.9)}
+.kwoty .linia b{color:var(--zloty)}
+.kwoty .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:10px;font-size:20px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.kwoty .uw{font-size:12.5px;color:rgba(251,247,240,.7);margin-top:10px;line-height:1.55}
 .przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
 .btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 30px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
 .btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
@@ -107,6 +124,25 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
       <div class="dni-sum" id="dni-sum"></div>
     </div>
 
+    <div class="pers-sekcja">
+      <label>Produkty spersonalizowane <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcjonalnie)</span></label>
+      <input type="hidden" name="pers" value="{{ pers_ids }}">
+      {% if personalizacje %}
+        {% for pr in personalizacje %}
+        <div class="pers-it" data-cena="{{ pr.cena }}">
+          <b>{{ pr.nazwa }}</b>
+          <div class="meta"><span class="cena">{{ '%.0f'|format(pr.cena) }} zł</span> · <span class="bez">płatne z góry, bezzwrotne</span></div>
+          <textarea name="pers_opis_{{ pr.id }}" rows="2" required
+                    placeholder="Opisz, co i jak ma być spersonalizowane (np. imiona, data, treść graweru...)"></textarea>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="mala" style="margin:8px 0 0">Nic nie wybrano. Każdy dodany produkt dostanie tu osobne pole opisu.</p>
+      {% endif %}
+      <a class="pers-link" href="{{ url_for('personalizacja', next=url_for('rezerwuj', pid=p.id, data=data, data_od=data_od, data_do=data_do, pers=','.join(pers_ids|map('string')))) }}">+ Dodaj produkty spersonalizowane</a>
+      <p class="mala" style="margin:8px 0 0">Rabat −5% od 3 produktów · personalizacja płatna z góry, kaucja za wynajem obowiązuje zawsze.</p>
+    </div>
+
     <div class="opcje">
       <div class="rzad">
         <input type="checkbox" id="tryb-nowa" name="tryb_sygnatury" value="nowa" checked>
@@ -146,6 +182,16 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
     <div class="pole">
       <label for="telefon">Telefon (opcjonalnie)</label>
       <input type="tel" id="telefon" name="telefon" placeholder="opcjonalnie">
+    </div>
+
+    <div class="kwoty">
+      <h3>Podsumowanie kwot (szacunkowe)</h3>
+      <div class="linia"><span id="kw-najem-txt">Najem: —</span><b id="kw-najem">—</b></div>
+      <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
+      <div class="linia"><span id="kw-pers-txt">Personalizacja: 0 produktów</span><b id="kw-pers">—</b></div>
+      <div class="razem"><span>RAZEM</span><span id="kw-razem">—</span></div>
+      <p class="uw"><b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
+      Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł. Kwoty potwierdzimy w odpowiedzi na zapytanie.</p>
     </div>
 
     <div class="przyciski">
@@ -198,6 +244,35 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
   });
   dOd.addEventListener('change', pokazDni);
   dDo.addEventListener('change', pokazDni);
+
+  /* podsumowanie kwot: najem × doby + kaucja + personalizacja (rabat −5% od 3 szt.) */
+  var STAWKA = {{ p.cena_liczba or 0 }};
+  function kwoty(){
+    var dni = dniN();
+    var najem = dni ? Math.round(STAWKA * dni) : 0;
+    document.getElementById('kw-najem-txt').textContent = dni
+      ? ('Najem: {{ p.cena }} × ' + dni + (dni === 1 ? ' doba' : dni < 5 ? ' doby' : ' dób'))
+      : 'Najem: —';
+    document.getElementById('kw-najem').textContent = dni ? (najem + ' zł') : '—';
+    var n = 0, suma = 0;
+    document.querySelectorAll('.pers-it').forEach(function(it){
+      n++;
+      suma += parseFloat(it.dataset.cena || 0);
+    });
+    var rabat = (n >= 3) ? Math.round(suma * 0.05) : 0;
+    var netto = suma - rabat;
+    document.getElementById('kw-pers-txt').textContent = 'Personalizacja: ' + n + (n === 1 ? ' produkt' : n < 5 ? ' produkty' : ' produktów')
+      + (rabat ? ' (z rabatem −5%)' : '');
+    document.getElementById('kw-pers').textContent = n ? (netto + ' zł') : '—';
+    document.getElementById('kw-razem').textContent = dni ? ((najem + 300 + netto) + ' zł') : '—';
+  }
+  function dniN(){
+    if (dOd.value && dDo.value && dOd.value <= dDo.value){
+      return Math.round((new Date(dDo.value) - new Date(dOd.value)) / 86400000) + 1;
+    }
+    return 0;
+  }
+  kwoty();
   pokazDni();
 })();
 </script>

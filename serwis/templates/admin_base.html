@@ -61,6 +61,7 @@ ul.zwykla{margin:8px 0;padding-left:20px}
     <a href="{{ url_for('admin_kategorie') }}" {% if aktywna=='kategorie' %}class="akt"{% endif %}>Kategorie</a>
     <a href="{{ url_for('admin_produkty') }}" {% if aktywna=='produkty' %}class="akt"{% endif %}>Produkty</a>
     <a href="{{ url_for('admin_pakiety') }}" {% if aktywna=='pakiety' %}class="akt"{% endif %}>Pakiety</a>
+    <a href="{{ url_for('admin_personalizacje') }}" {% if aktywna=='personalizacje' %}class="akt"{% endif %}>Personalizacje</a>
     <a href="{{ url_for('admin_maile') }}" {% if aktywna=='maile' %}class="akt"{% endif %}>Maile</a>
     <a href="{{ url_for('admin_ustawienia') }}" {% if aktywna=='ustawienia' %}class="akt"{% endif %}>Ustawienia</a>
     <a href="{{ url_for('wynajem') }}">Strona ↗</a>

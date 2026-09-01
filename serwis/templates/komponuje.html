@@ -49,6 +49,19 @@ h1{color:var(--brunatny);font-size:clamp(26px,4vw,36px);margin:14px 0 6px}
 .pod .wybrane div{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
 .pod .wybrane span{color:var(--zloty);white-space:nowrap}
 .pod .note{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
+.pod .linia{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:rgba(251,247,240,.9);padding:2px 0}
+.pod .linia b{color:var(--zloty)}
+.pod .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:8px;font-size:18px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.pers-sekcja{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.pers-sekcja>label{text-transform:none;letter-spacing:0;font-size:15px;font-weight:700;color:var(--brunatny)}
+.pers-it{border:1px solid rgba(107,69,48,.35);background:#fff;padding:10px 12px;margin-top:10px}
+.pers-it b{display:block;font-size:15px}
+.pers-it .meta{font-size:13px;color:rgba(51,38,28,.65);margin-bottom:6px}
+.pers-it .meta .cena{color:var(--butelkowa);font-weight:700}
+.pers-it .meta .bez{color:#8c2f2f;font-weight:700}
+.pers-link{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
+.kwoty-note{background:var(--butelkowa);color:rgba(251,247,240,.85);padding:14px 16px;margin-bottom:16px;font-size:13.5px}
+.kwoty-note b{color:var(--zloty)}
 .pod .btn{margin-top:16px;width:100%;text-align:center;background:var(--zloty);color:var(--butelkowa)}
 .pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
 /* kalendarz zajetosci */
@@ -152,6 +165,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
       <p class="rabat" id="komp-rab">Rabat −5% dopiero od 10 pozycji (masz 0)</p>
       <div class="suma" id="komp-suma"><small>suma / doba</small>0 zł</div>
       <div class="suma" id="komp-total" style="font-size:20px"><small>za wybrane dni</small>—</div>
+      <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
+      <div class="linia"><span id="pod-pers-txt">Personalizacja: 0</span><b id="pod-pers">—</b></div>
+      <div class="razem"><span>RAZEM</span><span id="komp-razem">—</span></div>
       <div class="wybrane" id="komp-lista"></div>
       <p class="note">+ kaucja zwrotna 300 zł · + personalizacja wg wybranych pozycji. Kwoty szacunkowe — potwierdzimy w odpowiedzi na zapytanie.</p>
       <a class="btn" href="#formularz">Przejdź do terminu i formularza</a>
@@ -217,6 +233,25 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
         <div class="dni-sum" id="dni-sum"></div>
       </div>
 
+      <div class="pers-sekcja">
+        <label>Produkty spersonalizowane <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcjonalnie)</span></label>
+        <input type="hidden" name="pers" id="pers" value="{{ pers_ids }}">
+        {% if personalizacje %}
+          {% for pr in personalizacje %}
+          <div class="pers-it" data-cena="{{ pr.cena }}">
+            <b>{{ pr.nazwa }}</b>
+            <div class="meta"><span class="cena">{{ '%.0f'|format(pr.cena) }} zł</span> · <span class="bez">płatne z góry, bezzwrotne</span></div>
+            <textarea name="pers_opis_{{ pr.id }}" rows="2" required
+                      placeholder="Opisz, co i jak ma być spersonalizowane..."></textarea>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="mala" style="margin:8px 0 0">Nic nie wybrano. Każdy dodany produkt dostanie tu osobne pole opisu.</p>
+        {% endif %}
+        <a class="pers-link" id="pers-link" href="/personalizacja/">+ Dodaj produkty spersonalizowane</a>
+        <p class="mala" style="margin:8px 0 0">Rabat −5% od 3 produktów · personalizacja płatna z góry, kaucja za wynajem obowiązuje zawsze.</p>
+      </div>
+
       <div class="opcje">
         <div class="rzad">
           <input type="checkbox" id="tryb-nowa" name="tryb_sygnatury" value="nowa" checked>
@@ -258,6 +293,10 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
         <input type="tel" id="telefon" name="telefon" placeholder="opcjonalnie">
       </div>
 
+      <div class="kwoty-note">
+        <b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
+        Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł. Kwoty potwierdzimy w odpowiedzi na zapytanie.
+      </div>
       <div class="przyciski">
         <a class="btn btn-line" href="{{ url_for('komponuje') }}">Zacznij od nowa</a>
         <button class="btn" type="submit">Wyślij zapytanie</button>
@@ -298,6 +337,27 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
     cb.addEventListener('change', przelicz);
   });
 
+  /* preselekcja pozycji (powrót z /personalizacja/) */
+  var POZ_IDS = {{ poz_ids|tojson }};
+  POZ_IDS.forEach(function(pid){
+    var cb = document.querySelector('.komp-it input[value="' + pid + '"]');
+    if (cb) cb.checked = true;
+  });
+
+  /* link do personalizacji niesie aktualny stan (termin + pozycje) */
+  function aktualizujLink(){
+    var a = document.getElementById('pers-link');
+    if (!a) return;
+    var ids = [];
+    document.querySelectorAll('.komp-it input:checked').forEach(function(cb){ ids.push(parseInt(cb.value)); });
+    var q = [];
+    if (dEv.value) q.push('data=' + dEv.value);
+    if (dOd.value) q.push('data_od=' + dOd.value);
+    if (dDo.value) q.push('data_do=' + dDo.value);
+    q.push('pozycje=' + encodeURIComponent(JSON.stringify(ids)));
+    a.href = '/personalizacja/?next=' + encodeURIComponent('/wynajem/komponuje/?' + q.join('&'));
+  }
+
   /* dni najmu */
   var dEv = document.getElementById('data');
   var dOd = document.getElementById('data_od');
@@ -323,6 +383,20 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
     var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
     var total = dni ? (suma - rabat) * dni : 0;
     document.getElementById('komp-total').innerHTML = '<small>za wybrane dni</small>' + (dni ? total + ' zł' : '—');
+    /* personalizacje */
+    var pn = 0, psuma = 0;
+    document.querySelectorAll('.pers-it').forEach(function(it){
+      pn++;
+      psuma += parseFloat(it.dataset.cena || 0);
+    });
+    var prabat = (pn >= 3) ? Math.round(psuma * 0.05) : 0;
+    var pnetto = psuma - prabat;
+    document.getElementById('pod-pers-txt').textContent = 'Personalizacja: ' + pn
+      + (pn === 1 ? ' produkt' : pn < 5 ? ' produkty' : ' produktów')
+      + (prabat ? ' (z rabatem −5%)' : '');
+    document.getElementById('pod-pers').textContent = pn ? (pnetto + ' zł') : '—';
+    document.getElementById('komp-razem').textContent = dni ? ((total + 300 + pnetto) + ' zł') : '—';
+    aktualizujLink();
   }
   dEv.addEventListener('change', function(){
     if (dEv.value){
@@ -360,6 +434,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
   aktualizujSyg();
 
   przelicz();
+  aktualizujLink();
 })();
 </script>
 </body>

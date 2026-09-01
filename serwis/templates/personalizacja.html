@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personalizacja — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--brunatny:#6B4530;--butelkowa:#1F3A32;--zloty:#C4A582;--krem:#FBF7F0;--krem2:#F6EFE1;--ink:#33261C}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
+a{color:var(--butelkowa)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
+.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
+.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
+.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
+.powrot{display:inline-block;margin:18px 0 0;font-size:15px}
+h1{color:var(--brunatny);font-size:clamp(26px,4vw,36px);margin:14px 0 6px}
+.sub{color:rgba(51,38,28,.75);max-width:800px;margin:0 0 10px}
+/* info kluczowe */
+.info{background:#fff;border:2px solid var(--brunatny);padding:18px 20px;margin:18px 0;font-size:15.5px}
+.info h2{font-size:20px;color:var(--butelkowa);margin:0 0 10px}
+.info ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.info b{color:var(--brunatny)}
+/* katalog */
+.pers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:18px 0}
+.pers-it{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px;cursor:pointer}
+.pers-it:hover{border-color:var(--brunatny)}
+.pers-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.pers-it b{display:block;font-size:15.5px;color:var(--ink)}
+.pers-it small{display:block;font-size:12.5px;color:rgba(51,38,28,.6);margin:2px 0}
+.pers-it .cena{font-size:14px;color:var(--butelkowa);font-weight:700}
+.pers-it .bez{font-size:12px;color:#8c2f2f;font-weight:700}
+/* pasek wyboru */
+.wybor{position:sticky;bottom:0;background:var(--butelkowa);color:var(--krem);padding:14px 0;margin-top:20px}
+.wybor .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.wybor .n{font-size:15px;color:rgba(251,247,240,.85)}
+.wybor .suma{font-size:22px;font-weight:700;color:var(--zloty)}
+.wybor .rabat{font-size:13px;color:var(--zloty);font-weight:700}
+.btn{display:inline-block;background:var(--zloty);color:var(--butelkowa);border:1px solid var(--zloty);padding:12px 26px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-left:auto}
+.btn:hover{background:var(--krem);border-color:var(--krem)}
+@media(max-width:620px){
+  .nav a{padding:6px 9px;font-size:15px}
+  .nav .brand{width:100%}
+  .btn{width:100%;margin-left:0;text-align:center}
+}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap nav">
+    <a class="brand" href="/">SygNATURA</a>
+    <a href="/">Start</a>
+    <a href="/warsztat.html">Rzemiosło</a>
+    <a href="/galeria.html">Galeria</a>
+    <a href="/sklep.html">Sklep</a>
+    <a class="akt" href="/wynajem/">Wynajem</a>
+    <a href="/kontakt.html">Kontakt</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="powrot" href="{{ nastepny }}">← wróć do rezerwacji</a>
+  <h1>Produkty spersonalizowane</h1>
+  <p class="sub">Wybierz produkty, które mają być wykonane pod Ciebie. W formularzu rezerwacji każdy z nich dostanie osobne pole opisu — co i jak ma być spersonalizowane.</p>
+
+  <div class="info">
+    <h2>Ważne zasady</h2>
+    <ul>
+      <li><b>Produkty spersonalizowane nie podlegają zwrotowi</b> — po imprezie zostają u Ciebie. Dla nas to jednorazówki wykonywane na zamówienie.</li>
+      <li><b>Płatne z góry</b> przy zamówieniu — osobno od najmu dekoracji.</li>
+      <li><b>Kaucja za wynajem obowiązuje zawsze</b> — personalizacja jej nie zastępuje.</li>
+      <li><b>Rabat −5%</b> na produkty spersonalizowane przy zamówieniu <b>min. 3 sztuk</b>.</li>
+    </ul>
+  </div>
+
+  <form id="wybor-form">
+    <div class="pers">
+      {% for p in pozycje %}
+      <label class="pers-it">
+        <input type="checkbox" value="{{ p.id }}" data-cena="{{ p.cena }}" data-nazwa="{{ p.nazwa }}"
+               {% if p.id|string in pers.split(',') %}checked{% endif %}>
+        <span>
+          <b>{{ p.nazwa }}</b>
+          <small>{{ p.opis or '' }}</small>
+          <span class="cena">{{ '%.0f'|format(p.cena) }} zł</span>
+          <span class="bez">· bezzwrotne</span>
+        </span>
+      </label>
+      {% endfor %}
+    </div>
+  </form>
+
+  <div class="wybor">
+    <div class="wrap">
+      <span class="n" id="wybor-n">0 wybranych</span>
+      <span class="suma" id="wybor-suma">0 zł</span>
+      <span class="rabat" id="wybor-rabat"></span>
+      <button class="btn" type="button" id="wybor-dodaj">Dodaj do rezerwacji</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var NEX = {{ nastepny|tojson }};
+  var cbs = document.querySelectorAll('.pers-it input');
+  function przelicz(){
+    var n = 0, suma = 0;
+    cbs.forEach(function(cb){ if (cb.checked){ n++; suma += parseFloat(cb.dataset.cena || 0); } });
+    var rabat = (n >= 3) ? Math.round(suma * 0.05) : 0;
+    document.getElementById('wybor-n').textContent = n + (n === 1 ? ' wybrany' : n < 5 ? ' wybrane' : ' wybranych');
+    document.getElementById('wybor-suma').textContent = (suma - rabat) + ' zł';
+    document.getElementById('wybor-rabat').textContent = rabat ? ('rabat −5%: −' + rabat + ' zł') : (n ? 'rabat −5% od 3 produktów' : '');
+  }
+  cbs.forEach(function(cb){ cb.addEventListener('change', przelicz); });
+  document.getElementById('wybor-dodaj').addEventListener('click', function(){
+    var ids = [];
+    cbs.forEach(function(cb){ if (cb.checked) ids.push(cb.value); });
+    var sep = NEX.indexOf('?') > -1 ? '&' : '?';
+    window.location.href = NEX + sep + 'pers=' + ids.join(',');
+  });
+  przelicz();
+})();
+</script>
+</body>
+</html>

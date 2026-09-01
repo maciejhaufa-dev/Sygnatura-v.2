@@ -91,6 +91,9 @@ a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:7
       <div class="cena">{{ p.cena }}</div>
       <ul>{% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}</ul>
       <a class="btn" href="{{ url_for('rezerwuj', pid=p.id) }}">Zarezerwuj termin</a>
+      <a class="btn" style="background:transparent;color:var(--butelkowa);border:1px solid var(--butelkowa);margin-top:10px;text-align:center"
+         href="{{ url_for('personalizacja', next=url_for('rezerwuj', pid=p.id)) }}">+ Dodaj produkty spersonalizowane</a>
+      <p style="margin:10px 0 0;font-size:13px;color:rgba(51,38,28,.65)">Personalizacja (imiona, daty, treści) to osobne produkty — jednorazówki płatne z góry, niepodlegające zwrotowi.</p>
     </div>
 
     <div class="cal" id="kalendarz">

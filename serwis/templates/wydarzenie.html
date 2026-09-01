@@ -84,6 +84,12 @@ a{color:var(--butelkowa)}
     {% endfor %}
   </div>
 
+  <div style="text-align:center;margin-top:26px">
+    <a class="btn" style="background:transparent;color:var(--butelkowa);border:1px solid var(--butelkowa)"
+       href="{{ url_for('personalizacja', next=url_for('wynajem_wydarzenie', ev=ev)) }}">+ Dodaj produkty spersonalizowane</a>
+    <p style="font-size:13.5px;color:rgba(51,38,28,.65);margin:10px 0 0">Personalizacja (imiona, daty, treści) jest wybierana osobno — jednorazówki płatne z góry, niepodlegające zwrotowi.</p>
+  </div>
+
   <div class="note">
     <b>Jak liczony jest termin:</b> dekoracje zakładamy <b>dzień przed</b> imprezą (montaż) i ściągamy <b>dzień po</b> (demontaż),
     więc najem trwa co najmniej <b>3 doby</b>. W formularzu wybierasz zakres od–do; na 1 dobę tylko w wyjątkowych sytuacjach

@@ -38,14 +38,24 @@ CREATE TABLE IF NOT EXISTS produkty (
 );
 -- Pakiety na wynajem (per typ wydarzenia, poziomy ESENCJA/MID/FULL)
 CREATE TABLE IF NOT EXISTS pakiety (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  ev          TEXT DEFAULT 'inne',  -- komunijny / weselny / firmowy / jubileuszowy
+  nazwa       TEXT NOT NULL,
+  opis        TEXT DEFAULT '',
+  cena        TEXT DEFAULT '',      -- tekst na stronę, np. 'od 199 zł / doba'
+  cena_liczba REAL DEFAULT 0,       -- liczba do kalkulacji (najem × doby)
+  tier        TEXT DEFAULT '',      -- ESENCJA / MID / FULL
+  pozycje     TEXT DEFAULT '',      -- lista pozycji, KAŻDA W OSOBNEJ LINII
+  dostepny    INTEGER DEFAULT 1,    -- 1 = pokazuj na stronie, 0 = ukryj (checkbox w adminie)
+  kolejnosc   INTEGER DEFAULT 0
+);
+-- Produkty spersonalizowane (jednorazówki: płatne z góry, NIE podlegają zwrotowi)
+CREATE TABLE IF NOT EXISTS personalizacje (
   id        INTEGER PRIMARY KEY AUTOINCREMENT,
-  ev        TEXT DEFAULT 'inne',    -- komunijny / weselny / firmowy / jubileuszowy
   nazwa     TEXT NOT NULL,
   opis      TEXT DEFAULT '',
-  cena      TEXT DEFAULT '',
-  tier      TEXT DEFAULT '',        -- ESENCJA / MID / FULL
-  pozycje   TEXT DEFAULT '',        -- lista pozycji, KAŻDA W OSOBNEJ LINII
-  dostepny  INTEGER DEFAULT 1,      -- 1 = pokazuj na stronie, 0 = ukryj (checkbox w adminie)
+  cena      REAL DEFAULT 0,         -- cena brutto za sztukę / komplet (płatna z góry)
+  dostepny  INTEGER DEFAULT 1,      -- 1 = widoczna w katalogu personalizacji
   kolejnosc INTEGER DEFAULT 0
 );
 -- Zgłoszenia / rezerwacje klientów
@@ -64,6 +74,7 @@ CREATE TABLE IF NOT EXISTS rezerwacje (
   telefon      TEXT DEFAULT '',
   tresc        TEXT DEFAULT '',     -- indywidualna wiadomość klienta
   pozycje      TEXT DEFAULT '[]',   -- JSON: skład zestawu własnego [{nazwa, cena}]
+  personalizacje TEXT DEFAULT '[]', -- JSON: produkty spersonalizowane [{nazwa, cena, opis}] — płatne z góry, bezzwrotne
   status       TEXT DEFAULT 'zapytanie',
   -- statusy: zapytanie | platnosc_w_toku | zarezerwowany | odrzucono
   priorytet    INTEGER DEFAULT 0,   -- 1 = stały partner (np. dekoratorka) — pokazujemy w adminie
@@ -100,53 +111,64 @@ KATEGORIE = [
 
 # (nazwa, kategoria, opis, cena za dobę)
 PRODUKTY = [
-    ('Szyld powitalny', 0, '„Witajcie" z imionami na wymiennej wkładce · 60×40 cm · opcjonalne podświetlenie LED', 49),
+    ('Szyld powitalny', 0, '„Witajcie" · 60×40 cm · wkładka wymienna (treść jako personalizacja) · opcjonalne LED', 49),
     ('Tablica „rozpiska stołów"', 0, 'Plan sali z listą gości · wymienne karty przy stołach · 100×70 cm', 59),
     ('Tablice informacyjne', 0, 'Toaleta · parking · palarnia · plan sali — komplet z podpórkami', 30),
     ('Numery stołów', 1, 'Grawerowane, stojące · komplet 10 szt. · wymienne', 25),
     ('Serwetniki', 1, 'Drewniane obrączki na serwetki · komplet 30 szt.', 20),
-    ('Winietki i plan dnia', 1, 'Imienne oznaczenia stołów + tablica harmonogramu imprezy', 30),
+    ('Plan dnia (tablica)', 1, 'Tablica harmonogramu imprezy · wymienna', 30),
     ('Skrzynka na życzenia', 1, 'Drewniana, z grawerem · na koperty i kartki', 25),
     ('Lampki', 2, 'Fairy lights, ciepłe 2700 K · 10 m · z koszykiem baterii', 15),
     ('Lampiony', 2, 'Drewniane, geometryczne · komplet 6 szt. · światło od środka', 35),
     ('Świeczniki', 2, 'Drewniane, stabilne · komplet 12 szt. · świece w zestawie', 30),
-    ('Litery podświetlane MAŁE', 3, 'Inicjały lub imiona · 25 cm · LED 2700 K', 45),
-    ('Litery podświetlane DUŻE', 3, '„LOVE" / nazwisko · 60 cm · podświetlenie LED', 120),
-    ('Mozaika „scrabble"', 3, 'Imiona w drewnianych kafelkach · składamy na ścianie lub stole', 55),
-    ('Panel z cytatem', 4, 'Warstwowy panel z sentencją, imionami i datą — do powieszenia na ścianie', 149),
-    ('Ramka rzeźbiona', 5, 'Na zdjęcie z uroczystości — rzeźbiona, z datą i okazją na dole', 169),
-    ('Grawer okolicznościowy', 5, 'Tabliczka z dedykacją — jubileusz, rocznica albo pożegnanie pracownika', 89),
+    ('Litery podświetlane MAŁE', 3, 'Litery do ułożenia napisu · 25 cm · LED 2700 K', 45),
+    ('Litery podświetlane DUŻE', 3, 'Napis do ułożenia · 60 cm · podświetlenie LED', 120),
+    ('Mozaika „scrabble"', 3, 'Drewniane literki do ułożenia napisu · ściana lub stół', 55),
 ]
 
 PAKIETY = [
-    # KOMUNIJNY (esencja / mid / full)
-    ('komunijny', 'Komunijny ESENCJA', 'dla kameralnego przyjęcia', 'od 199 zł / doba', 'ESENCJA',
-     'Tablica z imieniem — 1 szt.\nOznaczenia stołów — 6 szt.\nWinietki imienne — 20 szt.\nŚwieczniki drewniane — 6 szt.\nWkładka personalizowana w cenie'),
-    ('komunijny', 'Komunijny MID', 'najczęściej wybierany', 'od 349 zł / doba', 'MID',
-     'Wszystko z ESENCJI\nSzyld powitalny — 1 szt.\nPlan stołów — 1 szt.\nNumery stolików — 10 szt.\nLampki ciepłe 10 m + lampiony ×6\nMozaika „scrabble" z imionami\nWkładka personalizowana w cenie'),
-    ('komunijny', 'Komunijny FULL', 'pełna oprawa sali + montaż', 'od 599 zł / doba', 'FULL',
-     'Wszystko z MID\nLitery podświetlane DUŻE — imię, 60 cm\nLampki 30 m + lampiony ×12\nPanel z cytatem na ścianę\nMontaż i demontaż po stronie Studia\nPersonalizacja wszystkich grawerów w cenie'),
+    # KOMUNIJNY (esencja / mid / full) — cena_liczba = stawka za dobę do kalkulacji
+    ('komunijny', 'Komunijny ESENCJA', 'dla kameralnego przyjęcia', 'od 199 zł / doba', 199, 'ESENCJA',
+     'Tablica z imieniem — 1 szt.\nOznaczenia stołów — 6 szt.\nWinietki imienne — 20 szt.\nŚwieczniki drewniane — 6 szt.'),
+    ('komunijny', 'Komunijny MID', 'najczęściej wybierany', 'od 349 zł / doba', 349, 'MID',
+     'Wszystko z ESENCJI\nSzyld powitalny — 1 szt.\nPlan stołów — 1 szt.\nNumery stolików — 10 szt.\nLampki ciepłe 10 m + lampiony ×6\nMozaika „scrabble" (literki do ułożenia)'),
+    ('komunijny', 'Komunijny FULL', 'pełna oprawa sali + montaż', 'od 599 zł / doba', 599, 'FULL',
+     'Wszystko z MID\nLitery podświetlane DUŻE — 60 cm\nLampki 30 m + lampiony ×12\nMontaż i demontaż po stronie Studia'),
     # WESELNY (opcje i.w.)
-    ('weselny', 'Weselny ESENCJA', 'i.w. — małe wesele', 'od 299 zł / doba', 'ESENCJA',
-     'Szyld powitalny — 1 szt.\nPlan stołów — 1 szt.\nNumery stolików — 10 szt.\nLampki ciepłe 10 m + lampiony ×6\nWkładka personalizowana w cenie'),
-    ('weselny', 'Weselny MID', 'i.w. — do 120 gości', 'od 499 zł / doba', 'MID',
-     'Wszystko z ESENCJI\nLitery podświetlane MAŁE — inicjały\nMozaika „scrabble" z imionami\nSkrzynka na życzenia\nŚwieczniki — 12 szt.\nWkładka personalizowana w cenie'),
-    ('weselny', 'Weselny FULL', 'i.w. — pełna oprawa + montaż', 'od 799 zł / doba', 'FULL',
-     'Wszystko z MID\nLitery podświetlane DUŻE — „LOVE" / nazwisko, 60 cm\nLampki 30 m + lampiony ×12\nWinietki i plan dnia\nPanel z cytatem na ścianę\nMontaż i demontaż po stronie Studia\nPersonalizacja wszystkich grawerów w cenie'),
+    ('weselny', 'Weselny ESENCJA', 'i.w. — małe wesele', 'od 299 zł / doba', 299, 'ESENCJA',
+     'Szyld powitalny — 1 szt.\nPlan stołów — 1 szt.\nNumery stolików — 10 szt.\nLampki ciepłe 10 m + lampiony ×6'),
+    ('weselny', 'Weselny MID', 'i.w. — do 120 gości', 'od 499 zł / doba', 499, 'MID',
+     'Wszystko z ESENCJI\nLitery podświetlane MAŁE — inicjały\nMozaika „scrabble" (literki do ułożenia)\nSkrzynka na życzenia\nŚwieczniki — 12 szt.'),
+    ('weselny', 'Weselny FULL', 'i.w. — pełna oprawa + montaż', 'od 799 zł / doba', 799, 'FULL',
+     'Wszystko z MID\nLitery podświetlane DUŻE — 60 cm\nLampki 30 m + lampiony ×12\nWinietki i plan dnia\nMontaż i demontaż po stronie Studia'),
     # FIRMOWY
-    ('firmowy', 'Firmowy ESENCJA', 'spotkanie zespołu', 'od 249 zł / doba', 'ESENCJA',
-     'Tablica powitalna z logo — 1 szt.\nOznaczenia sal — 4 szt.\nNumeracja stanowisk — 12 szt.\nZnaki kierunkowe — 6 szt.\nWkładki z logo w cenie'),
-    ('firmowy', 'Firmowy MID', 'konferencja / event do 120 osób', 'od 449 zł / doba', 'MID',
-     'Wszystko z ESENCJI\nLitery podświetlane MAŁE — logo lub inicjały\nLampki 20 m + lampiony ×8\nŚwieczniki — 12 szt.\nWkładki z logo w cenie'),
-    ('firmowy', 'Firmowy FULL', 'gala / duży event + montaż', 'od 749 zł / doba', 'FULL',
-     'Wszystko z MID\nLitery podświetlane DUŻE — nazwa firmy, 60 cm\nLampki 30 m + lampiony ×12\nTablice informacyjne (toaleta · parking · palarnia)\nMontaż i demontaż po stronie Studia\nPersonalizacja wszystkich grawerów w cenie'),
+    ('firmowy', 'Firmowy ESENCJA', 'spotkanie zespołu', 'od 249 zł / doba', 249, 'ESENCJA',
+     'Tablica powitalna — 1 szt.\nOznaczenia sal — 4 szt.\nNumeracja stanowisk — 12 szt.\nZnaki kierunkowe — 6 szt.'),
+    ('firmowy', 'Firmowy MID', 'konferencja / event do 120 osób', 'od 449 zł / doba', 449, 'MID',
+     'Wszystko z ESENCJI\nLitery podświetlane MAŁE — 25 cm\nLampki 20 m + lampiony ×8\nŚwieczniki — 12 szt.'),
+    ('firmowy', 'Firmowy FULL', 'gala / duży event + montaż', 'od 749 zł / doba', 749, 'FULL',
+     'Wszystko z MID\nLitery podświetlane DUŻE — 60 cm\nLampki 30 m + lampiony ×12\nTablice informacyjne (toaleta · parking · palarnia)\nMontaż i demontaż po stronie Studia'),
     # JUBILEUSZOWY / URODZINOWY
-    ('jubileuszowy', 'Jubileuszowy ESENCJA', 'urodziny w gronie bliskich', 'od 199 zł / doba', 'ESENCJA',
-     'Szyld powitalny — 1 szt.\nNumery stolików — 6 szt.\nŚwieczniki drewniane — 6 szt.\nGrawer okolicznościowy — 1 szt.\nWkładka personalizowana w cenie'),
-    ('jubileuszowy', 'Jubileuszowy MID', 'okrągła rocznica', 'od 349 zł / doba', 'MID',
-     'Wszystko z ESENCJI\nLitery podświetlane MAŁE — wiek lub inicjały\nMozaika „scrabble" z imionami\nLampki 10 m + lampiony ×6\nPanel z cytatem na ścianę\nWkładka personalizowana w cenie'),
-    ('jubileuszowy', 'Jubileuszowy FULL', 'duża uroczystość + montaż', 'od 599 zł / doba', 'FULL',
-     'Wszystko z MID\nLitery podświetlane DUŻE — liczba lub nazwisko, 60 cm\nLampki 30 m + lampiony ×12\nRamka rzeźbiona na zdjęcie\nMontaż i demontaż po stronie Studia\nPersonalizacja wszystkich grawerów w cenie'),
+    ('jubileuszowy', 'Jubileuszowy ESENCJA', 'urodziny w gronie bliskich', 'od 199 zł / doba', 199, 'ESENCJA',
+     'Szyld powitalny — 1 szt.\nNumery stolików — 6 szt.\nŚwieczniki drewniane — 6 szt.'),
+    ('jubileuszowy', 'Jubileuszowy MID', 'okrągła rocznica', 'od 349 zł / doba', 349, 'MID',
+     'Wszystko z ESENCJI\nLitery podświetlane MAŁE — 25 cm\nMozaika „scrabble" (literki do ułożenia)\nLampki 10 m + lampiony ×6'),
+    ('jubileuszowy', 'Jubileuszowy FULL', 'duża uroczystość + montaż', 'od 599 zł / doba', 599, 'FULL',
+     'Wszystko z MID\nLitery podświetlane DUŻE — 60 cm\nLampki 30 m + lampiony ×12\nMontaż i demontaż po stronie Studia'),
+]
+
+# Produkty spersonalizowane: JEDNORAZÓWKI — płatne z góry, NIE podlegają zwrotowi (zostają u klienta).
+# Ceny robocze — do weryfikacji.
+PERSONALIZACJE = [
+    ('Wkładka do tablicy powitalnej', 'Imiona i data na wymiennej wkładce — grawer', 39),
+    ('Wkładka do planu stołów', 'Rozpiska stołów z imionami gości', 49),
+    ('Winietki imienne', 'Komplet 20 szt. z imionami gości', 49),
+    ('Kafelki z imionami do mozaiki „scrabble"', 'Imiona gości lub pary — komplet', 35),
+    ('Litery przestrzenne z imionami', 'Para liter z imionami lub nazwiskiem — na pamiątkę', 149),
+    ('Numery stołów z imionami', 'Numer stolika + imiona gości — komplet 10', 35),
+    ('Grawer okolicznościowy', 'Tabliczka z dedykacją — jubileusz, rocznica, pożegnanie', 89),
+    ('Panel z cytatem', 'Sentencja, imiona i data — do powieszenia na ścianie', 149),
+    ('Ramka rzeźbiona na zdjęcie', 'Data i okazja grawerowane na ramce', 169),
 ]
 
 
@@ -201,11 +223,60 @@ def inicjuj(sciezka=None):
 
     # migracja starszych baz: dodaj kolumny najmu od-do (jeśli ich nie ma)
     kolumny = {r[1] for r in db.execute('PRAGMA table_info(rezerwacje)')}
-    for kol, typ in [('data_od', 'TEXT'), ('data_do', 'TEXT'), ('dni', 'INTEGER DEFAULT 1'), ('pozycje', "TEXT DEFAULT '[]'")]:
+    for kol, typ in [('data_od', 'TEXT'), ('data_do', 'TEXT'), ('dni', 'INTEGER DEFAULT 1'),
+                     ('pozycje', "TEXT DEFAULT '[]'"), ('personalizacje', "TEXT DEFAULT '[]'")]:
         if kol not in kolumny:
             db.execute('ALTER TABLE rezerwacje ADD COLUMN %s %s' % (kol, typ))
     # stare rekordy miały tylko datę imprezy — domyślnie najem 3-dniowy (montaż dzień przed, demontaż dzień po)
     db.execute("UPDATE rezerwacje SET data_od=date(data,'-1 day'), data_do=date(data,'+1 day'), dni=3 WHERE data_od IS NULL OR data_od=''")
+    db.commit()
+
+    # migracja pakietów: kolumna cena_liczba (do kalkulacji najem × doby)
+    kol_pak = {r[1] for r in db.execute('PRAGMA table_info(pakiety)')}
+    if 'cena_liczba' not in kol_pak:
+        db.execute('ALTER TABLE pakiety ADD COLUMN cena_liczba REAL DEFAULT 0')
+    db.commit()
+    mapa_cen = {nazwa: cena_liczba for (_, nazwa, _, _, cena_liczba, _, _) in PAKIETY}
+    for nazwa, cena_liczba in mapa_cen.items():
+        db.execute('UPDATE pakiety SET cena_liczba=? WHERE nazwa=? AND (cena_liczba IS NULL OR cena_liczba=0)',
+                   (cena_liczba, nazwa))
+
+    # migracja katalogu najmu: jednorazówki NIE są najmem — przenieś do personalizacji
+    db.execute("DELETE FROM produkty WHERE nazwa IN ('Panel z cytatem','Ramka rzeźbiona','Grawer okolicznościowy')")
+    for stara, nowa_nazwa, nowy_opis in [
+        ('Winietki i plan dnia', 'Plan dnia (tablica)', 'Tablica harmonogramu imprezy · wymienna'),
+        ('Szyld powitalny', 'Szyld powitalny', '„Witajcie" · 60×40 cm · wkładka wymienna (treść jako personalizacja) · opcjonalne LED'),
+        ('Litery podświetlane MAŁE', 'Litery podświetlane MAŁE', 'Litery do ułożenia napisu · 25 cm · LED 2700 K'),
+        ('Litery podświetlane DUŻE', 'Litery podświetlane DUŻE', 'Napis do ułożenia · 60 cm · podświetlenie LED'),
+        ('Mozaika „scrabble"', 'Mozaika „scrabble"', 'Drewniane literki do ułożenia napisu · ściana lub stół'),
+    ]:
+        db.execute('UPDATE produkty SET nazwa=?, opis=? WHERE nazwa=?', (nowa_nazwa, nowy_opis, stara))
+    db.commit()
+
+    # migracja pakietów: USUŃ pozycje personalizowane (jednorazówki nie wchodzą do najmu);
+    # mozaika scrabble w pakietach zostaje jako literki do ułożenia (imiona = osobna personalizacja)
+    def czysc_pozycje(txt):
+        out = []
+        for linia in (txt or '').splitlines():
+            l = linia.strip()
+            if not l:
+                continue
+            low = l.lower()
+            if 'personalizowan' in low or 'personalizacj' in low or 'wkładki z logo' in low or low.startswith('wkładka'):
+                continue
+            if 'mozaika' in low and 'imionami' in low:
+                l = 'Mozaika „scrabble" (literki do ułożenia)'
+            if 'litery podświetlane' in low and '—' in l:
+                # zostaw sam produkt, bez dopisku o treści (treść = personalizacja)
+                l = l.split('—')[0].strip()
+            if 'panel z cytatem' in low or ('ramka' in low and 'rzeźbion' in low) or 'grawer okolicznościowy' in low:
+                continue
+            out.append(l)
+        return '\n'.join(out)
+    for row in db.execute('SELECT id, pozycje FROM pakiety').fetchall():
+        nowe = czysc_pozycje(row['pozycje'])
+        if nowe != (row['pozycje'] or ''):
+            db.execute('UPDATE pakiety SET pozycje=? WHERE id=?', (nowe, row['id']))
     db.commit()
 
     if db.execute('SELECT COUNT(*) FROM kategorie').fetchone()[0] == 0:
@@ -214,11 +285,18 @@ def inicjuj(sciezka=None):
         for nazwa, kat_id, opis, cena in PRODUKTY:
             db.execute('INSERT INTO produkty (nazwa, kategoria_id, opis, cena_doba) VALUES (?,?,?,?)',
                        (nazwa, kat_id + 1, opis, cena))
-        for ev, nazwa, opis, cena, tier, pozycje in PAKIETY:
-            db.execute('INSERT INTO pakiety (ev, nazwa, opis, cena, tier, pozycje) VALUES (?,?,?,?,?,?)',
-                       (ev, nazwa, opis, cena, tier, pozycje))
+        for ev, nazwa, opis, cena, cena_liczba, tier, pozycje in PAKIETY:
+            db.execute('INSERT INTO pakiety (ev, nazwa, opis, cena, cena_liczba, tier, pozycje) VALUES (?,?,?,?,?,?,?)',
+                       (ev, nazwa, opis, cena, cena_liczba, tier, pozycje))
         for klucz, wartosc in domyslne_ustawienia().items():
             db.execute('INSERT INTO ustawienia (klucz, wartosc) VALUES (?,?)', (klucz, wartosc))
+        db.commit()
+
+    # katalog personalizacji (jednorazówki) — seed przy pustej tabeli
+    if db.execute('SELECT COUNT(*) FROM personalizacje').fetchone()[0] == 0:
+        for i, (nazwa, opis, cena) in enumerate(PERSONALIZACJE):
+            db.execute('INSERT INTO personalizacje (nazwa, opis, cena, kolejnosc) VALUES (?,?,?,?)',
+                       (nazwa, opis, cena, i))
         db.commit()
 
     # demo ładuje się TYLKO przy pierwszym w historii uruchomieniu (marker na dysku);

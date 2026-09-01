@@ -326,3 +326,19 @@ v4/
 ### LEKCJE
 - Podmiana dużego bloku tras w app.py nadpisała trasę `dziekuje` (BuildError przy redirect) — po edycjach sprawdzać grep-em listę endpointów.
 - curl z `-X POST` + `-L` potrafi ponowić POST po 303 (405) — testować 303 bez -L i osobno GET celu.
+
+## 23. STATUS (1.09.2026 — personalizacja oddzielona od najmu + podsumowanie kwot)
+
+- [x] **Personalizacja = osobna podstrona** `/personalizacja/`: katalog jednorazówek (9 produktów: wkładki, winietki, kafelki scrabble, litery przestrzenne, numery z imionami, grawer, panel z cytatem, ramka) z zasadami: **płatne z góry, NIE podlegają zwrotowi** (zostają u klienta), kaucja za wynajem obowiązuje zawsze, rabat −5% od 3 szt.; wybór wraca do formularza (parametr next+pers).
+- [x] **Pakiety oczyszczone** z pozycji personalizowanych (migracja DB + seed): usunięte „wkładki personalizowane w cenie", panel z cytatem, ramka, grawer, litery z treścią; mozaika scrabble = „literki do ułożenia". Katalog najmu też oczyszczony: usunięte panel/ramka/grawer (→ personalizacje), poprawione opisy szyldu/liter/winietek (treść = personalizacja).
+- [x] **Opcja „Dodaj produkty spersonalizowane" w każdej warstwie:** karta na /wynajem/, przycisk na /wynajem/<ev>/, przycisk przy pakiecie; w formularzach (pakiet + kompozytor) sekcja z wybranymi produktami i **osobnym polem opisu dla każdego** (pers_opis_N, wymagane).
+- [x] **Podsumowanie kwot przed wysłaniem:** formularz pakietu (najem = cena_liczba × doby, kaucja 300 zł, personalizacja z rabatem, RAZEM — liczone w JS na żywo) + kompozytor (suma/doba, za dni, kaucja, personalizacja, RAZEM); notka o **protokole zdawczo-odbiorczym** (doby od przekazania do odbioru, płatność za każdą rozpoczętą dobę) w formularzu i mailach.
+- [x] **Backend:** kolumny pakiety.cena_liczba, rezerwacje.personalizacje (migracje); api_rezerwuj parsuje pers+opisy (walidacja: brak opisu → błąd z zachowaniem selekcji), liczy kwoty, zapisuje i wysyła w mailach (klient+studio): sekcje PRODUKTY SPERSONALIZOWANE i PODSUMOWANIE KWOT + punkty 5-6 procedury (personalizacja bezzwrotna, protokół).
+- [x] **Admin:** zakładka Personalizacje (CRUD + dostępny), szczegóły rezerwacji pokazują personalizacje z opisami i sumą/rabatem; dziekuje.html wspomina o personalizacjach.
+- [x] **Testy:** rezerwacja z 3 pers (mail: suma 137 zł → rabat 7 → 130; najem 597 = 199×3; RAZEM 1027), brak opisu → redirect z pers, 2 pers bez rabatu, preselekcja komponuje (pozycje+pers), JS OK na 6 stronach, admin 200. Baza wyczyszczona (4 demo).
+- [x] Commit i push.
+- [ ] **Czeka:** ceny personalizacji do weryfikacji (robocze), test usera, potem wdrożenie wg WDROZENIE.md.
+
+### LEKCJE
+- INSERT z 19 placeholderami na 18 kolumn — liczyć kolumny po dodaniu pola (SQLite: „N values for M columns").
+- Regex podmieniający pierwszy `return` w funkcji łapie early-return `return ''` zamiast docelowego — po masowej podmianie weryfikować grep-em.

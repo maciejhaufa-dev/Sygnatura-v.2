@@ -34,6 +34,9 @@ ul{text-align:left;margin:14px auto;max-width:380px;padding-left:20px}
     <li>W kalendarzu Twój termin widnieje teraz jako <b>„wysłano zapytanie"</b> — to informacja dla innych, że ktoś pytał o ten termin.</li>
     <li>Odpowiemy w ciągu <b>1 dnia roboczego</b>.</li>
     <li>Rezerwacja staje się wiążąca po wpłacie <b>kaucji w terminie 7 dni</b>. Zapłacone = zarezerwowane.</li>
+    {% if pers_n %}
+    <li>Do zamówienia dodano <b>{{ pers_n }}</b> produktów spersonalizowanych — płatne z góry, bezzwrotne (zostaną u Ciebie). Opisy personalizacji znajdziesz w e-mailu z podsumowaniem.</li>
+    {% endif %}
   </ul>
   <p class="mala">Nie dostałeś maila? Sprawdź folder spam albo napisz na kontakt@studiosygnatura.pl z numerem sprawy.</p>
   <p><a href="{{ url_for('wynajem') }}">← wróć do wynajmu</a></p>

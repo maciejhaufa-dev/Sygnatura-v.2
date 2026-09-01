@@ -255,10 +255,34 @@ def komponuje():
     data_do = request.args.get('data_do', '')
     if data and not data_od:
         data_od, data_do = zakres_domyslny(data)
+    # preselekcja: produkty z katalogu + personalizacje (powrót z /personalizacja/)
+    try:
+        poz_ids = [int(x) for x in json.loads(request.args.get('pozycje') or '[]')]
+    except Exception:
+        poz_ids = []
+    pers_ids = [int(x) for x in request.args.get('pers', '').split(',') if x.strip().isdigit()]
+    personalizacje = []
+    for pid3 in pers_ids:
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            personalizacje.append(pr)
     return render_template('komponuje.html', kategorie=kategorie, produkty_wg=produkty_wg,
-                           liczba=len(produkty),
+                           liczba=len(produkty), poz_ids=poz_ids, personalizacje=personalizacje, pers_ids=pers_ids,
                            dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
                            poprz=poprz, nast=nast, data=data, data_od=data_od, data_do=data_do)
+
+
+@app.route('/personalizacja/')
+def personalizacja():
+    """Podstrona personalizacji: jednorazówki płatne z góry, bezzwrotne.
+    Wybór wraca do formularza (parametr next)."""
+    db = get_db()
+    pozycje = db.execute('SELECT * FROM personalizacje WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    nastepny = request.args.get('next') or url_for('wynajem')
+    if not nastepny.startswith('/'):
+        nastepny = url_for('wynajem')
+    pers = request.args.get('pers', '')
+    return render_template('personalizacja.html', pozycje=pozycje, nastepny=nastepny, pers=pers)
 
 
 @app.route('/wynajem/<ev>/')
@@ -300,7 +324,15 @@ def rezerwuj(pid):
     data_do = request.args.get('data_do', '')
     if data and not data_od:
         data_od, data_do = zakres_domyslny(data)
-    return render_template('formularz.html', p=p, data=data, data_od=data_od, data_do=data_do)
+    # produkty spersonalizowane wybrane wcześniej na /personalizacja/
+    pers_ids = [int(x) for x in request.args.get('pers', '').split(',') if x.strip().isdigit()]
+    personalizacje = []
+    for pid3 in pers_ids:
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            personalizacje.append(pr)
+    return render_template('formularz.html', p=p, data=data, data_od=data_od, data_do=data_do,
+                           personalizacje=personalizacje, pers_ids=pers_ids)
 
 
 @app.route('/wynajem/<int:pakiet_id>/rezerwuj')
@@ -319,10 +351,13 @@ def api_rezerwuj():
         if not p:
             abort(404)
 
-    def wroc(data='', data_od='', data_do=''):
+    def wroc(data='', data_od='', data_do='', pers=''):
+        kw = dict(data=data, data_od=data_od, data_do=data_do)
+        if pers:
+            kw['pers'] = pers
         if pakiet_id:
-            return redirect303(url_for('rezerwuj', pid=pakiet_id, data=data, data_od=data_od, data_do=data_do))
-        return redirect303(url_for('komponuje', data=data, data_od=data_od, data_do=data_do))
+            return redirect303(url_for('rezerwuj', pid=pakiet_id, **kw))
+        return redirect303(url_for('komponuje', **kw))
 
     data = (request.form.get('data') or '').strip()
     data_od = (request.form.get('data_od') or '').strip()
@@ -364,6 +399,21 @@ def api_rezerwuj():
             flash('Zaznacz co najmniej jeden produkt z katalogu.')
             return wroc(data, data_od, data_do)
 
+    # produkty spersonalizowane (jednorazówki) — KAŻDY z własnym opisem
+    pers_list = []
+    try:
+        pers_ids = [int(x) for x in json.loads(request.form.get('pers') or '[]')]
+    except Exception:
+        pers_ids = []
+    for pid3 in pers_ids:
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            opis = (request.form.get('pers_opis_%d' % pr['id']) or '').strip()
+            if not opis:
+                flash('Uzupełnij opis personalizacji: %s (co i jak ma być spersonalizowane).' % pr['nazwa'])
+                return wroc(data, data_od, data_do, pers=','.join(str(x) for x in pers_ids))
+            pers_list.append({'nazwa': pr['nazwa'], 'cena': pr['cena'], 'opis': opis})
+
     email = (request.form.get('email') or '').strip()
     if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
         flash('Podaj poprawny adres e-mail.')
@@ -391,13 +441,29 @@ def api_rezerwuj():
               'Krótko uzasadnij w wiadomości, a rozpatrzymy to ręcznie.')
         return wroc(data, data_od, data_do)
 
+    # PODSUMOWANIE KWOT: najem × doby + kaucja + personalizacja z góry (rabat −5% od 3 szt.)
+    if p:
+        stawka = p['cena_liczba'] or 0
+        stawka_txt = p['cena']
+    else:
+        stawka = sum(float(x['cena']) for x in pozycje)
+        stawka_txt = '%d zł / doba (zestaw własny)' % stawka
+    pers_suma = sum(float(x['cena']) for x in pers_list)
+    pers_rabat = round(pers_suma * 0.05) if len(pers_list) >= 3 else 0
+    pers_netto = pers_suma - pers_rabat
+    najem_kwota = round(stawka * dni)
+    kwoty = {'najem': najem_kwota, 'stawka_txt': stawka_txt, 'dni': dni,
+             'pers_suma': pers_suma, 'pers_rabat': pers_rabat, 'pers_netto': pers_netto,
+             'razem': najem_kwota + 300 + pers_netto}
+
     teraz = core.teraz()
     pakiet_nazwa = p['nazwa'] if p else 'Zestaw własny'
     db.execute(
-        'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, '
-        'status, utworzono, zmieniono, historia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, personalizacje, '
+        'status, utworzono, zmieniono, historia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
         (sygnatura, data, data_od, data_do, dni, p['id'] if p else None, pakiet_nazwa, temat, imie, email, telefon, tresc,
          json.dumps(pozycje, ensure_ascii=False),
+         json.dumps(pers_list, ensure_ascii=False),
          'zapytanie', teraz, teraz, json.dumps([{'kiedy': teraz, 'status': 'zapytanie', 'uwaga': 'zgłoszenie przez formularz'}], ensure_ascii=False)))
     db.commit()
     rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (sygnatura,)).fetchone()
@@ -409,13 +475,17 @@ def api_rezerwuj():
         db.commit()
         rez = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rez['id'],)).fetchone()
 
+    # kwoty dołączamy do kopii rekordu (maile pokazują pełne podsumowanie)
+    rez_z_kwotami = dict(rez)
+    rez_z_kwotami['kwoty'] = kwoty
+
     # 1) e-mail do Studia (powiadomienie)
     core.wyslij_do_studia(db, 'Nowe zapytanie — %s — %s–%s' % (rez['pakiet_nazwa'], data_od, data_do),
-                          core.mail_studio_zapytanie(rez))
+                          core.mail_studio_zapytanie(rez_z_kwotami))
     # 2) autoresponder do klienta (podsumowanie + procedura + dokumenty)
     dok = json.loads(db.execute("SELECT wartosc FROM ustawienia WHERE klucz='dokumenty'").fetchone()['wartosc'] or '[]')
     core.wyslij_do_klienta(db, email, 'Twoje zapytanie %s — Studio Sygnatura' % sygnatura,
-                           core.mail_klient_zapytanie(rez, dok))
+                           core.mail_klient_zapytanie(rez_z_kwotami, dok))
     # 3) zapytanie do API Google Sheets (skonfigurujemy później — bez URL nic nie wysyła)
     core.push_do_sheets(db, rez)
 
@@ -427,7 +497,13 @@ def dziekuje():
     db = get_db()
     syg = request.args.get('sygnatura', '')
     rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (syg,)).fetchone() if syg else None
-    return render_template('dziekuje.html', rez=rez, sygnatura=syg)
+    pers_n = 0
+    if rez:
+        try:
+            pers_n = len(json.loads(rez['personalizacje'] or '[]'))
+        except Exception:
+            pers_n = 0
+    return render_template('dziekuje.html', rez=rez, sygnatura=syg, pers_n=pers_n)
 
 
 # ---------------------------------------------------------------- pliki (dokumenty)
@@ -607,6 +683,46 @@ def pakiety_usun(pid):
     return redirect303(url_for('admin_pakiety'))
 
 
+# ---------------------------------------------------------------- ADMIN: personalizacje
+@app.route('/admin/personalizacje')
+@admin_required
+def admin_personalizacje():
+    db = get_db()
+    rows = db.execute('SELECT * FROM personalizacje ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_personalizacje.html', rows=rows)
+
+
+@app.route('/admin/personalizacje/dodaj', methods=['POST'])
+@admin_required
+def personalizacje_dodaj():
+    db = get_db()
+    db.execute('INSERT INTO personalizacje (nazwa, opis, cena, dostepny) VALUES (?,?,?,?)',
+               (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0))
+    db.commit()
+    return redirect303(url_for('admin_personalizacje'))
+
+
+@app.route('/admin/personalizacje/<int:pid>/edytuj', methods=['POST'])
+@admin_required
+def personalizacje_edytuj(pid):
+    db = get_db()
+    db.execute('UPDATE personalizacje SET nazwa=?, opis=?, cena=?, dostepny=? WHERE id=?',
+               (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0, pid))
+    db.commit()
+    return redirect303(url_for('admin_personalizacje'))
+
+
+@app.route('/admin/personalizacje/<int:pid>/usun', methods=['POST'])
+@admin_required
+def personalizacje_usun(pid):
+    db = get_db()
+    db.execute('DELETE FROM personalizacje WHERE id=?', (pid,))
+    db.commit()
+    return redirect303(url_for('admin_personalizacje'))
+
+
 # ---------------------------------------------------------------- ADMIN: rezerwacje
 @app.route('/admin/rezerwacje')
 @admin_required
@@ -632,7 +748,9 @@ def admin_rezerwacja(rid):
         abort(404)
     historia = json.loads(r['historia'] or '[]')
     pozycje = json.loads(r['pozycje'] or '[]')
-    return render_template('admin_rezerwacja.html', r=r, historia=historia, pozycje=pozycje, statusy=core.STATUSY_PL)
+    personalizacje = json.loads(r['personalizacje'] or '[]')
+    return render_template('admin_rezerwacja.html', r=r, historia=historia, pozycje=pozycje,
+                           personalizacje=personalizacje, statusy=core.STATUSY_PL)
 
 
 @app.route('/admin/rezerwacje/<int:rid>/status', methods=['POST'])

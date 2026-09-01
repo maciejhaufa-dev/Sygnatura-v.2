@@ -29,7 +29,8 @@ Otwórz w przeglądarce:
 1. Klient wchodzi na `/wynajem/`, wybiera pakiet (komunijny / weselny / firmowy / jubileuszowy × ESENCJA/MID/FULL), każdy pakiet ma **własny kalendarz**.
 2. Klika **„Zarezerwuj termin"** → formularz kontaktowy z tematem **„Rezerwacja terminu"** (rozwijana lista).
 3. W formularzu: checkbox **„Nadaj nową sygnaturę"** lub **„Mam sygnaturę sprawy"** (odblokowuje pole na numer), miejsce na indywidualną wiadomość, e-mail kontaktowy klienta.
-4. Przyciski: **„Zmień termin"** (powrót do kalendarza) lub **„Wyślij zapytanie"**.
+   Każdy **produkt spersonalizowany** (dodawany na podstronie /personalizacja/) dostaje w formularzu osobne pole opisu — co i jak ma być spersonalizowane. Personalizacja = jednorazówki: **płatne z góry, nie podlegają zwrotowi** (zostają u klienta); rabat −5% od 3 sztuk. Formularz pokazuje **podsumowanie kwot** (najem × doby + kaucja 300 zł + personalizacja) przed wysłaniem.
+4. Przyciski: **„Zmień termin"** (powrót do kalendarza) lub **„Wyślij zapytanie"**. Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do odbioru — płatność za każdą rozpoczętą dobę.
 5. Po wysłaniu:
    - zgłoszenie trafia do bazy z sygnaturą (np. SYG-2026-001),
    - e-mail leci do `kontakt@studiosygnatura.pl`,
