@@ -297,3 +297,16 @@ v4/
 - Demo-seed tylko raz na maszynę: marker na dysku (data/.zainicjowano), bo flaga w DB wraca po skasowaniu bazy.
 - Flask debug auto-reload: przy edycji db.py ponownie odpala inicjuj() — marker chroni przed duplikatami demo.
 - Formularze NIE w <tr> (HTML je wyrzuca) — lista grid z form per wiersz.
+
+## 21. STATUS (1.09.2026 — wdrożenie: pytania o chmurę, OVH, GitHub Pages; responsywność)
+
+- [x] **Wyjaśnione i zapisane w serwis/WDROZENIE.md:** GitHub Pages NIE uruchomi Flaska/bazy (tylko statyka — zostaje jako wizytówka); dysk Google/Sheets to nie baza (Sheets = lustro przez webhook); OVH: hosting współdzielony = PHP (Flask nie wejdzie), OVH **Cloud Web ma Pythona** (43,99 zł netto/mc, runtime zarządzany), OVH **VPS** = rekomendowany dom produkcyjny; „baza w chmurze" = SQLite na zawsze włączonym serwerze.
+- [x] **Plan:** teraz test na telefonie (podgląd sandboxa) → PythonAnywhere FREE (trwały dysk, SQLite przeżywa, bez karty) → produkcja OVH VPS + domena studiosygnatura.pl + DNS A + nginx/certbot + systemd + backup cron. Alternatywa: Render (render.yaml gotowy, ale free = dysk efemeryczny — baza ginie przy deployu).
+- [x] **Pliki wdrożeniowe:** serwis/requirements.txt (flask, gunicorn), serwis/render.yaml (blueprint z ostrzeżeniem), serwis/WDROZENIE.md (instrukcje: PythonAnywhere z WSGI, VPS z systemd/nginx/certbot, DNS OVH, backup).
+- [x] **Responsywność (test usera na telefonie):** tabele admina w przewijalnych kontenerach .t-scroll (min-width 640px na mobile), strona wynajmu (pak 1 kolumna, przyciski pełnej szerokości, brand w nowej linii), formularz (przyciski kolumną, „Wyślij" na górze przez column-reverse).
+- [ ] **Czeka:** założenie konta PythonAnywhere przez usera + git clone (kroki w WDROZENIE.md), SMTP, Google Sheets, potem OVH VPS.
+
+### LEKCJE
+- Sandbox po resecie: ginie pip (flask!), procesy i LOKALNA historia gita; zmienia się też E2B_SANDBOX_ID → adres podglądu się zmienia (sprawdzać env, nie zapamiętywać URL-a).
+- curl z wnętrza sandboxa nie sięga własnego proxy e2b (SSL error) — podglądu nie da się zweryfikować curl-em; weryfikować lokalnie 127.0.0.1.
+- Procedura po resecie: reset --mixed FETCH_HEAD (zachowuje robocze pliki) → status → commit tylko diffu sesji.

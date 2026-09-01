@@ -6,14 +6,14 @@
 
 {% for m in rows %}
 <div class="forma">
-  <table class="tabela">
+  <div class="t-scroll"><table class="tabela">
     <tr><th style="width:110px">Kiedy</th><td class="mala">{{ m['utworzono'] }}</td>
         <th style="width:80px">Do</th><td>{{ m['do_kogo'] }}</td>
         <th style="width:80px">Typ</th><td class="mala">{{ m['typ'] }}</td></tr>
     <tr><th>Temat</th><td colspan="3">{{ m['temat'] }}</td>
         <th>Stan</th><td class="mala">{% if m['wyslany'] %}✔ wysłany{% elif m['blad'] %}⚠ {{ m['blad'] }}{% else %}◷ kopia (SMTP wył.){% endif %}</td></tr>
     <tr><th>Treść</th><td colspan="5" style="white-space:pre-wrap;font-size:15px">{{ m['tresc'] }}</td></tr>
-  </table>
+  </table></div>
   <form method="post" action="{{ url_for('mail_ponow', mid=m['id']) }}" style="margin-top:8px">
     <button class="btn btn-ghost" type="submit">Wyślij ponownie (SMTP)</button>
   </form>

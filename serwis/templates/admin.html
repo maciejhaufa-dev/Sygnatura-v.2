@@ -19,7 +19,7 @@
 </div>
 
 <h2>Najbliższe terminy</h2>
-<table class="tabela">
+<div class="t-scroll"><table class="tabela">
   <tr><th>Data</th><th>Sygnatura</th><th>Pakiet</th><th>Klient</th><th>Status</th></tr>
   {% for r in nadchodzace %}
   <tr>
@@ -32,10 +32,10 @@
   {% else %}
   <tr><td colspan="5" class="mala">Brak nadchodzących terminów.</td></tr>
   {% endfor %}
-</table>
+</table></div>
 
 <h2>Ostatnie e-maile (skrzynka nadawcza serwisu)</h2>
-<table class="tabela">
+<div class="t-scroll"><table class="tabela">
   <tr><th>Kiedy</th><th>Do</th><th>Temat</th><th>Typ</th><th>Stan</th></tr>
   {% for m in maile %}
   <tr>
@@ -48,5 +48,5 @@
   {% else %}
   <tr><td colspan="5" class="mala">Brak e-maili.</td></tr>
   {% endfor %}
-</table>
+</table></div>
 {% endblock %}

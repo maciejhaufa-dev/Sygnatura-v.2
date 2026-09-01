@@ -35,7 +35,7 @@
 <div class="forma">
   <h3>Dokumenty dołączane do autorespondera</h3>
   <p class="mala">Te dokumenty (procedura rezerwacji i kaucji, regulamin) serwis wymienia w e-mailu podsumowującym do klienta i linkuje poniżej.</p>
-  <table class="tabela">
+  <div class="t-scroll"><table class="tabela">
     <tr><th>Nazwa</th><th>Plik / link</th><th></th></tr>
     {% for d in dokumenty %}
     <tr>
@@ -50,7 +50,7 @@
     {% else %}
     <tr><td colspan="3" class="mala">Brak dokumentów — dodaj pierwszy.</td></tr>
     {% endfor %}
-  </table>
+  </table></div>
   <h3 style="margin-top:14px">Dodaj dokument (plik)</h3>
   <form method="post" action="{{ url_for('upload_dokument') }}" enctype="multipart/form-data">
     <label>Nazwa dokumentu (widoczna w mailu)</label>

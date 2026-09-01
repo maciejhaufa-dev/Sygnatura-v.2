@@ -6,7 +6,7 @@
 
 <div class="forma">
   <h3>Dane zgłoszenia</h3>
-  <table class="tabela">
+  <div class="t-scroll"><table class="tabela">
     <tr><th>Sygnatura</th><td>{{ r['sygnatura'] }}</td></tr>
     <tr><th>Utworzono</th><td>{{ r['utworzono'] }}</td></tr>
     <tr><th>Termin</th><td><b>{{ r['data'] }}</b></td></tr>
@@ -19,7 +19,7 @@
     <tr><th>Priorytet (stały partner)</th><td>{% if r['priorytet'] %}★ tak{% else %}nie{% endif %}</td></tr>
     <tr><th>Aktualny status</th><td><b>{{ statusy[r['status']] }}</b></td></tr>
     <tr><th>Ostatnia zmiana</th><td class="mala">{{ r['zmieniono'] }}</td></tr>
-  </table>
+  </table></div>
 </div>
 
 <div class="forma">
@@ -38,13 +38,13 @@
 
 <div class="forma">
   <h3>Historia zmian</h3>
-  <table class="tabela">
+  <div class="t-scroll"><table class="tabela">
     <tr><th>Kiedy</th><th>Status</th><th>Uwaga</th></tr>
     {% for h in historia %}
     <tr><td class="mala">{{ h['kiedy'] }}</td><td>{{ statusy.get(h['status'], h['status']) }}</td><td class="mala">{{ h['uwaga'] or '' }}</td></tr>
     {% else %}
     <tr><td colspan="3" class="mala">Brak wpisów.</td></tr>
     {% endfor %}
-  </table>
+  </table></div>
 </div>
 {% endblock %}
