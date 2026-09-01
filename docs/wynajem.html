@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>Wynajem dekoracji — Studio Sygnatura</title>
+<meta name="description" content="Wynajem drewnianych dekoracji ślubnych i eventowych: szyldy powitalne, tablice, podświetlane litery, oświetlenie. Kalendarz dostępności i gotowe zestawy.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C;
+  --serif:"Cormorant Garamond","Playfair Display",Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
+  --script:"Great Vibes","Alex Brush","Brush Script MT",cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+
+/* ================= SPLASH ================= */
+#splash{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
+  transition:opacity .8s ease,visibility .8s ease}
+#splash::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
+  radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.splash-card{position:relative;display:flex;flex-direction:column;align-items:center;
+  gap:clamp(14px,2.6vw,22px);background:rgba(251,247,240,.97);border:2px solid var(--brunatny);
+  border-radius:0;padding:clamp(28px,5vw,46px) clamp(34px,8vw,64px);
+  box-shadow:0 42px 90px rgba(15,26,21,.45);
+  --sygW:clamp(84px,20vw,126px);
+  animation:card-soft 1.1s cubic-bezier(.22,.61,.36,1) .3s both}
+.splash-sygnet{width:var(--sygW);height:auto;animation:rise-soft 1.2s cubic-bezier(.22,.61,.36,1) .75s both}
+.splash-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847)}
+
+/* litery logotypu */
+.lbox,.fall{display:inline-block;flex:none}
+.wl{height:1em;width:auto;display:block}
+.fall{opacity:0;animation:softfall .9s cubic-bezier(.22,.61,.36,1) forwards}
+
+@keyframes card-soft{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes rise-soft{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
+
+/* ================= NAGŁÓWEK ================= */
+/* nagłówek NAD zdjęciem hero (menu przykrywa górę zdjęcia — zdjęcie nie jest ucinane pod spodem) */
+.site-head{position:absolute;top:0;left:0;right:0;z-index:40}
+.topbar{display:flex;justify-content:flex-end;align-items:center;gap:4px;
+  padding:8px clamp(14px,3.5vw,44px);background:rgba(251,247,240,.95);
+  border-bottom:1px solid rgba(107,69,48,.16)}
+.iconbtn{width:40px;height:40px;display:grid;place-items:center;color:var(--brunatny);
+  border-radius:0;background:none;border:0;cursor:pointer}
+.iconbtn:hover{background:var(--krem-2)}
+.iconbtn svg{width:21px;height:21px}
+.burger{display:none}
+.menu{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2px;
+  background:var(--butelkowa);padding:10px clamp(10px,3vw,40px);box-shadow:0 14px 30px rgba(15,26,21,.28)}
+.menu a{color:var(--zloty);font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;
+  padding:9px 13px;transition:background .2s}
+.menu a:hover{background:rgba(196,165,130,.14)}
+.menu a.on{background:rgba(196,165,130,.2)}
+
+/* ================= HERO ================= */
+/* TŁO NA HERO użytkownika — pełna szerokość, bez cięcia boków (100% auto);
+   logo DUŻE po lewej na wysokości napisu „Cześć", panel u dołu PO PRAWEJ (rozciągnięty, 4 przyciski obok siebie) */
+.hero{flex:1;position:relative;display:flex;flex-direction:column;min-height:100svh;
+  background-color:#CECBB6;background-image:url('assets/hero.jpg');
+  background-size:100% auto;background-position:center 22%;background-repeat:no-repeat}
+.brand{position:absolute;top:clamp(96px,15%,170px);left:clamp(24px,4vw,72px);z-index:2;
+  display:flex;flex-direction:column;align-items:flex-start;gap:clamp(12px,1.6vw,18px);
+  --sygW:clamp(110px,13vw,176px)}
+.brand-sygnet{width:var(--sygW);height:auto;filter:drop-shadow(0 10px 24px rgba(30,20,10,.28));
+  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 3.9s forwards}
+.brand-txt{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.brand-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847);
+  filter:drop-shadow(0 6px 14px rgba(30,20,10,.30))}
+.brand-podpis{font-size:clamp(11px,1.2vw,14px);letter-spacing:.34em;text-transform:uppercase;color:var(--brunatny);
+  white-space:nowrap;text-shadow:0 1px 0 rgba(251,247,240,.65);
+  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.05s forwards}
+.panel{position:absolute;bottom:clamp(14px,2.6vh,30px);right:clamp(24px,4vw,72px);z-index:3;
+  width:min(1140px,calc(100% - clamp(48px,8vw,144px)));
+  background:#FFFDF8;border:2px solid var(--brunatny);border-radius:0;
+  padding:clamp(20px,2.6vw,36px);box-shadow:0 34px 70px rgba(20,15,8,.42);
+  opacity:0;animation:panel-up .85s cubic-bezier(.22,.61,.36,1) 3.7s forwards}
+@keyframes panel-up{from{opacity:.4;transform:translateY(14%)}to{opacity:1;transform:none}}
+.slow-row{display:flex;align-items:baseline;gap:clamp(10px,1.4vw,16px);flex-wrap:wrap}
+.slowo{font-family:var(--serif);color:var(--zloty);font-weight:600;
+  font-size:clamp(26px,3.2vw,42px);line-height:1.1;letter-spacing:.05em;
+  text-shadow:0 1px 0 rgba(107,69,48,.25),0 6px 16px rgba(20,15,8,.18);
+  opacity:0;animation:wipe .8s cubic-bezier(.22,.61,.36,1) forwards}
+.slowo.s1{animation-delay:4.3s}.slowo.s2{animation-delay:4.6s}.slowo.s3{animation-delay:4.9s}
+.slow-dash{color:var(--brunatny);font-size:clamp(18px,2.2vw,26px);font-weight:600;
+  opacity:0;animation:rise-soft .6s cubic-bezier(.22,.61,.36,1) forwards}
+.slow-dash.d1{animation-delay:4.5s}.slow-dash.d2{animation-delay:4.8s}
+.hero-text{font-size:clamp(14.5px,1.4vw,16.5px);line-height:1.65;color:rgba(51,38,28,.96);
+  margin-top:clamp(10px,1.4vw,14px);
+  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.2s forwards}
+.btn-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:clamp(14px,2vw,20px)}
+.btn-row .btn{opacity:0;animation:rise-soft .9s cubic-bezier(.22,.61,.36,1) forwards}
+.btn-row .btn:nth-child(1){animation-delay:5.5s}.btn-row .btn:nth-child(2){animation-delay:5.62s}
+.btn-row .btn:nth-child(3){animation-delay:5.74s}.btn-row .btn:nth-child(4){animation-delay:5.86s}
+@keyframes wipe{0%{clip-path:inset(0 100% 0 0);opacity:0}100%{clip-path:inset(0 -1% 0 0);opacity:1}}
+.btn{width:100%;text-align:center;padding:13px 10px;border-radius:0;font-size:12px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;transition:all .25s}
+.btn-solid{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa)}
+.btn-solid:hover{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
+.btn-outline{background:transparent;color:var(--brunatny);border:1.5px solid var(--brunatny)}
+.btn-outline:hover{background:var(--brunatny);color:var(--krem)}
+
+/* ================= STOPKA ================= */
+.site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
+  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px)}
+.foot-social{display:flex;align-items:center;gap:14px}
+.foot-label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--zloty-soft)}
+.soc-icons{display:flex;gap:8px}
+.soc-icons a{width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(196,165,130,.45);
+  border-radius:50%;color:var(--zloty);transition:all .25s}
+.soc-icons a:hover{background:var(--zloty);color:var(--butelkowa)}
+.soc-icons svg{width:16px;height:16px}
+.foot-mid{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.copy{font-size:13px;letter-spacing:.04em}
+.regbtn{border:1px solid rgba(196,165,130,.6);color:var(--zloty);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;padding:5px 13px;border-radius:0;transition:all .25s}
+.regbtn:hover{background:var(--zloty);color:var(--butelkowa)}
+.foot-right{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.foot-right a:hover{color:var(--zloty)}
+.foot-sep{opacity:.4}
+
+/* ================= RESPONSYWNOŚĆ ================= */
+@media (max-width:1023px){
+  /* telefon/tablet: pas zdjęcia pełnej szerokości POD nagłówkiem — „Cześć" w całości;
+     logo na pasie po lewej (na wysokości napisu), panel rozciągnięty na dole */
+  .hero{background-position:0 112px}
+  .brand{top:120px;left:14px;flex-direction:row;align-items:flex-start;gap:12px;--sygW:clamp(46px,13vw,64px)}
+  .brand-txt{gap:6px}
+  .brand-podpis{font-size:10px;letter-spacing:.26em}
+  .panel{left:14px;right:14px;width:auto;padding:18px 16px}
+  .slowo{font-size:clamp(24px,6.4vw,32px)}
+  .btn-row{grid-template-columns:1fr 1fr}
+}
+@media (max-width:860px){
+  .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
+  .menu.open{display:flex}
+  .menu a{padding:11px 12px}
+  .burger{display:grid}
+}
+/* niskie ekrany desktopowe: ciaśniejszy panel + kadr zdjęcia tak, żeby „Cześć" mieściło się nad panelem */
+@media (min-width:1024px) and (max-height:860px){
+  .hero{background-position:center 28%}
+  .brand{top:clamp(84px,12%,120px);--sygW:clamp(96px,11vw,150px)}
+  .panel{padding:14px 22px}
+  .slowo{font-size:clamp(24px,3vw,34px)}
+  .hero-text{font-size:13.5px;line-height:1.5}
+  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
+  .btn-row{gap:10px;margin-top:12px}
+  .slow-row{gap:10px}
+}
+/* bardzo szerokie monitory: kadr zdjęcia niżej (więcej góry), ciaśniejszy panel */
+@media (min-width:1024px) and (min-aspect-ratio:21/10){
+  .hero{background-position:center 18%}
+  .panel{padding:14px 22px}
+  .slowo{font-size:clamp(24px,3vw,34px)}
+  .hero-text{font-size:13.5px;line-height:1.5}
+  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
+}
+@media (max-width:520px){
+  .btn{font-size:10.5px;letter-spacing:.1em;padding:12px 8px}
+  .btn-row{grid-template-columns:1fr}
+  .site-foot{flex-direction:column;gap:14px;padding:18px 16px}
+  .foot-social{flex-direction:column;gap:10px}
+  .splash-card{padding:26px 30px}
+  .brand{top:118px}
+  .hero-cta{flex-direction:column;align-items:center}
+  .hero-cta .btn,.cta-end .btn{width:100%;max-width:340px}
+}
+
+/* ================= PODSTRONY (stuby) ================= */
+body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
+.stub-head{background:var(--butelkowa);padding:16px clamp(16px,4vw,44px);display:flex;align-items:center}
+.stub-brand{display:flex;align-items:center;gap:14px;color:var(--zloty)}
+.stub-brand img{width:52px;height:52px}
+.stub-brand span{font-weight:700;font-size:15px;letter-spacing:.2em;text-transform:uppercase}
+.stub-main{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 18px;background:var(--krem)}
+.stub-card{max-width:560px;width:100%;text-align:center;background:#fff;
+  border:1.5px solid rgba(107,69,48,.5);border-radius:0;padding:clamp(30px,6vw,52px);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  box-shadow:0 24px 50px rgba(38,29,20,.16)}
+.stub-card h1{font-size:clamp(24px,5vw,34px);font-weight:600;color:var(--ink)}
+.stub-tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
+.stub-card p{color:rgba(51,38,28,.85);line-height:1.7;font-size:15.5px}
+.stub-card .btn{margin-top:8px}
+.back{color:var(--brunatny);font-size:13.5px;letter-spacing:.08em;border-bottom:1px solid transparent}
+.back:hover{border-color:var(--brunatny)}
+
+/* ================= PODSTRONA: WYNAJEM ================= */
+body.page{background:var(--krem)}
+.page .site-head{position:sticky}
+.page-hero{background:var(--butelkowa);color:var(--krem);text-align:center;padding:clamp(34px,6vh,64px) clamp(16px,5vw,56px)}
+.page-tag{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);margin-bottom:14px}
+.page-hero h1{font-size:clamp(30px,5.4vw,48px);font-weight:600}
+.page-hero .lead{max-width:760px;margin:16px auto 0;color:var(--zloty-soft);font-size:clamp(15px,1.7vw,18px);line-height:1.7}
+.hero-cta{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:26px}
+.hero-cta .btn{width:auto;padding:14px 30px}
+.btn-ghost{background:transparent;color:var(--zloty);border:1.5px solid var(--zloty)}
+.btn-ghost:hover{background:var(--zloty);color:var(--butelkowa)}
+.sec{max-width:1120px;margin:0 auto;padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
+.sec-h2{font-size:clamp(24px,3.4vw,34px);color:var(--butelkowa);font-weight:600}
+.sec-h2.center{text-align:center}
+.sec-h2.center::after{content:"";display:block;width:64px;height:3px;background:var(--zloty);margin:12px auto 0}
+.sec-sub{text-align:center;max-width:720px;margin:14px auto 0;color:rgba(51,38,28,.8);font-size:15.5px;line-height:1.7}
+.kroki{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-top:28px}
+.krok{background:#fff;border:1px solid rgba(107,69,48,.4);padding:22px 18px;border-radius:0}
+.krok .num{display:block;font-size:26px;font-weight:700;color:var(--zloty);margin-bottom:8px}
+.krok b{color:var(--brunatny);font-size:15.5px}
+.krok p{margin-top:6px;font-size:13.5px;line-height:1.6;color:rgba(51,38,28,.8)}
+.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-top:28px}
+.cal-card{background:#fff;border:1px solid rgba(107,69,48,.45);padding:18px 16px;border-radius:0}
+.cal-card h3{text-align:center;font-size:18px;color:var(--brunatny);font-weight:600;margin-bottom:12px;text-transform:capitalize}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);padding-bottom:2px}
+.cal-d{aspect-ratio:1;display:grid;place-items:center;font-size:12.5px;background:var(--krem-2);color:var(--ink)}
+.cal-d.e{background:transparent}
+.cal-d.we{background:#F6EFE1}
+.cal-d.a{background:var(--krem);outline:2px solid var(--zloty);color:var(--brunatny);font-weight:700}
+.cal-d.b{background:var(--brunatny);color:var(--krem)}
+.cal-d.b span{text-decoration:line-through;opacity:.95}
+.cal-leg{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:20px;font-size:13.5px;color:rgba(51,38,28,.85)}
+.cal-leg i{display:inline-block;width:14px;height:14px;margin-right:7px;vertical-align:-2px}
+.cal-note{margin-top:12px;text-align:center;font-size:13px;color:rgba(51,38,28,.65)}
+.kat{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:28px}
+.kat-card{background:#fff;border:1px solid rgba(107,69,48,.45);padding:20px;border-radius:0;display:flex;flex-direction:column;gap:9px}
+.kat-ico{color:var(--brunatny)}
+.kat-ico svg{width:34px;height:34px}
+.kat-card h3{font-size:18.5px;color:var(--butelkowa);font-weight:600}
+.kat-card p{font-size:14px;line-height:1.65;color:rgba(51,38,28,.85);flex:1}
+.kat-price{margin-top:auto;border-top:1px dashed rgba(107,69,48,.4);padding-top:10px;font-size:14px;font-weight:700;color:var(--brunatny)}
+.pak{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:26px;margin-top:36px;align-items:stretch}
+.pak-card{position:relative;background:#fff;border:2px solid rgba(107,69,48,.5);border-radius:0;padding:30px 22px 24px;display:flex;flex-direction:column;gap:12px}
+.pak-card.top{border-color:var(--brunatny);box-shadow:0 26px 54px rgba(38,29,20,.2)}
+.pak-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--butelkowa);color:var(--zloty);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:6px 16px;white-space:nowrap}
+.pak-name{font-size:22px;font-weight:700;color:var(--butelkowa);text-align:center}
+.pak-sub{text-align:center;font-size:13px;color:rgba(51,38,28,.7)}
+.pak-price{text-align:center;color:var(--brunatny);font-size:27px;font-weight:700}
+.pak-price small{display:block;font-size:11.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6);margin-bottom:2px}
+.pak ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:rgba(51,38,28,.9);line-height:1.45}
+.pak li::before{content:"✦ ";color:var(--zloty)}
+.pak .btn{width:100%;margin-top:auto}
+.partner-sec{background:var(--butelkowa);color:var(--krem);padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
+.partner-sec .inner{max-width:1120px;margin:0 auto}
+.partner-sec h2{font-size:clamp(24px,3.4vw,34px);font-weight:600;text-align:center}
+.partner-sec h2::after{content:"";display:block;width:64px;height:3px;background:var(--zloty);margin:12px auto 0}
+.partner-sec .sub{text-align:center;max-width:680px;margin:14px auto 0;color:var(--zloty-soft);font-size:15.5px;line-height:1.7}
+.part-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:30px}
+.part-card{border:1px solid rgba(196,165,130,.5);padding:20px;border-radius:0}
+.part-card b{display:block;color:var(--zloty);font-size:16.5px;margin-bottom:8px}
+.part-card p{font-size:13.5px;line-height:1.65;color:var(--zloty-soft)}
+.partner-sec .cta{text-align:center;margin-top:30px}
+.partner-sec .cta .btn{width:auto;padding:14px 34px}
+.cta-end{text-align:center}
+.cta-end h2{font-size:clamp(24px,3.4vw,32px);color:var(--butelkowa);font-weight:600;margin-bottom:18px}
+.cta-end .btn{width:auto;display:inline-block;padding:14px 34px}
+
+/* ================= PICKER HERO ================= */
+.picker-head{background:var(--butelkowa);color:var(--krem);padding:22px clamp(16px,4vw,44px)}
+.picker-head h1{font-size:22px;font-weight:600}
+.picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
+.picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
+  background:url('assets/hero.jpg') center 40%/cover no-repeat}
+.picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
+  padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
+.picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;
+  padding:26px clamp(16px,4vw,44px) 60px}
+.picker-item{border:2px solid transparent;cursor:pointer;padding:6px;background:#fff;
+  border-radius:0;transition:border-color .2s}
+.picker-item img{width:100%;height:110px;object-fit:cover}
+.picker-item b{display:block;margin-top:6px;font-size:13px}
+.picker-item span{display:block;font-size:10.5px;color:#8A7B69;word-break:break-all}
+.picker-item.sel{border-color:var(--brunatny)}
+</style>
+</head>
+<body class="page">
+<header class="site-head">
+  <div class="topbar">
+    <a class="iconbtn" href="#" title="Koszyk — wkrótce" aria-label="Koszyk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></a>
+    <a class="iconbtn" href="#" title="Konto — wkrótce" aria-label="Konto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg></a>
+    <button class="iconbtn burger" id="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+  <nav class="menu" id="menu" aria-label="Menu główne">
+    <a href="index.html">Start</a>
+    <a href="warsztat.html">Rzemiosło</a>
+    <a href="galeria.html">Galeria</a>
+    <a href="#" title="wkrótce">Metryczki</a>
+    <a href="#" title="wkrótce">Numery i szyldy</a>
+    <a href="wynajem.html" class="on">Wynajem</a>
+    <a href="wynajem.html#partnerzy">Współpraca</a>
+    <a href="#" title="wkrótce">Dla firm</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+<main>
+  <section class="page-hero">
+    <p class="page-tag">Wynajem · wesela · eventy · firmówki</p>
+    <h1>Wynajem dekoracji</h1>
+    <p class="lead">Drewniane tablice, podświetlane litery i światło, które budują klimat przyjęcia. Ty wybierasz termin i zestaw — my grawerujemy napisy pod Twoje wydarzenie, dowozimy i montujemy.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#kalendarz">Sprawdź wolne terminy</a>
+      <a class="btn btn-ghost" href="#zestawy">Zobacz zestawy</a>
+    </div>
+  </section>
+
+  <section class="sec" id="jak">
+    <h2 class="sec-h2 center">Jak to działa</h2>
+    <div class="kroki">
+      <div class="krok"><span class="num">1</span><b>Wybierz termin</b><p>Sprawdź kalendarz poniżej albo napisz — odpowiadamy tego samego dnia.</p></div>
+      <div class="krok"><span class="num">2</span><b>Skomponuj zestaw</b><p>Weź gotowy pakiet albo zbierz własny z elementów katalogu.</p></div>
+      <div class="krok"><span class="num">3</span><b>Personalizacja</b><p>Grawerujemy imiona, plan sali i napisy — na wymiennych wkładkach.</p></div>
+      <div class="krok"><span class="num">4</span><b>Dostawa i montaż</b><p>Dowozimy i ustawiamy na miejscu (Warszawa i okolice) albo odbierasz z pracowni.</p></div>
+      <div class="krok"><span class="num">5</span><b>Zwrot po imprezie</b><p>Odbieramy dekoracje, rozliczamy kaucję. Ty zajmujesz się gośćmi.</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="kalendarz">
+    <h2 class="sec-h2 center">Kalendarz dostępności</h2>
+    <p class="sec-sub">Sezon 2026/2027 — październik–marzec (zapytania ślubne na 2027 już lecą). Termin rezerwuje zaliczka.</p>
+    <div class="cal"><div class="cal-card"><h3>październik 2026</h3><div class="cal-grid"><div class="cal-dow">Pn</div><div class="cal-dow">Wt</div><div class="cal-dow">Śr</div><div class="cal-dow">Cz</div><div class="cal-dow">Pt</div><div class="cal-dow">So</div><div class="cal-dow">Nd</div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d"><span>1</span></div><div class="cal-d"><span>2</span></div><div class="cal-d we a"><span>3</span></div><div class="cal-d we"><span>4</span></div><div class="cal-d"><span>5</span></div><div class="cal-d"><span>6</span></div><div class="cal-d"><span>7</span></div><div class="cal-d"><span>8</span></div><div class="cal-d"><span>9</span></div><div class="cal-d we b"><span>10</span></div><div class="cal-d we"><span>11</span></div><div class="cal-d"><span>12</span></div><div class="cal-d"><span>13</span></div><div class="cal-d"><span>14</span></div><div class="cal-d"><span>15</span></div><div class="cal-d"><span>16</span></div><div class="cal-d we a"><span>17</span></div><div class="cal-d we"><span>18</span></div><div class="cal-d"><span>19</span></div><div class="cal-d"><span>20</span></div><div class="cal-d"><span>21</span></div><div class="cal-d"><span>22</span></div><div class="cal-d"><span>23</span></div><div class="cal-d we b"><span>24</span></div><div class="cal-d we"><span>25</span></div><div class="cal-d"><span>26</span></div><div class="cal-d"><span>27</span></div><div class="cal-d"><span>28</span></div><div class="cal-d"><span>29</span></div><div class="cal-d"><span>30</span></div><div class="cal-d we"><span>31</span></div></div></div><div class="cal-card"><h3>listopad 2026</h3><div class="cal-grid"><div class="cal-dow">Pn</div><div class="cal-dow">Wt</div><div class="cal-dow">Śr</div><div class="cal-dow">Cz</div><div class="cal-dow">Pt</div><div class="cal-dow">So</div><div class="cal-dow">Nd</div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d we"><span>1</span></div><div class="cal-d"><span>2</span></div><div class="cal-d"><span>3</span></div><div class="cal-d"><span>4</span></div><div class="cal-d"><span>5</span></div><div class="cal-d"><span>6</span></div><div class="cal-d we b"><span>7</span></div><div class="cal-d we"><span>8</span></div><div class="cal-d"><span>9</span></div><div class="cal-d"><span>10</span></div><div class="cal-d"><span>11</span></div><div class="cal-d"><span>12</span></div><div class="cal-d"><span>13</span></div><div class="cal-d we a"><span>14</span></div><div class="cal-d we"><span>15</span></div><div class="cal-d"><span>16</span></div><div class="cal-d"><span>17</span></div><div class="cal-d"><span>18</span></div><div class="cal-d"><span>19</span></div><div class="cal-d"><span>20</span></div><div class="cal-d we b"><span>21</span></div><div class="cal-d we"><span>22</span></div><div class="cal-d"><span>23</span></div><div class="cal-d"><span>24</span></div><div class="cal-d"><span>25</span></div><div class="cal-d"><span>26</span></div><div class="cal-d"><span>27</span></div><div class="cal-d we a"><span>28</span></div><div class="cal-d we"><span>29</span></div><div class="cal-d"><span>30</span></div></div></div><div class="cal-card"><h3>grudzień 2026</h3><div class="cal-grid"><div class="cal-dow">Pn</div><div class="cal-dow">Wt</div><div class="cal-dow">Śr</div><div class="cal-dow">Cz</div><div class="cal-dow">Pt</div><div class="cal-dow">So</div><div class="cal-dow">Nd</div><div class="cal-d e"></div><div class="cal-d"><span>1</span></div><div class="cal-d"><span>2</span></div><div class="cal-d"><span>3</span></div><div class="cal-d"><span>4</span></div><div class="cal-d we a"><span>5</span></div><div class="cal-d we"><span>6</span></div><div class="cal-d"><span>7</span></div><div class="cal-d"><span>8</span></div><div class="cal-d"><span>9</span></div><div class="cal-d"><span>10</span></div><div class="cal-d"><span>11</span></div><div class="cal-d we b"><span>12</span></div><div class="cal-d we"><span>13</span></div><div class="cal-d"><span>14</span></div><div class="cal-d"><span>15</span></div><div class="cal-d"><span>16</span></div><div class="cal-d"><span>17</span></div><div class="cal-d"><span>18</span></div><div class="cal-d we b"><span>19</span></div><div class="cal-d we"><span>20</span></div><div class="cal-d"><span>21</span></div><div class="cal-d"><span>22</span></div><div class="cal-d"><span>23</span></div><div class="cal-d"><span>24</span></div><div class="cal-d"><span>25</span></div><div class="cal-d we a"><span>26</span></div><div class="cal-d we"><span>27</span></div><div class="cal-d"><span>28</span></div><div class="cal-d"><span>29</span></div><div class="cal-d"><span>30</span></div><div class="cal-d"><span>31</span></div></div></div><div class="cal-card"><h3>styczeń 2027</h3><div class="cal-grid"><div class="cal-dow">Pn</div><div class="cal-dow">Wt</div><div class="cal-dow">Śr</div><div class="cal-dow">Cz</div><div class="cal-dow">Pt</div><div class="cal-dow">So</div><div class="cal-dow">Nd</div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d e"></div><div class="cal-d"><span>1</span></div><div class="cal-d we"><span>2</span></div><div class="cal-d we"><span>3</span></div><div class="cal-d"><span>4</span></div><div class="cal-d"><span>5</span></div><div class="cal-d"><span>6</span></div><div class="cal-d"><span>7</span></div><div class="cal-d"><span>8</span></div><div class="cal-d we b"><span>9</span></div><div class="cal-d we"><span>10</span></div><div class="cal-d"><span>11</span></div><div class="cal-d"><span>12</span></div><div class="cal-d"><span>13</span></div><div class="cal-d"><span>14</span></div><div class="cal-d"><span>15</span></div><div class="cal-d we a"><span>16</span></div><div class="cal-d we"><span>17</span></div><div class="cal-d"><span>18</span></div><div class="cal-d"><span>19</span></div><div class="cal-d"><span>20</span></div><div class="cal-d"><span>21</span></div><div class="cal-d"><span>22</span></div><div class="cal-d we b"><span>23</span></div><div class="cal-d we"><span>24</span></div><div class="cal-d"><span>25</span></div><div class="cal-d"><span>26</span></div><div class="cal-d"><span>27</span></div><div class="cal-d"><span>28</span></div><div class="cal-d"><span>29</span></div><div class="cal-d we a"><span>30</span></div><div class="cal-d we"><span>31</span></div></div></div><div class="cal-card"><h3>luty 2027</h3><div class="cal-grid"><div class="cal-dow">Pn</div><div class="cal-dow">Wt</div><div class="cal-dow">Śr</div><div class="cal-dow">Cz</div><div class="cal-dow">Pt</div><div class="cal-dow">So</div><div class="cal-dow">Nd</div><div class="cal-d"><span>1</span></div><div class="cal-d"><span>2</span></div><div class="cal-d"><span>3</span></div><div class="cal-d"><span>4</span></div><div class="cal-d"><span>5</span></div><div class="cal-d we a"><span>6</span></div><div class="cal-d we"><span>7</span></div><div class="cal-d"><span>8</span></div><div class="cal-d"><span>9</span></div><div class="cal-d"><span>10</span></div><div class="cal-d"><span>11</span></div><div class="cal-d"><span>12</span></div><div class="cal-d we b"><span>13</span></div><div class="cal-d we"><span>14</span></div><div class="cal-d"><span>15</span></div><div class="cal-d"><span>16</span></div><div class="cal-d"><span>17</span></div><div class="cal-d"><span>18</span></div><div class="cal-d"><span>19</span></div><div class="cal-d we b"><span>20</span></div><div class="cal-d we"><span>21</span></div><div class="cal-d"><span>22</span></div><div class="cal-d"><span>23</span></div><div class="cal-d"><span>24</span></div><div class="cal-d"><span>25</span></div><div class="cal-d"><span>26</span></div><div class="cal-d we a"><span>27</span></div><div class="cal-d we"><span>28</span></div></div></div><div class="cal-card"><h3>marzec 2027</h3><div class="cal-grid"><div class="cal-dow">Pn</div><div class="cal-dow">Wt</div><div class="cal-dow">Śr</div><div class="cal-dow">Cz</div><div class="cal-dow">Pt</div><div class="cal-dow">So</div><div class="cal-dow">Nd</div><div class="cal-d"><span>1</span></div><div class="cal-d"><span>2</span></div><div class="cal-d"><span>3</span></div><div class="cal-d"><span>4</span></div><div class="cal-d"><span>5</span></div><div class="cal-d we b"><span>6</span></div><div class="cal-d we"><span>7</span></div><div class="cal-d"><span>8</span></div><div class="cal-d"><span>9</span></div><div class="cal-d"><span>10</span></div><div class="cal-d"><span>11</span></div><div class="cal-d"><span>12</span></div><div class="cal-d we a"><span>13</span></div><div class="cal-d we"><span>14</span></div><div class="cal-d"><span>15</span></div><div class="cal-d"><span>16</span></div><div class="cal-d"><span>17</span></div><div class="cal-d"><span>18</span></div><div class="cal-d"><span>19</span></div><div class="cal-d we b"><span>20</span></div><div class="cal-d we"><span>21</span></div><div class="cal-d"><span>22</span></div><div class="cal-d"><span>23</span></div><div class="cal-d"><span>24</span></div><div class="cal-d"><span>25</span></div><div class="cal-d"><span>26</span></div><div class="cal-d we a"><span>27</span></div><div class="cal-d we"><span>28</span></div><div class="cal-d"><span>29</span></div><div class="cal-d"><span>30</span></div><div class="cal-d"><span>31</span></div></div></div></div>
+    <div class="cal-leg">
+      <span><i style="background:var(--krem-2);border:1px solid rgba(107,69,48,.3)"></i>wolny</span>
+      <span><i style="background:var(--krem);outline:2px solid var(--zloty)"></i>zapytanie w toku</span>
+      <span><i style="background:var(--brunatny)"></i>zarezerwowany</span>
+    </div>
+    <p class="cal-note">Kalendarz ma charakter informacyjny — dostępność potwierdzamy w wiadomości zwrotnej. Soboty znikają najszybciej.</p>
+  </section>
+
+  <section class="sec" id="katalog">
+    <h2 class="sec-h2 center">Katalog produktów na wynajem</h2>
+    <p class="sec-sub">Każdy element możesz wypożyczyć osobno — ceny za dobę, grawer w cenie. Wszystko powstaje w naszej pracowni, więc napisy dopasujemy do każdego wydarzenia.</p>
+    <div class="kat"><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="20" height="14"/><path d="M9 8h14M9 12h9"/><path d="M11 18v10M21 18v10"/><path d="M8 28h16"/></svg></div><h3>Szyld powitalny</h3><p>„Witajcie" z imionami na wymiennej wkładce · 60×40 cm · opcjonalne podświetlenie LED</p><div class="kat-price">od 49 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="22" height="24"/><path d="M9 9h14M9 14h14M9 19h10M9 24h6"/></svg></div><h3>Tablica „rozpiska stołów"</h3><p>Plan sali z listą gości · wymienne karty przy stołach · 100×70 cm</p><div class="kat-price">od 59 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="3" width="12" height="26"/><path d="M10 11h12"/><path d="M13 18h6M13 25h6"/></svg></div><h3>Numery stołów</h3><p>Grawerowane, stojące · komplet 10 szt. · wymienne</p><div class="kat-price">od 25 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="6.5"/></svg></div><h3>Serwetniki</h3><p>Drewniane obrączki na serwetki · komplet 30 szt.</p><div class="kat-price">od 20 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 4c7 7 17 7 24 0"/><circle cx="8" cy="8" r="2.4"/><circle cx="16" cy="11" r="2.4"/><circle cx="24" cy="8" r="2.4"/></svg></div><h3>Lampki</h3><p>Fairy lights, ciepłe 2700 K · 10 m · z koszykiem baterii</p><div class="kat-price">od 15 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h8l-2.5 5h-3z"/><rect x="10" y="9" width="12" height="13"/><path d="M13 22h6M12 26h8"/></svg></div><h3>Lampiony</h3><p>Drewniane, geometryczne · komplet 6 szt. · światło od środka</p><div class="kat-price">od 35 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21.5" text-anchor="middle" font-family="Georgia, serif" font-size="13" stroke="none" fill="currentColor">AB</text><rect x="4" y="24" width="24" height="3"/></svg></div><h3>Litery podświetlane MAŁE</h3><p>Inicjały lub imiona · 25 cm · LED 2700 K</p><div class="kat-price">od 45 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21" text-anchor="middle" font-family="Georgia, serif" font-size="10.5" stroke="none" fill="currentColor">LOVE</text><rect x="4" y="24" width="24" height="3"/></svg></div><h3>Litery podświetlane DUŻE</h3><p>„LOVE" / nazwisko · 60 cm · podświetlenie LED</p><div class="kat-price">od 120 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="12"/><circle cx="16" cy="10" r="2.2"/><path d="M16 7.6v2.8M11 16v12M21 16v12M8 28h16"/></svg></div><h3>Tablice informacyjne</h3><p>Toaleta · parking · palarnia · plan sali — komplet z podpórkami</p><div class="kat-price">od 30 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9V6a8 8 0 0 1 16 0v3"/><rect x="5" y="9" width="22" height="15"/><path d="M10 17h12M10 21h8"/></svg></div><h3>Skrzynka na życzenia</h3><p>Drewniana, z grawerem · na koperty i kartki</p><div class="kat-price">od 25 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="5" width="10" height="10"/><rect x="17" y="5" width="10" height="10"/><rect x="5" y="17" width="10" height="10"/><rect x="17" y="17" width="10" height="10"/></svg></div><h3>Mozaika „scrabble"</h3><p>Imiona w drewnianych kafelkach · składamy na ścianie lub stole</p><div class="kat-price">od 55 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 6h6v9a3 3 0 0 1-6 0z"/><path d="M16 3v3"/><circle cx="16" cy="2.6" r="1.5"/><rect x="7" y="18" width="18" height="5"/></svg></div><h3>Świeczniki</h3><p>Drewniane, stabilne · komplet 12 szt. · świece w zestawie</p><div class="kat-price">od 30 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="8" y="6" width="16" height="20"/><path d="M11 12h10M11 16h10"/><path d="M16 26v4"/></svg></div><h3>Winietki i plan dnia</h3><p>Imienne oznaczenia stołów + tablica harmonogramu imprezy</p><div class="kat-price">od 30 zł / doba</div></div></div>
+  </section>
+
+  <section class="sec" id="zestawy">
+    <h2 class="sec-h2 center">Zestawy na wynajem</h2>
+    <p class="sec-sub">Trzy gotowe pakiety — od kameralnego przyjęcia po pełną oprawę sali. Zestaw wychodzi taniej niż suma pojedynczych elementów.</p>
+    <div class="pak"><div class="pak-card"><div class="pak-name">MINI</div><div class="pak-sub">kameralne przyjęcie do 50 gości</div><div class="pak-price"><small>wypożyczenie</small>od 199 zł / doba</div><ul><li>Szyld powitalny z imionami (wymienna wkładka)</li><li>Tablica „rozpiska stołów" — plan sali</li><li>Numery stołów — 6 szt.</li><li>Serwetniki — 30 szt.</li><li>Lampki ciepłe 10 m + lampiony ×4</li><li>Tablice informacyjne: toaleta · parking · palarnia</li></ul><a class="btn btn-solid" href="kontakt.html">Zapytaj o termin</a></div><div class="pak-card top"><div class="pak-badge">najczęściej wybierany</div><div class="pak-name">STANDARD</div><div class="pak-sub">wesele lub firmówka do 120 gości</div><div class="pak-price"><small>wypożyczenie</small>od 399 zł / doba</div><ul><li>Wszystko z pakietu MINI (numery ×10, serwetniki ×60)</li><li>Lampki 20 m + lampiony ×8</li><li>Litery podświetlane MAŁE — inicjały lub imiona</li><li>Mozaika „scrabble" z imionami</li><li>Skrzynka na życzenia (koperty)</li><li>Świeczniki — 12 szt.</li></ul><a class="btn btn-solid" href="kontakt.html">Zapytaj o termin</a></div><div class="pak-card"><div class="pak-name">PREMIUM</div><div class="pak-sub">pełna oprawa sali + montaż</div><div class="pak-price"><small>wypożyczenie</small>od 699 zł / doba</div><ul><li>Wszystko z pakietu STANDARD</li><li>Litery podświetlane DUŻE — „LOVE" / nazwisko, 60 cm</li><li>Lampki 30 m + lampiony ×12</li><li>Personalizacja wszystkich grawerów w cenie</li><li>Montaż i demontaż po stronie Studia</li><li>Konsultacja aranżacji przestrzeni</li></ul><a class="btn btn-solid" href="kontakt.html">Zapytaj o termin</a></div></div>
+    <p class="cal-note">Kaucja zwrotna 300 zł przy każdym zestawie · wypożyczenie od 1 doby · brakujące elementy dobierzesz à la carte.</p>
+  </section>
+
+  <section class="partner-sec" id="partnerzy">
+    <div class="inner">
+      <h2>Współpraca dla dekoratorek i sal weselnych</h2>
+      <p class="sub">Pracujemy z dekoratorkami i salami na stałych warunkach partnerskich — dekoracje krążą między wydarzeniami, a Ty zarabiasz na aranżacji.</p>
+      <div class="part-grid">
+        <div class="part-card"><b>−20% rabat partnerski</b><p>Stały rabat na cały katalog przy współpracy cyklicznej.</p></div>
+        <div class="part-card"><b>Priorytet terminów</b><p>Rezerwujesz daty z wyprzedzeniem, zanim trafią do sprzedaży indywidualnej.</p></div>
+        <div class="part-card"><b>Dostawa i montaż po naszej stronie</b><p>Dowozimy, ustawiamy i odbieramy — rozliczasz się za dobę wypożyczenia.</p></div>
+        <div class="part-card"><b>Materiały do Twoich ofert</b><p>Gotowe zdjęcia, wymiary i zestawienia — wkleisz wprost do propozycji dla klienta.</p></div>
+      </div>
+      <div class="cta"><a class="btn btn-solid" href="mailto:kontakt@studiosygnatura.pl">Porozmawiajmy o współpracy</a></div>
+    </div>
+  </section>
+
+  <section class="sec cta-end">
+    <h2>Masz już datę? Sprawdźmy dostępność.</h2>
+    <a class="btn btn-solid" href="kontakt.html">Napisz do nas</a>
+  </section>
+</main>
+<footer class="site-foot">
+  <div class="foot-social">
+    <span class="foot-label">Śledź nasze działania</span>
+    <div class="soc-icons">
+      <a href="#" aria-label="Instagram" title="Instagram — wkrótce"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" aria-label="Facebook" title="Facebook — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg></a>
+      <a href="#" aria-label="Pinterest" title="Pinterest — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>
+    </div>
+  </div>
+  <div class="foot-mid">
+    <span class="copy">© Studio Sygnatura</span>
+    <a class="regbtn" href="#" title="wkrótce">Regulamin serwisu</a>
+  </div>
+  <div class="foot-right">
+    <a href="kontakt.html">Kontakt</a><span class="foot-sep">/</span><a href="#" title="wkrótce">FAQ</a>
+  </div>
+</footer>
+<script>
+(function(){
+  var burger=document.getElementById('burger'),menu=document.getElementById('menu');
+  if(burger&&menu){burger.addEventListener('click',function(){
+    var open=menu.classList.toggle('open');
+    burger.setAttribute('aria-expanded',open?'true':'false');
+  });}
+})();
+</script>
+</body>
+</html>

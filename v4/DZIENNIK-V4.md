@@ -235,3 +235,18 @@ v4/
 - Pillow ZNIKA z sandboxa po resecie środowiska (nie tylko procesy) — przed każdym buildem sprawdzać `python3 -c "import PIL"`, reinstalować `pip3 install --break-system-packages pillow`.
 - Serwer podglądu też nie przeżywa resetu — po starcie sesji restartować `python3 v4/serve.py 8080` (cwd = v4!).
 - `cover` z tym zdjęciem = zły wybór: napis „Cześć" (x 46–96% W) nigdy nie zmieści się w oknie pionowego telefonu; `100% auto` + pozycja pionowa daje pełną kontrolę.
+
+## 17. STATUS (po sesji 10, 31.08.2026 — podstrona WYNAJEM)
+
+- [x] **Nowa podstrona `wynajem.html`** (generowana przez build.py, szablon WYNAJEM + funkcje calendar_html/catalog_html/packages_html):
+  - **Kalendarz dostępności:** 6 miesięcy sezonu 2026/27 (X–III), weekendy wyróżnione, stany: wolny / „zapytanie w toku" (złota obwódka) / zarezerwowany (brąz + przekreślenie). Dane w `RENTAL_BOOKED` / `RENTAL_ASK` (PRZYKŁADOWE — użytkownik podmieni na realne). Legenda + nota „kalendarz informacyjny, termin rezerwuje zaliczka".
+  - **Katalog 13 produktów** (ikony SVG, opis, cena za dobę): szyld powitalny, tablica rozpiska stołów, numery stołów, serwetniki, lampki, lampiony, litery MAŁE/DUŻE, tablice info (toaleta·parking·palarnia), skrzynka na życzenia, mozaika „scrabble", świeczniki, winietki+plan dnia.
+  - **3 zestawy:** MINI (od 199 zł/doba, do 50 gości) · STANDARD (od 399 zł, badge „najczęściej wybierany") · PREMIUM (od 699 zł, montaż+demontaż). Każdy z listą — zestawy zawierają CAŁĄ listę użytkownika + moje propozycje (skrzynka na życzenia, scrabble, świeczniki, winietki, konsultacja aranżacji). Kaucja zwrotna 300 zł.
+  - **Sekcja współpracy (#partnerzy)** dla dekoratorek i sal: −20% rabat, priorytet terminów, dostawa+montaż, materiały do ofert; CTA mailto.
+  - Kroki „Jak to działa" (1–5), hero z CTA, footer, burger JS. Sticky header na podstronach (`.page .site-head{position:sticky}`), scroll-margin na anchorach.
+- [x] Menu (index + wynajem): Wynajem → wynajem.html, Współpraca → wynajem.html#partnerzy.
+- [x] docs/ zsynchronizowany i pushnięty.
+- [ ] **Czeka:** opinia użytkownika (układ, ceny-z-czapy do rewizji, treść pakietów), potem realne terminy do kalendarza.
+
+### LEKCJE
+- Walidacja przez `html.count('cal-card')` łapie też reguły CSS — liczyć klasy tylko w części BODY (split '</style>').

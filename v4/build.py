@@ -14,6 +14,7 @@ Uwagi wcielone:
 import os
 import math
 import shutil
+import calendar
 
 from PIL import Image, ImageStat, ImageEnhance, ImageFilter
 
@@ -45,6 +46,88 @@ HERO_CANDIDATES = [
 ]
 DEFAULT_HERO = HERO_CANDIDATES[1]  # historyczne (picker); obecnie hero = TŁO NA HERO.png poniżej
 HERO_TLO = 'TŁO NA HERO.png'       # KOŃCOWE TŁO HERO (decyzja użytkownika, sesja 8) — kompozycja: „Cześć" po prawej u góry, pusta ściana po lewej i na dole
+
+# ---------------------------------------------------------------- wynajem (podstrona)
+# PRZYKŁADOWE rezerwacje — PODMIEŃ na realne terminy po pierwszych zapytaniach
+RENTAL_BOOKED = {
+    '2026-10': [10, 24], '2026-11': [7, 21], '2026-12': [12, 19],
+    '2027-1': [9, 23], '2027-2': [13, 20], '2027-3': [6, 20],
+}
+RENTAL_ASK = {
+    '2026-10': [3, 17], '2026-11': [14, 28], '2026-12': [5, 26],
+    '2027-1': [16, 30], '2027-2': [6, 27], '2027-3': [13, 27],
+}
+RENTAL_MONTHS = [(2026, 10), (2026, 11), (2026, 12), (2027, 1), (2027, 2), (2027, 3)]
+MONTHS_PL = {1: 'styczeń', 2: 'luty', 3: 'marzec', 10: 'październik', 11: 'listopad', 12: 'grudzień'}
+
+# katalog: (ikona, nazwa, opis, cena)
+PRODUCTS = [
+    ('szyld', 'Szyld powitalny', '„Witajcie" z imionami na wymiennej wkładce · 60×40 cm · opcjonalne podświetlenie LED', 'od 49 zł / doba'),
+    ('rozpiska', 'Tablica „rozpiska stołów"', 'Plan sali z listą gości · wymienne karty przy stołach · 100×70 cm', 'od 59 zł / doba'),
+    ('numery', 'Numery stołów', 'Grawerowane, stojące · komplet 10 szt. · wymienne', 'od 25 zł / doba'),
+    ('serwetniki', 'Serwetniki', 'Drewniane obrączki na serwetki · komplet 30 szt.', 'od 20 zł / doba'),
+    ('lampki', 'Lampki', 'Fairy lights, ciepłe 2700 K · 10 m · z koszykiem baterii', 'od 15 zł / doba'),
+    ('lampiony', 'Lampiony', 'Drewniane, geometryczne · komplet 6 szt. · światło od środka', 'od 35 zł / doba'),
+    ('litery_male', 'Litery podświetlane MAŁE', 'Inicjały lub imiona · 25 cm · LED 2700 K', 'od 45 zł / doba'),
+    ('litery_duze', 'Litery podświetlane DUŻE', '„LOVE" / nazwisko · 60 cm · podświetlenie LED', 'od 120 zł / doba'),
+    ('tablice', 'Tablice informacyjne', 'Toaleta · parking · palarnia · plan sali — komplet z podpórkami', 'od 30 zł / doba'),
+    ('skrzynka', 'Skrzynka na życzenia', 'Drewniana, z grawerem · na koperty i kartki', 'od 25 zł / doba'),
+    ('scrabble', 'Mozaika „scrabble"', 'Imiona w drewnianych kafelkach · składamy na ścianie lub stole', 'od 55 zł / doba'),
+    ('swieczniki', 'Świeczniki', 'Drewniane, stabilne · komplet 12 szt. · świece w zestawie', 'od 30 zł / doba'),
+    ('winietki', 'Winietki i plan dnia', 'Imienne oznaczenia stołów + tablica harmonogramu imprezy', 'od 30 zł / doba'),
+]
+
+ICONS_R = {
+    'szyld': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="20" height="14"/><path d="M9 8h14M9 12h9"/><path d="M11 18v10M21 18v10"/><path d="M8 28h16"/></svg>',
+    'rozpiska': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="22" height="24"/><path d="M9 9h14M9 14h14M9 19h10M9 24h6"/></svg>',
+    'numery': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="3" width="12" height="26"/><path d="M10 11h12"/><path d="M13 18h6M13 25h6"/></svg>',
+    'serwetniki': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="6.5"/></svg>',
+    'lampki': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 4c7 7 17 7 24 0"/><circle cx="8" cy="8" r="2.4"/><circle cx="16" cy="11" r="2.4"/><circle cx="24" cy="8" r="2.4"/></svg>',
+    'lampiony': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h8l-2.5 5h-3z"/><rect x="10" y="9" width="12" height="13"/><path d="M13 22h6M12 26h8"/></svg>',
+    'litery_male': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21.5" text-anchor="middle" font-family="Georgia, serif" font-size="13" stroke="none" fill="currentColor">AB</text><rect x="4" y="24" width="24" height="3"/></svg>',
+    'litery_duze': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21" text-anchor="middle" font-family="Georgia, serif" font-size="10.5" stroke="none" fill="currentColor">LOVE</text><rect x="4" y="24" width="24" height="3"/></svg>',
+    'tablice': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="12"/><circle cx="16" cy="10" r="2.2"/><path d="M16 7.6v2.8M11 16v12M21 16v12M8 28h16"/></svg>',
+    'skrzynka': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9V6a8 8 0 0 1 16 0v3"/><rect x="5" y="9" width="22" height="15"/><path d="M10 17h12M10 21h8"/></svg>',
+    'scrabble': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="5" width="10" height="10"/><rect x="17" y="5" width="10" height="10"/><rect x="5" y="17" width="10" height="10"/><rect x="17" y="17" width="10" height="10"/></svg>',
+    'swieczniki': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 6h6v9a3 3 0 0 1-6 0z"/><path d="M16 3v3"/><circle cx="16" cy="2.6" r="1.5"/><rect x="7" y="18" width="18" height="5"/></svg>',
+    'winietki': '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="8" y="6" width="16" height="20"/><path d="M11 12h10M11 16h10"/><path d="M16 26v4"/></svg>',
+}
+
+PACKAGES = [
+    {
+        'name': 'MINI', 'sub': 'kameralne przyjęcie do 50 gości', 'price': 'od 199 zł / doba', 'top': False,
+        'items': [
+            'Szyld powitalny z imionami (wymienna wkładka)',
+            'Tablica „rozpiska stołów" — plan sali',
+            'Numery stołów — 6 szt.',
+            'Serwetniki — 30 szt.',
+            'Lampki ciepłe 10 m + lampiony ×4',
+            'Tablice informacyjne: toaleta · parking · palarnia',
+        ],
+    },
+    {
+        'name': 'STANDARD', 'sub': 'wesele lub firmówka do 120 gości', 'price': 'od 399 zł / doba', 'top': True,
+        'items': [
+            'Wszystko z pakietu MINI (numery ×10, serwetniki ×60)',
+            'Lampki 20 m + lampiony ×8',
+            'Litery podświetlane MAŁE — inicjały lub imiona',
+            'Mozaika „scrabble" z imionami',
+            'Skrzynka na życzenia (koperty)',
+            'Świeczniki — 12 szt.',
+        ],
+    },
+    {
+        'name': 'PREMIUM', 'sub': 'pełna oprawa sali + montaż', 'price': 'od 699 zł / doba', 'top': False,
+        'items': [
+            'Wszystko z pakietu STANDARD',
+            'Litery podświetlane DUŻE — „LOVE" / nazwisko, 60 cm',
+            'Lampki 30 m + lampiony ×12',
+            'Personalizacja wszystkich grawerów w cenie',
+            'Montaż i demontaż po stronie Studia',
+            'Konsultacja aranżacji przestrzeni',
+        ],
+    },
+]
 
 
 # ---------------------------------------------------------------- przygotowanie
@@ -358,6 +441,8 @@ button{font-family:inherit}
   .foot-social{flex-direction:column;gap:10px}
   .splash-card{padding:26px 30px}
   .brand{top:118px}
+  .hero-cta{flex-direction:column;align-items:center}
+  .hero-cta .btn,.cta-end .btn{width:100%;max-width:340px}
 }
 
 /* ================= PODSTRONY (stuby) ================= */
@@ -377,6 +462,74 @@ body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
 .stub-card .btn{margin-top:8px}
 .back{color:var(--brunatny);font-size:13.5px;letter-spacing:.08em;border-bottom:1px solid transparent}
 .back:hover{border-color:var(--brunatny)}
+
+/* ================= PODSTRONA: WYNAJEM ================= */
+body.page{background:var(--krem)}
+.page .site-head{position:sticky}
+.page-hero{background:var(--butelkowa);color:var(--krem);text-align:center;padding:clamp(34px,6vh,64px) clamp(16px,5vw,56px)}
+.page-tag{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);margin-bottom:14px}
+.page-hero h1{font-size:clamp(30px,5.4vw,48px);font-weight:600}
+.page-hero .lead{max-width:760px;margin:16px auto 0;color:var(--zloty-soft);font-size:clamp(15px,1.7vw,18px);line-height:1.7}
+.hero-cta{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:26px}
+.hero-cta .btn{width:auto;padding:14px 30px}
+.btn-ghost{background:transparent;color:var(--zloty);border:1.5px solid var(--zloty)}
+.btn-ghost:hover{background:var(--zloty);color:var(--butelkowa)}
+.sec{max-width:1120px;margin:0 auto;padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
+.sec-h2{font-size:clamp(24px,3.4vw,34px);color:var(--butelkowa);font-weight:600}
+.sec-h2.center{text-align:center}
+.sec-h2.center::after{content:"";display:block;width:64px;height:3px;background:var(--zloty);margin:12px auto 0}
+.sec-sub{text-align:center;max-width:720px;margin:14px auto 0;color:rgba(51,38,28,.8);font-size:15.5px;line-height:1.7}
+.kroki{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-top:28px}
+.krok{background:#fff;border:1px solid rgba(107,69,48,.4);padding:22px 18px;border-radius:0}
+.krok .num{display:block;font-size:26px;font-weight:700;color:var(--zloty);margin-bottom:8px}
+.krok b{color:var(--brunatny);font-size:15.5px}
+.krok p{margin-top:6px;font-size:13.5px;line-height:1.6;color:rgba(51,38,28,.8)}
+.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-top:28px}
+.cal-card{background:#fff;border:1px solid rgba(107,69,48,.45);padding:18px 16px;border-radius:0}
+.cal-card h3{text-align:center;font-size:18px;color:var(--brunatny);font-weight:600;margin-bottom:12px;text-transform:capitalize}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);padding-bottom:2px}
+.cal-d{aspect-ratio:1;display:grid;place-items:center;font-size:12.5px;background:var(--krem-2);color:var(--ink)}
+.cal-d.e{background:transparent}
+.cal-d.we{background:#F6EFE1}
+.cal-d.a{background:var(--krem);outline:2px solid var(--zloty);color:var(--brunatny);font-weight:700}
+.cal-d.b{background:var(--brunatny);color:var(--krem)}
+.cal-d.b span{text-decoration:line-through;opacity:.95}
+.cal-leg{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:20px;font-size:13.5px;color:rgba(51,38,28,.85)}
+.cal-leg i{display:inline-block;width:14px;height:14px;margin-right:7px;vertical-align:-2px}
+.cal-note{margin-top:12px;text-align:center;font-size:13px;color:rgba(51,38,28,.65)}
+.kat{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:28px}
+.kat-card{background:#fff;border:1px solid rgba(107,69,48,.45);padding:20px;border-radius:0;display:flex;flex-direction:column;gap:9px}
+.kat-ico{color:var(--brunatny)}
+.kat-ico svg{width:34px;height:34px}
+.kat-card h3{font-size:18.5px;color:var(--butelkowa);font-weight:600}
+.kat-card p{font-size:14px;line-height:1.65;color:rgba(51,38,28,.85);flex:1}
+.kat-price{margin-top:auto;border-top:1px dashed rgba(107,69,48,.4);padding-top:10px;font-size:14px;font-weight:700;color:var(--brunatny)}
+.pak{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:26px;margin-top:36px;align-items:stretch}
+.pak-card{position:relative;background:#fff;border:2px solid rgba(107,69,48,.5);border-radius:0;padding:30px 22px 24px;display:flex;flex-direction:column;gap:12px}
+.pak-card.top{border-color:var(--brunatny);box-shadow:0 26px 54px rgba(38,29,20,.2)}
+.pak-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--butelkowa);color:var(--zloty);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:6px 16px;white-space:nowrap}
+.pak-name{font-size:22px;font-weight:700;color:var(--butelkowa);text-align:center}
+.pak-sub{text-align:center;font-size:13px;color:rgba(51,38,28,.7)}
+.pak-price{text-align:center;color:var(--brunatny);font-size:27px;font-weight:700}
+.pak-price small{display:block;font-size:11.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6);margin-bottom:2px}
+.pak ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:rgba(51,38,28,.9);line-height:1.45}
+.pak li::before{content:"✦ ";color:var(--zloty)}
+.pak .btn{width:100%;margin-top:auto}
+.partner-sec{background:var(--butelkowa);color:var(--krem);padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
+.partner-sec .inner{max-width:1120px;margin:0 auto}
+.partner-sec h2{font-size:clamp(24px,3.4vw,34px);font-weight:600;text-align:center}
+.partner-sec h2::after{content:"";display:block;width:64px;height:3px;background:var(--zloty);margin:12px auto 0}
+.partner-sec .sub{text-align:center;max-width:680px;margin:14px auto 0;color:var(--zloty-soft);font-size:15.5px;line-height:1.7}
+.part-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:30px}
+.part-card{border:1px solid rgba(196,165,130,.5);padding:20px;border-radius:0}
+.part-card b{display:block;color:var(--zloty);font-size:16.5px;margin-bottom:8px}
+.part-card p{font-size:13.5px;line-height:1.65;color:var(--zloty-soft)}
+.partner-sec .cta{text-align:center;margin-top:30px}
+.partner-sec .cta .btn{width:auto;padding:14px 34px}
+.cta-end{text-align:center}
+.cta-end h2{font-size:clamp(24px,3.4vw,32px);color:var(--butelkowa);font-weight:600;margin-bottom:18px}
+.cta-end .btn{width:auto;display:inline-block;padding:14px 34px}
 
 /* ================= PICKER HERO ================= */
 .picker-head{background:var(--butelkowa);color:var(--krem);padding:22px clamp(16px,4vw,44px)}
@@ -440,8 +593,8 @@ INDEX = r'''<!DOCTYPE html>
     <a href="galeria.html">Galeria</a>
     <a href="#" title="wkrótce">Metryczki</a>
     <a href="#" title="wkrótce">Numery i szyldy</a>
-    <a href="#" title="wkrótce">Wynajem</a>
-    <a href="#" title="wkrótce">Współpraca</a>
+    <a href="wynajem.html">Wynajem</a>
+    <a href="wynajem.html#partnerzy">Współpraca</a>
     <a href="#" title="wkrótce">Dla firm</a>
     <a href="kontakt.html">Kontakt</a>
   </nav>
@@ -550,6 +703,135 @@ document.getElementById('grid').addEventListener('click',function(e){
 </html>
 '''
 
+WYNAJEM = r'''<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>Wynajem dekoracji — Studio Sygnatura</title>
+<meta name="description" content="Wynajem drewnianych dekoracji ślubnych i eventowych: szyldy powitalne, tablice, podświetlane litery, oświetlenie. Kalendarz dostępności i gotowe zestawy.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<style>@@CSS@@</style>
+</head>
+<body class="page">
+<header class="site-head">
+  <div class="topbar">
+    <a class="iconbtn" href="#" title="Koszyk — wkrótce" aria-label="Koszyk">@@ICON_CART@@</a>
+    <a class="iconbtn" href="#" title="Konto — wkrótce" aria-label="Konto">@@ICON_USER@@</a>
+    <button class="iconbtn burger" id="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">@@ICON_BURGER@@</button>
+  </div>
+  <nav class="menu" id="menu" aria-label="Menu główne">
+    <a href="index.html">Start</a>
+    <a href="warsztat.html">Rzemiosło</a>
+    <a href="galeria.html">Galeria</a>
+    <a href="#" title="wkrótce">Metryczki</a>
+    <a href="#" title="wkrótce">Numery i szyldy</a>
+    <a href="wynajem.html" class="on">Wynajem</a>
+    <a href="wynajem.html#partnerzy">Współpraca</a>
+    <a href="#" title="wkrótce">Dla firm</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+<main>
+  <section class="page-hero">
+    <p class="page-tag">Wynajem · wesela · eventy · firmówki</p>
+    <h1>Wynajem dekoracji</h1>
+    <p class="lead">Drewniane tablice, podświetlane litery i światło, które budują klimat przyjęcia. Ty wybierasz termin i zestaw — my grawerujemy napisy pod Twoje wydarzenie, dowozimy i montujemy.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#kalendarz">Sprawdź wolne terminy</a>
+      <a class="btn btn-ghost" href="#zestawy">Zobacz zestawy</a>
+    </div>
+  </section>
+
+  <section class="sec" id="jak">
+    <h2 class="sec-h2 center">Jak to działa</h2>
+    <div class="kroki">
+      <div class="krok"><span class="num">1</span><b>Wybierz termin</b><p>Sprawdź kalendarz poniżej albo napisz — odpowiadamy tego samego dnia.</p></div>
+      <div class="krok"><span class="num">2</span><b>Skomponuj zestaw</b><p>Weź gotowy pakiet albo zbierz własny z elementów katalogu.</p></div>
+      <div class="krok"><span class="num">3</span><b>Personalizacja</b><p>Grawerujemy imiona, plan sali i napisy — na wymiennych wkładkach.</p></div>
+      <div class="krok"><span class="num">4</span><b>Dostawa i montaż</b><p>Dowozimy i ustawiamy na miejscu (Warszawa i okolice) albo odbierasz z pracowni.</p></div>
+      <div class="krok"><span class="num">5</span><b>Zwrot po imprezie</b><p>Odbieramy dekoracje, rozliczamy kaucję. Ty zajmujesz się gośćmi.</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="kalendarz">
+    <h2 class="sec-h2 center">Kalendarz dostępności</h2>
+    <p class="sec-sub">Sezon 2026/2027 — październik–marzec (zapytania ślubne na 2027 już lecą). Termin rezerwuje zaliczka.</p>
+    @@CALENDAR@@
+    <div class="cal-leg">
+      <span><i style="background:var(--krem-2);border:1px solid rgba(107,69,48,.3)"></i>wolny</span>
+      <span><i style="background:var(--krem);outline:2px solid var(--zloty)"></i>zapytanie w toku</span>
+      <span><i style="background:var(--brunatny)"></i>zarezerwowany</span>
+    </div>
+    <p class="cal-note">Kalendarz ma charakter informacyjny — dostępność potwierdzamy w wiadomości zwrotnej. Soboty znikają najszybciej.</p>
+  </section>
+
+  <section class="sec" id="katalog">
+    <h2 class="sec-h2 center">Katalog produktów na wynajem</h2>
+    <p class="sec-sub">Każdy element możesz wypożyczyć osobno — ceny za dobę, grawer w cenie. Wszystko powstaje w naszej pracowni, więc napisy dopasujemy do każdego wydarzenia.</p>
+    @@CATALOG@@
+  </section>
+
+  <section class="sec" id="zestawy">
+    <h2 class="sec-h2 center">Zestawy na wynajem</h2>
+    <p class="sec-sub">Trzy gotowe pakiety — od kameralnego przyjęcia po pełną oprawę sali. Zestaw wychodzi taniej niż suma pojedynczych elementów.</p>
+    @@PACKAGES@@
+    <p class="cal-note">Kaucja zwrotna 300 zł przy każdym zestawie · wypożyczenie od 1 doby · brakujące elementy dobierzesz à la carte.</p>
+  </section>
+
+  <section class="partner-sec" id="partnerzy">
+    <div class="inner">
+      <h2>Współpraca dla dekoratorek i sal weselnych</h2>
+      <p class="sub">Pracujemy z dekoratorkami i salami na stałych warunkach partnerskich — dekoracje krążą między wydarzeniami, a Ty zarabiasz na aranżacji.</p>
+      <div class="part-grid">
+        <div class="part-card"><b>−20% rabat partnerski</b><p>Stały rabat na cały katalog przy współpracy cyklicznej.</p></div>
+        <div class="part-card"><b>Priorytet terminów</b><p>Rezerwujesz daty z wyprzedzeniem, zanim trafią do sprzedaży indywidualnej.</p></div>
+        <div class="part-card"><b>Dostawa i montaż po naszej stronie</b><p>Dowozimy, ustawiamy i odbieramy — rozliczasz się za dobę wypożyczenia.</p></div>
+        <div class="part-card"><b>Materiały do Twoich ofert</b><p>Gotowe zdjęcia, wymiary i zestawienia — wkleisz wprost do propozycji dla klienta.</p></div>
+      </div>
+      <div class="cta"><a class="btn btn-solid" href="mailto:kontakt@studiosygnatura.pl">Porozmawiajmy o współpracy</a></div>
+    </div>
+  </section>
+
+  <section class="sec cta-end">
+    <h2>Masz już datę? Sprawdźmy dostępność.</h2>
+    <a class="btn btn-solid" href="kontakt.html">Napisz do nas</a>
+  </section>
+</main>
+<footer class="site-foot">
+  <div class="foot-social">
+    <span class="foot-label">Śledź nasze działania</span>
+    <div class="soc-icons">
+      <a href="#" aria-label="Instagram" title="Instagram — wkrótce">@@ICON_IG@@</a>
+      <a href="#" aria-label="Facebook" title="Facebook — wkrótce">@@ICON_FB@@</a>
+      <a href="#" aria-label="Pinterest" title="Pinterest — wkrótce">@@ICON_PIN@@</a>
+    </div>
+  </div>
+  <div class="foot-mid">
+    <span class="copy">© Studio Sygnatura</span>
+    <a class="regbtn" href="#" title="wkrótce">Regulamin serwisu</a>
+  </div>
+  <div class="foot-right">
+    <a href="kontakt.html">Kontakt</a><span class="foot-sep">/</span><a href="#" title="wkrótce">FAQ</a>
+  </div>
+</footer>
+<script>
+(function(){
+  var burger=document.getElementById('burger'),menu=document.getElementById('menu');
+  if(burger&&menu){burger.addEventListener('click',function(){
+    var open=menu.classList.toggle('open');
+    burger.setAttribute('aria-expanded',open?'true':'false');
+  });}
+})();
+</script>
+</body>
+</html>
+'''
+
 STUB = r'''<!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -599,6 +881,67 @@ def render_stub(css, title, h1, text, extra=''):
     return (STUB.replace('@@CSS@@', css)
             .replace('@@TITLE@@', title).replace('@@H1@@', h1)
             .replace('@@TEXT@@', text).replace('@@EXTRA@@', extra))
+
+
+def calendar_html():
+    """Kalendarz dostępności: 6 miesięcy sezonu, weekendy wyróżnione,
+    stany: wolny / zapytanie / zarezerwowany (dane: RENTAL_BOOKED / RENTAL_ASK)."""
+    dow = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
+    out = ['<div class="cal">']
+    for year, month in RENTAL_MONTHS:
+        fwd, ndays = calendar.monthrange(year, month)
+        key = f'{year}-{month}'
+        booked = set(RENTAL_BOOKED.get(key, ()))
+        ask = set(RENTAL_ASK.get(key, ()))
+        cells = [f'<div class="cal-dow">{d}</div>' for d in dow]
+        cells += ['<div class="cal-d e"></div>'] * fwd
+        for dnum in range(1, ndays + 1):
+            cls = 'cal-d'
+            if (fwd + dnum - 1) % 7 >= 5:
+                cls += ' we'
+            if dnum in booked:
+                cls += ' b'
+            elif dnum in ask:
+                cls += ' a'
+            cells.append(f'<div class="{cls}"><span>{dnum}</span></div>')
+        out.append(f'<div class="cal-card"><h3>{MONTHS_PL[month]} {year}</h3>'
+                   f'<div class="cal-grid">{"".join(cells)}</div></div>')
+    out.append('</div>')
+    return ''.join(out)
+
+
+def catalog_html():
+    cards = []
+    for key, name, desc, price in PRODUCTS:
+        cards.append(f'<div class="kat-card"><div class="kat-ico">{ICONS_R[key]}</div>'
+                     f'<h3>{name}</h3><p>{desc}</p>'
+                     f'<div class="kat-price">{price}</div></div>')
+    return '<div class="kat">' + ''.join(cards) + '</div>'
+
+
+def packages_html():
+    cards = []
+    for pkg in PACKAGES:
+        badge = '<div class="pak-badge">najczęściej wybierany</div>' if pkg['top'] else ''
+        items = ''.join(f'<li>{it}</li>' for it in pkg['items'])
+        cards.append(
+            f'<div class="pak-card{" top" if pkg["top"] else ""}">{badge}'
+            f'<div class="pak-name">{pkg["name"]}</div>'
+            f'<div class="pak-sub">{pkg["sub"]}</div>'
+            f'<div class="pak-price"><small>wypożyczenie</small>{pkg["price"]}</div>'
+            f'<ul>{items}</ul>'
+            f'<a class="btn btn-solid" href="kontakt.html">Zapytaj o termin</a></div>')
+    return '<div class="pak">' + ''.join(cards) + '</div>'
+
+
+def render_wynajem(css):
+    html = (WYNAJEM.replace('@@CSS@@', css)
+            .replace('@@CALENDAR@@', calendar_html())
+            .replace('@@CATALOG@@', catalog_html())
+            .replace('@@PACKAGES@@', packages_html()))
+    for key in ('CART', 'USER', 'BURGER', 'IG', 'FB', 'PIN'):
+        html = html.replace(f'@@ICON_{key}@@', ICONS[key.lower()])
+    return html
 
 
 def main():
@@ -671,6 +1014,11 @@ def main():
         with open(os.path.join(HERE, name), 'w', encoding='utf-8') as f:
             f.write(html)
         print(f'> {name}  {os.path.getsize(os.path.join(HERE, name)) // 1024} kB')
+
+    wynajem = render_wynajem(css)
+    with open(os.path.join(HERE, 'wynajem.html'), 'w', encoding='utf-8') as f:
+        f.write(wynajem)
+    print(f'> wynajem.html  {os.path.getsize(os.path.join(HERE, "wynajem.html")) // 1024} kB')
 
     print('Gotowe.')
 
