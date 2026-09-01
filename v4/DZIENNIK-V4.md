@@ -262,3 +262,19 @@ v4/
 
 ### LEKCJE
 - Ekstrakcja kart z v3 przez split po data-pkg myli kolejność (h3 z sąsiedniej karty) — mapować wg id pakietu, nie po kolejności h3.
+
+## 19. STATUS (1.09.2026 — wynajem: pakiety wg wydarzeń + własny kompozytor + wspólny kalendarz)
+
+- [x] **Wspólny kalendarz (jedna pula towaru):** usunięte terminarze per pakiet; jeden #kalendarz z nawigacją ‹ ›, zajęte = brązowe z przekreśleniem, klik daty → formularz (termin). `RENTAL_ZAJETE` = płaska lista dat (demo — do podmiany). Decyzja usera: dopóki brak towaru na równoległe wydarzenia, jedna data blokuje WSZYSTKO; rozdzielimy, gdy urośnie asortyment.
+- [x] **Pakiety wg TYPU WYDARZENIA (nie stylistyki):** 4 grupy × 3 poziomy: KOMUNIJNY (esencja/mid/full wg usera), WESELNY (opcje i.w.), FIRMOWY, JUBILEUSZOWY/urodzinowy. Na start jedna stylistyka (biel i złoto) — style dorobimy z asortymentem. MID wyróżniony ramką.
+- [x] **„Komponuję własny" = kompozytor:** checkboxy w kartach katalogu + kalkulator na żywo: suma, licznik, rabat −5% DOPIERO od 10 pozycji (user: bez −10% i bez gratis personalizacji), lista wybranych produktów, podsumowanie sticky, przycisk „Wyślij zapytanie". Personalizacja płatna osobno wg pozycji.
+- [x] **Formularz:** przycisk pakietu wpisuje nazwę pakietu; data z kalendarza; mailto z tematem + pełną treścią (pakiet/termin/dane/wybrany zestaw z sumą i rabatem).
+- [x] **Filtry katalogu:** dropdowny kategoria (6) + okazja (4) — data-kat/data-ok na kartach.
+- [x] **Testy jsdom:** kalendarz (3 busy we wrześniu), kalkulator (4 poz. = 153 zł; 10 poz. = 402 zł po −5%), lista wybranych, filtry (światło = 3 karty, komunijny = 12), mailto (treść z zestawem).
+- [x] docs/ zsynchronizowany i pushnięty.
+- [ ] **Czeka:** realne terminy do RENTAL_ZAJETE; decyzja o zbieraniu rezerwacji (Google Sheets API vs baza) — patrz notatka niżej.
+
+### LEKCJE / NOTATKI
+- **Zbieranie rezerwacji (pytanie usera):** na statycznym GitHub Pages NIE ma backendu ani bazy. Sensowne opcje: (1) **Google Sheets + Apps Script** jako mini-API (POST formularza → dopisanie wiersza; darmowe, user zna arkusze) — najszybsze do startu; (2) **Formspree/Netlify Forms** — gotowe, limit darmowy; (3) własna baza dopiero przy hostingu z backendem (np. Netlify Functions + Supabase). Rekomendacja: Sheets API.
+- jsdom nie implementuje `scrollIntoView` i nawigacji `mailto:` — testować te ścieżki osobno (string mailto), reszta testowalna.
+- v3: bug przesunięcia kart pakietów względem id (już nieistotny — pakiety przebudowane).

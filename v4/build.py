@@ -50,33 +50,31 @@ HERO_TLO = 'TŁO NA HERO.png'       # KOŃCOWE TŁO HERO (decyzja użytkownika, 
 # ---------------------------------------------------------------- wynajem (podstrona)
 # Terminarz wg v3: zajęte terminy PER PAKIET. PRZYKŁADOWE dane z v3 — PODMIEŃ na realne.
 # Klucz = id pakietu, wartość = lista dat 'RRRR-MM-DD'.
-RENTAL_ZAJETE = {
-    'klasyczny':  ['2026-08-29', '2026-08-30', '2026-09-05', '2026-09-12', '2026-09-19', '2026-10-03', '2026-10-10', '2026-10-17', '2026-11-07'],
-    'lesny':      ['2026-08-28', '2026-08-29', '2026-09-05', '2026-09-06', '2026-09-26', '2026-10-10', '2026-10-24', '2026-11-14'],
-    'rustykalny': ['2026-08-29', '2026-09-12', '2026-09-13', '2026-09-19', '2026-10-03', '2026-10-31'],
-    'komunijny':  ['2026-08-30', '2026-09-20', '2026-10-11', '2026-11-21'],
-    'firmowy':    ['2026-08-28', '2026-09-17', '2026-09-18', '2026-10-08', '2026-10-22', '2026-11-05', '2026-11-26'],
-    'wlasny':     ['2026-08-29', '2026-09-05', '2026-09-12', '2026-10-10'],
-}
+RENTAL_ZAJETE = [
+    '2026-08-29', '2026-08-30', '2026-09-05', '2026-09-12', '2026-09-19', '2026-10-03', '2026-10-10', '2026-10-17', '2026-11-07',
+]
+# Wspólny kalendarz: jedna pula towaru, wiec jedna data blokuje WSZYSTKIE pakiety.
+# Dopoki asortyment nie urosnie (osobne zestawy), NIE rozdzielamy terminow per pakiet.
+# TODO: realne terminy zamiast danych demo.
 
-# katalog: (ikona, nazwa, opis, cena)
+# katalog: (ikona, nazwa, opis, cena 'od X zł / doba', cena liczbowa do kalkulatora, pozycja gratis w personalizacji)
 PRODUCTS = [
-    ('szyld', 'Szyld powitalny', '„Witajcie" z imionami na wymiennej wkładce · 60×40 cm · opcjonalne podświetlenie LED', 'od 49 zł / doba'),
-    ('rozpiska', 'Tablica „rozpiska stołów"', 'Plan sali z listą gości · wymienne karty przy stołach · 100×70 cm', 'od 59 zł / doba'),
-    ('numery', 'Numery stołów', 'Grawerowane, stojące · komplet 10 szt. · wymienne', 'od 25 zł / doba'),
-    ('serwetniki', 'Serwetniki', 'Drewniane obrączki na serwetki · komplet 30 szt.', 'od 20 zł / doba'),
-    ('lampki', 'Lampki', 'Fairy lights, ciepłe 2700 K · 10 m · z koszykiem baterii', 'od 15 zł / doba'),
-    ('lampiony', 'Lampiony', 'Drewniane, geometryczne · komplet 6 szt. · światło od środka', 'od 35 zł / doba'),
-    ('litery_male', 'Litery podświetlane MAŁE', 'Inicjały lub imiona · 25 cm · LED 2700 K', 'od 45 zł / doba'),
-    ('litery_duze', 'Litery podświetlane DUŻE', '„LOVE" / nazwisko · 60 cm · podświetlenie LED', 'od 120 zł / doba'),
-    ('tablice', 'Tablice informacyjne', 'Toaleta · parking · palarnia · plan sali — komplet z podpórkami', 'od 30 zł / doba'),
-    ('skrzynka', 'Skrzynka na życzenia', 'Drewniana, z grawerem · na koperty i kartki', 'od 25 zł / doba'),
-    ('scrabble', 'Mozaika „scrabble"', 'Imiona w drewnianych kafelkach · składamy na ścianie lub stole', 'od 55 zł / doba'),
-    ('swieczniki', 'Świeczniki', 'Drewniane, stabilne · komplet 12 szt. · świece w zestawie', 'od 30 zł / doba'),
-    ('winietki', 'Winietki i plan dnia', 'Imienne oznaczenia stołów + tablica harmonogramu imprezy', 'od 30 zł / doba'),
-    ('panel_cytat', 'Panel z cytatem', 'Warstwowy panel z sentencją, imionami i datą — do powieszenia na ścianie', 'od 149 zł / doba'),
-    ('ramka', 'Ramka rzeźbiona', 'Na zdjęcie z uroczystości — rzeźbiona, z datą i okazją na dole', 'od 169 zł / doba'),
-    ('grawer', 'Grawer okolicznościowy', 'Tabliczka z dedykacją — jubileusz, rocznica albo pożegnanie pracownika', 'od 89 zł / doba'),
+    ('szyld', 'Szyld powitalny', '„Witajcie" z imionami na wymiennej wkładce · 60×40 cm · opcjonalne podświetlenie LED', 'od 49 zł / doba', 49, True),
+    ('rozpiska', 'Tablica „rozpiska stołów"', 'Plan sali z listą gości · wymienne karty przy stołach · 100×70 cm', 'od 59 zł / doba', 59, True),
+    ('numery', 'Numery stołów', 'Grawerowane, stojące · komplet 10 szt. · wymienne', 'od 25 zł / doba', 25, False),
+    ('serwetniki', 'Serwetniki', 'Drewniane obrączki na serwetki · komplet 30 szt.', 'od 20 zł / doba', 20, False),
+    ('lampki', 'Lampki', 'Fairy lights, ciepłe 2700 K · 10 m · z koszykiem baterii', 'od 15 zł / doba', 15, False),
+    ('lampiony', 'Lampiony', 'Drewniane, geometryczne · komplet 6 szt. · światło od środka', 'od 35 zł / doba', 35, False),
+    ('litery_male', 'Litery podświetlane MAŁE', 'Inicjały lub imiona · 25 cm · LED 2700 K', 'od 45 zł / doba', 45, True),
+    ('litery_duze', 'Litery podświetlane DUŻE', '„LOVE" / nazwisko · 60 cm · podświetlenie LED', 'od 120 zł / doba', 120, True),
+    ('tablice', 'Tablice informacyjne', 'Toaleta · parking · palarnia · plan sali — komplet z podpórkami', 'od 30 zł / doba', 30, False),
+    ('skrzynka', 'Skrzynka na życzenia', 'Drewniana, z grawerem · na koperty i kartki', 'od 25 zł / doba', 25, False),
+    ('scrabble', 'Mozaika „scrabble"', 'Imiona w drewnianych kafelkach · składamy na ścianie lub stole', 'od 55 zł / doba', 55, True),
+    ('swieczniki', 'Świeczniki', 'Drewniane, stabilne · komplet 12 szt. · świece w zestawie', 'od 30 zł / doba', 30, False),
+    ('winietki', 'Winietki i plan dnia', 'Imienne oznaczenia stołów + tablica harmonogramu imprezy', 'od 30 zł / doba', 30, True),
+    ('panel_cytat', 'Panel z cytatem', 'Warstwowy panel z sentencją, imionami i datą — do powieszenia na ścianie', 'od 149 zł / doba', 149, True),
+    ('ramka', 'Ramka rzeźbiona', 'Na zdjęcie z uroczystości — rzeźbiona, z datą i okazją na dole', 'od 169 zł / doba', 169, True),
+    ('grawer', 'Grawer okolicznościowy', 'Tabliczka z dedykacją — jubileusz, rocznica albo pożegnanie pracownika', 'od 89 zł / doba', 89, True),
 ]
 
 ICONS_R = {
@@ -99,67 +97,37 @@ ICONS_R = {
 }
 
 PACKAGES = [
-    {
-        'id': 'klasyczny', 'name': 'Pakiet Klasyczny', 'styl': 'biel i złoto — ponadczasowa elegancja', 'price': '270 zł / doba',
-        'items': [
-            'Tablica powitalna — 1 szt.',
-            'Plan stołów — 1 szt.',
-            'Numery stolików — 10 szt.',
-            'Tabliczki na krzesła — 2 szt.',
-            'Litery przestrzenne — para',
-            'Wkładka personalizowana w cenie',
-        ],
-    },
-    {
-        'id': 'lesny', 'name': 'Pakiet Leśny', 'styl': 'zieleń, mech i naturalne drewno', 'price': '285 zł / doba',
-        'items': [
-            'Tablica powitalna — 1 szt.',
-            'Plan stołów — 1 szt.',
-            'Numery stolików — 10 szt.',
-            'Skrzynka na koperty — 1 szt.',
-            'Ramka na zdjęcia — 1 szt.',
-            'Wkładka personalizowana w cenie',
-        ],
-    },
-    {
-        'id': 'rustykalny', 'name': 'Pakiet Rustykalny', 'styl': 'juta, surowe drewno, wiejski klimat', 'price': '150 zł / doba',
-        'items': [
-            'Tablica z imieniem — 1 szt.',
-            'Oznaczenia stołów — 6 szt.',
-            'Dekoracja wejścia — 1 kpl.',
-            'Świeczniki drewniane — 6 szt.',
-            'Wkładka personalizowana w cenie',
-        ],
-    },
-    {
-        'id': 'komunijny', 'name': 'Pakiet Komunijny', 'styl': 'jasne drewno i delikatne detale', 'price': '150 zł / doba',
-        'items': [
-            'Tablica z imieniem — 1 szt.',
-            'Oznaczenia stołów — 6 szt.',
-            'Winietki imienne — 20 szt.',
-            'Dekoracja wejścia — 1 kpl.',
-            'Wkładka personalizowana w cenie',
-        ],
-    },
-    {
-        'id': 'firmowy', 'name': 'Pakiet Firmowy', 'styl': 'logo, oznakowanie i kierowanie gości', 'price': '320 zł / doba',
-        'items': [
-            'Tablica powitalna z logo — 1 szt.',
-            'Oznaczenia sal — 4 szt.',
-            'Numeracja stanowisk — 12 szt.',
-            'Znaki kierunkowe — 6 szt.',
-            'Wkładki z logo w cenie',
-        ],
-    },
-    {
-        'id': 'wlasny', 'name': 'Zestaw własny', 'styl': 'komponujesz z katalogu — à la carte', 'price': 'od 15 zł / doba',
-        'items': [
-            'Wybierasz pozycje z katalogu niżej',
-            'Cena = suma wybranych pozycji',
-            'Rabat −10% od 5 pozycji',
-            'Wkładka personalizowana w cenie',
-        ],
-    },
+    # ---- KOMUNIJNY: esencja / mid / full ----
+    {'id': 'kom_esencja', 'ev': 'komunijny', 'name': 'Komunijny ESENCJA', 'sub': 'dla kameralnego przyjęcia', 'price': 'od 199 zł / doba', 'tier': 'ESENCJA',
+     'items': ['Tablica z imieniem — 1 szt.', 'Oznaczenia stołów — 6 szt.', 'Winietki imienne — 20 szt.', 'Świeczniki drewniane — 6 szt.', 'Wkładka personalizowana w cenie']},
+    {'id': 'kom_mid', 'ev': 'komunijny', 'top': True, 'name': 'Komunijny MID', 'sub': 'najczęściej wybierany', 'price': 'od 349 zł / doba', 'tier': 'MID',
+     'items': ['Wszystko z ESENCJI', 'Szyld powitalny — 1 szt.', 'Plan stołów — 1 szt.', 'Numery stolików — 10 szt.', 'Lampki ciepłe 10 m + lampiony ×6', 'Mozaika „scrabble" z imionami', 'Wkładka personalizowana w cenie']},
+    {'id': 'kom_full', 'ev': 'komunijny', 'name': 'Komunijny FULL', 'sub': 'pełna oprawa sali + montaż', 'price': 'od 599 zł / doba', 'tier': 'FULL',
+     'items': ['Wszystko z MID', 'Litery podświetlane DUŻE — imię, 60 cm', 'Lampki 30 m + lampiony ×12', 'Panel z cytatem na ścianę', 'Montaż i demontaż po stronie Studia', 'Personalizacja wszystkich grawerów w cenie']},
+    # ---- WESELNY: opcje i.w. ----
+    {'id': 'wes_esencja', 'ev': 'weselny', 'name': 'Weselny ESENCJA', 'sub': 'i.w. — małe wesele', 'price': 'od 299 zł / doba', 'tier': 'ESENCJA',
+     'items': ['Szyld powitalny — 1 szt.', 'Plan stołów — 1 szt.', 'Numery stolików — 10 szt.', 'Lampki ciepłe 10 m + lampiony ×6', 'Wkładka personalizowana w cenie']},
+    {'id': 'wes_mid', 'ev': 'weselny', 'top': True, 'name': 'Weselny MID', 'sub': 'i.w. — do 120 gości', 'price': 'od 499 zł / doba', 'tier': 'MID',
+     'items': ['Wszystko z ESENCJI', 'Litery podświetlane MAŁE — inicjały', 'Mozaika „scrabble" z imionami', 'Skrzynka na życzenia', 'Świeczniki — 12 szt.', 'Wkładka personalizowana w cenie']},
+    {'id': 'wes_full', 'ev': 'weselny', 'name': 'Weselny FULL', 'sub': 'i.w. — pełna oprawa + montaż', 'price': 'od 799 zł / doba', 'tier': 'FULL',
+     'items': ['Wszystko z MID', 'Litery podświetlane DUŻE — „LOVE" / nazwisko, 60 cm', 'Lampki 30 m + lampiony ×12', 'Winietki i plan dnia', 'Panel z cytatem na ścianę', 'Montaż i demontaż po stronie Studia', 'Personalizacja wszystkich grawerów w cenie']},
+    # ---- FIRMOWY ----
+    {'id': 'fir_esencja', 'ev': 'firmowy', 'name': 'Firmowy ESENCJA', 'sub': 'spotkanie zespołu', 'price': 'od 249 zł / doba', 'tier': 'ESENCJA',
+     'items': ['Tablica powitalna z logo — 1 szt.', 'Oznaczenia sal — 4 szt.', 'Numeracja stanowisk — 12 szt.', 'Znaki kierunkowe — 6 szt.', 'Wkładki z logo w cenie']},
+    {'id': 'fir_mid', 'ev': 'firmowy', 'top': True, 'name': 'Firmowy MID', 'sub': 'konferencja / event do 120 osób', 'price': 'od 449 zł / doba', 'tier': 'MID',
+     'items': ['Wszystko z ESENCJI', 'Litery podświetlane MAŁE — logo lub inicjały', 'Lampki 20 m + lampiony ×8', 'Świeczniki — 12 szt.', 'Wkładki z logo w cenie']},
+    {'id': 'fir_full', 'ev': 'firmowy', 'name': 'Firmowy FULL', 'sub': 'gala / duży event + montaż', 'price': 'od 749 zł / doba', 'tier': 'FULL',
+     'items': ['Wszystko z MID', 'Litery podświetlane DUŻE — nazwa firmy, 60 cm', 'Lampki 30 m + lampiony ×12', 'Tablice informacyjne (toaleta · parking · palarnia)', 'Montaż i demontaż po stronie Studia', 'Personalizacja wszystkich grawerów w cenie']},
+    # ---- JUBILEUSZOWY / URODZINOWY ----
+    {'id': 'jub_esencja', 'ev': 'jubileuszowy', 'name': 'Jubileuszowy ESENCJA', 'sub': 'urodziny w gronie bliskich', 'price': 'od 199 zł / doba', 'tier': 'ESENCJA',
+     'items': ['Szyld powitalny — 1 szt.', 'Numery stolików — 6 szt.', 'Świeczniki drewniane — 6 szt.', 'Grawer okolicznościowy — 1 szt.', 'Wkładka personalizowana w cenie']},
+    {'id': 'jub_mid', 'ev': 'jubileuszowy', 'top': True, 'name': 'Jubileuszowy MID', 'sub': 'okrągła rocznica', 'price': 'od 349 zł / doba', 'tier': 'MID',
+     'items': ['Wszystko z ESENCJI', 'Litery podświetlane MAŁE — wiek lub inicjały', 'Mozaika „scrabble" z imionami', 'Lampki 10 m + lampiony ×6', 'Panel z cytatem na ścianę', 'Wkładka personalizowana w cenie']},
+    {'id': 'jub_full', 'ev': 'jubileuszowy', 'name': 'Jubileuszowy FULL', 'sub': 'duża uroczystość + montaż', 'price': 'od 599 zł / doba', 'tier': 'FULL',
+     'items': ['Wszystko z MID', 'Litery podświetlane DUŻE — liczba lub nazwisko, 60 cm', 'Lampki 30 m + lampiony ×12', 'Ramka rzeźbiona na zdjęcie', 'Montaż i demontaż po stronie Studia', 'Personalizacja wszystkich grawerów w cenie']},
+    # ---- KOMPONUJĘ WŁASNY ----
+    {'id': 'wlasny', 'ev': 'wlasny', 'name': 'Komponuję własny', 'sub': 'składasz z katalogu — cena liczona automatycznie', 'price': 'suma wybranych pozycji', 'tier': 'DIY',
+     'items': ['Wybierasz produkty z katalogu (checkboxy)', 'Kalkulator liczy sumę na żywo', 'Rabat −5% dopiero od 10 pozycji', 'Personalizacja płatna osobno — wybierasz, co grawerujemy', 'Wszystko widoczne w podsumowaniu na dole strony']},
 ]
 
 
@@ -565,6 +533,54 @@ body.page{background:var(--krem)}
 .pak ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:rgba(51,38,28,.9);line-height:1.45}
 .pak li::before{content:"✦ ";color:var(--zloty)}
 .pak .btn{width:100%;margin-top:auto}
+/* pakiety zgrupowane wg typu wydarzenia */
+.pak-grupa{margin-top:44px}
+.pak-grupa:first-child{margin-top:8px}
+.pak-grupa-h{display:flex;align-items:center;gap:14px;border-bottom:2px solid rgba(107,69,48,.35);padding-bottom:12px;margin-bottom:8px}
+.pak-grupa-h .ik{width:44px;height:44px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem);flex:none}
+.pak-grupa-h .ik svg{width:26px;height:26px}
+.pak-grupa-h h3{font-size:24px;color:var(--butelkowa);font-weight:700}
+.pak-grupa-h p{margin:0;font-size:13px;color:rgba(51,38,28,.65)}
+.pak-tag{display:inline-block;margin-left:auto;background:var(--krem);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;white-space:nowrap}
+.pak-grupa .pak{margin-top:20px}
+/* kompozytor (własny zestaw) */
+.pak-diy{background:#fff;border:2px solid rgba(107,69,48,.5);padding:clamp(18px,3vw,28px);margin-top:24px}
+.pak-diy-h{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pak-diy-h .ik{width:44px;height:44px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem);flex:none}
+.pak-diy-h .ik svg{width:26px;height:26px}
+.pak-diy-h h3{font-size:22px;color:var(--butelkowa);font-weight:700;margin:0}
+.pak-diy-h p{margin:0;font-size:13px;color:rgba(51,38,28,.65)}
+.pak-diy .hint{margin:10px 0 0;font-size:13px;color:rgba(51,38,28,.65)}
+.pak-diy .hint b{color:var(--butelkowa)}
+.komp{display:grid;grid-template-columns:1fr 320px;gap:24px;margin-top:16px;align-items:start}
+@media(max-width:900px){.komp{grid-template-columns:1fr}}
+.komp-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:10px}
+.komp-sel{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--krem);border:1px solid rgba(107,69,48,.35);padding:9px 12px;font-size:13.5px}
+.komp-sel b{color:var(--ink);font-weight:600}
+.komp-sel span{color:var(--butelkowa);font-weight:700;white-space:nowrap}
+.komp-it{display:flex;gap:12px;align-items:flex-start;background:var(--krem-2);border:1px solid rgba(107,69,48,.3);padding:12px;cursor:pointer}
+.komp-it:hover{border-color:var(--brunatny)}
+.komp-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.komp-it .ik{width:38px;height:38px;flex:none;border:1px solid rgba(107,69,48,.4);background:#fff;display:grid;place-items:center;color:var(--brunatny)}
+.komp-it .ik svg{width:22px;height:22px}
+.komp-it b{display:block;font-size:14.5px;color:var(--ink)}
+.komp-it small{display:block;font-size:11.5px;color:rgba(51,38,28,.6);margin:2px 0}
+.komp-it .cena{font-size:13.5px;color:var(--butelkowa);font-weight:700}
+.komp-pod{position:sticky;top:120px;background:var(--butelkowa);color:var(--krem);padding:24px 22px}
+.komp-pod h4{margin:0 0 4px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--zloty)}
+.komp-pod .n{margin:0;font-size:12.5px;color:rgba(251,247,240,.75)}
+.komp-pod .rabat{font-size:12.5px;color:rgba(251,247,240,.75);margin:14px 0 0;min-height:18px}
+.komp-pod .rabat.on{color:var(--zloty);font-weight:700}
+.komp-pod .suma{font-size:36px;font-weight:700;color:var(--zloty);margin:6px 0 0}
+.komp-pod .suma small{display:block;font-size:11.5px;font-weight:400;color:rgba(251,247,240,.75);letter-spacing:.1em;text-transform:uppercase}
+.komp-pod .dopisz{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
+.komp-pod .btn{margin-top:16px;width:100%;background:var(--zloty);color:var(--butelkowa)}
+.komp-pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
+/* filtry katalogu (dropdowny) */
+.cat-filtry{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.cat-filtry select{appearance:none;padding:10px 36px 10px 14px;border:1px solid rgba(107,69,48,.5);background:var(--krem) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="%236B4530"/></svg>') no-repeat right 12px center;font-family:var(--serif);font-size:14px;color:var(--ink);border-radius:0;cursor:pointer}
+.cat-filtry select:focus{outline:2px solid var(--zloty)}
+.kat-none{display:none;font-size:13.5px;color:rgba(51,38,28,.6);margin:14px 0 0}
 .partner-sec{background:var(--butelkowa);color:var(--krem);padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
 .partner-sec .inner{max-width:1120px;margin:0 auto}
 .partner-sec h2{font-size:clamp(24px,3.4vw,34px);font-weight:600;text-align:center}
@@ -791,8 +807,8 @@ WYNAJEM = r'''<!DOCTYPE html>
     <h1>Wynajem dekoracji</h1>
     <p class="lead">Drewniane tablice, podświetlane litery i światło, które budują klimat przyjęcia. Ty wybierasz termin i zestaw — my grawerujemy napisy pod Twoje wydarzenie, dowozimy i montujemy.</p>
     <div class="hero-cta">
-      <a class="btn btn-solid" href="#pakiety">Sprawdź wolne terminy</a>
-      <a class="btn btn-ghost" href="#katalog">Zobacz katalog</a>
+      <a class="btn btn-solid" href="#kalendarz">Sprawdź wolne terminy</a>
+      <a class="btn btn-ghost" href="#pakiety">Zobacz pakiety</a>
     </div>
   </section>
 
@@ -800,22 +816,48 @@ WYNAJEM = r'''<!DOCTYPE html>
     <h2 class="sec-h2 center">Jak to działa</h2>
     <div class="kroki">
       <div class="krok"><span class="num">1</span><b>Wybierz termin</b><p>Sprawdź kalendarz poniżej albo napisz — odpowiadamy tego samego dnia.</p></div>
-      <div class="krok"><span class="num">2</span><b>Skomponuj zestaw</b><p>Weź gotowy pakiet albo zbierz własny z elementów katalogu.</p></div>
+      <div class="krok"><span class="num">2</span><b>Skomponuj zestaw</b><p>Weź gotowy pakiet (esencja / mid / full) albo zbierz własny z katalogu — z kalkulatorem na stronie.</p></div>
       <div class="krok"><span class="num">3</span><b>Personalizacja</b><p>Grawerujemy imiona, plan sali i napisy — na wymiennych wkładkach.</p></div>
       <div class="krok"><span class="num">4</span><b>Dostawa i montaż</b><p>Dowozimy i ustawiamy na miejscu (Warszawa i okolice) albo odbierasz z pracowni.</p></div>
       <div class="krok"><span class="num">5</span><b>Zwrot po imprezie</b><p>Odbieramy dekoracje, rozliczamy kaucję. Ty zajmujesz się gośćmi.</p></div>
     </div>
   </section>
 
+  <section class="sec" id="kalendarz">
+    <h2 class="sec-h2 center">Kalendarz dostępności</h2>
+    <p class="sec-sub">Jedna pula towaru, jeden wspólny kalendarz — gdy termin jest zajęty, blokuje wszystkie pakiety. Termin rezerwuje zaliczka.</p>
+    <div class="cal" id="kal-wspolny"></div>
+    <p class="cal-note">Kalendarz ma charakter informacyjny — dostępność potwierdzamy w wiadomości zwrotnej. Soboty znikają najszybciej.</p>
+  </section>
+
   <section class="sec" id="katalog">
     <h2 class="sec-h2 center">Katalog produktów na wynajem</h2>
-    <p class="sec-sub">Każdy element możesz wypożyczyć osobno — ceny za dobę, grawer w cenie. Wszystko powstaje w naszej pracowni, więc napisy dopasujemy do każdego wydarzenia.</p>
+    <p class="sec-sub">Każdy element możesz wypożyczyć osobno — ceny za dobę, personalizacja płatna wg wybranych pozycji. Kompletujesz z katalogu własny zestaw — checkboxy pojawiają się, gdy wybierzesz „Komponuję własny" w pakietach poniżej.</p>
+    <div class="cat-filtry">
+      <select id="f-kat" aria-label="Kategoria">
+        <option value="wszystko">Wszystkie kategorie</option>
+        <option value="powitalne">Powitalne i informacyjne</option>
+        <option value="stoly">Stoły i goście</option>
+        <option value="swiatlo">Światło</option>
+        <option value="litery">Litery i napisy</option>
+        <option value="detale">Detale i dodatki</option>
+        <option value="prezenty">Prezenty i pamiątki</option>
+      </select>
+      <select id="f-okazja" aria-label="Okazja">
+        <option value="wszystko">Każda okazja</option>
+        <option value="komunijny">Komunia</option>
+        <option value="weselny">Wesele</option>
+        <option value="firmowy">Firmowe</option>
+        <option value="jubileuszowy">Jubileusz / urodziny</option>
+      </select>
+    </div>
     @@CATALOG@@
+    <div class="kat-none" id="kat-none">Nic nie pasuje do wybranych filtrów — zmień kategorię albo okazję.</div>
   </section>
 
   <section class="sec" id="pakiety">
-    <h2 class="sec-h2 center">Pakiety ozdób — wybierz stylistykę</h2>
-    <p class="sec-sub">Każdy pakiet ma własny terminarz — kliknij datę, żeby sprawdzić dostępność i wysłać zapytanie. Zajęte dni są oznaczone na brązowo.</p>
+    <h2 class="sec-h2 center">Pakiety — wybierz okazję</h2>
+    <p class="sec-sub">Pakiety są zbudowane pod wydarzenie, nie pod styl — na start wszystkie w jednej, spójnej stylistyce (biel i złoto). Style rozbudujemy, gdy urośnie asortyment. Każdy pakiet ma własny poziom: ESENCJA / MID / FULL.</p>
     @@PACKAGES@@
     <p class="cal-note">Kaucja zwrotna 300 zł przy każdym pakiecie · wypożyczenie od 1 doby · brakujące elementy dobierzesz z katalogu.</p>
   </section>
@@ -888,106 +930,212 @@ WYNAJEM = r'''<!DOCTYPE html>
 })();
 </script>
 <script>
-/* Terminarz wynajmu (port z v3) — zajete terminy per pakiet w ZAJETE */
+/* Terminarz wynajmu v2 — jeden wspolny kalendarz (jedna pula towaru)
+   + kompozytor "Komponuje wlasny" z kalkulacja na zywo.
+   Zajete terminy edytujesz w build.py (RENTAL_ZAJETE, plaska lista). */
 var ZAJETE = @@ZAJETE_JS@@;
+var PRODUKTY = @@PRODUCTS_JS@@;
 var MIES = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
 var DNI  = ['pn','wt','śr','cz','pt','so','nd'];
 function iso(y,m,d){ return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
 
+/* ----- wspolny kalendarz ----- */
+var KAL = { box:null, rok:null, mies:null, dzis:null, wybor:null };
 function Kalendarz(box){
-  var id   = box.dataset.pkg;
-  var busy = ZAJETE[id] || [];
-  var dzis = new Date(); dzis.setHours(0,0,0,0);
-  var rok  = dzis.getFullYear(), mies = dzis.getMonth();
-  var wybor = null;
-
-  function rysuj(){
-    var pierwszy = new Date(rok, mies, 1);
-    var przesun  = (pierwszy.getDay() + 6) % 7;
-    var ile      = new Date(rok, mies + 1, 0).getDate();
-    var wstecz   = (rok < dzis.getFullYear()) || (rok === dzis.getFullYear() && mies <= dzis.getMonth());
-    var h = '<div class="calhead"><b>' + MIES[mies] + ' ' + rok + '</b>'
-          + '<span class="calnav">'
-          + '<button type="button" data-go="-1"' + (wstecz ? ' disabled' : '') + '>&#8249;</button>'
-          + '<button type="button" data-go="1">&#8250;</button></span></div>'
-          + '<div class="calgrid">';
-    DNI.forEach(function(d){ h += '<i>' + d + '</i>'; });
-    for (var i = 0; i < przesun; i++) h += '<span></span>';
-    for (var d = 1; d <= ile; d++){
-      var data = iso(rok, mies, d);
-      var dt   = new Date(rok, mies, d);
-      var kl   = '';
-      if (dt < dzis)                    kl = 'past';
-      else if (busy.indexOf(data) > -1) kl = 'busy';
-      if (data === wybor)               kl = 'sel';
-      var blok = (kl === 'past' || kl === 'busy') ? ' disabled' : '';
-      var opis = kl === 'busy' ? ' title="Termin zajęty"' : '';
-      h += '<button type="button" class="' + kl + '" data-d="' + data + '"' + blok + opis + '>' + d + '</button>';
-    }
-    h += '</div>'
-      +  '<div class="callegend"><em><i></i> wolny</em><em><i class="b"></i> zajęty</em></div>'
-      +  '<div class="calpick">' + (wybor ? tekstWyboru(wybor) : 'Kliknij datę, żeby sprawdzić dostępność.') + '</div>';
-    box.innerHTML = h;
-    box.querySelectorAll('[data-go]').forEach(function(b){
-      b.onclick = function(){
-        mies += parseInt(b.dataset.go, 10);
-        if (mies > 11){ mies = 0; rok++; }
-        if (mies < 0){ mies = 11; rok--; }
-        rysuj();
-      };
-    });
-    box.querySelectorAll('[data-d]').forEach(function(b){
-      b.onclick = function(){ wybor = b.dataset.d; rysuj(); zapiszWybor(id, wybor); };
-    });
-  }
-  function tekstWyboru(d){
-    var cz = d.split('-');
-    return 'Wybrany termin: <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0] + '</b> — wolny.';
-  }
-  rysuj();
+  KAL.box = box;
+  KAL.dzis = new Date(); KAL.dzis.setHours(0,0,0,0);
+  KAL.rok = KAL.dzis.getFullYear(); KAL.mies = KAL.dzis.getMonth();
+  KAL.wybor = null;
+  rysujKal();
 }
-
-function zapiszWybor(pkg, data){
+function rysujKal(){
+  var b = KAL.box; if(!b) return;
+  var pierwszy = new Date(KAL.rok, KAL.mies, 1);
+  var przesun  = (pierwszy.getDay() + 6) % 7;
+  var ile      = new Date(KAL.rok, KAL.mies + 1, 0).getDate();
+  var wstecz   = (KAL.rok < KAL.dzis.getFullYear()) || (KAL.rok === KAL.dzis.getFullYear() && KAL.mies <= KAL.dzis.getMonth());
+  var h = '<div class="calhead"><b>' + MIES[KAL.mies] + ' ' + KAL.rok + '</b>'
+        + '<span class="calnav">'
+        + '<button type="button" data-go="-1"' + (wstecz ? ' disabled' : '') + '>&#8249;</button>'
+        + '<button type="button" data-go="1">&#8250;</button></span></div>'
+        + '<div class="calgrid">';
+  DNI.forEach(function(d){ h += '<i>' + d + '</i>'; });
+  for (var i = 0; i < przesun; i++) h += '<span></span>';
+  for (var d = 1; d <= ile; d++){
+    var data = iso(KAL.rok, KAL.mies, d);
+    var dt   = new Date(KAL.rok, KAL.mies, d);
+    var kl   = '';
+    if (dt < KAL.dzis)            kl = 'past';
+    else if (ZAJETE.indexOf(data) > -1) kl = 'busy';
+    if (data === KAL.wybor)       kl = 'sel';
+    var blok = (kl === 'past' || kl === 'busy') ? ' disabled' : '';
+    var opis = kl === 'busy' ? ' title="Termin zajęty"' : '';
+    h += '<button type="button" class="' + kl + '" data-d="' + data + '"' + blok + opis + '>' + d + '</button>';
+  }
+  h += '</div>'
+     + '<div class="callegend"><em><i></i> wolny</em><em><i class="b"></i> zajęty</em></div>'
+     + '<div class="calpick">' + (KAL.wybor ? tekstWyboru(KAL.wybor) : 'Kliknij datę, żeby sprawdzić dostępność — jedna data blokuje wszystkie pakiety.') + '</div>';
+  b.innerHTML = h;
+  b.querySelectorAll('[data-go]').forEach(function(bt){
+    bt.onclick = function(){
+      KAL.mies += parseInt(bt.dataset.go, 10);
+      if (KAL.mies > 11){ KAL.mies = 0; KAL.rok++; }
+      if (KAL.mies < 0){ KAL.mies = 11; KAL.rok--; }
+      rysujKal();
+    };
+  });
+  b.querySelectorAll('[data-d]').forEach(function(bt){
+    bt.onclick = function(){
+      KAL.wybor = bt.dataset.d;
+      rysujKal();
+      zapiszWybor(KAL.wybor);
+      document.getElementById('rezerwacja').scrollIntoView({behavior:'smooth', block:'center'});
+    };
+  });
+}
+function tekstWyboru(d){
+  var cz = d.split('-');
+  return 'Wybrany termin: <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0] + '</b> — wolny.';
+}
+function zapiszWybor(data){
   var fd = document.getElementById('rez-data');
-  var fp = document.getElementById('rez-pakiet');
   if (fd) fd.value = data;
-  if (fp) fp.value = pkg;
   var info = document.getElementById('rez-info');
   if (info){
     var cz = data.split('-');
     info.innerHTML = 'Termin <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0]
-                   + '</b> — pakiet <b>' + pkg + '</b>. Wyślij zgłoszenie, żeby zablokować termin.';
+                   + '</b> wpisany do formularza — uzupełnij dane i wyślij zgłoszenie, żeby zablokować termin.';
   }
-  var f = document.getElementById('rezerwacja');
-  if (f) f.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ----- kompozytor wlasnego zestawu ----- */
+function cenaOd(p){ return PRODUKTY[p] ? PRODUKTY[p].c : 0; }
+function startKompozycji(){
+  document.querySelectorAll('.komp-it input').forEach(function(cb){ cb.checked = false; });
+  document.getElementById('f-kat').value = 'wszystko';
+  document.getElementById('f-okazja').value = 'wszystko';
+  zastosujFiltry();
+  document.getElementById('katalog').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function licznik(){
+  var n = document.querySelectorAll('.komp-it input:checked').length;
+  var el = document.getElementById('komp-n');
+  if (el) el.textContent = n + ' z 16 pozycji';
+  var rab = document.getElementById('komp-rab');
+  if (rab) rab.classList.toggle('on', n >= 10);
+  if (rab) rab.textContent = (n >= 10) ? '✔ Rabat −5% naliczony (10+ pozycji)' : 'Rabat −5% dopiero od 10 pozycji (masz ' + n + ')';
+  var lista = document.getElementById('komp-lista');
+  if (lista){
+    var wybrane = document.querySelectorAll('.komp-it input:checked');
+    if (!wybrane.length){
+      lista.innerHTML = '<p class="hint" style="margin-top:0">Nic jeszcze nie wybrałeś — lista pojawi się, gdy zaznaczysz pierwszy produkt.</p>';
+    } else {
+      lista.innerHTML = Array.prototype.map.call(wybrane, function(cb){
+        var p = PRODUKTY[cb.value];
+        return '<div class="komp-sel"><b>' + p.n + '</b><span>' + p.c + ' zł</span></div>';
+      }).join('');
+    }
+  }
+}
+function przelicz(){
+  var suma = 0;
+  document.querySelectorAll('.komp-it input:checked').forEach(function(cb){
+    suma += cenaOd(cb.value);
+  });
+  var n = document.querySelectorAll('.komp-it input:checked').length;
+  var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+  var doZaplaty = suma - rabat;
+  var el = document.getElementById('komp-suma');
+  if (el) el.innerHTML = '<small>suma / doba</small>' + doZaplaty + ' zł';
+  if (rabat){
+    var r = document.getElementById('komp-rab-kwota');
+    if (r) r.textContent = 'w tym rabat −5%: −' + rabat + ' zł (przy sumie ' + suma + ' zł)';
+  } else {
+    var r2 = document.getElementById('komp-rab-kwota');
+    if (r2) r2.textContent = '';
+  }
+  licznik();
+  var info = document.getElementById('rez-info');
+  if (info){
+    if (n === 0) info.innerHTML = 'Wybierz datę w kalendarzu i skład własnego zestawu w katalogu — podsumowanie wypełni się samo.';
+    else info.innerHTML = 'Własny zestaw: <b>' + n + ' pozycji</b>, suma <b>' + doZaplaty + ' zł / doba</b>'
+                        + (rabat ? ' (z rabatem −5%)' : '') + '. Wybierz termin w kalendarzu i wyślij zgłoszenie.';
+  }
+}
+function ustawPakiet(val){
+  var fp = document.getElementById('rez-pakiet');
+  if (fp) fp.value = val;
+  var info = document.getElementById('rez-info');
+  if (info) info.innerHTML = 'Wybrany pakiet: <b>' + val + '</b>. Wybierz termin w kalendarzu wyżej, uzupełnij dane i wyślij zgłoszenie.';
+  document.getElementById('rezerwacja').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function zastosujFiltry(){
+  var kat  = document.getElementById('f-kat').value;
+  var okz  = document.getElementById('f-okazja').value;
+  var wid  = 0;
+  document.querySelectorAll('.kat-card').forEach(function(k){
+    var m = (kat === 'wszystko' || k.dataset.kat === kat)
+         && (okz === 'wszystko' || k.dataset.ok.split(' ').indexOf(okz) > -1);
+    k.style.display = m ? '' : 'none';
+    if (m) wid++;
+  });
+  var none = document.getElementById('kat-none');
+  if (none) none.style.display = wid ? 'none' : 'block';
+}
+
+/* ----- formularz ----- */
+function wybudujRezerwacje(){
+  var data   = document.getElementById('rez-data').value || 'data do ustalenia';
+  var pakiet = document.getElementById('rez-pakiet').value || 'pakiet do ustalenia';
+  var imie   = document.getElementById('rez-imie').value;
+  var mail   = document.getElementById('rez-mail').value;
+  var tel    = document.getElementById('rez-tel').value;
+  var okazja = document.getElementById('rez-okazja').value;
+  var uw     = document.getElementById('rez-uw').value;
+  var checked = Array.prototype.slice.call(document.querySelectorAll('.komp-it input:checked')).map(function(cb){
+    var p = PRODUKTY[cb.value];
+    return '• ' + p.n + ' — ' + p.c + ' zł';
+  }).join('\n');
+  var suma = 0;
+  document.querySelectorAll('.komp-it input:checked').forEach(function(cb){ suma += cenaOd(cb.value); });
+  var n = document.querySelectorAll('.komp-it input:checked').length;
+  var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+  var body = 'Zapytanie o wynajem dekoracji\n\nTermin: ' + data
+           + '\nPakiet: ' + pakiet
+           + '\nImię: ' + imie
+           + '\nE-mail: ' + mail
+           + (tel ? '\nTelefon: ' + tel : '')
+           + '\nOkazja: ' + okazja
+           + (checked ? '\n\nWłasny zestaw:\n' + checked + '\nSuma: ' + suma + ' zł' + (rabat ? ' − rabat 5% = ' + (suma-rabat) + ' zł' : '') : '')
+           + (uw ? '\nUwagi: ' + uw : '');
+  var link = 'mailto:kontakt@studiosygnatura.pl'
+           + '?subject=' + encodeURIComponent('Wynajem — ' + pakiet + ' — ' + data)
+           + '&body=' + encodeURIComponent(body);
+  var ok = document.getElementById('rez-ok');
+  if (ok) ok.style.display = 'block';
+  window.location.href = link;
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  document.querySelectorAll('[data-pkg]').forEach(Kalendarz);
-  var f = document.getElementById('rez-form');
-  if (f) f.addEventListener('submit', function(e){
-    e.preventDefault();
-    var data    = document.getElementById('rez-data').value || 'data do ustalenia';
-    var pakiet  = document.getElementById('rez-pakiet').value || 'pakiet do ustalenia';
-    var imie    = document.getElementById('rez-imie').value;
-    var mail    = document.getElementById('rez-mail').value;
-    var tel     = document.getElementById('rez-tel').value;
-    var okazja  = document.getElementById('rez-okazja').value;
-    var uw      = document.getElementById('rez-uw').value;
-    var body = 'Zapytanie o wynajem dekoracji\n\nTermin: ' + data
-             + '\nPakiet: ' + pakiet
-             + '\nImię: ' + imie
-             + '\nE-mail: ' + mail
-             + (tel ? '\nTelefon: ' + tel : '')
-             + '\nOkazja: ' + okazja
-             + (uw ? '\nUwagi: ' + uw : '');
-    var link = 'mailto:kontakt@studiosygnatura.pl'
-             + '?subject=' + encodeURIComponent('Wynajem — ' + pakiet + ' — ' + data)
-             + '&body=' + encodeURIComponent(body);
-    var ok = document.getElementById('rez-ok');
-    if (ok) ok.style.display = 'block';
-    window.location.href = link;
+  var kal = document.getElementById('kal-wspolny');
+  if (kal) Kalendarz(kal);
+  document.querySelectorAll('.komp-it input').forEach(function(cb){
+    cb.addEventListener('change', przelicz);
   });
+  document.querySelectorAll('.btn-wlasny').forEach(function(b){
+    b.addEventListener('click', startKompozycji);
+  });
+  document.getElementById('f-kat').addEventListener('change', zastosujFiltry);
+  document.getElementById('f-okazja').addEventListener('change', zastosujFiltry);
+  document.querySelectorAll('[data-pakiet]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      if (a.getAttribute('href') === '#rezerwacja') e.preventDefault();
+      ustawPakiet(a.dataset.pakiet);
+    });
+  });
+  var f = document.getElementById('rez-form');
+  if (f) f.addEventListener('submit', function(e){ e.preventDefault(); wybudujRezerwacje(); });
+  przelicz();
 });
 </script>
 </body>
@@ -1045,33 +1193,106 @@ def render_stub(css, title, h1, text, extra=''):
             .replace('@@TEXT@@', text).replace('@@EXTRA@@', extra))
 
 
+PROD_KAT = {  # kategoria katalogu: atrybut data-kat w kartach + dropdown
+    'szyld': 'powitalne', 'rozpiska': 'powitalne', 'tablice': 'powitalne',
+    'numery': 'stoly', 'serwetniki': 'stoly', 'winietki': 'stoly', 'skrzynka': 'stoly',
+    'lampki': 'swiatlo', 'lampiony': 'swiatlo', 'swieczniki': 'swiatlo',
+    'litery_male': 'litery', 'litery_duze': 'litery', 'scrabble': 'litery',
+    'panel_cytat': 'detale', 'grawer': 'prezenty', 'ramka': 'prezenty',
+}
+PROD_OK = {  # okazje, do których pasuje produkt: data-ok w kartach + dropdown
+    'szyld': 'komunijny weselny firmowy jubileuszowy',
+    'rozpiska': 'komunijny weselny firmowy jubileuszowy',
+    'numery': 'komunijny weselny firmowy jubileuszowy',
+    'serwetniki': 'komunijny weselny firmowy jubileuszowy',
+    'lampki': 'komunijny weselny firmowy jubileuszowy',
+    'lampiony': 'komunijny weselny firmowy jubileuszowy',
+    'litery_male': 'komunijny weselny firmowy jubileuszowy',
+    'litery_duze': 'komunijny weselny firmowy jubileuszowy',
+    'tablice': 'weselny firmowy',
+    'skrzynka': 'weselny jubileuszowy',
+    'scrabble': 'komunijny weselny jubileuszowy',
+    'swieczniki': 'komunijny weselny firmowy jubileuszowy',
+    'winietki': 'komunijny weselny firmowy',
+    'panel_cytat': 'komunijny weselny jubileuszowy',
+    'ramka': 'jubileuszowy',
+    'grawer': 'firmowy jubileuszowy',
+}
+PROD_FREE = {p[0] for p in PRODUCTS if p[5]}  # pozycje z personalizacją gratis w zestawach
+
+
 def catalog_html():
     cards = []
-    for key, name, desc, price in PRODUCTS:
-        cards.append(f'<div class="kat-card"><div class="kat-ico">{ICONS_R[key]}</div>'
+    for key, name, desc, price, pnum, _free in PRODUCTS:
+        cards.append(f'<div class="kat-card" data-kat="{PROD_KAT[key]}" data-ok="{PROD_OK[key]}">'
+                     f'<div class="kat-ico">{ICONS_R[key]}</div>'
                      f'<h3>{name}</h3><p>{desc}</p>'
-                     f'<div class="kat-price">{price}</div></div>')
+                     f'<div class="kat-price">{price}</div>'
+                     f'<label class="komp-it"><input type="checkbox" value="{key}">'
+                     f'<span class="ik">{ICONS_R[key]}</span>'
+                     f'<span><b>{name}</b><small>dodaj do własnego zestawu</small><span class="cena">+{pnum} zł</span></span>'
+                     f'</label></div>')
     return '<div class="kat">' + ''.join(cards) + '</div>'
 
 
-def packages_html():
-    cards = []
-    for pkg in PACKAGES:
-        items = ''.join(f'<li>{it}</li>' for it in pkg['items'])
-        cards.append(
-            f'<div class="pak-card">'
+GRUPY_PAKIETOW = [
+    ('komunijny', 'Pakiet Komunijny', 'komunia / chrzest — esencja, mid i full', '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 3v26"/><path d="M9 9h14"/><path d="M7 22h18"/></svg>', 'formuła ESENCJA / MID / FULL'),
+    ('weselny', 'Pakiet Weselny', 'wesele — opcje i.w. (impreza wesele)', '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M15.5 8h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 15.5 8z"/><path d="M11 12h10l-1.5 6.5h-7z"/><path d="M14 18.5L12 21h8l-2-2.5"/></svg>', 'opcje i.w.'),
+    ('firmowy', 'Pakiet Firmowy', 'konferencja, gala, event firmowy', '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M5 28V10l11-6 11 6v18"/><path d="M10 28v-9h12v9"/><path d="M13 13h2M17 13h2M13 17h2M17 17h2"/></svg>', 'logo i oznakowanie'),
+    ('jubileuszowy', 'Pakiet Jubileuszowy', 'urodziny, rocznica, jubileusz', '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 29V14"/><path d="M8 16h16"/><path d="M9 19h14"/><path d="M11 22h10"/><path d="M13 25h6"/></svg>', 'urodziny i jubileusze'),
+]
+
+
+def pakiet_card(pkg):
+    items = ''.join(f'<li>{it}</li>' for it in pkg['items'])
+    return (f'<div class="pak-card{" top" if pkg.get("top") else ""}">'
+            f'<div class="pak-tag">{pkg["tier"]}</div>'
             f'<div class="pak-name">{pkg["name"]}</div>'
-            f'<div class="pak-sub">{pkg["styl"]}</div>'
-            f'<div class="pak-price"><small>wypożyczenie</small>{pkg["price"]}</div>'
+            f'<div class="pak-sub">{pkg["sub"]}</div>'
+            f'<div class="pak-price"><small>wypożyczenie / doba</small>{pkg["price"]}</div>'
             f'<ul>{items}</ul>'
-            f'<div class="cal" data-pkg="{pkg["id"]}"></div>'
-            f'<a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div>')
-    return '<div class="pak">' + ''.join(cards) + '</div>'
+            f'<a class="btn btn-solid" href="#rezerwacja" data-pakiet="{pkg["name"]}">Zapytaj o ten pakiet</a></div>')
+
+
+def packages_html():
+    grupy = []
+    for ev_id, ev_name, ev_sub, ev_iko, ev_tag in GRUPY_PAKIETOW:
+        karty = ''.join(pakiet_card(p) for p in PACKAGES if p['ev'] == ev_id)
+        grupy.append(f'<div class="pak-grupa" id="ev-{ev_id}">'
+                     f'<div class="pak-grupa-h"><span class="ik">{ev_iko}</span>'
+                     f'<div><h3>{ev_name}</h3><p>{ev_sub}</p></div>'
+                     f'<span class="pak-tag">{ev_tag}</span></div>'
+                     f'<div class="pak">{karty}</div></div>')
+    # sekcja "Komponuję własny" z kalkulatorem
+    diy_items = [p for p in PACKAGES if p['ev'] == 'wlasny']
+    diy = ''
+    if diy_items:
+        p = diy_items[0]
+        diy = ('<section class="pak-diy" id="komponuje">'
+               '<div class="pak-diy-h"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h18v16H7z"/><path d="M11 13l3.5 3.5L21 10"/></svg></span>'
+               '<div><h3>' + p['name'] + '</h3><p>' + p['sub'] + '</p></div></div>'
+               '<p class="hint">Zasady: <b>bez rabatu −10% i bez gratisowej personalizacji</b> — rabat <b>−5%</b> naliczy się dopiero, gdy zaznaczysz <b>min. 10 produktów</b>. '
+               'Personalizację wybierasz i płacisz osobno. Termin blokuje cały kalendarz (jedna pula towaru).</p>'
+               '<div class="komp">'
+               '<div><p class="hint" style="margin-top:0">Wybrane produkty — zaznaczaj checkboxy w katalogu powyżej, lista i suma aktualizują się na bieżąco:</p>'
+               '<div class="komp-lista" id="komp-lista"></div></div>'
+               '<div class="komp-pod"><h4>Twoje podsumowanie</h4>'
+               '<p class="n" id="komp-n">0 z 16 pozycji</p>'
+               '<p class="rabat" id="komp-rab">Rabat −5% dopiero od 10 pozycji (masz 0)</p>'
+               '<div class="suma" id="komp-suma"><small>suma / doba</small>0 zł</div>'
+               '<p class="dopisz" id="komp-rab-kwota"></p>'
+               '<p class="dopisz">+ kaucja zwrotna 300 zł · + personalizacja wg wybranych pozycji</p>'
+               '<button class="btn btn-solid btn-wlasny" type="button">Przejdź do katalogu</button>'
+               '<a class="btn btn-ghost" href="#rezerwacja" data-pakiet="Zestaw własny" style="background:transparent;border:1px solid var(--zloty);color:var(--zloty)">Wyślij zapytanie</a>'
+               '</div></div></section>')
+    return ''.join(grupy) + diy
 
 
 def render_wynajem(css):
+    produkty_js = {p[0]: {'n': p[1], 'c': p[4]} for p in PRODUCTS}
     html = (WYNAJEM.replace('@@CSS@@', css)
             .replace('@@ZAJETE_JS@@', json.dumps(RENTAL_ZAJETE, ensure_ascii=False))
+            .replace('@@PRODUCTS_JS@@', json.dumps(produkty_js, ensure_ascii=False))
             .replace('@@CATALOG@@', catalog_html())
             .replace('@@PACKAGES@@', packages_html()))
     for key in ('CART', 'USER', 'BURGER', 'IG', 'FB', 'PIN'):

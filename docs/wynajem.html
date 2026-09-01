@@ -270,6 +270,54 @@ body.page{background:var(--krem)}
 .pak ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:rgba(51,38,28,.9);line-height:1.45}
 .pak li::before{content:"✦ ";color:var(--zloty)}
 .pak .btn{width:100%;margin-top:auto}
+/* pakiety zgrupowane wg typu wydarzenia */
+.pak-grupa{margin-top:44px}
+.pak-grupa:first-child{margin-top:8px}
+.pak-grupa-h{display:flex;align-items:center;gap:14px;border-bottom:2px solid rgba(107,69,48,.35);padding-bottom:12px;margin-bottom:8px}
+.pak-grupa-h .ik{width:44px;height:44px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem);flex:none}
+.pak-grupa-h .ik svg{width:26px;height:26px}
+.pak-grupa-h h3{font-size:24px;color:var(--butelkowa);font-weight:700}
+.pak-grupa-h p{margin:0;font-size:13px;color:rgba(51,38,28,.65)}
+.pak-tag{display:inline-block;margin-left:auto;background:var(--krem);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;white-space:nowrap}
+.pak-grupa .pak{margin-top:20px}
+/* kompozytor (własny zestaw) */
+.pak-diy{background:#fff;border:2px solid rgba(107,69,48,.5);padding:clamp(18px,3vw,28px);margin-top:24px}
+.pak-diy-h{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pak-diy-h .ik{width:44px;height:44px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem);flex:none}
+.pak-diy-h .ik svg{width:26px;height:26px}
+.pak-diy-h h3{font-size:22px;color:var(--butelkowa);font-weight:700;margin:0}
+.pak-diy-h p{margin:0;font-size:13px;color:rgba(51,38,28,.65)}
+.pak-diy .hint{margin:10px 0 0;font-size:13px;color:rgba(51,38,28,.65)}
+.pak-diy .hint b{color:var(--butelkowa)}
+.komp{display:grid;grid-template-columns:1fr 320px;gap:24px;margin-top:16px;align-items:start}
+@media(max-width:900px){.komp{grid-template-columns:1fr}}
+.komp-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:10px}
+.komp-sel{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--krem);border:1px solid rgba(107,69,48,.35);padding:9px 12px;font-size:13.5px}
+.komp-sel b{color:var(--ink);font-weight:600}
+.komp-sel span{color:var(--butelkowa);font-weight:700;white-space:nowrap}
+.komp-it{display:flex;gap:12px;align-items:flex-start;background:var(--krem-2);border:1px solid rgba(107,69,48,.3);padding:12px;cursor:pointer}
+.komp-it:hover{border-color:var(--brunatny)}
+.komp-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.komp-it .ik{width:38px;height:38px;flex:none;border:1px solid rgba(107,69,48,.4);background:#fff;display:grid;place-items:center;color:var(--brunatny)}
+.komp-it .ik svg{width:22px;height:22px}
+.komp-it b{display:block;font-size:14.5px;color:var(--ink)}
+.komp-it small{display:block;font-size:11.5px;color:rgba(51,38,28,.6);margin:2px 0}
+.komp-it .cena{font-size:13.5px;color:var(--butelkowa);font-weight:700}
+.komp-pod{position:sticky;top:120px;background:var(--butelkowa);color:var(--krem);padding:24px 22px}
+.komp-pod h4{margin:0 0 4px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--zloty)}
+.komp-pod .n{margin:0;font-size:12.5px;color:rgba(251,247,240,.75)}
+.komp-pod .rabat{font-size:12.5px;color:rgba(251,247,240,.75);margin:14px 0 0;min-height:18px}
+.komp-pod .rabat.on{color:var(--zloty);font-weight:700}
+.komp-pod .suma{font-size:36px;font-weight:700;color:var(--zloty);margin:6px 0 0}
+.komp-pod .suma small{display:block;font-size:11.5px;font-weight:400;color:rgba(251,247,240,.75);letter-spacing:.1em;text-transform:uppercase}
+.komp-pod .dopisz{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
+.komp-pod .btn{margin-top:16px;width:100%;background:var(--zloty);color:var(--butelkowa)}
+.komp-pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
+/* filtry katalogu (dropdowny) */
+.cat-filtry{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+.cat-filtry select{appearance:none;padding:10px 36px 10px 14px;border:1px solid rgba(107,69,48,.5);background:var(--krem) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="%236B4530"/></svg>') no-repeat right 12px center;font-family:var(--serif);font-size:14px;color:var(--ink);border-radius:0;cursor:pointer}
+.cat-filtry select:focus{outline:2px solid var(--zloty)}
+.kat-none{display:none;font-size:13.5px;color:rgba(51,38,28,.6);margin:14px 0 0}
 .partner-sec{background:var(--butelkowa);color:var(--krem);padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
 .partner-sec .inner{max-width:1120px;margin:0 auto}
 .partner-sec h2{font-size:clamp(24px,3.4vw,34px);font-weight:600;text-align:center}
@@ -328,8 +376,8 @@ body.page{background:var(--krem)}
     <h1>Wynajem dekoracji</h1>
     <p class="lead">Drewniane tablice, podświetlane litery i światło, które budują klimat przyjęcia. Ty wybierasz termin i zestaw — my grawerujemy napisy pod Twoje wydarzenie, dowozimy i montujemy.</p>
     <div class="hero-cta">
-      <a class="btn btn-solid" href="#pakiety">Sprawdź wolne terminy</a>
-      <a class="btn btn-ghost" href="#katalog">Zobacz katalog</a>
+      <a class="btn btn-solid" href="#kalendarz">Sprawdź wolne terminy</a>
+      <a class="btn btn-ghost" href="#pakiety">Zobacz pakiety</a>
     </div>
   </section>
 
@@ -337,23 +385,49 @@ body.page{background:var(--krem)}
     <h2 class="sec-h2 center">Jak to działa</h2>
     <div class="kroki">
       <div class="krok"><span class="num">1</span><b>Wybierz termin</b><p>Sprawdź kalendarz poniżej albo napisz — odpowiadamy tego samego dnia.</p></div>
-      <div class="krok"><span class="num">2</span><b>Skomponuj zestaw</b><p>Weź gotowy pakiet albo zbierz własny z elementów katalogu.</p></div>
+      <div class="krok"><span class="num">2</span><b>Skomponuj zestaw</b><p>Weź gotowy pakiet (esencja / mid / full) albo zbierz własny z katalogu — z kalkulatorem na stronie.</p></div>
       <div class="krok"><span class="num">3</span><b>Personalizacja</b><p>Grawerujemy imiona, plan sali i napisy — na wymiennych wkładkach.</p></div>
       <div class="krok"><span class="num">4</span><b>Dostawa i montaż</b><p>Dowozimy i ustawiamy na miejscu (Warszawa i okolice) albo odbierasz z pracowni.</p></div>
       <div class="krok"><span class="num">5</span><b>Zwrot po imprezie</b><p>Odbieramy dekoracje, rozliczamy kaucję. Ty zajmujesz się gośćmi.</p></div>
     </div>
   </section>
 
+  <section class="sec" id="kalendarz">
+    <h2 class="sec-h2 center">Kalendarz dostępności</h2>
+    <p class="sec-sub">Jedna pula towaru, jeden wspólny kalendarz — gdy termin jest zajęty, blokuje wszystkie pakiety. Termin rezerwuje zaliczka.</p>
+    <div class="cal" id="kal-wspolny"></div>
+    <p class="cal-note">Kalendarz ma charakter informacyjny — dostępność potwierdzamy w wiadomości zwrotnej. Soboty znikają najszybciej.</p>
+  </section>
+
   <section class="sec" id="katalog">
     <h2 class="sec-h2 center">Katalog produktów na wynajem</h2>
-    <p class="sec-sub">Każdy element możesz wypożyczyć osobno — ceny za dobę, grawer w cenie. Wszystko powstaje w naszej pracowni, więc napisy dopasujemy do każdego wydarzenia.</p>
-    <div class="kat"><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="20" height="14"/><path d="M9 8h14M9 12h9"/><path d="M11 18v10M21 18v10"/><path d="M8 28h16"/></svg></div><h3>Szyld powitalny</h3><p>„Witajcie" z imionami na wymiennej wkładce · 60×40 cm · opcjonalne podświetlenie LED</p><div class="kat-price">od 49 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="22" height="24"/><path d="M9 9h14M9 14h14M9 19h10M9 24h6"/></svg></div><h3>Tablica „rozpiska stołów"</h3><p>Plan sali z listą gości · wymienne karty przy stołach · 100×70 cm</p><div class="kat-price">od 59 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="3" width="12" height="26"/><path d="M10 11h12"/><path d="M13 18h6M13 25h6"/></svg></div><h3>Numery stołów</h3><p>Grawerowane, stojące · komplet 10 szt. · wymienne</p><div class="kat-price">od 25 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="6.5"/></svg></div><h3>Serwetniki</h3><p>Drewniane obrączki na serwetki · komplet 30 szt.</p><div class="kat-price">od 20 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 4c7 7 17 7 24 0"/><circle cx="8" cy="8" r="2.4"/><circle cx="16" cy="11" r="2.4"/><circle cx="24" cy="8" r="2.4"/></svg></div><h3>Lampki</h3><p>Fairy lights, ciepłe 2700 K · 10 m · z koszykiem baterii</p><div class="kat-price">od 15 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h8l-2.5 5h-3z"/><rect x="10" y="9" width="12" height="13"/><path d="M13 22h6M12 26h8"/></svg></div><h3>Lampiony</h3><p>Drewniane, geometryczne · komplet 6 szt. · światło od środka</p><div class="kat-price">od 35 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21.5" text-anchor="middle" font-family="Georgia, serif" font-size="13" stroke="none" fill="currentColor">AB</text><rect x="4" y="24" width="24" height="3"/></svg></div><h3>Litery podświetlane MAŁE</h3><p>Inicjały lub imiona · 25 cm · LED 2700 K</p><div class="kat-price">od 45 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21" text-anchor="middle" font-family="Georgia, serif" font-size="10.5" stroke="none" fill="currentColor">LOVE</text><rect x="4" y="24" width="24" height="3"/></svg></div><h3>Litery podświetlane DUŻE</h3><p>„LOVE" / nazwisko · 60 cm · podświetlenie LED</p><div class="kat-price">od 120 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="12"/><circle cx="16" cy="10" r="2.2"/><path d="M16 7.6v2.8M11 16v12M21 16v12M8 28h16"/></svg></div><h3>Tablice informacyjne</h3><p>Toaleta · parking · palarnia · plan sali — komplet z podpórkami</p><div class="kat-price">od 30 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9V6a8 8 0 0 1 16 0v3"/><rect x="5" y="9" width="22" height="15"/><path d="M10 17h12M10 21h8"/></svg></div><h3>Skrzynka na życzenia</h3><p>Drewniana, z grawerem · na koperty i kartki</p><div class="kat-price">od 25 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="5" width="10" height="10"/><rect x="17" y="5" width="10" height="10"/><rect x="5" y="17" width="10" height="10"/><rect x="17" y="17" width="10" height="10"/></svg></div><h3>Mozaika „scrabble"</h3><p>Imiona w drewnianych kafelkach · składamy na ścianie lub stole</p><div class="kat-price">od 55 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 6h6v9a3 3 0 0 1-6 0z"/><path d="M16 3v3"/><circle cx="16" cy="2.6" r="1.5"/><rect x="7" y="18" width="18" height="5"/></svg></div><h3>Świeczniki</h3><p>Drewniane, stabilne · komplet 12 szt. · świece w zestawie</p><div class="kat-price">od 30 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="8" y="6" width="16" height="20"/><path d="M11 12h10M11 16h10"/><path d="M16 26v4"/></svg></div><h3>Winietki i plan dnia</h3><p>Imienne oznaczenia stołów + tablica harmonogramu imprezy</p><div class="kat-price">od 30 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="6" width="24" height="20"/><rect x="8" y="10" width="16" height="12"/><path d="M10 20h12M10 24h8"/></svg></div><h3>Panel z cytatem</h3><p>Warstwowy panel z sentencją, imionami i datą — do powieszenia na ścianie</p><div class="kat-price">od 149 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="5" y="7" width="22" height="18"/><rect x="9" y="11" width="14" height="10"/><path d="M16 21l-3.2 4h6.4z"/><circle cx="12" cy="14.5" r="1.2"/></svg></div><h3>Ramka rzeźbiona</h3><p>Na zdjęcie z uroczystości — rzeźbiona, z datą i okazją na dole</p><div class="kat-price">od 169 zł / doba</div></div><div class="kat-card"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="24"/><path d="M11 9h10M11 14h10M11 19h7"/><path d="M13 28h6"/></svg></div><h3>Grawer okolicznościowy</h3><p>Tabliczka z dedykacją — jubileusz, rocznica albo pożegnanie pracownika</p><div class="kat-price">od 89 zł / doba</div></div></div>
+    <p class="sec-sub">Każdy element możesz wypożyczyć osobno — ceny za dobę, personalizacja płatna wg wybranych pozycji. Kompletujesz z katalogu własny zestaw — checkboxy pojawiają się, gdy wybierzesz „Komponuję własny" w pakietach poniżej.</p>
+    <div class="cat-filtry">
+      <select id="f-kat" aria-label="Kategoria">
+        <option value="wszystko">Wszystkie kategorie</option>
+        <option value="powitalne">Powitalne i informacyjne</option>
+        <option value="stoly">Stoły i goście</option>
+        <option value="swiatlo">Światło</option>
+        <option value="litery">Litery i napisy</option>
+        <option value="detale">Detale i dodatki</option>
+        <option value="prezenty">Prezenty i pamiątki</option>
+      </select>
+      <select id="f-okazja" aria-label="Okazja">
+        <option value="wszystko">Każda okazja</option>
+        <option value="komunijny">Komunia</option>
+        <option value="weselny">Wesele</option>
+        <option value="firmowy">Firmowe</option>
+        <option value="jubileuszowy">Jubileusz / urodziny</option>
+      </select>
+    </div>
+    <div class="kat"><div class="kat-card" data-kat="powitalne" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="20" height="14"/><path d="M9 8h14M9 12h9"/><path d="M11 18v10M21 18v10"/><path d="M8 28h16"/></svg></div><h3>Szyld powitalny</h3><p>„Witajcie" z imionami na wymiennej wkładce · 60×40 cm · opcjonalne podświetlenie LED</p><div class="kat-price">od 49 zł / doba</div><label class="komp-it"><input type="checkbox" value="szyld"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="20" height="14"/><path d="M9 8h14M9 12h9"/><path d="M11 18v10M21 18v10"/><path d="M8 28h16"/></svg></span><span><b>Szyld powitalny</b><small>dodaj do własnego zestawu</small><span class="cena">+49 zł</span></span></label></div><div class="kat-card" data-kat="powitalne" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="22" height="24"/><path d="M9 9h14M9 14h14M9 19h10M9 24h6"/></svg></div><h3>Tablica „rozpiska stołów"</h3><p>Plan sali z listą gości · wymienne karty przy stołach · 100×70 cm</p><div class="kat-price">od 59 zł / doba</div><label class="komp-it"><input type="checkbox" value="rozpiska"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="22" height="24"/><path d="M9 9h14M9 14h14M9 19h10M9 24h6"/></svg></span><span><b>Tablica „rozpiska stołów"</b><small>dodaj do własnego zestawu</small><span class="cena">+59 zł</span></span></label></div><div class="kat-card" data-kat="stoly" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="3" width="12" height="26"/><path d="M10 11h12"/><path d="M13 18h6M13 25h6"/></svg></div><h3>Numery stołów</h3><p>Grawerowane, stojące · komplet 10 szt. · wymienne</p><div class="kat-price">od 25 zł / doba</div><label class="komp-it"><input type="checkbox" value="numery"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="3" width="12" height="26"/><path d="M10 11h12"/><path d="M13 18h6M13 25h6"/></svg></span><span><b>Numery stołów</b><small>dodaj do własnego zestawu</small><span class="cena">+25 zł</span></span></label></div><div class="kat-card" data-kat="stoly" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="6.5"/></svg></div><h3>Serwetniki</h3><p>Drewniane obrączki na serwetki · komplet 30 szt.</p><div class="kat-price">od 20 zł / doba</div><label class="komp-it"><input type="checkbox" value="serwetniki"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="6.5"/></svg></span><span><b>Serwetniki</b><small>dodaj do własnego zestawu</small><span class="cena">+20 zł</span></span></label></div><div class="kat-card" data-kat="swiatlo" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 4c7 7 17 7 24 0"/><circle cx="8" cy="8" r="2.4"/><circle cx="16" cy="11" r="2.4"/><circle cx="24" cy="8" r="2.4"/></svg></div><h3>Lampki</h3><p>Fairy lights, ciepłe 2700 K · 10 m · z koszykiem baterii</p><div class="kat-price">od 15 zł / doba</div><label class="komp-it"><input type="checkbox" value="lampki"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 4c7 7 17 7 24 0"/><circle cx="8" cy="8" r="2.4"/><circle cx="16" cy="11" r="2.4"/><circle cx="24" cy="8" r="2.4"/></svg></span><span><b>Lampki</b><small>dodaj do własnego zestawu</small><span class="cena">+15 zł</span></span></label></div><div class="kat-card" data-kat="swiatlo" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h8l-2.5 5h-3z"/><rect x="10" y="9" width="12" height="13"/><path d="M13 22h6M12 26h8"/></svg></div><h3>Lampiony</h3><p>Drewniane, geometryczne · komplet 6 szt. · światło od środka</p><div class="kat-price">od 35 zł / doba</div><label class="komp-it"><input type="checkbox" value="lampiony"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h8l-2.5 5h-3z"/><rect x="10" y="9" width="12" height="13"/><path d="M13 22h6M12 26h8"/></svg></span><span><b>Lampiony</b><small>dodaj do własnego zestawu</small><span class="cena">+35 zł</span></span></label></div><div class="kat-card" data-kat="litery" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21.5" text-anchor="middle" font-family="Georgia, serif" font-size="13" stroke="none" fill="currentColor">AB</text><rect x="4" y="24" width="24" height="3"/></svg></div><h3>Litery podświetlane MAŁE</h3><p>Inicjały lub imiona · 25 cm · LED 2700 K</p><div class="kat-price">od 45 zł / doba</div><label class="komp-it"><input type="checkbox" value="litery_male"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21.5" text-anchor="middle" font-family="Georgia, serif" font-size="13" stroke="none" fill="currentColor">AB</text><rect x="4" y="24" width="24" height="3"/></svg></span><span><b>Litery podświetlane MAŁE</b><small>dodaj do własnego zestawu</small><span class="cena">+45 zł</span></span></label></div><div class="kat-card" data-kat="litery" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21" text-anchor="middle" font-family="Georgia, serif" font-size="10.5" stroke="none" fill="currentColor">LOVE</text><rect x="4" y="24" width="24" height="3"/></svg></div><h3>Litery podświetlane DUŻE</h3><p>„LOVE" / nazwisko · 60 cm · podświetlenie LED</p><div class="kat-price">od 120 zł / doba</div><label class="komp-it"><input type="checkbox" value="litery_duze"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><text x="16" y="21" text-anchor="middle" font-family="Georgia, serif" font-size="10.5" stroke="none" fill="currentColor">LOVE</text><rect x="4" y="24" width="24" height="3"/></svg></span><span><b>Litery podświetlane DUŻE</b><small>dodaj do własnego zestawu</small><span class="cena">+120 zł</span></span></label></div><div class="kat-card" data-kat="powitalne" data-ok="weselny firmowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="12"/><circle cx="16" cy="10" r="2.2"/><path d="M16 7.6v2.8M11 16v12M21 16v12M8 28h16"/></svg></div><h3>Tablice informacyjne</h3><p>Toaleta · parking · palarnia · plan sali — komplet z podpórkami</p><div class="kat-price">od 30 zł / doba</div><label class="komp-it"><input type="checkbox" value="tablice"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="12"/><circle cx="16" cy="10" r="2.2"/><path d="M16 7.6v2.8M11 16v12M21 16v12M8 28h16"/></svg></span><span><b>Tablice informacyjne</b><small>dodaj do własnego zestawu</small><span class="cena">+30 zł</span></span></label></div><div class="kat-card" data-kat="stoly" data-ok="weselny jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9V6a8 8 0 0 1 16 0v3"/><rect x="5" y="9" width="22" height="15"/><path d="M10 17h12M10 21h8"/></svg></div><h3>Skrzynka na życzenia</h3><p>Drewniana, z grawerem · na koperty i kartki</p><div class="kat-price">od 25 zł / doba</div><label class="komp-it"><input type="checkbox" value="skrzynka"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9V6a8 8 0 0 1 16 0v3"/><rect x="5" y="9" width="22" height="15"/><path d="M10 17h12M10 21h8"/></svg></span><span><b>Skrzynka na życzenia</b><small>dodaj do własnego zestawu</small><span class="cena">+25 zł</span></span></label></div><div class="kat-card" data-kat="litery" data-ok="komunijny weselny jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="5" width="10" height="10"/><rect x="17" y="5" width="10" height="10"/><rect x="5" y="17" width="10" height="10"/><rect x="17" y="17" width="10" height="10"/></svg></div><h3>Mozaika „scrabble"</h3><p>Imiona w drewnianych kafelkach · składamy na ścianie lub stole</p><div class="kat-price">od 55 zł / doba</div><label class="komp-it"><input type="checkbox" value="scrabble"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="5" width="10" height="10"/><rect x="17" y="5" width="10" height="10"/><rect x="5" y="17" width="10" height="10"/><rect x="17" y="17" width="10" height="10"/></svg></span><span><b>Mozaika „scrabble"</b><small>dodaj do własnego zestawu</small><span class="cena">+55 zł</span></span></label></div><div class="kat-card" data-kat="swiatlo" data-ok="komunijny weselny firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 6h6v9a3 3 0 0 1-6 0z"/><path d="M16 3v3"/><circle cx="16" cy="2.6" r="1.5"/><rect x="7" y="18" width="18" height="5"/></svg></div><h3>Świeczniki</h3><p>Drewniane, stabilne · komplet 12 szt. · świece w zestawie</p><div class="kat-price">od 30 zł / doba</div><label class="komp-it"><input type="checkbox" value="swieczniki"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 6h6v9a3 3 0 0 1-6 0z"/><path d="M16 3v3"/><circle cx="16" cy="2.6" r="1.5"/><rect x="7" y="18" width="18" height="5"/></svg></span><span><b>Świeczniki</b><small>dodaj do własnego zestawu</small><span class="cena">+30 zł</span></span></label></div><div class="kat-card" data-kat="stoly" data-ok="komunijny weselny firmowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="8" y="6" width="16" height="20"/><path d="M11 12h10M11 16h10"/><path d="M16 26v4"/></svg></div><h3>Winietki i plan dnia</h3><p>Imienne oznaczenia stołów + tablica harmonogramu imprezy</p><div class="kat-price">od 30 zł / doba</div><label class="komp-it"><input type="checkbox" value="winietki"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="8" y="6" width="16" height="20"/><path d="M11 12h10M11 16h10"/><path d="M16 26v4"/></svg></span><span><b>Winietki i plan dnia</b><small>dodaj do własnego zestawu</small><span class="cena">+30 zł</span></span></label></div><div class="kat-card" data-kat="detale" data-ok="komunijny weselny jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="6" width="24" height="20"/><rect x="8" y="10" width="16" height="12"/><path d="M10 20h12M10 24h8"/></svg></div><h3>Panel z cytatem</h3><p>Warstwowy panel z sentencją, imionami i datą — do powieszenia na ścianie</p><div class="kat-price">od 149 zł / doba</div><label class="komp-it"><input type="checkbox" value="panel_cytat"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="6" width="24" height="20"/><rect x="8" y="10" width="16" height="12"/><path d="M10 20h12M10 24h8"/></svg></span><span><b>Panel z cytatem</b><small>dodaj do własnego zestawu</small><span class="cena">+149 zł</span></span></label></div><div class="kat-card" data-kat="prezenty" data-ok="jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="5" y="7" width="22" height="18"/><rect x="9" y="11" width="14" height="10"/><path d="M16 21l-3.2 4h6.4z"/><circle cx="12" cy="14.5" r="1.2"/></svg></div><h3>Ramka rzeźbiona</h3><p>Na zdjęcie z uroczystości — rzeźbiona, z datą i okazją na dole</p><div class="kat-price">od 169 zł / doba</div><label class="komp-it"><input type="checkbox" value="ramka"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="5" y="7" width="22" height="18"/><rect x="9" y="11" width="14" height="10"/><path d="M16 21l-3.2 4h6.4z"/><circle cx="12" cy="14.5" r="1.2"/></svg></span><span><b>Ramka rzeźbiona</b><small>dodaj do własnego zestawu</small><span class="cena">+169 zł</span></span></label></div><div class="kat-card" data-kat="prezenty" data-ok="firmowy jubileuszowy"><div class="kat-ico"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="24"/><path d="M11 9h10M11 14h10M11 19h7"/><path d="M13 28h6"/></svg></div><h3>Grawer okolicznościowy</h3><p>Tabliczka z dedykacją — jubileusz, rocznica albo pożegnanie pracownika</p><div class="kat-price">od 89 zł / doba</div><label class="komp-it"><input type="checkbox" value="grawer"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="4" width="18" height="24"/><path d="M11 9h10M11 14h10M11 19h7"/><path d="M13 28h6"/></svg></span><span><b>Grawer okolicznościowy</b><small>dodaj do własnego zestawu</small><span class="cena">+89 zł</span></span></label></div></div>
+    <div class="kat-none" id="kat-none">Nic nie pasuje do wybranych filtrów — zmień kategorię albo okazję.</div>
   </section>
 
   <section class="sec" id="pakiety">
-    <h2 class="sec-h2 center">Pakiety ozdób — wybierz stylistykę</h2>
-    <p class="sec-sub">Każdy pakiet ma własny terminarz — kliknij datę, żeby sprawdzić dostępność i wysłać zapytanie. Zajęte dni są oznaczone na brązowo.</p>
-    <div class="pak"><div class="pak-card"><div class="pak-name">Pakiet Klasyczny</div><div class="pak-sub">biel i złoto — ponadczasowa elegancja</div><div class="pak-price"><small>wypożyczenie</small>270 zł / doba</div><ul><li>Tablica powitalna — 1 szt.</li><li>Plan stołów — 1 szt.</li><li>Numery stolików — 10 szt.</li><li>Tabliczki na krzesła — 2 szt.</li><li>Litery przestrzenne — para</li><li>Wkładka personalizowana w cenie</li></ul><div class="cal" data-pkg="klasyczny"></div><a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div><div class="pak-card"><div class="pak-name">Pakiet Leśny</div><div class="pak-sub">zieleń, mech i naturalne drewno</div><div class="pak-price"><small>wypożyczenie</small>285 zł / doba</div><ul><li>Tablica powitalna — 1 szt.</li><li>Plan stołów — 1 szt.</li><li>Numery stolików — 10 szt.</li><li>Skrzynka na koperty — 1 szt.</li><li>Ramka na zdjęcia — 1 szt.</li><li>Wkładka personalizowana w cenie</li></ul><div class="cal" data-pkg="lesny"></div><a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div><div class="pak-card"><div class="pak-name">Pakiet Rustykalny</div><div class="pak-sub">juta, surowe drewno, wiejski klimat</div><div class="pak-price"><small>wypożyczenie</small>150 zł / doba</div><ul><li>Tablica z imieniem — 1 szt.</li><li>Oznaczenia stołów — 6 szt.</li><li>Dekoracja wejścia — 1 kpl.</li><li>Świeczniki drewniane — 6 szt.</li><li>Wkładka personalizowana w cenie</li></ul><div class="cal" data-pkg="rustykalny"></div><a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div><div class="pak-card"><div class="pak-name">Pakiet Komunijny</div><div class="pak-sub">jasne drewno i delikatne detale</div><div class="pak-price"><small>wypożyczenie</small>150 zł / doba</div><ul><li>Tablica z imieniem — 1 szt.</li><li>Oznaczenia stołów — 6 szt.</li><li>Winietki imienne — 20 szt.</li><li>Dekoracja wejścia — 1 kpl.</li><li>Wkładka personalizowana w cenie</li></ul><div class="cal" data-pkg="komunijny"></div><a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div><div class="pak-card"><div class="pak-name">Pakiet Firmowy</div><div class="pak-sub">logo, oznakowanie i kierowanie gości</div><div class="pak-price"><small>wypożyczenie</small>320 zł / doba</div><ul><li>Tablica powitalna z logo — 1 szt.</li><li>Oznaczenia sal — 4 szt.</li><li>Numeracja stanowisk — 12 szt.</li><li>Znaki kierunkowe — 6 szt.</li><li>Wkładki z logo w cenie</li></ul><div class="cal" data-pkg="firmowy"></div><a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div><div class="pak-card"><div class="pak-name">Zestaw własny</div><div class="pak-sub">komponujesz z katalogu — à la carte</div><div class="pak-price"><small>wypożyczenie</small>od 15 zł / doba</div><ul><li>Wybierasz pozycje z katalogu niżej</li><li>Cena = suma wybranych pozycji</li><li>Rabat −10% od 5 pozycji</li><li>Wkładka personalizowana w cenie</li></ul><div class="cal" data-pkg="wlasny"></div><a class="btn btn-solid" href="#rezerwacja">Zapytaj o termin</a></div></div>
+    <h2 class="sec-h2 center">Pakiety — wybierz okazję</h2>
+    <p class="sec-sub">Pakiety są zbudowane pod wydarzenie, nie pod styl — na start wszystkie w jednej, spójnej stylistyce (biel i złoto). Style rozbudujemy, gdy urośnie asortyment. Każdy pakiet ma własny poziom: ESENCJA / MID / FULL.</p>
+    <div class="pak-grupa" id="ev-komunijny"><div class="pak-grupa-h"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 3v26"/><path d="M9 9h14"/><path d="M7 22h18"/></svg></span><div><h3>Pakiet Komunijny</h3><p>komunia / chrzest — esencja, mid i full</p></div><span class="pak-tag">formuła ESENCJA / MID / FULL</span></div><div class="pak"><div class="pak-card"><div class="pak-tag">ESENCJA</div><div class="pak-name">Komunijny ESENCJA</div><div class="pak-sub">dla kameralnego przyjęcia</div><div class="pak-price"><small>wypożyczenie / doba</small>od 199 zł / doba</div><ul><li>Tablica z imieniem — 1 szt.</li><li>Oznaczenia stołów — 6 szt.</li><li>Winietki imienne — 20 szt.</li><li>Świeczniki drewniane — 6 szt.</li><li>Wkładka personalizowana w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Komunijny ESENCJA">Zapytaj o ten pakiet</a></div><div class="pak-card top"><div class="pak-tag">MID</div><div class="pak-name">Komunijny MID</div><div class="pak-sub">najczęściej wybierany</div><div class="pak-price"><small>wypożyczenie / doba</small>od 349 zł / doba</div><ul><li>Wszystko z ESENCJI</li><li>Szyld powitalny — 1 szt.</li><li>Plan stołów — 1 szt.</li><li>Numery stolików — 10 szt.</li><li>Lampki ciepłe 10 m + lampiony ×6</li><li>Mozaika „scrabble" z imionami</li><li>Wkładka personalizowana w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Komunijny MID">Zapytaj o ten pakiet</a></div><div class="pak-card"><div class="pak-tag">FULL</div><div class="pak-name">Komunijny FULL</div><div class="pak-sub">pełna oprawa sali + montaż</div><div class="pak-price"><small>wypożyczenie / doba</small>od 599 zł / doba</div><ul><li>Wszystko z MID</li><li>Litery podświetlane DUŻE — imię, 60 cm</li><li>Lampki 30 m + lampiony ×12</li><li>Panel z cytatem na ścianę</li><li>Montaż i demontaż po stronie Studia</li><li>Personalizacja wszystkich grawerów w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Komunijny FULL">Zapytaj o ten pakiet</a></div></div></div><div class="pak-grupa" id="ev-weselny"><div class="pak-grupa-h"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M15.5 8h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 15.5 8z"/><path d="M11 12h10l-1.5 6.5h-7z"/><path d="M14 18.5L12 21h8l-2-2.5"/></svg></span><div><h3>Pakiet Weselny</h3><p>wesele — opcje i.w. (impreza wesele)</p></div><span class="pak-tag">opcje i.w.</span></div><div class="pak"><div class="pak-card"><div class="pak-tag">ESENCJA</div><div class="pak-name">Weselny ESENCJA</div><div class="pak-sub">i.w. — małe wesele</div><div class="pak-price"><small>wypożyczenie / doba</small>od 299 zł / doba</div><ul><li>Szyld powitalny — 1 szt.</li><li>Plan stołów — 1 szt.</li><li>Numery stolików — 10 szt.</li><li>Lampki ciepłe 10 m + lampiony ×6</li><li>Wkładka personalizowana w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Weselny ESENCJA">Zapytaj o ten pakiet</a></div><div class="pak-card top"><div class="pak-tag">MID</div><div class="pak-name">Weselny MID</div><div class="pak-sub">i.w. — do 120 gości</div><div class="pak-price"><small>wypożyczenie / doba</small>od 499 zł / doba</div><ul><li>Wszystko z ESENCJI</li><li>Litery podświetlane MAŁE — inicjały</li><li>Mozaika „scrabble" z imionami</li><li>Skrzynka na życzenia</li><li>Świeczniki — 12 szt.</li><li>Wkładka personalizowana w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Weselny MID">Zapytaj o ten pakiet</a></div><div class="pak-card"><div class="pak-tag">FULL</div><div class="pak-name">Weselny FULL</div><div class="pak-sub">i.w. — pełna oprawa + montaż</div><div class="pak-price"><small>wypożyczenie / doba</small>od 799 zł / doba</div><ul><li>Wszystko z MID</li><li>Litery podświetlane DUŻE — „LOVE" / nazwisko, 60 cm</li><li>Lampki 30 m + lampiony ×12</li><li>Winietki i plan dnia</li><li>Panel z cytatem na ścianę</li><li>Montaż i demontaż po stronie Studia</li><li>Personalizacja wszystkich grawerów w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Weselny FULL">Zapytaj o ten pakiet</a></div></div></div><div class="pak-grupa" id="ev-firmowy"><div class="pak-grupa-h"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M5 28V10l11-6 11 6v18"/><path d="M10 28v-9h12v9"/><path d="M13 13h2M17 13h2M13 17h2M17 17h2"/></svg></span><div><h3>Pakiet Firmowy</h3><p>konferencja, gala, event firmowy</p></div><span class="pak-tag">logo i oznakowanie</span></div><div class="pak"><div class="pak-card"><div class="pak-tag">ESENCJA</div><div class="pak-name">Firmowy ESENCJA</div><div class="pak-sub">spotkanie zespołu</div><div class="pak-price"><small>wypożyczenie / doba</small>od 249 zł / doba</div><ul><li>Tablica powitalna z logo — 1 szt.</li><li>Oznaczenia sal — 4 szt.</li><li>Numeracja stanowisk — 12 szt.</li><li>Znaki kierunkowe — 6 szt.</li><li>Wkładki z logo w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Firmowy ESENCJA">Zapytaj o ten pakiet</a></div><div class="pak-card top"><div class="pak-tag">MID</div><div class="pak-name">Firmowy MID</div><div class="pak-sub">konferencja / event do 120 osób</div><div class="pak-price"><small>wypożyczenie / doba</small>od 449 zł / doba</div><ul><li>Wszystko z ESENCJI</li><li>Litery podświetlane MAŁE — logo lub inicjały</li><li>Lampki 20 m + lampiony ×8</li><li>Świeczniki — 12 szt.</li><li>Wkładki z logo w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Firmowy MID">Zapytaj o ten pakiet</a></div><div class="pak-card"><div class="pak-tag">FULL</div><div class="pak-name">Firmowy FULL</div><div class="pak-sub">gala / duży event + montaż</div><div class="pak-price"><small>wypożyczenie / doba</small>od 749 zł / doba</div><ul><li>Wszystko z MID</li><li>Litery podświetlane DUŻE — nazwa firmy, 60 cm</li><li>Lampki 30 m + lampiony ×12</li><li>Tablice informacyjne (toaleta · parking · palarnia)</li><li>Montaż i demontaż po stronie Studia</li><li>Personalizacja wszystkich grawerów w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Firmowy FULL">Zapytaj o ten pakiet</a></div></div></div><div class="pak-grupa" id="ev-jubileuszowy"><div class="pak-grupa-h"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 29V14"/><path d="M8 16h16"/><path d="M9 19h14"/><path d="M11 22h10"/><path d="M13 25h6"/></svg></span><div><h3>Pakiet Jubileuszowy</h3><p>urodziny, rocznica, jubileusz</p></div><span class="pak-tag">urodziny i jubileusze</span></div><div class="pak"><div class="pak-card"><div class="pak-tag">ESENCJA</div><div class="pak-name">Jubileuszowy ESENCJA</div><div class="pak-sub">urodziny w gronie bliskich</div><div class="pak-price"><small>wypożyczenie / doba</small>od 199 zł / doba</div><ul><li>Szyld powitalny — 1 szt.</li><li>Numery stolików — 6 szt.</li><li>Świeczniki drewniane — 6 szt.</li><li>Grawer okolicznościowy — 1 szt.</li><li>Wkładka personalizowana w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Jubileuszowy ESENCJA">Zapytaj o ten pakiet</a></div><div class="pak-card top"><div class="pak-tag">MID</div><div class="pak-name">Jubileuszowy MID</div><div class="pak-sub">okrągła rocznica</div><div class="pak-price"><small>wypożyczenie / doba</small>od 349 zł / doba</div><ul><li>Wszystko z ESENCJI</li><li>Litery podświetlane MAŁE — wiek lub inicjały</li><li>Mozaika „scrabble" z imionami</li><li>Lampki 10 m + lampiony ×6</li><li>Panel z cytatem na ścianę</li><li>Wkładka personalizowana w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Jubileuszowy MID">Zapytaj o ten pakiet</a></div><div class="pak-card"><div class="pak-tag">FULL</div><div class="pak-name">Jubileuszowy FULL</div><div class="pak-sub">duża uroczystość + montaż</div><div class="pak-price"><small>wypożyczenie / doba</small>od 599 zł / doba</div><ul><li>Wszystko z MID</li><li>Litery podświetlane DUŻE — liczba lub nazwisko, 60 cm</li><li>Lampki 30 m + lampiony ×12</li><li>Ramka rzeźbiona na zdjęcie</li><li>Montaż i demontaż po stronie Studia</li><li>Personalizacja wszystkich grawerów w cenie</li></ul><a class="btn btn-solid" href="#rezerwacja" data-pakiet="Jubileuszowy FULL">Zapytaj o ten pakiet</a></div></div></div><section class="pak-diy" id="komponuje"><div class="pak-diy-h"><span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h18v16H7z"/><path d="M11 13l3.5 3.5L21 10"/></svg></span><div><h3>Komponuję własny</h3><p>składasz z katalogu — cena liczona automatycznie</p></div></div><p class="hint">Zasady: <b>bez rabatu −10% i bez gratisowej personalizacji</b> — rabat <b>−5%</b> naliczy się dopiero, gdy zaznaczysz <b>min. 10 produktów</b>. Personalizację wybierasz i płacisz osobno. Termin blokuje cały kalendarz (jedna pula towaru).</p><div class="komp"><div><p class="hint" style="margin-top:0">Wybrane produkty — zaznaczaj checkboxy w katalogu powyżej, lista i suma aktualizują się na bieżąco:</p><div class="komp-lista" id="komp-lista"></div></div><div class="komp-pod"><h4>Twoje podsumowanie</h4><p class="n" id="komp-n">0 z 16 pozycji</p><p class="rabat" id="komp-rab">Rabat −5% dopiero od 10 pozycji (masz 0)</p><div class="suma" id="komp-suma"><small>suma / doba</small>0 zł</div><p class="dopisz" id="komp-rab-kwota"></p><p class="dopisz">+ kaucja zwrotna 300 zł · + personalizacja wg wybranych pozycji</p><button class="btn btn-solid btn-wlasny" type="button">Przejdź do katalogu</button><a class="btn btn-ghost" href="#rezerwacja" data-pakiet="Zestaw własny" style="background:transparent;border:1px solid var(--zloty);color:var(--zloty)">Wyślij zapytanie</a></div></div></section>
     <p class="cal-note">Kaucja zwrotna 300 zł przy każdym pakiecie · wypożyczenie od 1 doby · brakujące elementy dobierzesz z katalogu.</p>
   </section>
 
@@ -425,106 +499,212 @@ body.page{background:var(--krem)}
 })();
 </script>
 <script>
-/* Terminarz wynajmu (port z v3) — zajete terminy per pakiet w ZAJETE */
-var ZAJETE = {"klasyczny": ["2026-08-29", "2026-08-30", "2026-09-05", "2026-09-12", "2026-09-19", "2026-10-03", "2026-10-10", "2026-10-17", "2026-11-07"], "lesny": ["2026-08-28", "2026-08-29", "2026-09-05", "2026-09-06", "2026-09-26", "2026-10-10", "2026-10-24", "2026-11-14"], "rustykalny": ["2026-08-29", "2026-09-12", "2026-09-13", "2026-09-19", "2026-10-03", "2026-10-31"], "komunijny": ["2026-08-30", "2026-09-20", "2026-10-11", "2026-11-21"], "firmowy": ["2026-08-28", "2026-09-17", "2026-09-18", "2026-10-08", "2026-10-22", "2026-11-05", "2026-11-26"], "wlasny": ["2026-08-29", "2026-09-05", "2026-09-12", "2026-10-10"]};
+/* Terminarz wynajmu v2 — jeden wspolny kalendarz (jedna pula towaru)
+   + kompozytor "Komponuje wlasny" z kalkulacja na zywo.
+   Zajete terminy edytujesz w build.py (RENTAL_ZAJETE, plaska lista). */
+var ZAJETE = ["2026-08-29", "2026-08-30", "2026-09-05", "2026-09-12", "2026-09-19", "2026-10-03", "2026-10-10", "2026-10-17", "2026-11-07"];
+var PRODUKTY = {"szyld": {"n": "Szyld powitalny", "c": 49}, "rozpiska": {"n": "Tablica „rozpiska stołów\"", "c": 59}, "numery": {"n": "Numery stołów", "c": 25}, "serwetniki": {"n": "Serwetniki", "c": 20}, "lampki": {"n": "Lampki", "c": 15}, "lampiony": {"n": "Lampiony", "c": 35}, "litery_male": {"n": "Litery podświetlane MAŁE", "c": 45}, "litery_duze": {"n": "Litery podświetlane DUŻE", "c": 120}, "tablice": {"n": "Tablice informacyjne", "c": 30}, "skrzynka": {"n": "Skrzynka na życzenia", "c": 25}, "scrabble": {"n": "Mozaika „scrabble\"", "c": 55}, "swieczniki": {"n": "Świeczniki", "c": 30}, "winietki": {"n": "Winietki i plan dnia", "c": 30}, "panel_cytat": {"n": "Panel z cytatem", "c": 149}, "ramka": {"n": "Ramka rzeźbiona", "c": 169}, "grawer": {"n": "Grawer okolicznościowy", "c": 89}};
 var MIES = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
 var DNI  = ['pn','wt','śr','cz','pt','so','nd'];
 function iso(y,m,d){ return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
 
+/* ----- wspolny kalendarz ----- */
+var KAL = { box:null, rok:null, mies:null, dzis:null, wybor:null };
 function Kalendarz(box){
-  var id   = box.dataset.pkg;
-  var busy = ZAJETE[id] || [];
-  var dzis = new Date(); dzis.setHours(0,0,0,0);
-  var rok  = dzis.getFullYear(), mies = dzis.getMonth();
-  var wybor = null;
-
-  function rysuj(){
-    var pierwszy = new Date(rok, mies, 1);
-    var przesun  = (pierwszy.getDay() + 6) % 7;
-    var ile      = new Date(rok, mies + 1, 0).getDate();
-    var wstecz   = (rok < dzis.getFullYear()) || (rok === dzis.getFullYear() && mies <= dzis.getMonth());
-    var h = '<div class="calhead"><b>' + MIES[mies] + ' ' + rok + '</b>'
-          + '<span class="calnav">'
-          + '<button type="button" data-go="-1"' + (wstecz ? ' disabled' : '') + '>&#8249;</button>'
-          + '<button type="button" data-go="1">&#8250;</button></span></div>'
-          + '<div class="calgrid">';
-    DNI.forEach(function(d){ h += '<i>' + d + '</i>'; });
-    for (var i = 0; i < przesun; i++) h += '<span></span>';
-    for (var d = 1; d <= ile; d++){
-      var data = iso(rok, mies, d);
-      var dt   = new Date(rok, mies, d);
-      var kl   = '';
-      if (dt < dzis)                    kl = 'past';
-      else if (busy.indexOf(data) > -1) kl = 'busy';
-      if (data === wybor)               kl = 'sel';
-      var blok = (kl === 'past' || kl === 'busy') ? ' disabled' : '';
-      var opis = kl === 'busy' ? ' title="Termin zajęty"' : '';
-      h += '<button type="button" class="' + kl + '" data-d="' + data + '"' + blok + opis + '>' + d + '</button>';
-    }
-    h += '</div>'
-      +  '<div class="callegend"><em><i></i> wolny</em><em><i class="b"></i> zajęty</em></div>'
-      +  '<div class="calpick">' + (wybor ? tekstWyboru(wybor) : 'Kliknij datę, żeby sprawdzić dostępność.') + '</div>';
-    box.innerHTML = h;
-    box.querySelectorAll('[data-go]').forEach(function(b){
-      b.onclick = function(){
-        mies += parseInt(b.dataset.go, 10);
-        if (mies > 11){ mies = 0; rok++; }
-        if (mies < 0){ mies = 11; rok--; }
-        rysuj();
-      };
-    });
-    box.querySelectorAll('[data-d]').forEach(function(b){
-      b.onclick = function(){ wybor = b.dataset.d; rysuj(); zapiszWybor(id, wybor); };
-    });
-  }
-  function tekstWyboru(d){
-    var cz = d.split('-');
-    return 'Wybrany termin: <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0] + '</b> — wolny.';
-  }
-  rysuj();
+  KAL.box = box;
+  KAL.dzis = new Date(); KAL.dzis.setHours(0,0,0,0);
+  KAL.rok = KAL.dzis.getFullYear(); KAL.mies = KAL.dzis.getMonth();
+  KAL.wybor = null;
+  rysujKal();
 }
-
-function zapiszWybor(pkg, data){
+function rysujKal(){
+  var b = KAL.box; if(!b) return;
+  var pierwszy = new Date(KAL.rok, KAL.mies, 1);
+  var przesun  = (pierwszy.getDay() + 6) % 7;
+  var ile      = new Date(KAL.rok, KAL.mies + 1, 0).getDate();
+  var wstecz   = (KAL.rok < KAL.dzis.getFullYear()) || (KAL.rok === KAL.dzis.getFullYear() && KAL.mies <= KAL.dzis.getMonth());
+  var h = '<div class="calhead"><b>' + MIES[KAL.mies] + ' ' + KAL.rok + '</b>'
+        + '<span class="calnav">'
+        + '<button type="button" data-go="-1"' + (wstecz ? ' disabled' : '') + '>&#8249;</button>'
+        + '<button type="button" data-go="1">&#8250;</button></span></div>'
+        + '<div class="calgrid">';
+  DNI.forEach(function(d){ h += '<i>' + d + '</i>'; });
+  for (var i = 0; i < przesun; i++) h += '<span></span>';
+  for (var d = 1; d <= ile; d++){
+    var data = iso(KAL.rok, KAL.mies, d);
+    var dt   = new Date(KAL.rok, KAL.mies, d);
+    var kl   = '';
+    if (dt < KAL.dzis)            kl = 'past';
+    else if (ZAJETE.indexOf(data) > -1) kl = 'busy';
+    if (data === KAL.wybor)       kl = 'sel';
+    var blok = (kl === 'past' || kl === 'busy') ? ' disabled' : '';
+    var opis = kl === 'busy' ? ' title="Termin zajęty"' : '';
+    h += '<button type="button" class="' + kl + '" data-d="' + data + '"' + blok + opis + '>' + d + '</button>';
+  }
+  h += '</div>'
+     + '<div class="callegend"><em><i></i> wolny</em><em><i class="b"></i> zajęty</em></div>'
+     + '<div class="calpick">' + (KAL.wybor ? tekstWyboru(KAL.wybor) : 'Kliknij datę, żeby sprawdzić dostępność — jedna data blokuje wszystkie pakiety.') + '</div>';
+  b.innerHTML = h;
+  b.querySelectorAll('[data-go]').forEach(function(bt){
+    bt.onclick = function(){
+      KAL.mies += parseInt(bt.dataset.go, 10);
+      if (KAL.mies > 11){ KAL.mies = 0; KAL.rok++; }
+      if (KAL.mies < 0){ KAL.mies = 11; KAL.rok--; }
+      rysujKal();
+    };
+  });
+  b.querySelectorAll('[data-d]').forEach(function(bt){
+    bt.onclick = function(){
+      KAL.wybor = bt.dataset.d;
+      rysujKal();
+      zapiszWybor(KAL.wybor);
+      document.getElementById('rezerwacja').scrollIntoView({behavior:'smooth', block:'center'});
+    };
+  });
+}
+function tekstWyboru(d){
+  var cz = d.split('-');
+  return 'Wybrany termin: <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0] + '</b> — wolny.';
+}
+function zapiszWybor(data){
   var fd = document.getElementById('rez-data');
-  var fp = document.getElementById('rez-pakiet');
   if (fd) fd.value = data;
-  if (fp) fp.value = pkg;
   var info = document.getElementById('rez-info');
   if (info){
     var cz = data.split('-');
     info.innerHTML = 'Termin <b>' + parseInt(cz[2],10) + ' ' + MIES[parseInt(cz[1],10)-1] + ' ' + cz[0]
-                   + '</b> — pakiet <b>' + pkg + '</b>. Wyślij zgłoszenie, żeby zablokować termin.';
+                   + '</b> wpisany do formularza — uzupełnij dane i wyślij zgłoszenie, żeby zablokować termin.';
   }
-  var f = document.getElementById('rezerwacja');
-  if (f) f.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ----- kompozytor wlasnego zestawu ----- */
+function cenaOd(p){ return PRODUKTY[p] ? PRODUKTY[p].c : 0; }
+function startKompozycji(){
+  document.querySelectorAll('.komp-it input').forEach(function(cb){ cb.checked = false; });
+  document.getElementById('f-kat').value = 'wszystko';
+  document.getElementById('f-okazja').value = 'wszystko';
+  zastosujFiltry();
+  document.getElementById('katalog').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function licznik(){
+  var n = document.querySelectorAll('.komp-it input:checked').length;
+  var el = document.getElementById('komp-n');
+  if (el) el.textContent = n + ' z 16 pozycji';
+  var rab = document.getElementById('komp-rab');
+  if (rab) rab.classList.toggle('on', n >= 10);
+  if (rab) rab.textContent = (n >= 10) ? '✔ Rabat −5% naliczony (10+ pozycji)' : 'Rabat −5% dopiero od 10 pozycji (masz ' + n + ')';
+  var lista = document.getElementById('komp-lista');
+  if (lista){
+    var wybrane = document.querySelectorAll('.komp-it input:checked');
+    if (!wybrane.length){
+      lista.innerHTML = '<p class="hint" style="margin-top:0">Nic jeszcze nie wybrałeś — lista pojawi się, gdy zaznaczysz pierwszy produkt.</p>';
+    } else {
+      lista.innerHTML = Array.prototype.map.call(wybrane, function(cb){
+        var p = PRODUKTY[cb.value];
+        return '<div class="komp-sel"><b>' + p.n + '</b><span>' + p.c + ' zł</span></div>';
+      }).join('');
+    }
+  }
+}
+function przelicz(){
+  var suma = 0;
+  document.querySelectorAll('.komp-it input:checked').forEach(function(cb){
+    suma += cenaOd(cb.value);
+  });
+  var n = document.querySelectorAll('.komp-it input:checked').length;
+  var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+  var doZaplaty = suma - rabat;
+  var el = document.getElementById('komp-suma');
+  if (el) el.innerHTML = '<small>suma / doba</small>' + doZaplaty + ' zł';
+  if (rabat){
+    var r = document.getElementById('komp-rab-kwota');
+    if (r) r.textContent = 'w tym rabat −5%: −' + rabat + ' zł (przy sumie ' + suma + ' zł)';
+  } else {
+    var r2 = document.getElementById('komp-rab-kwota');
+    if (r2) r2.textContent = '';
+  }
+  licznik();
+  var info = document.getElementById('rez-info');
+  if (info){
+    if (n === 0) info.innerHTML = 'Wybierz datę w kalendarzu i skład własnego zestawu w katalogu — podsumowanie wypełni się samo.';
+    else info.innerHTML = 'Własny zestaw: <b>' + n + ' pozycji</b>, suma <b>' + doZaplaty + ' zł / doba</b>'
+                        + (rabat ? ' (z rabatem −5%)' : '') + '. Wybierz termin w kalendarzu i wyślij zgłoszenie.';
+  }
+}
+function ustawPakiet(val){
+  var fp = document.getElementById('rez-pakiet');
+  if (fp) fp.value = val;
+  var info = document.getElementById('rez-info');
+  if (info) info.innerHTML = 'Wybrany pakiet: <b>' + val + '</b>. Wybierz termin w kalendarzu wyżej, uzupełnij dane i wyślij zgłoszenie.';
+  document.getElementById('rezerwacja').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function zastosujFiltry(){
+  var kat  = document.getElementById('f-kat').value;
+  var okz  = document.getElementById('f-okazja').value;
+  var wid  = 0;
+  document.querySelectorAll('.kat-card').forEach(function(k){
+    var m = (kat === 'wszystko' || k.dataset.kat === kat)
+         && (okz === 'wszystko' || k.dataset.ok.split(' ').indexOf(okz) > -1);
+    k.style.display = m ? '' : 'none';
+    if (m) wid++;
+  });
+  var none = document.getElementById('kat-none');
+  if (none) none.style.display = wid ? 'none' : 'block';
+}
+
+/* ----- formularz ----- */
+function wybudujRezerwacje(){
+  var data   = document.getElementById('rez-data').value || 'data do ustalenia';
+  var pakiet = document.getElementById('rez-pakiet').value || 'pakiet do ustalenia';
+  var imie   = document.getElementById('rez-imie').value;
+  var mail   = document.getElementById('rez-mail').value;
+  var tel    = document.getElementById('rez-tel').value;
+  var okazja = document.getElementById('rez-okazja').value;
+  var uw     = document.getElementById('rez-uw').value;
+  var checked = Array.prototype.slice.call(document.querySelectorAll('.komp-it input:checked')).map(function(cb){
+    var p = PRODUKTY[cb.value];
+    return '• ' + p.n + ' — ' + p.c + ' zł';
+  }).join('\n');
+  var suma = 0;
+  document.querySelectorAll('.komp-it input:checked').forEach(function(cb){ suma += cenaOd(cb.value); });
+  var n = document.querySelectorAll('.komp-it input:checked').length;
+  var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+  var body = 'Zapytanie o wynajem dekoracji\n\nTermin: ' + data
+           + '\nPakiet: ' + pakiet
+           + '\nImię: ' + imie
+           + '\nE-mail: ' + mail
+           + (tel ? '\nTelefon: ' + tel : '')
+           + '\nOkazja: ' + okazja
+           + (checked ? '\n\nWłasny zestaw:\n' + checked + '\nSuma: ' + suma + ' zł' + (rabat ? ' − rabat 5% = ' + (suma-rabat) + ' zł' : '') : '')
+           + (uw ? '\nUwagi: ' + uw : '');
+  var link = 'mailto:kontakt@studiosygnatura.pl'
+           + '?subject=' + encodeURIComponent('Wynajem — ' + pakiet + ' — ' + data)
+           + '&body=' + encodeURIComponent(body);
+  var ok = document.getElementById('rez-ok');
+  if (ok) ok.style.display = 'block';
+  window.location.href = link;
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  document.querySelectorAll('[data-pkg]').forEach(Kalendarz);
-  var f = document.getElementById('rez-form');
-  if (f) f.addEventListener('submit', function(e){
-    e.preventDefault();
-    var data    = document.getElementById('rez-data').value || 'data do ustalenia';
-    var pakiet  = document.getElementById('rez-pakiet').value || 'pakiet do ustalenia';
-    var imie    = document.getElementById('rez-imie').value;
-    var mail    = document.getElementById('rez-mail').value;
-    var tel     = document.getElementById('rez-tel').value;
-    var okazja  = document.getElementById('rez-okazja').value;
-    var uw      = document.getElementById('rez-uw').value;
-    var body = 'Zapytanie o wynajem dekoracji\n\nTermin: ' + data
-             + '\nPakiet: ' + pakiet
-             + '\nImię: ' + imie
-             + '\nE-mail: ' + mail
-             + (tel ? '\nTelefon: ' + tel : '')
-             + '\nOkazja: ' + okazja
-             + (uw ? '\nUwagi: ' + uw : '');
-    var link = 'mailto:kontakt@studiosygnatura.pl'
-             + '?subject=' + encodeURIComponent('Wynajem — ' + pakiet + ' — ' + data)
-             + '&body=' + encodeURIComponent(body);
-    var ok = document.getElementById('rez-ok');
-    if (ok) ok.style.display = 'block';
-    window.location.href = link;
+  var kal = document.getElementById('kal-wspolny');
+  if (kal) Kalendarz(kal);
+  document.querySelectorAll('.komp-it input').forEach(function(cb){
+    cb.addEventListener('change', przelicz);
   });
+  document.querySelectorAll('.btn-wlasny').forEach(function(b){
+    b.addEventListener('click', startKompozycji);
+  });
+  document.getElementById('f-kat').addEventListener('change', zastosujFiltry);
+  document.getElementById('f-okazja').addEventListener('change', zastosujFiltry);
+  document.querySelectorAll('[data-pakiet]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      if (a.getAttribute('href') === '#rezerwacja') e.preventDefault();
+      ustawPakiet(a.dataset.pakiet);
+    });
+  });
+  var f = document.getElementById('rez-form');
+  if (f) f.addEventListener('submit', function(e){ e.preventDefault(); wybudujRezerwacje(); });
+  przelicz();
 });
 </script>
 </body>
