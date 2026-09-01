@@ -19,21 +19,24 @@ h1{color:var(--brunatny);font-size:30px;margin:0 0 4px}
 .karta{background:#fff;border:2px solid var(--brunatny);padding:24px 22px;margin-bottom:20px}
 .karta .pkg{font-size:20px;font-weight:700;color:var(--butelkowa)}
 .karta .cena{color:var(--brunatny);font-weight:700}
-.data-info{background:var(--krem2);border:1px solid rgba(107,69,48,.35);padding:10px 14px;margin-top:10px;font-size:15px}
-.data-info.wolny{background:#F1F7F2;border-color:rgba(31,58,50,.4)}
-.data-info.st-zapytanie{background:#FFF8E1;border-color:var(--zloty)}
-.data-info.st-platnosc,.data-info.st-zarezerwowany{background:#F6E3E0;border-color:#8c2f2f}
 .flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:0 0 16px;font-size:15px}
 .pole{margin-bottom:16px}
 label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-input[type=text],input[type=email],input[type=tel],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
+input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
 textarea{min-height:130px;resize:vertical}
 input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
+/* terminy */
+.terminy{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.terminy .rzad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media(max-width:520px){.terminy .rzad{grid-template-columns:1fr}}
+.terminy .info{font-size:13.5px;color:rgba(51,38,28,.7);margin:8px 0 0}
+.terminy .info b{color:var(--brunatny)}
+.dni-sum{font-size:14px;color:var(--butelkowa);font-weight:700;margin-top:8px}
+/* sygnatura */
 .opcje{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
 .opcje .rzad{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
 .opcje .rzad:last-child{margin-bottom:0}
 .opcje input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
-.opcje input[type=radio]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
 .opcje .etyk{font-weight:700;color:var(--brunatny)}
 .opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
 #pole-syg{display:none;margin-top:10px}
@@ -53,7 +56,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
 </head>
 <body>
 <div class="wrap">
-  <a class="powrot" href="{{ url_for('wynajem', pakiet=p.id) }}#pakiet-{{ p.id }}">← wróć do kalendarza</a>
+  <a class="powrot" href="{{ url_for('pakiet_szczegoly', pid=p.id) }}#kalendarz">← wróć do kalendarza</a>
   <h1>Rezerwacja terminu</h1>
   <p class="podsum">Wypełnij formularz — po wysłaniu dostaniesz e-mail z podsumowaniem, sygnaturą sprawy i dokumentami do zapoznania.</p>
 
@@ -68,16 +71,10 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
     <ul style="margin:10px 0 0;padding-left:20px;font-size:15px">
       {% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}
     </ul>
-    {% if data %}
-    <div class="data-info {{ klasa or 'wolny' }}">
-      {% if tytul %}{{ tytul }}{% else %}Wybrany termin: <b>{{ data }}</b> — wolny.{% endif %}
-    </div>
-    {% endif %}
   </div>
 
   <form method="post" action="{{ url_for('api_rezerwuj') }}">
     <input type="hidden" name="pakiet_id" value="{{ p.id }}">
-    <input type="hidden" name="data" value="{{ data }}">
 
     <div class="pole">
       <label for="temat">Temat zapytania</label>
@@ -89,10 +86,25 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
       </select>
     </div>
 
-    <div class="pole">
-      <label for="termin">Termin</label>
-      <input type="text" id="termin" name="termin_wyswietlany" value="{{ data }}" placeholder="RRRR-MM-DD" required>
-      <p class="mala" style="margin:4px 0 0">Wybrany w kalendarzu. Chcesz inny? Kliknij „Zmień termin" na dole.</p>
+    <div class="terminy">
+      <label for="data">Data imprezy</label>
+      <input type="date" id="data" name="data" value="{{ data }}" required>
+      <div class="rzad">
+        <div>
+          <label for="data_od">Termin od (montaż)</label>
+          <input type="date" id="data_od" name="data_od" value="{{ data_od }}" required>
+        </div>
+        <div>
+          <label for="data_do">Termin do (demontaż)</label>
+          <input type="date" id="data_do" name="data_do" value="{{ data_do }}" required>
+        </div>
+      </div>
+      <p class="info">
+        <b>Domyślnie: dzień przed imprezą (montaż) i dzień po (demontaż) — razem min. 3 doby.</b>
+        Dekoracji nie da się fizycznie zamontować i zdjąć w jeden dzień; najem 1-dniowy tylko w wyjątkowych
+        sytuacjach — opisz to w wiadomości, a rozpatrzymy ręcznie.
+      </p>
+      <div class="dni-sum" id="dni-sum"></div>
     </div>
 
     <div class="opcje">
@@ -137,7 +149,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
     </div>
 
     <div class="przyciski">
-      <a class="btn btn-line" href="{{ url_for('wynajem', pakiet=p.id) }}#pakiet-{{ p.id }}">Zmień termin</a>
+      <a class="btn btn-line" href="{{ url_for('pakiet_szczegoly', pid=p.id) }}#kalendarz">Zmień termin</a>
       <button class="btn" type="submit">Wyślij zapytanie</button>
     </div>
     <p class="mala" style="margin-top:14px">Wysyłając formularz akceptujesz kontakt e-mail w sprawie zapytania (art. 398 PKE). Termin rezerwuje kaucja w terminie 7 dni.</p>
@@ -145,20 +157,48 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
 </div>
 
 <script>
-/* checkboxy sygnatury wzajemnie się wykluczają;
-   zaznaczenie "Mam sygnaturę sprawy" odblokowuje pole obok */
 (function(){
+  /* checkboxy sygnatury wzajemnie się wykluczają */
   var nowa = document.getElementById('tryb-nowa');
   var ist  = document.getElementById('tryb-istniejaca');
   var pole = document.getElementById('pole-syg');
-  function aktualizuj(){
+  function aktualizujSyg(){
     if (ist.checked) nowa.checked = false;
     pole.style.display = ist.checked ? 'block' : 'none';
     document.getElementById('sygnatura').required = ist.checked;
   }
-  nowa.addEventListener('change', function(){ if (nowa.checked) ist.checked = false; aktualizuj(); });
-  ist.addEventListener('change', aktualizuj);
-  aktualizuj();
+  nowa.addEventListener('change', function(){ if (nowa.checked) ist.checked = false; aktualizujSyg(); });
+  ist.addEventListener('change', aktualizujSyg);
+  aktualizujSyg();
+
+  /* zakres najmu: zmiana daty imprezy -> domyślnie dzień przed i dzień po */
+  var dEv = document.getElementById('data');
+  var dOd = document.getElementById('data_od');
+  var dDo = document.getElementById('data_do');
+  var sumaDni = document.getElementById('dni-sum');
+  function przesun(d, k){
+    var x = new Date(d + 'T12:00:00');
+    x.setDate(x.getDate() + k);
+    return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+  }
+  function pokazDni(){
+    if (dOd.value && dDo.value && dOd.value <= dDo.value){
+      var dni = Math.round((new Date(dDo.value) - new Date(dOd.value)) / 86400000) + 1;
+      sumaDni.textContent = 'Łącznie: ' + dni + (dni === 1 ? ' doba' : dni < 5 ? ' doby' : ' dób') + ' najmu';
+    } else {
+      sumaDni.textContent = '';
+    }
+  }
+  dEv.addEventListener('change', function(){
+    if (dEv.value){
+      dOd.value = przesun(dEv.value, -1);
+      dDo.value = przesun(dEv.value, 1);
+      pokazDni();
+    }
+  });
+  dOd.addEventListener('change', pokazDni);
+  dDo.addEventListener('change', pokazDni);
+  pokazDni();
 })();
 </script>
 </body>

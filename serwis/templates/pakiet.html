@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ p.nazwa }} — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brunatny:#6B4530; --butelkowa:#1F3A32; --zloty:#C4A582;
+  --krem:#FBF7F0; --krem2:#F6EFE1; --ink:#33261C;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
+a{color:var(--butelkowa)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
+.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
+.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
+.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
+.powrot{display:inline-block;margin:18px 0 0;font-size:15px}
+.glowna{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;margin-top:22px;align-items:start}
+@media(max-width:860px){.glowna{grid-template-columns:1fr}}
+/* karta pakietu */
+.karta{background:#fff;border:2px solid rgba(107,69,48,.5);padding:26px 22px}
+.karta .tag{display:inline-block;background:var(--krem2);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px}
+.karta h1{font-size:28px;color:var(--butelkowa);margin:12px 0 4px}
+.karta .sub{font-size:14.5px;color:rgba(51,38,28,.7);margin:0 0 12px}
+.karta .cena{color:var(--brunatny);font-size:26px;font-weight:700;margin-bottom:12px}
+.karta ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:15px;color:rgba(51,38,28,.9)}
+.karta li::before{content:"✦ ";color:var(--zloty)}
+.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 28px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-top:18px}
+.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
+/* kalendarz */
+.cal{background:#fff;border:2px solid rgba(107,69,48,.5);padding:14px}
+.cal h2{font-size:20px;color:var(--brunatny);margin:0 0 10px}
+.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:8px 12px}
+.calhead b{font-size:16px;text-transform:capitalize}
+.calnav{display:flex;gap:2px}
+.calnav a{color:var(--zloty);text-decoration:none;font-size:19px;padding:0 8px}
+.calnav a.disabled{opacity:.3;pointer-events:none}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.calgrid i{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase;padding:2px 0}
+.cal-d{display:block;text-align:center;padding:6px 0;font-size:13.5px;text-decoration:none;background:var(--krem2);border:1px solid rgba(107,69,48,.25);color:var(--ink)}
+a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:700}
+.cal-d.pusty{background:transparent;border-color:transparent}
+.cal-d.przeszly{background:transparent;border-color:transparent;color:rgba(51,38,28,.28)}
+.cal-d.st-zapytanie{background:#FFF8E1;outline:2px solid var(--zloty);color:#7a5a10}
+.cal-d.st-platnosc{background:#E8C97A;color:var(--butelkowa);font-weight:700}
+.cal-d.st-zarezerwowany{background:var(--brunatny);color:var(--krem);text-decoration:line-through}
+.callegend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:rgba(51,38,28,.75);margin-top:10px}
+.callegend i{display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(107,69,48,.3);background:var(--krem2)}
+.callegend i.st-zapytanie{background:#FFF8E1;outline:1px solid var(--zloty)}
+.callegend i.st-platnosc{background:#E8C97A}
+.callegend i.st-zarezerwowany{background:var(--brunatny)}
+.hint{margin-top:14px;font-size:14px;color:rgba(51,38,28,.7);background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:12px 14px}
+.hint b{color:var(--brunatny)}
+@media(max-width:620px){
+  .nav a{padding:6px 9px;font-size:15px}
+  .nav .brand{width:100%}
+  .cal-d{padding:4px 0;font-size:12.5px}
+  .btn{width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap nav">
+    <a class="brand" href="/">SygNATURA</a>
+    <a href="/">Start</a>
+    <a href="/warsztat.html">Rzemiosło</a>
+    <a href="/galeria.html">Galeria</a>
+    <a href="/sklep.html">Sklep</a>
+    <a class="akt" href="/wynajem/">Wynajem</a>
+    <a href="/kontakt.html">Kontakt</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="powrot" href="{{ url_for('wynajem_wydarzenie', ev=p.ev) }}">← {{ ev_nazwa }}</a>
+
+  <div class="glowna">
+    <div class="karta">
+      <span class="tag">{{ p.tier or 'pakiet' }}</span>
+      <h1>{{ p.nazwa }}</h1>
+      <p class="sub">{{ p.opis or '' }}</p>
+      <div class="cena">{{ p.cena }}</div>
+      <ul>{% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}</ul>
+      <a class="btn" href="{{ url_for('rezerwuj', pid=p.id) }}">Zarezerwuj termin</a>
+    </div>
+
+    <div class="cal" id="kalendarz">
+      <h2>Kalendarz dostępności</h2>
+      <div class="calhead">
+        <b>{{ mies_nazwa }} {{ rok }}</b>
+        <span class="calnav">
+          <a href="{{ url_for('pakiet_szczegoly', pid=p.id, rok=poprz[0], mies=poprz[1]) }}#kalendarz">&#8249;</a>
+          <a href="{{ url_for('pakiet_szczegoly', pid=p.id, rok=nast[0], mies=nast[1]) }}#kalendarz">&#8250;</a>
+        </span>
+      </div>
+      <div class="calgrid">
+        {% for d in ['Pn','Wt','Śr','Cz','Pt','So','Nd'] %}<i>{{ d }}</i>{% endfor %}
+        {% for dzien in dni %}
+          {% if not dzien.nr %}
+            <span class="cal-d pusty"></span>
+          {% elif dzien.zajety %}
+            <span class="cal-d {{ dzien.klasa }}" title="{{ dzien.tytul }}">{{ dzien.nr }}</span>
+          {% else %}
+            <a class="cal-d {{ dzien.klasa }}" href="{{ url_for('rezerwuj', pid=p.id, data=dzien.data) }}" title="{{ dzien.tytul or 'Wolny termin — kliknij, aby zarezerwować' }}">{{ dzien.nr }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="callegend">
+        <span><i></i> wolny</span>
+        <span><i class="st-zapytanie"></i> wysłano zapytanie — nadal można pytać</span>
+        <span><i class="st-platnosc"></i> płatność w toku</span>
+        <span><i class="st-zarezerwowany"></i> zarezerwowany</span>
+      </div>
+      <div class="hint">
+        <b>Kliknij datę imprezy.</b> Domyślnie zarezerwujemy również <b>dzień przed</b> (montaż dekoracji)
+        i <b>dzień po</b> (demontaż) — razem min. 3 doby. Zakres od–do zmienisz w formularzu.
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px">
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt.html" style="color:var(--zloty)">Napisz do nas →</a>
+  </div>
+</footer>
+</body>
+</html>

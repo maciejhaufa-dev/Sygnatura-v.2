@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Komponuję własny zestaw — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--brunatny:#6B4530;--butelkowa:#1F3A32;--zloty:#C4A582;--krem:#FBF7F0;--krem2:#F6EFE1;--ink:#33261C}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
+a{color:var(--butelkowa)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
+.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
+.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
+.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
+.powrot{display:inline-block;margin:18px 0 0;font-size:15px}
+h1{color:var(--brunatny);font-size:clamp(26px,4vw,36px);margin:14px 0 6px}
+.sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 10px}
+.flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:12px 0 0;font-size:15px}
+.reguly{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px 16px;margin:14px 0 0;font-size:14.5px;color:rgba(51,38,28,.8)}
+.reguly b{color:var(--brunatny)}
+/* uklad: katalog + podsumowanie */
+.komp{display:grid;grid-template-columns:1fr 330px;gap:24px;margin-top:18px;align-items:start}
+@media(max-width:920px){.komp{grid-template-columns:1fr}}
+.kat h4{font-size:19px;color:var(--brunatny);margin:24px 0 10px;border-left:4px solid var(--zloty);padding-left:10px}
+.kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.komp-it{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.3);padding:12px;cursor:pointer}
+.komp-it:hover{border-color:var(--brunatny)}
+.komp-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.komp-it .ik{width:38px;height:38px;flex:none;border:1px solid rgba(107,69,48,.4);background:var(--krem2);display:grid;place-items:center;color:var(--brunatny);font-weight:700;font-size:15px}
+.komp-it b{display:block;font-size:15px;color:var(--ink)}
+.komp-it small{display:block;font-size:12px;color:rgba(51,38,28,.6);margin:2px 0}
+.komp-it .cena{font-size:14px;color:var(--butelkowa);font-weight:700}
+/* podsumowanie */
+.pod{position:sticky;top:70px;background:var(--butelkowa);color:var(--krem);padding:22px}
+.pod h3{margin:0 0 4px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--zloty)}
+.pod .n{margin:0;font-size:12.5px;color:rgba(251,247,240,.75)}
+.pod .rabat{font-size:12.5px;color:rgba(251,247,240,.75);margin:12px 0 0;min-height:18px}
+.pod .rabat.on{color:var(--zloty);font-weight:700}
+.pod .suma{font-size:32px;font-weight:700;color:var(--zloty);margin:6px 0 0}
+.pod .suma small{display:block;font-size:11.5px;font-weight:400;color:rgba(251,247,240,.75);letter-spacing:.1em;text-transform:uppercase}
+.pod .wybrane{margin-top:14px;font-size:13px;border-top:1px solid rgba(196,165,130,.35);padding-top:10px}
+.pod .wybrane div{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.pod .wybrane span{color:var(--zloty);white-space:nowrap}
+.pod .note{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
+.pod .btn{margin-top:16px;width:100%;text-align:center;background:var(--zloty);color:var(--butelkowa)}
+.pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
+/* kalendarz zajetosci */
+.cal{background:#fff;border:1px solid rgba(107,69,48,.35);padding:10px;margin:16px 0}
+.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:6px 10px}
+.calhead b{font-size:14px;text-transform:capitalize}
+.calnav a{color:var(--zloty);text-decoration:none;font-size:18px;padding:0 8px}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px}
+.calgrid i{font-size:10px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase}
+.cal-d{display:block;text-align:center;padding:4px 0;font-size:12.5px;text-decoration:none;background:var(--krem2);border:1px solid rgba(107,69,48,.25);color:var(--ink);cursor:pointer;font-family:inherit}
+.cal-d.pusty{background:transparent;border-color:transparent;cursor:default}
+.cal-d.przeszly{background:transparent;border-color:transparent;color:rgba(51,38,28,.28);cursor:default}
+.cal-d.st-zapytanie{background:#FFF8E1;outline:2px solid var(--zloty);color:#7a5a10;cursor:pointer}
+.cal-d.st-platnosc,.cal-d.st-zarezerwowany{cursor:default}
+.cal-d.st-platnosc{background:#E8C97A;color:var(--butelkowa);font-weight:700}
+.cal-d.st-zarezerwowany{background:var(--brunatny);color:var(--krem);text-decoration:line-through}
+.callegend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:rgba(51,38,28,.75);margin-top:8px}
+.callegend i{display:inline-block;width:12px;height:12px;margin-right:5px;vertical-align:-1px;border:1px solid rgba(107,69,48,.3);background:var(--krem2)}
+.callegend i.st-zapytanie{background:#FFF8E1;outline:1px solid var(--zloty)}
+.callegend i.st-platnosc{background:#E8C97A}
+.callegend i.st-zarezerwowany{background:var(--brunatny)}
+/* formularz */
+.forma{background:#fff;border:2px solid var(--brunatny);padding:24px 22px;margin-top:20px}
+.pole{margin-bottom:16px}
+label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
+textarea{min-height:120px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
+.terminy{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.terminy .rzad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media(max-width:520px){.terminy .rzad{grid-template-columns:1fr}}
+.terminy .info{font-size:13.5px;color:rgba(51,38,28,.7);margin:8px 0 0}
+.dni-sum{font-size:14px;color:var(--butelkowa);font-weight:700;margin-top:8px}
+.opcje{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.opcje .rzad{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.opcje .rzad:last-child{margin-bottom:0}
+.opcje input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
+.opcje .etyk{font-weight:700;color:var(--brunatny)}
+.opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
+#pole-syg{display:none;margin-top:10px}
+.przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 30px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
+.btn-line{background:transparent;color:var(--brunatny);border-color:var(--brunatny)}
+.btn-line:hover{background:var(--krem2);color:var(--brunatny)}
+.mala{font-size:13.5px;color:rgba(51,38,28,.6)}
+@media(max-width:560px){.przyciski .btn{flex:1;text-align:center}.przyciski{flex-direction:column-reverse}}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap nav">
+    <a class="brand" href="/">SygNATURA</a>
+    <a href="/">Start</a>
+    <a href="/warsztat.html">Rzemiosło</a>
+    <a href="/galeria.html">Galeria</a>
+    <a href="/sklep.html">Sklep</a>
+    <a class="akt" href="/wynajem/">Wynajem</a>
+    <a href="/kontakt.html">Kontakt</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <a class="powrot" href="{{ url_for('wynajem') }}">← wszystkie wydarzenia</a>
+  <h1>Komponuję własny zestaw</h1>
+  <p class="sub">Zaznacz produkty z katalogu — suma i rabat liczą się na żywo w podsumowaniu. Potem wybierz termin od–do i wyślij zapytanie.</p>
+  {% with wiad = get_flashed_messages() %}
+    {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
+  {% endwith %}
+  <div class="reguly">
+    <b>Zasady zestawu własnego:</b> bez rabatu −10% i bez darmowej personalizacji — rabat <b>−5%</b> nalicza się dopiero od
+    <b>10 pozycji</b>; personalizację wybierasz i płacisz osobno. Termin blokuje całą pulę towaru (jedna data = wszystkie pakiety).
+    Najem od–do: domyślnie dzień przed (montaż) i dzień po (demontaż), min. 3 doby.
+  </div>
+
+  <div class="komp">
+    <div class="kat">
+      {% for k in kategorie %}
+      {% if produkty_wg.get(k.id) %}
+      <h4>{{ k.nazwa }}</h4>
+      <div class="kat-grid">
+        {% for pr in produkty_wg[k.id] %}
+        <label class="komp-it">
+          <input type="checkbox" value="{{ pr.id }}" data-cena="{{ pr.cena_doba }}" data-nazwa="{{ pr.nazwa }}">
+          <span class="ik">{{ pr.nazwa[0] }}</span>
+          <span>
+            <b>{{ pr.nazwa }}</b>
+            <small>{{ pr.opis or '' }}</small>
+            <span class="cena">{{ '%.0f'|format(pr.cena_doba) }} zł / doba</span>
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="pod" id="pod">
+      <h3>Twoje podsumowanie</h3>
+      <p class="n" id="komp-n">0 z {{ produkty_wg|length * 4 }} pozycji</p>
+      <p class="rabat" id="komp-rab">Rabat −5% dopiero od 10 pozycji (masz 0)</p>
+      <div class="suma" id="komp-suma"><small>suma / doba</small>0 zł</div>
+      <div class="suma" id="komp-total" style="font-size:20px"><small>za wybrane dni</small>—</div>
+      <div class="wybrane" id="komp-lista"></div>
+      <p class="note">+ kaucja zwrotna 300 zł · + personalizacja wg wybranych pozycji. Kwoty szacunkowe — potwierdzimy w odpowiedzi na zapytanie.</p>
+      <a class="btn" href="#formularz">Przejdź do terminu i formularza</a>
+    </div>
+  </div>
+
+  <div class="cal" id="kalendarz">
+    <div class="calhead">
+      <b>Zajętość całej puli — {{ mies_nazwa }} {{ rok }}</b>
+      <span class="calnav">
+        <a href="{{ url_for('komponuje', rok=poprz[0], mies=poprz[1]) }}#kalendarz">&#8249;</a>
+        <a href="{{ url_for('komponuje', rok=nast[0], mies=nast[1]) }}#kalendarz">&#8250;</a>
+      </span>
+    </div>
+    <div class="calgrid">
+      {% for d in ['Pn','Wt','Śr','Cz','Pt','So','Nd'] %}<i>{{ d }}</i>{% endfor %}
+      {% for dzien in dni %}
+        {% if not dzien.nr %}<span class="cal-d pusty"></span>
+        {% else %}<button type="button" class="cal-d {{ dzien.klasa }}" data-d="{{ dzien.data }}" title="{{ dzien.tytul or 'Kliknij, aby ustawić jako datę imprezy' }}">{{ dzien.nr }}</button>{% endif %}
+      {% endfor %}
+    </div>
+    <div class="callegend">
+      <span><i></i> wolny</span>
+      <span><i class="st-zapytanie"></i> wysłano zapytanie — nadal można pytać</span>
+      <span><i class="st-platnosc"></i> płatność w toku</span>
+      <span><i class="st-zarezerwowany"></i> zarezerwowany</span>
+    </div>
+  </div>
+
+  <div class="forma" id="formularz">
+    <h2 style="color:var(--brunatny);margin:0 0 4px">Rezerwacja terminu</h2>
+    <p class="sub" style="margin-bottom:16px">Wypełnij dane — po wysłaniu dostaniesz e-mail z podsumowaniem, sygnaturą sprawy i dokumentami.</p>
+
+    <form method="post" action="{{ url_for('api_rezerwuj') }}">
+      <input type="hidden" name="pakiet_id" value="0">
+      <input type="hidden" name="pozycje" id="pozycje" value="[]">
+
+      <div class="pole">
+        <label for="temat">Temat zapytania</label>
+        <select id="temat" name="temat">
+          <option value="Rezerwacja terminu" selected>Rezerwacja terminu</option>
+          <option value="Pytanie o zestaw">Pytanie o zestaw</option>
+          <option value="Wynajem indywidualny">Wynajem indywidualny</option>
+          <option value="Inne">Inne</option>
+        </select>
+      </div>
+
+      <div class="terminy">
+        <label for="data">Data imprezy</label>
+        <input type="date" id="data" name="data" value="{{ data }}" required>
+        <div class="rzad">
+          <div>
+            <label for="data_od">Termin od (montaż)</label>
+            <input type="date" id="data_od" name="data_od" value="{{ data_od }}" required>
+          </div>
+          <div>
+            <label for="data_do">Termin do (demontaż)</label>
+            <input type="date" id="data_do" name="data_do" value="{{ data_do }}" required>
+          </div>
+        </div>
+        <p class="info"><b>Domyślnie: dzień przed imprezą (montaż) i dzień po (demontaż) — min. 3 doby.</b>
+        Najem 1-dniowy tylko wyjątkowo — uzasadnij w wiadomości.</p>
+        <div class="dni-sum" id="dni-sum"></div>
+      </div>
+
+      <div class="opcje">
+        <div class="rzad">
+          <input type="checkbox" id="tryb-nowa" name="tryb_sygnatury" value="nowa" checked>
+          <div>
+            <div class="etyk"><label for="tryb-nowa" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Nadaj nową sygnaturę</label></div>
+            <div class="opis">System automatycznie nada numer sprawy (np. SYG-2026-001) i wyśle go w e-mailu z podsumowaniem.</div>
+          </div>
+        </div>
+        <div class="rzad">
+          <input type="checkbox" id="tryb-istniejaca" name="tryb_sygnatury" value="istniejaca">
+          <div>
+            <div class="etyk"><label for="tryb-istniejaca" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Mam sygnaturę sprawy</label></div>
+            <div class="opis">Jeśli już z nami rozmawiałeś i masz numer sprawy — dopiszemy do niej to zapytanie.</div>
+            <div id="pole-syg">
+              <label for="sygnatura">Twoja sygnatura sprawy</label>
+              <input type="text" id="sygnatura" name="sygnatura" placeholder="np. SYG-2026-001">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pole">
+        <label for="tresc">Twoja wiadomość</label>
+        <textarea id="tresc" name="tresc" placeholder="Opisz okazję, liczbę gości, miejsce imprezy..."></textarea>
+      </div>
+
+      <div class="pole">
+        <label for="imie">Imię i nazwisko</label>
+        <input type="text" id="imie" name="imie" required>
+      </div>
+
+      <div class="pole">
+        <label for="email">Twój adres e-mail do kontaktu</label>
+        <input type="email" id="email" name="email" placeholder="adres@poczta.pl" required>
+      </div>
+
+      <div class="pole">
+        <label for="telefon">Telefon (opcjonalnie)</label>
+        <input type="tel" id="telefon" name="telefon" placeholder="opcjonalnie">
+      </div>
+
+      <div class="przyciski">
+        <a class="btn btn-line" href="{{ url_for('komponuje') }}">Zacznij od nowa</a>
+        <button class="btn" type="submit">Wyślij zapytanie</button>
+      </div>
+      <p class="mala" style="margin-top:14px">Wysyłając formularz akceptujesz kontakt e-mail w sprawie zapytania (art. 398 PKE). Termin rezerwuje kaucja w terminie 7 dni.</p>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  var LICZBA_PRODUKTOW = {{ liczba }};
+
+  /* podsumowanie */
+  function przelicz(){
+    var cbs = document.querySelectorAll('.komp-it input');
+    var n = 0, suma = 0, lista = '';
+    cbs.forEach(function(cb){
+      if (cb.checked){
+        n++;
+        suma += parseFloat(cb.dataset.cena || 0);
+        lista += '<div><span>' + cb.dataset.nazwa + '</span><span>' + parseInt(cb.dataset.cena) + ' zł</span></div>';
+      }
+    });
+    var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+    document.getElementById('komp-n').textContent = n + ' z ' + LICZBA_PRODUKTOW + ' pozycji';
+    var rab = document.getElementById('komp-rab');
+    rab.classList.toggle('on', rabat > 0);
+    rab.textContent = rabat > 0 ? ('✔ Rabat −5% naliczony (−' + rabat + ' zł)') : ('Rabat −5% dopiero od 10 pozycji (masz ' + n + ')');
+    document.getElementById('komp-suma').innerHTML = '<small>suma / doba</small>' + (suma - rabat) + ' zł';
+    document.getElementById('komp-lista').innerHTML = lista || '<div><span>Nic jeszcze nie wybrano</span></div>';
+    var ids = [];
+    cbs.forEach(function(cb){ if (cb.checked) ids.push(parseInt(cb.value)); });
+    document.getElementById('pozycje').value = JSON.stringify(ids);
+    przeliczDni();
+  }
+  document.querySelectorAll('.komp-it input').forEach(function(cb){
+    cb.addEventListener('change', przelicz);
+  });
+
+  /* dni najmu */
+  var dEv = document.getElementById('data');
+  var dOd = document.getElementById('data_od');
+  var dDo = document.getElementById('data_do');
+  function przesun(d, k){
+    var x = new Date(d + 'T12:00:00');
+    x.setDate(x.getDate() + k);
+    return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+  }
+  function dniN(){
+    if (dOd.value && dDo.value && dOd.value <= dDo.value){
+      return Math.round((new Date(dDo.value) - new Date(dOd.value)) / 86400000) + 1;
+    }
+    return 0;
+  }
+  function przeliczDni(){
+    var dni = dniN();
+    var el = document.getElementById('dni-sum');
+    el.textContent = dni ? ('Łącznie: ' + dni + (dni === 1 ? ' doba' : dni < 5 ? ' doby' : ' dób') + ' najmu') : '';
+    var cbs = document.querySelectorAll('.komp-it input');
+    var n = 0, suma = 0;
+    cbs.forEach(function(cb){ if (cb.checked){ n++; suma += parseFloat(cb.dataset.cena || 0); } });
+    var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+    var total = dni ? (suma - rabat) * dni : 0;
+    document.getElementById('komp-total').innerHTML = '<small>za wybrane dni</small>' + (dni ? total + ' zł' : '—');
+  }
+  dEv.addEventListener('change', function(){
+    if (dEv.value){
+      dOd.value = przesun(dEv.value, -1);
+      dDo.value = przesun(dEv.value, 1);
+      przeliczDni();
+    }
+  });
+  dOd.addEventListener('change', przeliczDni);
+  dDo.addEventListener('change', przeliczDni);
+
+  /* mini-kalendarz: klik dnia ustawia datę imprezy (i domyślny zakres) */
+  document.querySelectorAll('.cal-d[data-d]').forEach(function(b){
+    if (b.classList.contains('przeszly') || b.classList.contains('st-platnosc') || b.classList.contains('st-zarezerwowany')) return;
+    b.addEventListener('click', function(){
+      dEv.value = b.dataset.d;
+      dOd.value = przesun(b.dataset.d, -1);
+      dDo.value = przesun(b.dataset.d, 1);
+      przeliczDni();
+      document.getElementById('formularz').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  /* sygnatura checkboxy */
+  var nowa = document.getElementById('tryb-nowa');
+  var ist  = document.getElementById('tryb-istniejaca');
+  var pole = document.getElementById('pole-syg');
+  function aktualizujSyg(){
+    if (ist.checked) nowa.checked = false;
+    pole.style.display = ist.checked ? 'block' : 'none';
+    document.getElementById('sygnatura').required = ist.checked;
+  }
+  nowa.addEventListener('change', function(){ if (nowa.checked) ist.checked = false; aktualizujSyg(); });
+  ist.addEventListener('change', aktualizujSyg);
+  aktualizujSyg();
+
+  przelicz();
+})();
+</script>
+</body>
+</html>

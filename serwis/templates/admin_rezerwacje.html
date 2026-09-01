@@ -9,12 +9,12 @@
 </p>
 
 <div class="t-scroll"><table class="tabela">
-  <tr><th>Sygnatura</th><th>Utworzono</th><th>Termin</th><th>Pakiet</th><th>Klient</th><th>Status</th><th></th></tr>
+  <tr><th>Sygnatura</th><th>Utworzono</th><th>Najem (od–do)</th><th>Pakiet</th><th>Klient</th><th>Status</th><th></th></tr>
   {% for r in rows %}
   <tr>
     <td><a href="{{ url_for('admin_rezerwacja', rid=r['id']) }}"><b>{{ r['sygnatura'] }}</b></a></td>
     <td class="mala">{{ r['utworzono'] }}</td>
-    <td><b>{{ r['data'] }}</b></td>
+    <td><b>{{ r['data_od'] or r['data'] }} – {{ r['data_do'] or r['data'] }}</b>{% if r['dni'] %}<br><span class="mala">{{ r['dni'] }} dn. · impreza {{ r['data'] }}</span>{% endif %}</td>
     <td>{{ r['pakiet_nazwa'] }}</td>
     <td>{{ r['imie'] or '—' }}<br><span class="mala">{{ r['email'] }}</span>{% if r['priorytet'] %}<br><span class="mala">★ stały partner</span>{% endif %}</td>
     <td>

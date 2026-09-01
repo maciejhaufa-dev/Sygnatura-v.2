@@ -9,13 +9,24 @@
   <div class="t-scroll"><table class="tabela">
     <tr><th>Sygnatura</th><td>{{ r['sygnatura'] }}</td></tr>
     <tr><th>Utworzono</th><td>{{ r['utworzono'] }}</td></tr>
-    <tr><th>Termin</th><td><b>{{ r['data'] }}</b></td></tr>
+    <tr><th>Najem od–do</th><td><b>{{ r['data_od'] or r['data'] }} – {{ r['data_do'] or r['data'] }}</b> ({{ r['dni'] }} dn.)</td></tr>
+    <tr><th>Data imprezy</th><td>{{ r['data'] }}</td></tr>
     <tr><th>Pakiet</th><td>{{ r['pakiet_nazwa'] }}</td></tr>
     <tr><th>Temat</th><td>{{ r['temat'] }}</td></tr>
     <tr><th>Imię i nazwisko</th><td>{{ r['imie'] or '—' }}</td></tr>
     <tr><th>E-mail</th><td><a href="mailto:{{ r['email'] }}">{{ r['email'] }}</a></td></tr>
     <tr><th>Telefon</th><td>{{ r['telefon'] or '—' }}</td></tr>
     <tr><th>Treść zapytania</th><td style="white-space:pre-wrap">{{ r['tresc'] or '—' }}</td></tr>
+    {% if pozycje %}
+    <tr><th>Skład zestawu własnego</th><td>
+      <ul class="zwykla">
+        {% for pz in pozycje %}<li>{{ pz.nazwa }} — {{ '%.0f'|format(pz.cena) }} zł</li>{% endfor %}
+      </ul>
+      {% set suma = pozycje|sum(attribute='cena') %}
+      <b>Suma: {{ '%.0f'|format(suma) }} zł / doba</b>{% if pozycje|length >= 10 %} · rabat −5%: {{ '%.0f'|format(suma*0.05) }} zł{% endif %}
+      {% if r['dni'] %} · szacunkowo za {{ r['dni'] }} dn.: {{ '%.0f'|format((suma - (suma*0.05 if pozycje|length >= 10 else 0)) * r['dni']) }} zł{% endif %}
+    </td></tr>
+    {% endif %}
     <tr><th>Priorytet (stały partner)</th><td>{% if r['priorytet'] %}★ tak{% else %}nie{% endif %}</td></tr>
     <tr><th>Aktualny status</th><td><b>{{ statusy[r['status']] }}</b></td></tr>
     <tr><th>Ostatnia zmiana</th><td class="mala">{{ r['zmieniono'] }}</td></tr>

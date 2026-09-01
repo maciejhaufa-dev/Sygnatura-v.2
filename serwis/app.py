@@ -139,11 +139,18 @@ def assets(nazwa):
 
 # ---------------------------------------------------------------- strona wynajmu
 def stan_dnia(db, pakiet_id, data):
-    """(klasa_css, tytul, czy_zablokowany) dla jednego dnia w kalendarzu pakietu."""
-    row = db.execute(
-        "SELECT status FROM rezerwacje WHERE pakiet_id=? AND data=? AND status!='odrzucono' "
-        "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
-        (pakiet_id, data)).fetchone()
+    """(klasa_css, tytul, czy_zablokowany) dla jednego dnia.
+    pakiet_id=None -> sprawdza rezerwacje WSZYSTKICH pakietów (zestaw własny = wspólna pula towaru)."""
+    if pakiet_id:
+        row = db.execute(
+            "SELECT status FROM rezerwacje WHERE pakiet_id=? AND status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+            "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+            (pakiet_id, data)).fetchone()
+    else:
+        row = db.execute(
+            "SELECT status FROM rezerwacje WHERE status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+            "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+            (data,)).fetchone()
     if not row:
         return '', '', False
     status = row['status']
@@ -171,67 +178,196 @@ def siatka_miesiaca(db, pakiet_id, rok, mies):
     return dni
 
 
+def zakres_domyslny(data):
+    """Domyślny zakres najmu: dzień przed imprezą (montaż) i dzień po (demontaż) = min. 3 doby."""
+    if not data:
+        return '', ''
+    try:
+        d = datetime.date.fromisoformat(data)
+    except ValueError:
+        return '', ''
+    return (d - datetime.timedelta(days=1)).isoformat(), (d + datetime.timedelta(days=1)).isoformat()
+
+
+def konflikty_zakresu(db, pakiet_id, od, do):
+    """Sprawdza cały zakres od–do dzień po dniu.
+    Zwraca (konflikty_blokujace, ostrzezenia_zapytania).
+    pakiet_id=None -> sprawdza całą pulę (zestaw własny)."""
+    blok, pyt = [], []
+    dzien = od
+    while dzien <= do:
+        iso = dzien.isoformat()
+        if pakiet_id:
+            row = db.execute(
+                "SELECT status FROM rezerwacje WHERE pakiet_id=? AND status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+                "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+                (pakiet_id, iso)).fetchone()
+        else:
+            row = db.execute(
+                "SELECT status FROM rezerwacje WHERE status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+                "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+                (iso,)).fetchone()
+        if row:
+            if row['status'] in ('zarezerwowany', 'platnosc_w_toku'):
+                blok.append((iso, row['status']))
+            else:
+                pyt.append(iso)
+        dzien += datetime.timedelta(days=1)
+    return blok, pyt
+
+
 @app.route('/wynajem/')
 def wynajem():
+    """Strona główna wynajmu: WYBÓR TYPU WYDARZENIA — bez kalendarzy."""
     db = get_db()
-    rok = int(request.args.get('rok') or datetime.date.today().year)
-    mies = int(request.args.get('mies') or datetime.date.today().month)
-    wybrany = request.args.get('pakiet', type=int)
-    # pakiety aktywne, zgrupowane
     pakiety = db.execute('SELECT * FROM pakiety WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    liczba = {}
+    for p in pakiety:
+        liczba[p['ev']] = liczba.get(p['ev'], 0) + 1
     grupy = []
     for ev, (nazwa_g, opis_g) in EV_GRUPY.items():
-        lista = [p for p in pakiety if p['ev'] == ev]
-        if lista:
-            grupy.append({'ev': ev, 'nazwa': nazwa_g, 'opis': opis_g, 'pakiety': lista})
-    kalendarze = {}
-    for p in pakiety:
-        kalendarze[p['id']] = siatka_miesiaca(db, p['id'], rok, mies)
+        if liczba.get(ev):
+            grupy.append({'ev': ev, 'nazwa': nazwa_g, 'opis': opis_g, 'ile': liczba[ev]})
     kategorie = db.execute('SELECT * FROM kategorie ORDER BY kolejnosc, id').fetchall()
     produkty = db.execute('SELECT * FROM produkty WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
     produkty_wg = {}
     for pr in produkty:
         produkty_wg.setdefault(pr['kategoria_id'], []).append(pr)
+    return render_template('wynajem.html', grupy=grupy, kategorie=kategorie, produkty_wg=produkty_wg)
+
+
+@app.route('/wynajem/komponuje/')
+def komponuje():
+    """Kompozytor własnego zestawu: katalog z kalkulatorem + termin od–do."""
+    db = get_db()
+    kategorie = db.execute('SELECT * FROM kategorie ORDER BY kolejnosc, id').fetchall()
+    produkty = db.execute('SELECT * FROM produkty WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    produkty_wg = {}
+    for pr in produkty:
+        produkty_wg.setdefault(pr['kategoria_id'], []).append(pr)
+    rok = int(request.args.get('rok') or datetime.date.today().year)
+    mies = int(request.args.get('mies') or datetime.date.today().month)
+    dni = siatka_miesiaca(db, None, rok, mies)  # zajętość z CAŁEJ puli towaru
     poprz = (rok - 1, 12) if mies == 1 else (rok, mies - 1)
     nast = (rok + 1, 1) if mies == 12 else (rok, mies + 1)
-    return render_template('wynajem.html', grupy=grupy, kalendarze=kalendarze,
-                           rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
-                           poprz=poprz, nast=nast, wybrany=wybrany,
-                           kategorie=kategorie, produkty_wg=produkty_wg,
-                           statusy=core.STATUSY_PL)
+    data = request.args.get('data', '')
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    if data and not data_od:
+        data_od, data_do = zakres_domyslny(data)
+    return render_template('komponuje.html', kategorie=kategorie, produkty_wg=produkty_wg,
+                           liczba=len(produkty),
+                           dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
+                           poprz=poprz, nast=nast, data=data, data_od=data_od, data_do=data_do)
 
 
-@app.route('/wynajem/<int:pakiet_id>/rezerwuj')
-def rezerwuj(pakiet_id):
+@app.route('/wynajem/<ev>/')
+def wynajem_wydarzenie(ev):
+    """Wybrany typ wydarzenia: poziomy ESENCJA / MID / FULL — bez kalendarzy."""
+    if ev not in EV_GRUPY:
+        abort(404)
     db = get_db()
-    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pakiet_id,)).fetchone()
+    pakiety = db.execute('SELECT * FROM pakiety WHERE ev=? AND dostepny=1 ORDER BY kolejnosc, id', (ev,)).fetchall()
+    if not pakiety:
+        abort(404)
+    return render_template('wydarzenie.html', ev=ev, nazwa=EV_GRUPY[ev][0], opis=EV_GRUPY[ev][1], pakiety=pakiety)
+
+
+@app.route('/wynajem/pakiet/<int:pid>/')
+def pakiet_szczegoly(pid):
+    """Konkretny pakiet: kalendarz dostępności + wejście do rezerwacji od–do."""
+    db = get_db()
+    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pid,)).fetchone()
+    if not p:
+        abort(404)
+    rok = int(request.args.get('rok') or datetime.date.today().year)
+    mies = int(request.args.get('mies') or datetime.date.today().month)
+    dni = siatka_miesiaca(db, p['id'], rok, mies)
+    poprz = (rok - 1, 12) if mies == 1 else (rok, mies - 1)
+    nast = (rok + 1, 1) if mies == 12 else (rok, mies + 1)
+    return render_template('pakiet.html', p=p, dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
+                           poprz=poprz, nast=nast, ev_nazwa=EV_GRUPY.get(p['ev'], ('Inne', ''))[0])
+
+
+@app.route('/wynajem/pakiet/<int:pid>/rezerwuj')
+def rezerwuj(pid):
+    db = get_db()
+    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pid,)).fetchone()
     if not p:
         abort(404)
     data = request.args.get('data', '')
-    klasa = tytul = ''
-    if data:
-        klasa, tytul, _ = stan_dnia(db, pakiet_id, data)
-    return render_template('formularz.html', p=p, data=data, klasa=klasa, tytul=tytul,
-                           statusy=core.STATUSY_PL)
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    if data and not data_od:
+        data_od, data_do = zakres_domyslny(data)
+    return render_template('formularz.html', p=p, data=data, data_od=data_od, data_do=data_do)
+
+
+@app.route('/wynajem/<int:pakiet_id>/rezerwuj')
+def rezerwuj_stare(pakiet_id):
+    """Stary adres — przekierowanie na nową strukturę."""
+    return redirect(url_for('rezerwuj', pid=pakiet_id, data=request.args.get('data', '')), code=301)
 
 
 @app.route('/api/rezerwuj', methods=['POST'])
 def api_rezerwuj():
     db = get_db()
     pakiet_id = int(request.form.get('pakiet_id') or 0)
-    p = db.execute('SELECT * FROM pakiety WHERE id=?', (pakiet_id,)).fetchone()
-    if not p:
-        abort(404)
+    p = None
+    if pakiet_id:
+        p = db.execute('SELECT * FROM pakiety WHERE id=?', (pakiet_id,)).fetchone()
+        if not p:
+            abort(404)
+
+    def wroc(data='', data_od='', data_do=''):
+        if pakiet_id:
+            return redirect303(url_for('rezerwuj', pid=pakiet_id, data=data, data_od=data_od, data_do=data_do))
+        return redirect303(url_for('komponuje', data=data, data_od=data_od, data_do=data_do))
+
     data = (request.form.get('data') or '').strip()
+    data_od = (request.form.get('data_od') or '').strip()
+    data_do = (request.form.get('data_do') or '').strip()
     try:
-        datetime.date.fromisoformat(data)
+        d_ev = datetime.date.fromisoformat(data)
+        d_od = datetime.date.fromisoformat(data_od)
+        d_do = datetime.date.fromisoformat(data_do)
     except ValueError:
-        flash('Podaj poprawną datę (RRRR-MM-DD).')
-        return redirect303(url_for('rezerwuj', pakiet_id=pakiet_id, data=data))
+        flash('Podaj poprawne daty (RRRR-MM-DD).')
+        return wroc(data, data_od, data_do)
+    if not (d_od <= d_ev <= d_do):
+        flash('Data imprezy musi się mieścić między „od" a „do".')
+        return wroc(data, data_od, data_do)
+    if d_od < datetime.date.today():
+        flash('Termin nie może zaczynać się w przeszłości.')
+        return wroc(data, data_od, data_do)
+    dni = (d_do - d_od).days + 1
+
+    # konflikt w całym zakresie (dzień po dniu)
+    blok, pyt = konflikty_zakresu(db, pakiet_id, d_od, d_do)
+    if blok:
+        opis = ', '.join('%s (%s)' % (d, core.STATUSY_PL[s]) for d, s in blok[:5])
+        flash('Termin niedostępny w dniach: %s. Wybierz inny zakres.' % opis)
+        return wroc(data, data_od, data_do)
+
+    # zestaw własny: skład z katalogu
+    pozycje = []
+    if not pakiet_id:
+        try:
+            ids = [int(x) for x in json.loads(request.form.get('pozycje') or '[]')]
+        except Exception:
+            ids = []
+        for pid2 in ids:
+            pr = db.execute('SELECT * FROM produkty WHERE id=?', (pid2,)).fetchone()
+            if pr:
+                pozycje.append({'nazwa': pr['nazwa'], 'cena': pr['cena_doba']})
+        if not pozycje:
+            flash('Zaznacz co najmniej jeden produkt z katalogu.')
+            return wroc(data, data_od, data_do)
+
     email = (request.form.get('email') or '').strip()
     if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
         flash('Podaj poprawny adres e-mail.')
-        return redirect303(url_for('rezerwuj', pakiet_id=pakiet_id, data=data))
+        return wroc(data, data_od, data_do)
 
     # checkboxy: value=nowa / value=istniejaca (zaznaczony "istniejaca" ma priorytet)
     tryb = 'istniejaca' if 'istniejaca' in request.form.getlist('tryb_sygnatury') else 'nowa'
@@ -240,7 +376,7 @@ def api_rezerwuj():
         sygnatura = (request.form.get('sygnatura') or '').strip().upper()
         if not sygnatura:
             flash('Wpisz sygnaturę sprawy albo zaznacz „nadaj nową sygnaturę".')
-            return redirect303(url_for('rezerwuj', pakiet_id=pakiet_id, data=data))
+            return wroc(data, data_od, data_do)
     else:
         sygnatura = core.nowa_sygnatura(db)
 
@@ -248,17 +384,33 @@ def api_rezerwuj():
     imie = (request.form.get('imie') or '').strip()
     telefon = (request.form.get('telefon') or '').strip()
     tresc = (request.form.get('tresc') or '').strip()
+
+    # najem na 1 dobę tylko z uzasadnieniem (montaż/demontaż wymaga min. 3 dób)
+    if dni == 1 and len(tresc) < 20:
+        flash('Najem na 1 dobę to wyjątek — dekoracje zakładamy dzień przed i ściągamy dzień po imprezie. '
+              'Krótko uzasadnij w wiadomości, a rozpatrzymy to ręcznie.')
+        return wroc(data, data_od, data_do)
+
     teraz = core.teraz()
+    pakiet_nazwa = p['nazwa'] if p else 'Zestaw własny'
     db.execute(
-        'INSERT INTO rezerwacje (sygnatura, data, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, '
-        'status, utworzono, zmieniono, historia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        (sygnatura, data, p['id'], p['nazwa'], temat, imie, email, telefon, tresc,
+        'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, '
+        'status, utworzono, zmieniono, historia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        (sygnatura, data, data_od, data_do, dni, p['id'] if p else None, pakiet_nazwa, temat, imie, email, telefon, tresc,
+         json.dumps(pozycje, ensure_ascii=False),
          'zapytanie', teraz, teraz, json.dumps([{'kiedy': teraz, 'status': 'zapytanie', 'uwaga': 'zgłoszenie przez formularz'}], ensure_ascii=False)))
     db.commit()
     rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (sygnatura,)).fetchone()
 
+    # informacja dla Studia o istniejących zapytaniach w zakresie (nie blokują, ale warto wiedzieć)
+    if pyt:
+        db.execute('UPDATE rezerwacje SET tresc=? WHERE id=?',
+                   ((rez['tresc'] + '\n\nUWAGA: w zakresie są dni z istniejącymi zapytaniami: ' + ', '.join(pyt)).strip(), rez['id']))
+        db.commit()
+        rez = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rez['id'],)).fetchone()
+
     # 1) e-mail do Studia (powiadomienie)
-    core.wyslij_do_studia(db, 'Nowe zapytanie — %s — %s' % (rez['pakiet_nazwa'], data),
+    core.wyslij_do_studia(db, 'Nowe zapytanie — %s — %s–%s' % (rez['pakiet_nazwa'], data_od, data_do),
                           core.mail_studio_zapytanie(rez))
     # 2) autoresponder do klienta (podsumowanie + procedura + dokumenty)
     dok = json.loads(db.execute("SELECT wartosc FROM ustawienia WHERE klucz='dokumenty'").fetchone()['wartosc'] or '[]')
@@ -479,7 +631,8 @@ def admin_rezerwacja(rid):
     if not r:
         abort(404)
     historia = json.loads(r['historia'] or '[]')
-    return render_template('admin_rezerwacja.html', r=r, historia=historia, statusy=core.STATUSY_PL)
+    pozycje = json.loads(r['pozycje'] or '[]')
+    return render_template('admin_rezerwacja.html', r=r, historia=historia, pozycje=pozycje, statusy=core.STATUSY_PL)
 
 
 @app.route('/admin/rezerwacje/<int:rid>/status', methods=['POST'])

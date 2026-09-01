@@ -310,3 +310,19 @@ v4/
 - Sandbox po resecie: ginie pip (flask!), procesy i LOKALNA historia gita; zmienia się też E2B_SANDBOX_ID → adres podglądu się zmienia (sprawdzać env, nie zapamiętywać URL-a).
 - curl z wnętrza sandboxa nie sięga własnego proxy e2b (SSL error) — podglądu nie da się zweryfikować curl-em; weryfikować lokalnie 127.0.0.1.
 - Procedura po resecie: reset --mixed FETCH_HEAD (zachowuje robocze pliki) → status → commit tylko diffu sesji.
+
+## 22. STATUS (1.09.2026 — wynajem: pakiety bez kalendarzy, najem od–do, kompozytor własnego zestawu)
+
+- [x] **Nowa struktura nawigacji (3 poziomy wg uwag usera):** `/wynajem/` = WYBÓR TYPU WYDARZENIA bez kalendarzy (4 karty + karta „Komponuję własny") → `/wynajem/<ev>/` = 3 poziomy ESENCJA/MID/FULL bez kalendarzy → `/wynajem/pakiet/<id>/` = kalendarz TEGO pakietu + „Zarezerwuj termin". Stary adres `/wynajem/<id>/rezerwuj` → 301 na nowy.
+- [x] **Najem OD–DO (48–72 h):** formularz ma datę imprezy + „termin od (montaż)" + „termin do (demontaż)"; klik daty imprezy w kalendarzu domyślnie ustawia dzień przed i dzień po (min. 3 doby); JS przelicza dni na żywo; najem 1-dobowy = wyjątek wymagający uzasadnienia w wiadomości (walidacja serwera: dni==1 i tresc<20 znaków → błąd); zakres blokowany w całości (konflikt dzień po dniu, blokują: zarezerwowany/płatność w toku; „zapytanie" NIE blokuje, ale dodaje ostrzeżenie do maila Studia).
+- [x] **Baza:** rezerwacje + kolumny data_od/data_do/dni/pozycje (migracja ALTER TABLE dla starych baz; stare rekordy → 3-dniowe ±1); demo zaktualizowane na 3-dniowe.
+- [x] **„Komponuję własny" wrócił:** `/wynajem/komponuje/` — interaktywny katalog (checkboxy), kalkulator na żywo (suma/doba, licznik, rabat −5% od 10 pozycji, lista wybranych, suma × dni), mini-kalendarz zajętości CAŁEJ puli (klik dnia = data imprezy), formularz z zakresem od–do i sygnaturami; pozycje lecą do bazy (JSON) i do maili (skład + suma + szacunkowo za dni).
+- [x] **Maile:** wszystkie (klient: zapytanie/kaucja/potwierdzenie/odrzucenie; studio) pokazują „Termin najmu: od–do (impreza: X, N dn.)"; zestaw własny z sekcją SKŁAD ZESTAWU i wyliczeniem. Sheets payload + od/do/dni/pozycje.
+- [x] **Admin:** lista pokazuje zakres od–do + dni; szczegóły: najem od–do, data imprezy, skład zestawu własnego z sumą i rabatem.
+- [x] **Testy:** struktura 3 poziomów (0 kalendarzy na liście/poziomach), formularz z domyślnym ±1, 3-dniowa rezerwacja 303→dziekuje, 1 doba bez uzasadnienia → błąd, konflikt zakresu → błąd, kompozytor z pozycjami → zapis+mail ze składem, bez pozycji → błąd, kalendarz blokuje cały zakres (11–13.12 = 3×st-zapytanie), node --check JS OK. Baza wyczyszczona (tylko SYG-DEMO-*).
+- [x] Commit i push.
+- [ ] **Czeka:** test usera (lokalnie + telefon), potem PythonAnywhere/SMTP/Sheets wg WDROZENIE.md.
+
+### LEKCJE
+- Podmiana dużego bloku tras w app.py nadpisała trasę `dziekuje` (BuildError przy redirect) — po edycjach sprawdzać grep-em listę endpointów.
+- curl z `-X POST` + `-L` potrafi ponowić POST po 303 (405) — testować 303 bez -L i osobno GET celu.

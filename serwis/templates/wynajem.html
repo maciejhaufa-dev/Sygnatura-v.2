@@ -33,6 +33,8 @@ img{max-width:100%}
 .btn:hover{background:var(--krem);border-color:var(--krem)}
 .btn-line{background:transparent;color:var(--zloty);border-color:var(--zloty)}
 .btn-line:hover{background:rgba(196,165,130,.12);border-color:var(--zloty)}
+.btn-ciemny{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa)}
+.btn-ciemny:hover{background:var(--brunatny);border-color:var(--brunatny)}
 /* sekcje */
 .sec{padding:44px 0 20px;scroll-margin-top:80px}
 .sec h2{font-size:clamp(24px,3.5vw,34px);color:var(--brunatny);margin:0 0 8px}
@@ -45,44 +47,20 @@ img{max-width:100%}
 .krok .num{display:inline-grid;place-items:center;width:32px;height:32px;background:var(--butelkowa);color:var(--zloty);font-weight:700;margin-bottom:10px}
 .krok b{display:block;margin-bottom:6px;color:var(--brunatny)}
 .krok p{margin:0;font-size:15px;color:rgba(51,38,28,.8)}
-/* grupy pakietow */
-.pak-grupa{margin-top:40px}
-.pak-grupa-h{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid rgba(107,69,48,.35);padding-bottom:10px;flex-wrap:wrap}
-.pak-grupa-h h3{font-size:26px;color:var(--butelkowa);margin:0}
-.pak-grupa-h p{margin:0;font-size:15px;color:rgba(51,38,28,.65)}
-.pak{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-top:18px;align-items:start}
-.pak-card{position:relative;background:#fff;border:2px solid rgba(107,69,48,.5);padding:24px 20px 20px;display:flex;flex-direction:column;gap:10px}
-.pak-card.top{border-color:var(--brunatny);box-shadow:0 22px 44px rgba(38,29,20,.16)}
-.pak-tag{display:inline-block;align-self:flex-start;background:var(--krem2);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px}
-.pak-name{font-size:22px;font-weight:700;color:var(--butelkowa)}
-.pak-sub{font-size:14px;color:rgba(51,38,28,.7);margin-top:-6px}
-.pak-price{color:var(--brunatny);font-size:26px;font-weight:700}
-.pak-price small{display:block;font-size:11.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6)}
-.pak ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:15px;color:rgba(51,38,28,.9)}
-.pak li::before{content:"✦ ";color:var(--zloty)}
-.pak .btn{margin-top:auto}
-/* kalendarz */
-.cal{background:var(--krem2);border:1px solid rgba(107,69,48,.35);padding:10px;margin-top:6px}
-.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:6px 10px}
-.calhead b{font-size:15px;text-transform:capitalize}
-.calnav{display:flex;gap:2px}
-.calnav a{color:var(--zloty);text-decoration:none;font-size:19px;padding:0 8px}
-.calnav a.disabled{opacity:.3;pointer-events:none}
-.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px}
-.calgrid i{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase;padding:2px 0}
-.cal-d{display:block;text-align:center;padding:5px 0;font-size:13px;text-decoration:none;background:#fff;border:1px solid rgba(107,69,48,.25);color:var(--ink)}
-a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:700}
-.cal-d.pusty{background:transparent;border-color:transparent}
-.cal-d.przeszly{background:transparent;border-color:transparent;color:rgba(51,38,28,.28)}
-.cal-d.st-zapytanie{background:#FFF8E1;outline:2px solid var(--zloty);color:#7a5a10}
-.cal-d.st-platnosc{background:#E8C97A;color:var(--butelkowa);font-weight:700}
-.cal-d.st-zarezerwowany{background:var(--brunatny);color:var(--krem);text-decoration:line-through}
-.callegend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:rgba(51,38,28,.75);margin-top:8px}
-.callegend i{display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(107,69,48,.3);background:#fff}
-.callegend i.st-zapytanie{background:#FFF8E1;outline:1px solid var(--zloty)}
-.callegend i.st-platnosc{background:#E8C97A}
-.callegend i.st-zarezerwowany{background:var(--brunatny)}
-/* katalog */
+/* wybor wydarzenia */
+.wyd{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:22px}
+.wyd-card{background:#fff;border:2px solid rgba(107,69,48,.45);padding:26px 20px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink)}
+.wyd-card:hover{border-color:var(--brunatny);box-shadow:0 18px 36px rgba(38,29,20,.12)}
+.wyd-card .ik{width:52px;height:52px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem2);margin-bottom:6px}
+.wyd-card .ik svg{width:30px;height:30px}
+.wyd-card h3{font-size:22px;color:var(--butelkowa);margin:0}
+.wyd-card p{margin:0;font-size:14.5px;color:rgba(51,38,28,.75);flex:1}
+.wyd-card .wiecej{color:var(--brunatny);font-weight:700;font-size:15px}
+.wyd-card.diy{background:var(--butelkowa);border-color:var(--butelkowa)}
+.wyd-card.diy h3,.wyd-card.diy .wiecej{color:var(--zloty)}
+.wyd-card.diy p{color:rgba(251,247,240,.8)}
+.wyd-card.diy .ik{border-color:var(--zloty);color:var(--zloty);background:transparent}
+/* katalog (statyczny, informacyjny) */
 .kat{margin-top:16px}
 .kat h4{font-size:19px;color:var(--brunatny);margin:22px 0 10px;border-left:4px solid var(--zloty);padding-left:10px}
 .kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
@@ -94,15 +72,13 @@ a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:7
 .stopka{background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px}
 .stopka .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .stopka a{color:var(--zloty)}
-/* telefon */
 @media(max-width:620px){
   .nav a{padding:6px 9px;font-size:15px}
   .nav .brand{width:100%}
   .hero{padding:38px 0 30px}
-  .cal-d{padding:4px 0;font-size:12.5px}
-  .pak{grid-template-columns:1fr}
   .btn{width:100%;text-align:center}
   .kroki{grid-template-columns:1fr}
+  .wyd{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -122,9 +98,9 @@ a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:7
 <section class="hero">
   <div class="wrap">
     <h1>Wynajem dekoracji na Twoje wydarzenie</h1>
-    <p>Wybierz pakiet, sprawdź wolny termin w kalendarzu i wyślij zapytanie — odpowiadamy w ciągu jednego dnia roboczego.</p>
+    <p>Wybierz rodzaj wydarzenia, potem poziom pakietu i sprawdź wolne terminy. Dekoracje zakładamy dzień przed imprezą i ściągamy dzień po — najem trwa więc co najmniej 3 doby.</p>
     <div class="cta">
-      <a class="btn" href="#pakiety">Wybierz pakiet</a>
+      <a class="btn" href="#wydarzenia">Wybierz wydarzenie</a>
       <a class="btn btn-line" href="#jak">Jak to działa</a>
     </div>
   </div>
@@ -134,8 +110,8 @@ a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:7
   <div class="wrap">
     <h2 class="center">Jak to działa</h2>
     <div class="kroki">
-      <div class="krok"><span class="num">1</span><b>Wybierz pakiet</b><p>Komunijny, weselny, firmowy lub jubileuszowy — w trzech poziomach.</p></div>
-      <div class="krok"><span class="num">2</span><b>Sprawdź termin</b><p>Każdy pakiet ma własny kalendarz. Termin z pytaniem widnieje jako „wysłano zapytanie".</p></div>
+      <div class="krok"><span class="num">1</span><b>Wybierz wydarzenie</b><p>Komunia, wesele, impreza firmowa lub jubileusz — w trzech poziomach pakietu.</p></div>
+      <div class="krok"><span class="num">2</span><b>Sprawdź terminy</b><p>Kalendarz jest przy konkretnym pakiecie. Kliknij datę imprezy — domyślnie rezerwujemy też dzień przed (montaż) i dzień po (demontaż).</p></div>
       <div class="krok"><span class="num">3</span><b>Wyślij zapytanie</b><p>Formularz z tematem „Rezerwacja terminu" — automatycznie dostajesz sygnaturę sprawy.</p></div>
       <div class="krok"><span class="num">4</span><b>Wpłać kaucję</b><p>Zapłacone = zarezerwowane. Kaucja w 7 dni, potem termin blokujemy na sztywno.</p></div>
       <div class="krok"><span class="num">5</span><b>Baw się!</b><p>Dowozimy, montujemy i odbieramy dekoracje. Ty zajmujesz się gośćmi.</p></div>
@@ -143,63 +119,34 @@ a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:7
   </div>
 </section>
 
-<section class="sec" id="pakiety">
+<section class="sec" id="wydarzenia">
   <div class="wrap">
-    <h2 class="center">Pakiety — wybierz okazję</h2>
-    <p class="sub center">Pakiety są zbudowane pod wydarzenie, nie pod styl — na start wszystkie w jednej, spójnej stylistyce. Każdy ma własny kalendarz z terminami.</p>
-
-    <div class="callegend" style="justify-content:center;margin-bottom:14px">
-      <span><i></i> wolny</span>
-      <span><i class="st-zapytanie"></i> wysłano zapytanie — nadal można pytać</span>
-      <span><i class="st-platnosc"></i> płatność w toku</span>
-      <span><i class="st-zarezerwowany"></i> zarezerwowany</span>
-    </div>
-
-    {% for g in grupy %}
-    <div class="pak-grupa" id="gr-{{ g.ev }}">
-      <div class="pak-grupa-h">
+    <h2 class="center">Wybierz rodzaj wydarzenia</h2>
+    <p class="sub center">Pakiety są zbudowane pod wydarzenie, nie pod styl — na start wszystkie w jednej, spójnej stylistyce. W każdym pakiecie trzy poziomy: ESENCJA / MID / FULL.</p>
+    <div class="wyd">
+      {% for g in grupy %}
+      <a class="wyd-card" href="{{ url_for('wynajem_wydarzenie', ev=g.ev) }}">
+        <span class="ik">
+          {% if g.ev == 'komunijny' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 3v26"/><path d="M9 9h14"/><path d="M7 22h18"/></svg>
+          {% elif g.ev == 'weselny' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M15.5 8h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 15.5 8z"/><path d="M11 12h10l-1.5 6.5h-7z"/><path d="M14 18.5L12 21h8l-2-2.5"/></svg>
+          {% elif g.ev == 'firmowy' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M5 28V10l11-6 11 6v18"/><path d="M10 28v-9h12v9"/><path d="M13 13h2M17 13h2M13 17h2M17 17h2"/></svg>
+          {% else %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 29V14"/><path d="M8 16h16"/><path d="M9 19h14"/><path d="M11 22h10"/><path d="M13 25h6"/></svg>{% endif %}
+        </span>
         <h3>{{ g.nazwa }}</h3>
         <p>{{ g.opis }}</p>
-      </div>
-      <div class="pak">
-        {% for p in g.pakiety %}
-        <div class="pak-card {% if p.tier=='MID' %}top{% endif %}" id="pakiet-{{ p.id }}">
-          <span class="pak-tag">{{ p.tier or 'pakiet' }}</span>
-          <div class="pak-name">{{ p.nazwa }}</div>
-          <div class="pak-sub">{{ p.opis or '' }}</div>
-          <div class="pak-price"><small>wypożyczenie / doba</small>{{ p.cena }}</div>
-          <ul>{% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}</ul>
-          <div class="cal">
-            <div class="calhead">
-              <b>{{ mies_nazwa }} {{ rok }}</b>
-              <span class="calnav">
-                <a href="{{ url_for('wynajem', pakiet=p.id, rok=poprz[0], mies=poprz[1]) }}#pakiet-{{ p.id }}" {% if poprz[0]==rok and poprz[1]==mies %}class="disabled"{% endif %}>&#8249;</a>
-                <a href="{{ url_for('wynajem', pakiet=p.id, rok=nast[0], mies=nast[1]) }}#pakiet-{{ p.id }}">&#8250;</a>
-              </span>
-            </div>
-            <div class="calgrid">
-              {% for d in ['Pn','Wt','Śr','Cz','Pt','So','Nd'] %}<i>{{ d }}</i>{% endfor %}
-              {% for dzien in kalendarze[p.id] %}
-                {% if not dzien.nr %}
-                  <span class="cal-d pusty"></span>
-                {% elif dzien.zajety %}
-                  <span class="cal-d {{ dzien.klasa }}" title="{{ dzien.tytul }}">{{ dzien.nr }}</span>
-                {% else %}
-                  <a class="cal-d {{ dzien.klasa }}" href="{{ url_for('rezerwuj', pakiet_id=p.id, data=dzien.data) }}" title="{{ dzien.tytul or 'Wolny termin' }}">{{ dzien.nr }}</a>
-                {% endif %}
-              {% endfor %}
-            </div>
-          </div>
-          <a class="btn" href="{{ url_for('rezerwuj', pakiet_id=p.id) }}">Zarezerwuj termin</a>
-        </div>
-        {% endfor %}
-      </div>
+        <span class="wiecej">{{ g.ile }} poziomy pakietu →</span>
+      </a>
+      {% endfor %}
+      <a class="wyd-card diy" href="{{ url_for('komponuje') }}">
+        <span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h18v16H7z"/><path d="M11 13l3.5 3.5L21 10"/></svg></span>
+        <h3>Komponuję własny</h3>
+        <p>Składasz zestaw z katalogu — kalkulator liczy na żywo. Rabat −5% od 10 pozycji. Personalizacja płatna osobno.</p>
+        <span class="wiecej">Przejdź do katalogu →</span>
+      </a>
     </div>
-    {% endfor %}
-
-    <p style="margin-top:22px;font-size:14px;color:rgba(51,38,28,.65)">
-      Kaucja zwrotna 300 zł przy każdym pakiecie · wypożyczenie od 1 doby · „wysłano zapytanie" nie blokuje terminu —
-      decyduje kolejność wpłat (kto pierwszy, ten lepszy; priorytet mają stali partnerzy).
+    <p style="margin-top:22px;font-size:14.5px;color:rgba(51,38,28,.65)">
+      Najem trwa co najmniej 48–72 h: dekoracje zakładamy <b>dzień przed</b> imprezą i ściągamy <b>dzień po</b>.
+      Kaucja zwrotna 300 zł przy każdym pakiecie · „wysłano zapytanie" nie blokuje terminu — decyduje kolejność wpłat (kto pierwszy, ten lepszy; priorytet mają stali partnerzy).
     </p>
   </div>
 </section>
@@ -207,7 +154,7 @@ a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:7
 <section class="sec" id="katalog">
   <div class="wrap">
     <h2 class="center">Katalog</h2>
-    <p class="sub center">Elementy wypożyczasz osobno — napisz do nas, a skomponujemy zestaw pod Twoje potrzeby.</p>
+    <p class="sub center">Elementy wypożyczasz osobno — w sekcji „Komponuję własny" zbierzesz je w zestaw z kalkulatorem.</p>
     <div class="kat">
       {% for k in kategorie %}
       {% if produkty_wg.get(k.id) %}

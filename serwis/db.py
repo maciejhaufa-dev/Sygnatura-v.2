@@ -52,7 +52,10 @@ CREATE TABLE IF NOT EXISTS pakiety (
 CREATE TABLE IF NOT EXISTS rezerwacje (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   sygnatura    TEXT,                -- np. SYG-2026-001 (nadawana automatycznie)
-  data         TEXT,                -- 'RRRR-MM-DD'
+  data         TEXT,                -- 'RRRR-MM-DD' — DATA IMPREZY (środkowy dzień)
+  data_od      TEXT,                -- 'RRRR-MM-DD' — początek najmu (domyślnie dzień przed imprezą = montaż)
+  data_do      TEXT,                -- 'RRRR-MM-DD' — koniec najmu (domyślnie dzień po imprezie = demontaż)
+  dni          INTEGER DEFAULT 1,   -- liczba dób najmu
   pakiet_id    INTEGER,
   pakiet_nazwa TEXT,
   temat        TEXT DEFAULT 'Rezerwacja terminu',
@@ -60,6 +63,7 @@ CREATE TABLE IF NOT EXISTS rezerwacje (
   email        TEXT NOT NULL,
   telefon      TEXT DEFAULT '',
   tresc        TEXT DEFAULT '',     -- indywidualna wiadomość klienta
+  pozycje      TEXT DEFAULT '[]',   -- JSON: skład zestawu własnego [{nazwa, cena}]
   status       TEXT DEFAULT 'zapytanie',
   -- statusy: zapytanie | platnosc_w_toku | zarezerwowany | odrzucono
   priorytet    INTEGER DEFAULT 0,   -- 1 = stały partner (np. dekoratorka) — pokazujemy w adminie
@@ -175,10 +179,12 @@ def zaladuj_demo(db, dzis):
     ]
     for syg, nazwa_pak, plus_dni, status, imie, email, tresc in demo:
         data = (dzis + datetime.timedelta(days=plus_dni)).isoformat()
+        od = (dzis + datetime.timedelta(days=plus_dni - 1)).isoformat()
+        do = (dzis + datetime.timedelta(days=plus_dni + 1)).isoformat()
         db.execute(
-            'INSERT INTO rezerwacje (sygnatura, data, pakiet_id, pakiet_nazwa, temat, imie, email, tresc, status, utworzono, zmieniono, historia) '
-            'VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-            (syg, data, pakiety[nazwa_pak], nazwa_pak, 'Rezerwacja terminu', imie, email, tresc,
+            'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, tresc, status, utworzono, zmieniono, historia) '
+            'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            (syg, data, od, do, 3, pakiety[nazwa_pak], nazwa_pak, 'Rezerwacja terminu', imie, email, tresc,
              status, dzis.isoformat() + ' 09:00', dzis.isoformat() + ' 09:00',
              json.dumps([{'kiedy': dzis.isoformat() + ' 09:00', 'status': status, 'uwaga': 'dane demo'}], ensure_ascii=False)))
     db.commit()
@@ -192,6 +198,15 @@ def inicjuj(sciezka=None):
     db = sqlite3.connect(baza_plik)
     db.row_factory = sqlite3.Row
     db.executescript(SCHEMAT)
+
+    # migracja starszych baz: dodaj kolumny najmu od-do (jeśli ich nie ma)
+    kolumny = {r[1] for r in db.execute('PRAGMA table_info(rezerwacje)')}
+    for kol, typ in [('data_od', 'TEXT'), ('data_do', 'TEXT'), ('dni', 'INTEGER DEFAULT 1'), ('pozycje', "TEXT DEFAULT '[]'")]:
+        if kol not in kolumny:
+            db.execute('ALTER TABLE rezerwacje ADD COLUMN %s %s' % (kol, typ))
+    # stare rekordy miały tylko datę imprezy — domyślnie najem 3-dniowy (montaż dzień przed, demontaż dzień po)
+    db.execute("UPDATE rezerwacje SET data_od=date(data,'-1 day'), data_do=date(data,'+1 day'), dni=3 WHERE data_od IS NULL OR data_od=''")
+    db.commit()
 
     if db.execute('SELECT COUNT(*) FROM kategorie').fetchone()[0] == 0:
         for i, (nazwa, opis) in enumerate(KATEGORIE):

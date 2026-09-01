@@ -24,7 +24,8 @@ ul{text-align:left;margin:14px auto;max-width:380px;padding-left:20px}
   {% if rez %}
   <p>Twoja sprawa otrzymała sygnaturę:</p>
   <div class="syg">{{ rez['sygnatura'] }}</div>
-  <p><b>Termin: {{ rez['data'] }}</b><br>{{ rez['pakiet_nazwa'] }}</p>
+  <p><b>Termin najmu: {{ rez['data_od'] }} – {{ rez['data_do'] }}</b><br>
+     (impreza: {{ rez['data'] }}, {{ rez['dni'] }} dn.)<br>{{ rez['pakiet_nazwa'] }}</p>
   {% else %}
   <p>Twoje zapytanie zostało przyjęte{% if sygnatura %} — sygnatura: <b>{{ sygnatura }}</b>{% endif %}.</p>
   {% endif %}

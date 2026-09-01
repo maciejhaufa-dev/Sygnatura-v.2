@@ -103,6 +103,10 @@ def push_do_sheets(db, rezerwacja):
         'email': rezerwacja['email'],
         'telefon': rezerwacja['telefon'],
         'tresc': rezerwacja['tresc'],
+        'data_od': rezerwacja['data_od'],
+        'data_do': rezerwacja['data_do'],
+        'dni': rezerwacja['dni'],
+        'pozycje': rezerwacja['pozycje'],
     }, ensure_ascii=False).encode('utf-8')
     try:
         req = urllib.request.Request(url['wartosc'].strip(), data=payload, headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -122,6 +126,34 @@ def procedura_txt(dokumenty):
     return '\n'.join(out)
 
 
+def zakres_txt(rez):
+    """Czytelny opis terminu: od–do + data imprezy + liczba dób."""
+    od = rez['data_od'] or rez['data']
+    do = rez['data_do'] or rez['data']
+    dni = rez['dni'] or 1
+    return '%s – %s  (impreza: %s, %s dn.)' % (od, do, rez['data'], dni)
+
+
+def pozycje_txt(rez):
+    """Skład zestawu własnego z wyliczeniem (jeśli rezerwacja ma pozycje)."""
+    try:
+        poz = json.loads(rez['pozycje'] or '[]')
+    except Exception:
+        poz = []
+    if not poz:
+        return ''
+    suma = sum(float(p.get('cena') or 0) for p in poz)
+    dni = rez['dni'] or 1
+    rabat = round(suma * 0.05) if len(poz) >= 10 else 0
+    linie = ['SKŁAD ZESTAWU (własny):']
+    linie += ['• %s — %.0f zł' % (p.get('nazwa', ''), p.get('cena') or 0) for p in poz]
+    linie.append('Suma: %.0f zł / doba' % suma)
+    if rabat:
+        linie.append('Rabat −5%% (od 10 pozycji): −%d zł' % rabat)
+    linie.append('Szacunkowo za %d dn.: %.0f zł (kwota do potwierdzenia)' % (dni, (suma - rabat) * dni))
+    return '\n'.join(linie)
+
+
 def mail_klient_zapytanie(rez, dokumenty):
     d = rez['data']
     try:
@@ -134,12 +166,13 @@ def mail_klient_zapytanie(rez, dokumenty):
         'dziękujemy za zapytanie o wynajem w Studio Sygnatura.\n\n'
         'PODSUMOWANIE ZGŁOSZENIA\n'
         'Sygnatura sprawy: %(sygnatura)s\n'
-        'Termin: %(data_pl)s\n'
+        'Termin najmu: %(zakres)s\n'
         'Pakiet: %(pakiet)s\n'
         'Imię i nazwisko: %(imie)s\n'
         'E-mail kontaktowy: %(email)s\n'
         '%(telefon)s'
         '\nTREŚĆ TWOJEGO PYTANIA\n%(tresc)s\n'
+        '%(pozycje)s'
         '\nJAK DZIAŁAMY\n'
         '1. Twoje zapytanie jest widoczne w naszym kalendarzu jako „wysłano zapytanie" — '
         'termin nie jest zablokowany, dopóki nie wpłynie kaucja.\n'
@@ -152,10 +185,11 @@ def mail_klient_zapytanie(rez, dokumenty):
         'Studio Sygnatura\n'
         'kontakt@studiosygnatura.pl'
     ) % {
-        'sygnatura': rez['sygnatura'], 'data_pl': d_pl, 'pakiet': rez['pakiet_nazwa'],
+        'sygnatura': rez['sygnatura'], 'zakres': zakres_txt(rez), 'pakiet': rez['pakiet_nazwa'],
         'imie': rez['imie'], 'email': rez['email'],
         'telefon': ('Telefon: %s\n' % rez['telefon']) if rez['telefon'] else '',
         'tresc': (rez['tresc'].strip() or '(brak treści)'),
+        'pozycje': pozycje_txt(rez),
         'procedura': procedura_txt(dokumenty),
     }
 
@@ -166,18 +200,20 @@ def mail_studio_zapytanie(rez):
         'Sygnatura: %(sygnatura)s\n'
         'Data zgłoszenia: %(utworzono)s\n'
         'Status: zapytanie\n'
-        'Termin: %(data)s\n'
+        'Termin najmu: %(zakres)s\n'
         'Pakiet: %(pakiet)s\n'
         'Imię i nazwisko: %(imie)s\n'
         'E-mail: %(email)s\n'
         '%(telefon)s'
         '\nTreść:\n%(tresc)s\n'
+        '%(pozycje)s'
         '\nPanel admina: /admin (zmień status po weryfikacji).'
     ) % {
-        'sygnatura': rez['sygnatura'], 'utworzono': rez['utworzono'], 'data': rez['data'],
+        'sygnatura': rez['sygnatura'], 'utworzono': rez['utworzono'], 'zakres': zakres_txt(rez),
         'pakiet': rez['pakiet_nazwa'], 'imie': rez['imie'], 'email': rez['email'],
         'telefon': ('Telefon: %s\n' % rez['telefon']) if rez['telefon'] else '',
         'tresc': (rez['tresc'].strip() or '(brak treści)'),
+        'pozycje': pozycje_txt(rez),
     }
 
 
@@ -186,19 +222,19 @@ def mail_klient_platnosc(rez):
         'Dzień dobry,\n\n'
         'dziękujemy za wpłatę kaucji. Otrzymaliśmy przelew — gdy zostanie zaksięgowany na naszym koncie, '
         'status Twojej rezerwacji zmienimy na „zarezerwowany" i termin zostanie zablokowany na sztywno.\n\n'
-        'Sprawa: %(sygnatura)s\nTermin: %(data)s\nPakiet: %(pakiet)s\n\n'
+        'Sprawa: %(sygnatura)s\nTermin najmu: %(zakres)s\nPakiet: %(pakiet)s\n\n'
         'Pozdrawiamy,\nStudio Sygnatura\nkontakt@studiosygnatura.pl'
-    ) % {'sygnatura': rez['sygnatura'], 'data': rez['data'], 'pakiet': rez['pakiet_nazwa']}
+    ) % {'sygnatura': rez['sygnatura'], 'zakres': zakres_txt(rez), 'pakiet': rez['pakiet_nazwa']}
 
 
 def mail_klient_rezerwacja(rez):
     return (
         'Dzień dobry,\n\n'
-        'potwierdzamy: kaucja została zaksięgowana i termin %(data)s dla pakietu „%(pakiet)s" '
+        'potwierdzamy: kaucja została zaksięgowana i termin %(zakres)s dla pakietu „%(pakiet)s" '
         'rezerwujemy na sztywno. Do zobaczenia na uroczystości!\n\n'
         'Sprawa: %(sygnatura)s\n\n'
         'Pozdrawiamy,\nStudio Sygnatura\nkontakt@studiosygnatura.pl'
-    ) % {'sygnatura': rez['sygnatura'], 'data': rez['data'], 'pakiet': rez['pakiet_nazwa']}
+    ) % {'sygnatura': rez['sygnatura'], 'zakres': zakres_txt(rez), 'pakiet': rez['pakiet_nazwa']}
 
 
 def mail_klient_odrzucono(rez, powod=''):
@@ -206,7 +242,7 @@ def mail_klient_odrzucono(rez, powod=''):
         'Dzień dobry,\n\n'
         'dziękujemy za zapytanie. Niestety nie możemy zrealizować tej rezerwacji'
         + ((' — ' + powod) if powod else '') + '.\n\n'
-        'Sprawa: %(sygnatura)s\nTermin: %(data)s\nPakiet: %(pakiet)s\n\n'
+        'Sprawa: %(sygnatura)s\nTermin najmu: %(zakres)s\nPakiet: %(pakiet)s\n\n'
         'Zapraszamy przy innej okazji.\n\n'
         'Pozdrawiamy,\nStudio Sygnatura\nkontakt@studiosygnatura.pl'
-    ) % {'sygnatura': rez['sygnatura'], 'data': rez['data'], 'pakiet': rez['pakiet_nazwa']}
+    ) % {'sygnatura': rez['sygnatura'], 'zakres': zakres_txt(rez), 'pakiet': rez['pakiet_nazwa']}
