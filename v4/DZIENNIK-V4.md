@@ -278,3 +278,22 @@ v4/
 - **Zbieranie rezerwacji (pytanie usera):** na statycznym GitHub Pages NIE ma backendu ani bazy. Sensowne opcje: (1) **Google Sheets + Apps Script** jako mini-API (POST formularza → dopisanie wiersza; darmowe, user zna arkusze) — najszybsze do startu; (2) **Formspree/Netlify Forms** — gotowe, limit darmowy; (3) własna baza dopiero przy hostingu z backendem (np. Netlify Functions + Supabase). Rekomendacja: Sheets API.
 - jsdom nie implementuje `scrollIntoView` i nawigacji `mailto:` — testować te ścieżki osobno (string mailto), reszta testowalna.
 - v3: bug przesunięcia kart pakietów względem id (już nieistotny — pakiety przebudowane).
+
+## 20. STATUS (1.09.2026 — przełom: własny serwis z bazą, koniec "strony bez backendu")
+
+- [x] **Decyzja architektoniczna (user):** potrzebny PRAWDZIWY system, nie statyczna strona. Wybór: **Flask (Python) + SQLite** — zero kosztów, działa lokalnie na komputerze usera (localhost), HTML/CSS w zwykłych plikach do edycji dla żony; bez WordPress/WooCommerce. Docelowo: hosting Pythonowy (PythonAnywhere darmowy / Render / VPS), GitHub Pages zostaje wizytówką.
+- [x] **serwis/ zbudowany i przetestowany:** db.py (schemat + seed: 6 kategorii, 16 produktów, 12 pakietów, 4 zgłoszenia demo z markerem jednorazowym), core.py (statusy, sygnatury SYG-ROK-NNN, mailer SMTP + outbox, webhook Sheets, 4 autorespondery), app.py (trasy, panel, API), templates (wynajem/formularz/dziękuję/404 + 8 ekranów admina), README.md (instrukcja lokalna).
+- [x] **Workflow wg specyfikacji usera:** kalendarz PER PAKIET (osobne, z nawigacją ‹ ›, statusy: zapytanie=złota obwódka i NIE blokuje / płatność w toku=żółty i wstrzymuje / zarezerwowany=brąz+przekreślenie i blokuje na sztywno; minione zablokowane); przycisk „Zarezerwuj termin" → formularz z tematem „Rezerwacja terminu" (rozwijana lista), checkbox „Nadaj nową sygnaturę" / „Mam sygnaturę sprawy" (odblokowuje pole), pole na indywidualną wiadomość, e-mail kontaktowy; przyciski „Zmień termin" (powrót do kalendarza) / „Wyślij zapytanie".
+- [x] **Po wysłaniu:** mail na kontakt@studiosygnatura.pl + zapytanie do API Google Sheets (webhook, na razie bez URL) + autoresponder do klienta z podsumowaniem (sygnatura, treść pytania, procedura, dokumenty; kaucja 7 dni, zapłacone=zarezerwowane).
+- [x] **Panel admina /admin/ (hasło startowe sygnatura-2026):** pulpit, rezerwacje (filtr statusów, szczegóły, historia), kategorie CRUD, produkty CRUD, pakiety CRUD z checkboxem **dostępny/niedostępny na stronie** (ukrywa pakiet z kalendarzem — test: znika natychmiast), maile (outbox + ponowna wysyłka), ustawienia (kontakt, SMTP, hasło, sheets_url, dokumenty do autorespondera).
+- [x] **Zmiana statusu w adminie:** zapytanie→płatność w toku (autoresponder „kaucja w drodze")→zarezerwowany (autoresponder potwierdzający)→odrzucono (mail z powodem); każda zmiana w historii + push do Sheets (gdy podpięty).
+- [x] **Testy:** pełny cykl klienta (formularz→303→dziękuję→status w kalendarzu), sygnatura istniejąca vs nowa, outbox (maile do studia + klienta), blokada terminu (span vs link), CRUD kategorii/produktów/pakietów, logowanie. Baza wyczyszczona z danych testowych (tylko 4 SYG-DEMO-* + marker .zainicjowano).
+- [x] .gitignore: serwis/data/ (baza, sekrety, dokumenty poza gitem). Commit 558bc1f push OK.
+- [ ] **Następne kroki:** 1) Google Sheets Apps Script (webhook + arkusz z datą/godziną/statusem), 2) SMTP (dane poczty usera), 3) test usera na localhost (pip install flask; python app.py; http://127.0.0.1:8000), 4) hosting.
+
+### LEKCJE
+- sqlite3.Row nie ma .get() — w core.py używać indeksowania [] albo dyktów.
+- redirect po POST: używać 303 (curl -L ponawia POST na 302 i dostaje 405 — artefakt narzędzia, ale 303 jest też poprawniejsze).
+- Demo-seed tylko raz na maszynę: marker na dysku (data/.zainicjowano), bo flaga w DB wraca po skasowaniu bazy.
+- Flask debug auto-reload: przy edycji db.py ponownie odpala inicjuj() — marker chroni przed duplikatami demo.
+- Formularze NIE w <tr> (HTML je wyrzuca) — lista grid z form per wiersz.
