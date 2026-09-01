@@ -1,0 +1,50 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}{{ r['sygnatura'] }} — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>{{ r['sygnatura'] }}</h1>
+<p class="mala"><a href="{{ url_for('admin_rezerwacje') }}">← wszystkie zgłoszenia</a></p>
+
+<div class="forma">
+  <h3>Dane zgłoszenia</h3>
+  <table class="tabela">
+    <tr><th>Sygnatura</th><td>{{ r['sygnatura'] }}</td></tr>
+    <tr><th>Utworzono</th><td>{{ r['utworzono'] }}</td></tr>
+    <tr><th>Termin</th><td><b>{{ r['data'] }}</b></td></tr>
+    <tr><th>Pakiet</th><td>{{ r['pakiet_nazwa'] }}</td></tr>
+    <tr><th>Temat</th><td>{{ r['temat'] }}</td></tr>
+    <tr><th>Imię i nazwisko</th><td>{{ r['imie'] or '—' }}</td></tr>
+    <tr><th>E-mail</th><td><a href="mailto:{{ r['email'] }}">{{ r['email'] }}</a></td></tr>
+    <tr><th>Telefon</th><td>{{ r['telefon'] or '—' }}</td></tr>
+    <tr><th>Treść zapytania</th><td style="white-space:pre-wrap">{{ r['tresc'] or '—' }}</td></tr>
+    <tr><th>Priorytet (stały partner)</th><td>{% if r['priorytet'] %}★ tak{% else %}nie{% endif %}</td></tr>
+    <tr><th>Aktualny status</th><td><b>{{ statusy[r['status']] }}</b></td></tr>
+    <tr><th>Ostatnia zmiana</th><td class="mala">{{ r['zmieniono'] }}</td></tr>
+  </table>
+</div>
+
+<div class="forma">
+  <h3>Zmień status</h3>
+  <form method="post" action="{{ url_for('rezerwacja_status', rid=r['id']) }}">
+    <label>Nowy status</label>
+    <select name="status">
+      {% for st in statusy %}<option value="{{ st }}" {% if st==r['status'] %}selected{% endif %}>{{ statusy[st] }}</option>{% endfor %}
+    </select>
+    <label>Powód / uwaga (wymagane przy „odrzucono" — leci do klienta)</label>
+    <input type="text" name="powod" placeholder="np. termin zajęty u stałego partnera">
+    <p class="mala" style="margin-top:8px">Po zmianie statusu serwis automatycznie wysyła autoresponder do klienta i aktualizuje arkusz Google (gdy podpięty).</p>
+    <p><button class="btn" type="submit">Zapisz status</button></p>
+  </form>
+</div>
+
+<div class="forma">
+  <h3>Historia zmian</h3>
+  <table class="tabela">
+    <tr><th>Kiedy</th><th>Status</th><th>Uwaga</th></tr>
+    {% for h in historia %}
+    <tr><td class="mala">{{ h['kiedy'] }}</td><td>{{ statusy.get(h['status'], h['status']) }}</td><td class="mala">{{ h['uwaga'] or '' }}</td></tr>
+    {% else %}
+    <tr><td colspan="3" class="mala">Brak wpisów.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

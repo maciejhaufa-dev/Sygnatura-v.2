@@ -1,2 +1,4 @@
+# baza danych, sekrety i wgrane dokumenty — NIE trafiają do repozytorium
+serwis/data/
 __pycache__/
 *.pyc

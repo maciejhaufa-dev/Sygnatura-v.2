@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rezerwacja terminu — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--brunatny:#6B4530;--butelkowa:#1F3A32;--zloty:#C4A582;--krem:#FBF7F0;--krem2:#F6EFE1;--ink:#33261C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
+a{color:var(--butelkowa)}
+.wrap{max-width:720px;margin:0 auto;padding:30px 16px 60px}
+.powrot{display:inline-block;margin-bottom:16px;font-size:15px}
+h1{color:var(--brunatny);font-size:30px;margin:0 0 4px}
+.podsum{color:rgba(51,38,28,.75);margin:0 0 20px;font-size:16px}
+.karta{background:#fff;border:2px solid var(--brunatny);padding:24px 22px;margin-bottom:20px}
+.karta .pkg{font-size:20px;font-weight:700;color:var(--butelkowa)}
+.karta .cena{color:var(--brunatny);font-weight:700}
+.data-info{background:var(--krem2);border:1px solid rgba(107,69,48,.35);padding:10px 14px;margin-top:10px;font-size:15px}
+.data-info.wolny{background:#F1F7F2;border-color:rgba(31,58,50,.4)}
+.data-info.st-zapytanie{background:#FFF8E1;border-color:var(--zloty)}
+.data-info.st-platnosc,.data-info.st-zarezerwowany{background:#F6E3E0;border-color:#8c2f2f}
+.flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:0 0 16px;font-size:15px}
+.pole{margin-bottom:16px}
+label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input[type=text],input[type=email],input[type=tel],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
+textarea{min-height:130px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
+.opcje{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.opcje .rzad{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.opcje .rzad:last-child{margin-bottom:0}
+.opcje input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
+.opcje input[type=radio]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
+.opcje .etyk{font-weight:700;color:var(--brunatny)}
+.opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
+#pole-syg{display:none;margin-top:10px}
+.przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 30px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
+.btn-line{background:transparent;color:var(--brunatny);border-color:var(--brunatny)}
+.btn-line:hover{background:var(--krem2);color:var(--brunatny)}
+.mala{font-size:13.5px;color:rgba(51,38,28,.6)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="powrot" href="{{ url_for('wynajem', pakiet=p.id) }}#pakiet-{{ p.id }}">← wróć do kalendarza</a>
+  <h1>Rezerwacja terminu</h1>
+  <p class="podsum">Wypełnij formularz — po wysłaniu dostaniesz e-mail z podsumowaniem, sygnaturą sprawy i dokumentami do zapoznania.</p>
+
+  {% with wiad = get_flashed_messages() %}
+    {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
+  {% endwith %}
+
+  <div class="karta">
+    <div class="pkg">{{ p.nazwa }}</div>
+    <div class="cena">{{ p.cena }}</div>
+    {% if p.opis %}<div class="mala">{{ p.opis }}</div>{% endif %}
+    <ul style="margin:10px 0 0;padding-left:20px;font-size:15px">
+      {% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}
+    </ul>
+    {% if data %}
+    <div class="data-info {{ klasa or 'wolny' }}">
+      {% if tytul %}{{ tytul }}{% else %}Wybrany termin: <b>{{ data }}</b> — wolny.{% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <form method="post" action="{{ url_for('api_rezerwuj') }}">
+    <input type="hidden" name="pakiet_id" value="{{ p.id }}">
+    <input type="hidden" name="data" value="{{ data }}">
+
+    <div class="pole">
+      <label for="temat">Temat zapytania</label>
+      <select id="temat" name="temat">
+        <option value="Rezerwacja terminu" selected>Rezerwacja terminu</option>
+        <option value="Pytanie o pakiet">Pytanie o pakiet</option>
+        <option value="Wynajem indywidualny">Wynajem indywidualny</option>
+        <option value="Inne">Inne</option>
+      </select>
+    </div>
+
+    <div class="pole">
+      <label for="termin">Termin</label>
+      <input type="text" id="termin" name="termin_wyswietlany" value="{{ data }}" placeholder="RRRR-MM-DD" required>
+      <p class="mala" style="margin:4px 0 0">Wybrany w kalendarzu. Chcesz inny? Kliknij „Zmień termin" na dole.</p>
+    </div>
+
+    <div class="opcje">
+      <div class="rzad">
+        <input type="checkbox" id="tryb-nowa" name="tryb_sygnatury" value="nowa" checked>
+        <div>
+          <div class="etyk"><label for="tryb-nowa" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Nadaj nową sygnaturę</label></div>
+          <div class="opis">System automatycznie nada numer sprawy (np. SYG-2026-001) i wyśle go w e-mailu z podsumowaniem.</div>
+        </div>
+      </div>
+      <div class="rzad">
+        <input type="checkbox" id="tryb-istniejaca" name="tryb_sygnatury" value="istniejaca">
+        <div>
+          <div class="etyk"><label for="tryb-istniejaca" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Mam sygnaturę sprawy</label></div>
+          <div class="opis">Jeśli już z nami rozmawiałeś i masz numer sprawy — dopiszemy do niej to zapytanie.</div>
+          <div id="pole-syg">
+            <label for="sygnatura">Twoja sygnatura sprawy</label>
+            <input type="text" id="sygnatura" name="sygnatura" placeholder="np. SYG-2026-001">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pole">
+      <label for="tresc">Twoja wiadomość</label>
+      <textarea id="tresc" name="tresc" placeholder="Opisz okazję, liczbę gości, miejsce imprezy, czego potrzebujesz..."></textarea>
+    </div>
+
+    <div class="pole">
+      <label for="imie">Imię i nazwisko</label>
+      <input type="text" id="imie" name="imie" required>
+    </div>
+
+    <div class="pole">
+      <label for="email">Twój adres e-mail do kontaktu</label>
+      <input type="email" id="email" name="email" placeholder="adres@poczta.pl" required>
+    </div>
+
+    <div class="pole">
+      <label for="telefon">Telefon (opcjonalnie)</label>
+      <input type="tel" id="telefon" name="telefon" placeholder="opcjonalnie">
+    </div>
+
+    <div class="przyciski">
+      <a class="btn btn-line" href="{{ url_for('wynajem', pakiet=p.id) }}#pakiet-{{ p.id }}">Zmień termin</a>
+      <button class="btn" type="submit">Wyślij zapytanie</button>
+    </div>
+    <p class="mala" style="margin-top:14px">Wysyłając formularz akceptujesz kontakt e-mail w sprawie zapytania (art. 398 PKE). Termin rezerwuje kaucja w terminie 7 dni.</p>
+  </form>
+</div>
+
+<script>
+/* checkboxy sygnatury wzajemnie się wykluczają;
+   zaznaczenie "Mam sygnaturę sprawy" odblokowuje pole obok */
+(function(){
+  var nowa = document.getElementById('tryb-nowa');
+  var ist  = document.getElementById('tryb-istniejaca');
+  var pole = document.getElementById('pole-syg');
+  function aktualizuj(){
+    if (ist.checked) nowa.checked = false;
+    pole.style.display = ist.checked ? 'block' : 'none';
+    document.getElementById('sygnatura').required = ist.checked;
+  }
+  nowa.addEventListener('change', function(){ if (nowa.checked) ist.checked = false; aktualizuj(); });
+  ist.addEventListener('change', aktualizuj);
+  aktualizuj();
+})();
+</script>
+</body>
+</html>

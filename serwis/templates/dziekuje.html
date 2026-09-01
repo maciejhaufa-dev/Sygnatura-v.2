@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dziękujemy — Studio Sygnatura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--brunatny:#6B4530;--butelkowa:#1F3A32;--zloty:#C4A582;--krem:#FBF7F0;--ink:#33261C}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--krem);font-family:'Cormorant Garamond',Georgia,serif;color:var(--ink);padding:16px}
+.box{background:#fff;border:2px solid var(--brunatny);padding:34px 30px;max-width:560px;width:100%;text-align:center}
+h1{color:var(--butelkowa);font-size:28px;margin:0 0 10px}
+.syg{display:inline-block;background:var(--butelkowa);color:var(--zloty);padding:8px 18px;font-size:20px;letter-spacing:.06em;margin:8px 0 14px}
+p{margin:8px 0;line-height:1.65}
+a{color:var(--brunatny)}
+ul{text-align:left;margin:14px auto;max-width:380px;padding-left:20px}
+.mala{font-size:14px;color:rgba(51,38,28,.65)}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Dziękujemy za zapytanie!</h1>
+  {% if rez %}
+  <p>Twoja sprawa otrzymała sygnaturę:</p>
+  <div class="syg">{{ rez['sygnatura'] }}</div>
+  <p><b>Termin: {{ rez['data'] }}</b><br>{{ rez['pakiet_nazwa'] }}</p>
+  {% else %}
+  <p>Twoje zapytanie zostało przyjęte{% if sygnatura %} — sygnatura: <b>{{ sygnatura }}</b>{% endif %}.</p>
+  {% endif %}
+  <ul>
+    <li>Na Twój adres e-mail wysłaliśmy <b>podsumowanie zgłoszenia</b> z treścią zapytania, procedurą i dokumentami do zapoznania.</li>
+    <li>W kalendarzu Twój termin widnieje teraz jako <b>„wysłano zapytanie"</b> — to informacja dla innych, że ktoś pytał o ten termin.</li>
+    <li>Odpowiemy w ciągu <b>1 dnia roboczego</b>.</li>
+    <li>Rezerwacja staje się wiążąca po wpłacie <b>kaucji w terminie 7 dni</b>. Zapłacone = zarezerwowane.</li>
+  </ul>
+  <p class="mala">Nie dostałeś maila? Sprawdź folder spam albo napisz na kontakt@studiosygnatura.pl z numerem sprawy.</p>
+  <p><a href="{{ url_for('wynajem') }}">← wróć do wynajmu</a></p>
+</div>
+</body>
+</html>

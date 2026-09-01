@@ -1,0 +1,70 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Ustawienia — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Ustawienia</h1>
+
+<div class="forma">
+  <h3>E-mail serwisu</h3>
+  <form method="post" action="{{ url_for('admin_ustawienia') }}">
+    <label>Adres kontaktowy Studia (na niego lecą powiadomienia)</label>
+    <input type="email" name="kontakt_email" value="{{ u.get('kontakt_email','') }}">
+    <label>Nadawca (nagłówek From)</label>
+    <input type="text" name="nadawca" value="{{ u.get('nadawca','') }}">
+
+    <h3>SMTP — wysyłka e-maili (opcjonalne, do testów działa tryb lokalny)</h3>
+    <p class="mala">Dane od dostawcy poczty (np. dhosting, home.pl, Gmail z hasłem aplikacji).</p>
+    <label>Host SMTP</label><input type="text" name="smtp_host" value="{{ u.get('smtp_host','') }}" placeholder="smtp.twojadomena.pl">
+    <label>Port</label><input type="text" name="smtp_port" value="{{ u.get('smtp_port','587') }}">
+    <label>Login</label><input type="text" name="smtp_user" value="{{ u.get('smtp_user','') }}">
+    <label>Hasło</label><input type="password" name="smtp_haslo" value="{{ u.get('smtp_haslo','') }}">
+    <div class="rzad" style="margin-top:10px"><label><input type="checkbox" name="smtp_ssl" {% if u.get('smtp_ssl')=='1' %}checked{% endif %}> połączenie SSL (port 465)</label></div>
+
+    <h3>Google Sheets (webhook)</h3>
+    <p class="mala">URL skryptu Apps Script — skonfigurujemy później. Każde zgłoszenie i każda zmiana statusu leci na ten adres jako JSON.</p>
+    <label>URL arkusza (Apps Script web app)</label>
+    <input type="text" name="sheets_url" value="{{ u.get('sheets_url','') }}" placeholder="https://script.google.com/macros/s/.../exec">
+
+    <h3>Hasło do panelu</h3>
+    <label>Nowe hasło (zostaw puste, żeby nie zmieniać)</label>
+    <input type="password" name="haslo" placeholder="••••••••">
+
+    <p><button class="btn" type="submit">Zapisz ustawienia</button></p>
+  </form>
+</div>
+
+<div class="forma">
+  <h3>Dokumenty dołączane do autorespondera</h3>
+  <p class="mala">Te dokumenty (procedura rezerwacji i kaucji, regulamin) serwis wymienia w e-mailu podsumowującym do klienta i linkuje poniżej.</p>
+  <table class="tabela">
+    <tr><th>Nazwa</th><th>Plik / link</th><th></th></tr>
+    {% for d in dokumenty %}
+    <tr>
+      <td>{{ d.get('nazwa','') }}</td>
+      <td>{% if d.get('plik') %}<a href="{{ url_for('pliki', nazwa=d['plik']) }}" target="_blank">/pliki/{{ d['plik'] }}</a>{% else %}—{% endif %}</td>
+      <td>
+        <form method="post" action="{{ url_for('dokument_usun', idx=loop.index0) }}">
+          <button class="btn btn-niebez" type="submit">Usuń</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3" class="mala">Brak dokumentów — dodaj pierwszy.</td></tr>
+    {% endfor %}
+  </table>
+  <h3 style="margin-top:14px">Dodaj dokument (plik)</h3>
+  <form method="post" action="{{ url_for('upload_dokument') }}" enctype="multipart/form-data">
+    <label>Nazwa dokumentu (widoczna w mailu)</label>
+    <input type="text" name="nazwa" placeholder="np. Procedura rezerwacji i kaucji">
+    <label>Plik (PDF)</label>
+    <input type="file" name="plik" accept=".pdf,.doc,.docx,.txt" required>
+    <p><button class="btn" type="submit">Wgraj dokument</button></p>
+  </form>
+  <p class="mala">Wgrane pliki: {% for f in pliki %}<a href="{{ url_for('pliki', nazwa=f) }}" target="_blank">{{ f }}</a>{% if not loop.last %}, {% endif %}{% else %}brak{% endfor %}</p>
+</div>
+
+<div class="forma">
+  <h3>Dane startowe (demo)</h3>
+  <p class="mala">Baza zawiera 4 zgłoszenia demo (SYG-DEMO-*) — usuń je w zakładce Rezerwacje, gdy dodasz prawdziwe. Aby całkiem wyczyścić bazę: zatrzymaj serwis, usuń plik <b>data/serwis.db</b> i uruchom ponownie — baza odtworzy się z kategoriami, produktami i pakietami, ale BEZ demo.</p>
+  <p class="mala">Licznik sygnatur: {{ u.get('licznik_sygnatur','0') }}</p>
+</div>
+{% endblock %}

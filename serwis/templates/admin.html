@@ -1,0 +1,52 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Pulpit — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Pulpit</h1>
+
+{% if smtp_off or sheets_off %}
+<div class="uwaga">
+  ⚠ <b>Tryb lokalny / testowy:</b>
+  {% if smtp_off %}SMTP nie skonfigurowany — e-maile NIE wychodzą, ale każdy ląduje w zakładce <a href="{{ url_for('admin_maile') }}">Maile</a> (kopia do wglądu).{% endif %}
+  {% if sheets_off %}Arkusz Google nie podpięty — zgłoszenia zostają tylko w bazie (skonfigurujemy później).{% endif %}
+</div>
+{% endif %}
+
+<h2>Zgłoszenia wg statusu</h2>
+<div class="kafle">
+  {% for st, n in licznik.items() %}
+  <div class="kafel"><b>{{ n }}</b><span>{{ statusy[st] }}</span></div>
+  {% endfor %}
+</div>
+
+<h2>Najbliższe terminy</h2>
+<table class="tabela">
+  <tr><th>Data</th><th>Sygnatura</th><th>Pakiet</th><th>Klient</th><th>Status</th></tr>
+  {% for r in nadchodzace %}
+  <tr>
+    <td><b>{{ r['data'] }}</b></td>
+    <td><a href="{{ url_for('admin_rezerwacja', rid=r['id']) }}">{{ r['sygnatura'] }}</a></td>
+    <td>{{ r['pakiet_nazwa'] }}</td>
+    <td>{{ r['imie'] or '—' }}<br><span class="mala">{{ r['email'] }}</span></td>
+    <td>{{ statusy[r['status']] }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" class="mala">Brak nadchodzących terminów.</td></tr>
+  {% endfor %}
+</table>
+
+<h2>Ostatnie e-maile (skrzynka nadawcza serwisu)</h2>
+<table class="tabela">
+  <tr><th>Kiedy</th><th>Do</th><th>Temat</th><th>Typ</th><th>Stan</th></tr>
+  {% for m in maile %}
+  <tr>
+    <td class="mala">{{ m['utworzono'] }}</td>
+    <td>{{ m['do_kogo'] }}</td>
+    <td>{{ m['temat'] }}</td>
+    <td class="mala">{{ m['typ'] }}</td>
+    <td class="mala">{% if m['wyslany'] %}✔ wysłany{% elif m['blad'] %}⚠ {{ m['blad'] }}{% else %}◷ kopia (SMTP wył.){% endif %}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" class="mala">Brak e-maili.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

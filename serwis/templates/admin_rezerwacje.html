@@ -1,0 +1,38 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Rezerwacje — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Rezerwacje / zgłoszenia</h1>
+<p class="mala">
+  Filtry:
+  <a href="{{ url_for('admin_rezerwacje') }}">wszystkie</a>
+  {% for st in statusy %}| <a href="{{ url_for('admin_rezerwacje', status=st) }}">{{ statusy[st] }}</a>{% endfor %}
+</p>
+
+<table class="tabela">
+  <tr><th>Sygnatura</th><th>Utworzono</th><th>Termin</th><th>Pakiet</th><th>Klient</th><th>Status</th><th></th></tr>
+  {% for r in rows %}
+  <tr>
+    <td><a href="{{ url_for('admin_rezerwacja', rid=r['id']) }}"><b>{{ r['sygnatura'] }}</b></a></td>
+    <td class="mala">{{ r['utworzono'] }}</td>
+    <td><b>{{ r['data'] }}</b></td>
+    <td>{{ r['pakiet_nazwa'] }}</td>
+    <td>{{ r['imie'] or '—' }}<br><span class="mala">{{ r['email'] }}</span>{% if r['priorytet'] %}<br><span class="mala">★ stały partner</span>{% endif %}</td>
+    <td>
+      {% if r['status']=='zapytanie' %}<span style="color:#8a6d1a">●</span>
+      {% elif r['status']=='platnosc_w_toku' %}<span style="color:#b07d1e">●</span>
+      {% elif r['status']=='zarezerwowany' %}<span style="color:var(--butelkowa)">●</span>
+      {% else %}<span style="color:#8c2f2f">●</span>{% endif %}
+      {{ statusy[r['status']] }}
+    </td>
+    <td>
+      <form method="post" action="{{ url_for('rezerwacja_usun', rid=r['id']) }}"
+            onsubmit="return confirm('Na pewno usunąć to zgłoszenie?')">
+        <button class="btn btn-niebez" type="submit">Usuń</button>
+      </form>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="mala">Brak zgłoszeń o tym statusie.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

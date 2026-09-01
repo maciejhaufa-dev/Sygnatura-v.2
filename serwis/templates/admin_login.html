@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logowanie — Studio Sygnatura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+:root{--brunatny:#6B4530;--butelkowa:#1F3A32;--zloty:#C4A582;--krem:#FBF7F0;--ink:#33261C}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--krem);font-family:'Cormorant Garamond',Georgia,serif;color:var(--ink)}
+.box{background:#fff;border:2px solid var(--brunatny);padding:34px 30px;width:min(420px,90vw)}
+h1{color:var(--butelkowa);font-size:26px;margin:0 0 6px}
+p{margin:0 0 18px;color:rgba(51,38,28,.7);font-size:15px}
+label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input{width:100%;padding:10px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;margin-bottom:14px}
+button{width:100%;background:var(--butelkowa);color:var(--zloty);border:0;padding:11px;font-family:inherit;font-size:17px;cursor:pointer}
+button:hover{background:var(--brunatny)}
+.flash{background:var(--butelkowa);color:var(--zloty);padding:9px 12px;margin-bottom:14px;font-size:15px}
+a{color:var(--brunatny);font-size:14px}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Panel administracyjny</h1>
+  <p>Studio Sygnatura — zarządzanie serwisem</p>
+  {% with wiad = get_flashed_messages() %}
+    {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
+  {% endwith %}
+  <form method="post">
+    <label for="haslo">Hasło</label>
+    <input id="haslo" name="haslo" type="password" autofocus required>
+    <button type="submit">Zaloguj</button>
+  </form>
+  <p style="margin-top:16px;text-align:center"><a href="{{ url_for('index') }}">← wróć na stronę</a></p>
+</div>
+</body>
+</html>

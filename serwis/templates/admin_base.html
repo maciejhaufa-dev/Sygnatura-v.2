@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block tytul %}Panel — Studio Sygnatura{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brunatny:#6B4530; --butelkowa:#1F3A32; --zloty:#C4A582;
+  --krem:#FBF7F0; --krem2:#F6EFE1; --ink:#33261C;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px}
+a{color:var(--butelkowa)}
+h1,h2,h3{color:var(--brunatny)}
+.adm-head{background:var(--butelkowa);color:var(--krem);display:flex;align-items:center;gap:18px;padding:10px 18px;flex-wrap:wrap}
+.adm-head .logo{font-size:22px;font-weight:700;color:var(--zloty);letter-spacing:.04em}
+.adm-head nav{display:flex;gap:4px;flex-wrap:wrap}
+.adm-head a{color:var(--krem);text-decoration:none;padding:7px 12px;border:1px solid transparent}
+.adm-head a:hover,.adm-head a.akt{color:var(--zloty);border-color:var(--zloty)}
+.adm-head .wylog{margin-left:auto}
+.adm-head form{display:inline}
+.adm-head button{background:none;border:1px solid var(--zloty);color:var(--zloty);font-family:inherit;font-size:15px;padding:6px 12px;cursor:pointer}
+.adm-wrap{max-width:1100px;margin:0 auto;padding:22px 16px 60px}
+.flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:0 0 14px;font-size:15px}
+.tabela{width:100%;border-collapse:collapse;background:#fff;font-size:16px}
+.tabela th{background:var(--krem2);text-align:left;padding:8px 10px;border-bottom:2px solid rgba(107,69,48,.4);font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--brunatny)}
+.tabela td{padding:8px 10px;border-bottom:1px solid rgba(107,69,48,.15);vertical-align:top}
+.tabela tr:hover td{background:var(--krem2)}
+.forma{background:#fff;border:1px solid rgba(107,69,48,.35);padding:16px;margin:14px 0;max-width:760px}
+.forma label{display:block;font-size:14px;color:var(--brunatny);margin:10px 0 3px;text-transform:uppercase;letter-spacing:.04em}
+.forma input[type=text],.forma input[type=number],.forma input[type=password],.forma input[type=email],.forma textarea,.forma select{width:100%;padding:9px 10px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px}
+.forma textarea{min-height:90px}
+.forma .rzad{display:flex;gap:14px;align-items:center}
+.forma .rzad label{margin:0;text-transform:none;font-size:16px;display:flex;align-items:center;gap:6px}
+.forma input[type=checkbox]{width:17px;height:17px;accent-color:var(--butelkowa)}
+.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:9px 20px;font-family:inherit;font-size:16px;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
+.btn-ghost{background:transparent;color:var(--brunatny);border-color:var(--brunatny)}
+.btn-ghost:hover{background:var(--krem2);color:var(--brunatny)}
+.btn-niebez{background:transparent;color:#8c2f2f;border-color:#8c2f2f;font-size:14px;padding:4px 10px}
+.mala{font-size:14px;color:rgba(51,38,28,.65)}
+.kafle{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:16px 0}
+.kafel{background:#fff;border:1px solid rgba(107,69,48,.35);padding:16px;text-align:center}
+.kafel b{display:block;font-size:32px;color:var(--butelkowa)}
+.kafel span{font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em}
+.uwaga{background:#FFF4E0;border:1px solid var(--zloty);padding:10px 14px;font-size:15px;margin:10px 0}
+ul.zwykla{margin:8px 0;padding-left:20px}
+@media(max-width:640px){.tabela{font-size:14px}.tabela th,.tabela td{padding:6px}}
+</style>
+</head>
+<body>
+<header class="adm-head">
+  <span class="logo">SygNATURA · panel</span>
+  <nav>
+    <a href="{{ url_for('admin_dash') }}" {% if aktywna=='dash' %}class="akt"{% endif %}>Pulpit</a>
+    <a href="{{ url_for('admin_rezerwacje') }}" {% if aktywna=='rezerwacje' %}class="akt"{% endif %}>Rezerwacje</a>
+    <a href="{{ url_for('admin_kategorie') }}" {% if aktywna=='kategorie' %}class="akt"{% endif %}>Kategorie</a>
+    <a href="{{ url_for('admin_produkty') }}" {% if aktywna=='produkty' %}class="akt"{% endif %}>Produkty</a>
+    <a href="{{ url_for('admin_pakiety') }}" {% if aktywna=='pakiety' %}class="akt"{% endif %}>Pakiety</a>
+    <a href="{{ url_for('admin_maile') }}" {% if aktywna=='maile' %}class="akt"{% endif %}>Maile</a>
+    <a href="{{ url_for('admin_ustawienia') }}" {% if aktywna=='ustawienia' %}class="akt"{% endif %}>Ustawienia</a>
+    <a href="{{ url_for('wynajem') }}">Strona ↗</a>
+  </nav>
+  <form class="wylog" method="post" action="{{ url_for('admin_logout') }}"><button type="submit">Wyloguj</button></form>
+</header>
+<div class="adm-wrap">
+  {% with wiad = get_flashed_messages() %}
+    {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
+  {% endwith %}
+  {% block tresc %}{% endblock %}
+</div>
+</body>
+</html>

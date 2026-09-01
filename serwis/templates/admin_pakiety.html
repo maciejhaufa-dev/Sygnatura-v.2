@@ -1,0 +1,56 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Pakiety — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Pakiety</h1>
+<p class="mala">Pakiety na wynajem. <b>Dostępny na stronie</b> = pakiet widać na stronie z własnym kalendarzem; odznaczony = ukryty (zgłoszenia zostają). Pozycje wpisuj KAŻDĄ W OSOBNEJ LINII. Opis pakietu edytujesz w wierszu (pole pod nazwą po rozszerzeniu).</p>
+<style>
+.wiersz{display:grid;grid-template-columns:44px 1fr 1fr 110px 150px 130px auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(107,69,48,.15)}
+.wiersz input,.wiersz select,.wiersz textarea{padding:7px;font-family:inherit;font-size:16px;border:1px solid rgba(107,69,48,.35);background:var(--krem);width:100%}
+.wiersz textarea{min-height:74px;font-size:14px}
+.wiersz .idk{color:var(--brunatny);font-weight:700}
+.wiersz label{margin:0;display:flex;align-items:center;gap:6px;font-size:13px;text-transform:none;letter-spacing:0}
+.naglowek{display:grid;grid-template-columns:44px 1fr 1fr 110px 150px 130px auto;gap:8px;padding:8px 0;border-bottom:2px solid rgba(107,69,48,.4);font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--brunatny)}
+@media(max-width:900px){.wiersz,.naglowek{grid-template-columns:1fr}.naglowek{display:none}}
+</style>
+<div class="naglowek"><span>ID</span><span>Wydarzenie + opis</span><span>Nazwa + poziom</span><span>Cena</span><span>Pozycje (linia po linii)</span><span>Dostępny</span><span></span></div>
+{% for p in rows %}
+<form class="wiersz" method="post" action="{{ url_for('pakiety_edytuj', pid=p['id']) }}">
+  <span class="idk">{{ p['id'] }}</span>
+  <span>
+    <select name="ev" style="margin-bottom:6px">
+      {% for ev, (nazwa, _) in ev_grupy.items() %}<option value="{{ ev }}" {% if ev==p['ev'] %}selected{% endif %}>{{ nazwa }}</option>{% endfor %}
+    </select>
+    <input type="text" name="opis" value="{{ p['opis'] or '' }}" placeholder="opis / podtytuł">
+  </span>
+  <span>
+    <input type="text" name="nazwa" value="{{ p['nazwa'] }}" style="margin-bottom:6px">
+    <select name="tier">
+      {% for t in ['ESENCJA','MID','FULL',''] %}<option value="{{ t }}" {% if t==p['tier'] %}selected{% endif %}>{{ t or '—' }}</option>{% endfor %}
+    </select>
+  </span>
+  <input type="text" name="cena" value="{{ p['cena'] }}">
+  <textarea name="pozycje">{{ p['pozycje'] or '' }}</textarea>
+  <label><input type="checkbox" name="dostepny" {% if p['dostepny'] %}checked{% endif %}> na stronie</label>
+  <span style="white-space:nowrap">
+    <button class="btn btn-ghost" type="submit" style="padding:6px 12px">Zapisz</button>
+    <button class="btn btn-niebez" type="submit" formaction="{{ url_for('pakiety_usun', pid=p['id']) }}">Usuń</button>
+  </span>
+</form>
+{% endfor %}
+
+<div class="forma">
+  <h3>Nowy pakiet</h3>
+  <form method="post" action="{{ url_for('pakiety_dodaj') }}">
+    <label>Wydarzenie</label>
+    <select name="ev">{% for ev, (nazwa, _) in ev_grupy.items() %}<option value="{{ ev }}">{{ nazwa }}</option>{% endfor %}</select>
+    <label>Nazwa (np. Komunijny ESENCJA)</label><input type="text" name="nazwa" required>
+    <label>Opis (podtytuł)</label><input type="text" name="opis">
+    <label>Poziom</label>
+    <select name="tier"><option>ESENCJA</option><option>MID</option><option>FULL</option><option value="">—</option></select>
+    <label>Cena (np. „od 199 zł / doba")</label><input type="text" name="cena">
+    <label>Pozycje pakietu (każda w osobnej linii)</label><textarea name="pozycje"></textarea>
+    <div class="rzad" style="margin-top:12px"><label><input type="checkbox" name="dostepny" checked> Dostępny na stronie (pokaż z kalendarzem)</label></div>
+    <p><button class="btn" type="submit">Dodaj pakiet</button></p>
+  </form>
+</div>
+{% endblock %}

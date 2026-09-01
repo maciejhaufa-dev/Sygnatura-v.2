@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wynajem — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brunatny:#6B4530; --butelkowa:#1F3A32; --zloty:#C4A582;
+  --krem:#FBF7F0; --krem2:#F6EFE1; --ink:#33261C;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
+a{color:var(--butelkowa)}
+img{max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+/* menu */
+.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
+.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
+.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
+.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
+/* hero */
+.hero{background:var(--butelkowa);color:var(--krem);padding:56px 0 44px;text-align:center}
+.hero h1{font-size:clamp(30px,5vw,44px);margin:0 0 10px;color:var(--zloty)}
+.hero p{max-width:640px;margin:0 auto;color:rgba(251,247,240,.85);font-size:18px}
+.hero .cta{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;background:var(--zloty);color:var(--butelkowa);border:1px solid var(--zloty);padding:11px 26px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:.02em}
+.btn:hover{background:var(--krem);border-color:var(--krem)}
+.btn-line{background:transparent;color:var(--zloty);border-color:var(--zloty)}
+.btn-line:hover{background:rgba(196,165,130,.12);border-color:var(--zloty)}
+/* sekcje */
+.sec{padding:44px 0 20px;scroll-margin-top:80px}
+.sec h2{font-size:clamp(24px,3.5vw,34px);color:var(--brunatny);margin:0 0 8px}
+.sec .sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 24px;font-size:17px}
+.center{text-align:center}
+.center .sub{margin-left:auto;margin-right:auto}
+/* kroki */
+.kroki{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-top:20px}
+.krok{background:#fff;border:1px solid rgba(107,69,48,.3);padding:18px 16px}
+.krok .num{display:inline-grid;place-items:center;width:32px;height:32px;background:var(--butelkowa);color:var(--zloty);font-weight:700;margin-bottom:10px}
+.krok b{display:block;margin-bottom:6px;color:var(--brunatny)}
+.krok p{margin:0;font-size:15px;color:rgba(51,38,28,.8)}
+/* grupy pakietow */
+.pak-grupa{margin-top:40px}
+.pak-grupa-h{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid rgba(107,69,48,.35);padding-bottom:10px;flex-wrap:wrap}
+.pak-grupa-h h3{font-size:26px;color:var(--butelkowa);margin:0}
+.pak-grupa-h p{margin:0;font-size:15px;color:rgba(51,38,28,.65)}
+.pak{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-top:18px;align-items:start}
+.pak-card{position:relative;background:#fff;border:2px solid rgba(107,69,48,.5);padding:24px 20px 20px;display:flex;flex-direction:column;gap:10px}
+.pak-card.top{border-color:var(--brunatny);box-shadow:0 22px 44px rgba(38,29,20,.16)}
+.pak-tag{display:inline-block;align-self:flex-start;background:var(--krem2);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px}
+.pak-name{font-size:22px;font-weight:700;color:var(--butelkowa)}
+.pak-sub{font-size:14px;color:rgba(51,38,28,.7);margin-top:-6px}
+.pak-price{color:var(--brunatny);font-size:26px;font-weight:700}
+.pak-price small{display:block;font-size:11.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6)}
+.pak ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:15px;color:rgba(51,38,28,.9)}
+.pak li::before{content:"✦ ";color:var(--zloty)}
+.pak .btn{margin-top:auto}
+/* kalendarz */
+.cal{background:var(--krem2);border:1px solid rgba(107,69,48,.35);padding:10px;margin-top:6px}
+.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:6px 10px}
+.calhead b{font-size:15px;text-transform:capitalize}
+.calnav{display:flex;gap:2px}
+.calnav a{color:var(--zloty);text-decoration:none;font-size:19px;padding:0 8px}
+.calnav a.disabled{opacity:.3;pointer-events:none}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px}
+.calgrid i{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase;padding:2px 0}
+.cal-d{display:block;text-align:center;padding:5px 0;font-size:13px;text-decoration:none;background:#fff;border:1px solid rgba(107,69,48,.25);color:var(--ink)}
+a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:700}
+.cal-d.pusty{background:transparent;border-color:transparent}
+.cal-d.przeszly{background:transparent;border-color:transparent;color:rgba(51,38,28,.28)}
+.cal-d.st-zapytanie{background:#FFF8E1;outline:2px solid var(--zloty);color:#7a5a10}
+.cal-d.st-platnosc{background:#E8C97A;color:var(--butelkowa);font-weight:700}
+.cal-d.st-zarezerwowany{background:var(--brunatny);color:var(--krem);text-decoration:line-through}
+.callegend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:rgba(51,38,28,.75);margin-top:8px}
+.callegend i{display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(107,69,48,.3);background:#fff}
+.callegend i.st-zapytanie{background:#FFF8E1;outline:1px solid var(--zloty)}
+.callegend i.st-platnosc{background:#E8C97A}
+.callegend i.st-zarezerwowany{background:var(--brunatny)}
+/* katalog */
+.kat{margin-top:16px}
+.kat h4{font-size:19px;color:var(--brunatny);margin:22px 0 10px;border-left:4px solid var(--zloty);padding-left:10px}
+.kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.kat-card{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px}
+.kat-card b{display:block;color:var(--butelkowa);font-size:17px}
+.kat-card p{margin:4px 0;font-size:14px;color:rgba(51,38,28,.75)}
+.kat-card .cena{color:var(--brunatny);font-weight:700;font-size:15px}
+/* stopka */
+.stopka{background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px}
+.stopka .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.stopka a{color:var(--zloty)}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap nav">
+    <a class="brand" href="/">SygNATURA</a>
+    <a href="/">Start</a>
+    <a href="/warsztat.html">Rzemiosło</a>
+    <a href="/galeria.html">Galeria</a>
+    <a href="/sklep.html">Sklep</a>
+    <a class="akt" href="/wynajem/">Wynajem</a>
+    <a href="/kontakt.html">Kontakt</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Wynajem dekoracji na Twoje wydarzenie</h1>
+    <p>Wybierz pakiet, sprawdź wolny termin w kalendarzu i wyślij zapytanie — odpowiadamy w ciągu jednego dnia roboczego.</p>
+    <div class="cta">
+      <a class="btn" href="#pakiety">Wybierz pakiet</a>
+      <a class="btn btn-line" href="#jak">Jak to działa</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="jak">
+  <div class="wrap">
+    <h2 class="center">Jak to działa</h2>
+    <div class="kroki">
+      <div class="krok"><span class="num">1</span><b>Wybierz pakiet</b><p>Komunijny, weselny, firmowy lub jubileuszowy — w trzech poziomach.</p></div>
+      <div class="krok"><span class="num">2</span><b>Sprawdź termin</b><p>Każdy pakiet ma własny kalendarz. Termin z pytaniem widnieje jako „wysłano zapytanie".</p></div>
+      <div class="krok"><span class="num">3</span><b>Wyślij zapytanie</b><p>Formularz z tematem „Rezerwacja terminu" — automatycznie dostajesz sygnaturę sprawy.</p></div>
+      <div class="krok"><span class="num">4</span><b>Wpłać kaucję</b><p>Zapłacone = zarezerwowane. Kaucja w 7 dni, potem termin blokujemy na sztywno.</p></div>
+      <div class="krok"><span class="num">5</span><b>Baw się!</b><p>Dowozimy, montujemy i odbieramy dekoracje. Ty zajmujesz się gośćmi.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="pakiety">
+  <div class="wrap">
+    <h2 class="center">Pakiety — wybierz okazję</h2>
+    <p class="sub center">Pakiety są zbudowane pod wydarzenie, nie pod styl — na start wszystkie w jednej, spójnej stylistyce. Każdy ma własny kalendarz z terminami.</p>
+
+    <div class="callegend" style="justify-content:center;margin-bottom:14px">
+      <span><i></i> wolny</span>
+      <span><i class="st-zapytanie"></i> wysłano zapytanie — nadal można pytać</span>
+      <span><i class="st-platnosc"></i> płatność w toku</span>
+      <span><i class="st-zarezerwowany"></i> zarezerwowany</span>
+    </div>
+
+    {% for g in grupy %}
+    <div class="pak-grupa" id="gr-{{ g.ev }}">
+      <div class="pak-grupa-h">
+        <h3>{{ g.nazwa }}</h3>
+        <p>{{ g.opis }}</p>
+      </div>
+      <div class="pak">
+        {% for p in g.pakiety %}
+        <div class="pak-card {% if p.tier=='MID' %}top{% endif %}" id="pakiet-{{ p.id }}">
+          <span class="pak-tag">{{ p.tier or 'pakiet' }}</span>
+          <div class="pak-name">{{ p.nazwa }}</div>
+          <div class="pak-sub">{{ p.opis or '' }}</div>
+          <div class="pak-price"><small>wypożyczenie / doba</small>{{ p.cena }}</div>
+          <ul>{% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}</ul>
+          <div class="cal">
+            <div class="calhead">
+              <b>{{ mies_nazwa }} {{ rok }}</b>
+              <span class="calnav">
+                <a href="{{ url_for('wynajem', pakiet=p.id, rok=poprz[0], mies=poprz[1]) }}#pakiet-{{ p.id }}" {% if poprz[0]==rok and poprz[1]==mies %}class="disabled"{% endif %}>&#8249;</a>
+                <a href="{{ url_for('wynajem', pakiet=p.id, rok=nast[0], mies=nast[1]) }}#pakiet-{{ p.id }}">&#8250;</a>
+              </span>
+            </div>
+            <div class="calgrid">
+              {% for d in ['Pn','Wt','Śr','Cz','Pt','So','Nd'] %}<i>{{ d }}</i>{% endfor %}
+              {% for dzien in kalendarze[p.id] %}
+                {% if not dzien.nr %}
+                  <span class="cal-d pusty"></span>
+                {% elif dzien.zajety %}
+                  <span class="cal-d {{ dzien.klasa }}" title="{{ dzien.tytul }}">{{ dzien.nr }}</span>
+                {% else %}
+                  <a class="cal-d {{ dzien.klasa }}" href="{{ url_for('rezerwuj', pakiet_id=p.id, data=dzien.data) }}" title="{{ dzien.tytul or 'Wolny termin' }}">{{ dzien.nr }}</a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <a class="btn" href="{{ url_for('rezerwuj', pakiet_id=p.id) }}">Zarezerwuj termin</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <p style="margin-top:22px;font-size:14px;color:rgba(51,38,28,.65)">
+      Kaucja zwrotna 300 zł przy każdym pakiecie · wypożyczenie od 1 doby · „wysłano zapytanie" nie blokuje terminu —
+      decyduje kolejność wpłat (kto pierwszy, ten lepszy; priorytet mają stali partnerzy).
+    </p>
+  </div>
+</section>
+
+<section class="sec" id="katalog">
+  <div class="wrap">
+    <h2 class="center">Katalog</h2>
+    <p class="sub center">Elementy wypożyczasz osobno — napisz do nas, a skomponujemy zestaw pod Twoje potrzeby.</p>
+    <div class="kat">
+      {% for k in kategorie %}
+      {% if produkty_wg.get(k.id) %}
+      <h4>{{ k.nazwa }}</h4>
+      <div class="kat-grid">
+        {% for pr in produkty_wg[k.id] %}
+        <div class="kat-card">
+          <b>{{ pr.nazwa }}</b>
+          <p>{{ pr.opis or '' }}</p>
+          <span class="cena">od {{ '%.0f'|format(pr.cena_doba) }} zł / doba</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt.html">Napisz do nas →</a>
+  </div>
+</footer>
+</body>
+</html>
