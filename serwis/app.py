@@ -185,8 +185,10 @@ def assets(nazwa):
 
 @app.route('/static/<path:nazwa>')
 def static_pliki(nazwa):
-    # wspólna szata graficzna serwisu (CSS/JS) — edytowalna bez Pythona
-    return send_from_directory(os.path.join(ROOT, 'static'), nazwa)
+    # wspólna szata graficzna serwisu (CSS/JS) — edytowalna bez Pythona.
+    # max_age=0 -> przeglądarka ZAWSZE pobiera świeży plik (koniec z rozjechanym
+    # wyglądem przez stary CSS w pamięci telefonu).
+    return send_from_directory(os.path.join(ROOT, 'static'), nazwa, max_age=0)
 
 
 # ---------------------------------------------------------------- PLAN MINIMUM: portfolio + kontakt

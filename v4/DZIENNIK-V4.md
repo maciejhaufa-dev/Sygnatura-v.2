@@ -482,3 +482,11 @@ klik „Start"/logo → 404, filtry realizacji martwe).
 - [ ] SMTP: darmowe PA blokuje połączenia SMTP poza Gmailem (błąd połączenia mimo dobrych danych OVH);
   opcje: Gmail (test), plan Hacker, VPS OVH (produkcja). Maile sprawdza się w panelu (Maile → Stan),
   nie przez GitHub Pages (statyczny hosting nie wysyła ani nie sprawdza poczty).
+
+## 32. STATUS (07.09.2026 — wymuszenie świeżego CSS + instrukcja czyszczenia cache)
+
+- [x] /static/* serwowane z Cache-Control: no-cache (max_age=0) — telefon nie trzyma starego CSS;
+  linki w 11 szablonach: style.css?v=3, app.js?v=3.
+- [x] Test: nagłówek no-cache, v3 na 4 sprawdzonych podstronach, 200.
+- [ ] User: git pull + Reload; przy dalszym rozjechaniu — wyczyścić cache telefonu (incognito).
+- [ ] Maile: GitHub Pages NIE wysyła/sprawdza poczty — tylko panel (Maile → Stan) + webmail.ovh.pl.
