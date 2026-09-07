@@ -471,3 +471,14 @@ klik „Start"/logo → 404, filtry realizacji martwe).
 - Po dodaniu kolumny do INSERT liczyć placeholdery na nowo (znów 20/19 — ten sam błąd co w 13c).
 - Sandbox potrafi zresetować się W TRAKCIE sesji (proces + data/) — po każdym takim zdarzeniu:
   pip install, restart serwisu, baza się odtwarza (demo), testy od nowa.
+
+## 31. STATUS (07.09.2026 — naprawa stylów na podstronach bez style.css)
+
+- [x] **Błąd:** realizacje/kontakt/realizacja_szczegoly/dziekuje/404 NIE miały podpiętego /static/style.css
+  (styl menu .site-head/.nav był usunięty z ich inline CSS przy ujednolicaniu) → menu rozjeżdżone.
+- [x] Fix: link do style.css w 5 szablonach; dziekuje.html dostało też wspólne menu (_nav + flex).
+- [x] Test: css:1 + nav:1 na 8 podstronach (200).
+- [ ] User: git pull + Reload na PythonAnywhere i sprawdzenie menu.
+- [ ] SMTP: darmowe PA blokuje połączenia SMTP poza Gmailem (błąd połączenia mimo dobrych danych OVH);
+  opcje: Gmail (test), plan Hacker, VPS OVH (produkcja). Maile sprawdza się w panelu (Maile → Stan),
+  nie przez GitHub Pages (statyczny hosting nie wysyła ani nie sprawdza poczty).
