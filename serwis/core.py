@@ -91,7 +91,14 @@ def wyslij_do_studia(db, temat, tresc):
 # ------------------------------------------------ Google Sheets (webhook Apps Script)
 def sheets_payload(rezerwacja, typ='rezerwacja'):
     """Buduje JSON wysyłany do arkusza (klucz 'typ' mówi skryptowi,
-    czy to nowa rezerwacja, zmiana statusu, czy test)."""
+    czy to nowa rezerwacja, zmiana statusu, rozliczenie, czy test)."""
+    import json as _json
+    kw = rezerwacja.get('kwoty')
+    if isinstance(kw, str) and kw:
+        try:
+            kw = _json.loads(kw)
+        except Exception:
+            kw = None
     dane = {
         'typ': typ,
         'sygnatura': rezerwacja.get('sygnatura') or '',
@@ -109,6 +116,11 @@ def sheets_payload(rezerwacja, typ='rezerwacja'):
         'dni': rezerwacja.get('dni') or 0,
         'pozycje': rezerwacja.get('pozycje') or '[]',
         'personalizacje': rezerwacja.get('personalizacje') or '[]',
+        'rozliczenie': rezerwacja.get('rozliczenie') or 'wspolne',
+        'kwoty_lacznie': (kw or {}).get('razem') if kw else '',
+        'kwoty_najem': (kw or {}).get('najem') if kw else '',
+        'kwoty_pers': (kw or {}).get('pers_netto') if kw else '',
+        'kwoty_kaucja': 300 if kw else '',
     }
     return json.dumps(dane, ensure_ascii=False).encode('utf-8')
 
@@ -122,6 +134,8 @@ def push_do_sheets(db, rezerwacja, typ='rezerwacja'):
     url = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='sheets_url'").fetchone()
     if not url or not url['wartosc'].strip():
         return False, 'brak URL webhooka (Ustawienia → URL arkusza)'
+    if not isinstance(rezerwacja, dict):
+        rezerwacja = dict(rezerwacja)   # sqlite3.Row nie ma .get()
     payload = sheets_payload(rezerwacja, typ)
     try:
         req = urllib.request.Request(url['wartosc'].strip(), data=payload,
@@ -214,6 +228,79 @@ def kwoty_txt(rez):
     if kw.get('pers_rabat'):
         linie.insert(3, 'w tym rabat na personalizację −5%%: −%d zł' % kw['pers_rabat'])
     return '\n'.join(linie) + '\n'
+
+
+def kwota_lacznie(rez):
+    """Sam RAZEM z podsumowania kwot (do arkusza / rozliczeń)."""
+    kw = rez.get('kwoty') if isinstance(rez, dict) else None
+    if not kw:
+        return ''
+    return '%.0f zł' % kw['razem']
+
+
+# ------------------------------------------------ autorespondery (szablony z bazy)
+def podstawienia(rez):
+    """Zmienne dostępne w szablonach autoresponderów: %(sygnatura)s itd."""
+    kw = rez.get('kwoty') if isinstance(rez, dict) else None
+    telefon = (rez.get('telefon') or '').strip()
+    return {
+        'sygnatura': rez.get('sygnatura') or '',
+        'imie': (rez.get('imie') or '').strip() or 'Państwo',
+        'email': rez.get('email') or '',
+        'telefon': ('Telefon: %s\n' % telefon) if telefon else '',
+        'temat': rez.get('temat') or '',
+        'tresc': (rez.get('tresc') or '').strip() or '(brak treści)',
+        'pakiet': rez.get('pakiet_nazwa') or '',
+        'zakres': zakres_txt(rez),
+        'dni': str(rez.get('dni') or 1),
+        'data': rez.get('data') or '',
+        'status': (rez.get('status') or '').strip(),
+        'powod': (' — ' + (rez.get('powod') or '').strip()) if (rez.get('powod') or '').strip() else '',
+        'pozycje': pozycje_txt(rez),
+        'personalizacje': personalizacje_txt(rez),
+        'kwoty': kwoty_txt(rez),
+        'kwoty_lacznie': kwota_lacznie(rez),
+        'kontakt_email': 'kontakt@studiosygnatura.pl',
+        'rok': str(datetime.date.today().year),
+        'kwartal': 'Q%d' % ((datetime.date.today().month - 1) // 3 + 1),
+    }
+
+
+DOMYSLNE_SZABLONY = {}  # (nieużywane — szablony lecą prosto z bazy lub db.SZABLONY_MAILI)
+
+
+def render_szablon(db, klucz, rez):
+    """Zwraca (temat, tresc) gotowego autorespondera wg szablonu z bazy
+    (Ustawienia → Autorespondery). Rezerwacje mają w rez pole 'kwoty'."""
+    z = podstawienia(rez)
+    kontakt_email = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='kontakt_email'").fetchone()
+    z['kontakt_email'] = kontakt_email['wartosc'] if kontakt_email else 'kontakt@studiosygnatura.pl'
+    row = db.execute('SELECT temat, tresc, aktywny FROM szablony_maili WHERE klucz=?', (klucz,)).fetchone()
+    if row:
+        if not row['aktywny']:
+            return None, None
+        return row['temat'] % z, row['tresc'] % z
+    # brak szablonu w bazie (starsza baza bez seeda) — domyślny z kodu
+    import db as _db
+    for k, nazwa, temat, tresc in _db.SZABLONY_MAILI:
+        if k == klucz:
+            return temat % z, tresc % z
+    return None, None
+
+
+def wyslij_szablon(db, klucz, rez, do_kogo):
+    """Wysyła autoresponder wg szablonu z bazy do klienta. Zwraca (ok, blad).
+    Szablon wyłączony (aktywny=0) → nic nie wysyła (tylko informacja)."""
+    temat, tresc = render_szablon(db, klucz, rez)
+    if temat is None:
+        return False, 'autoresponder wyłączony lub brak szablonu'
+    host = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='smtp_host'").fetchone()
+    if not host or not host['wartosc'].strip():
+        # tryb lokalny: kopia ląduje w outboxie (panel: Maile), prawdziwa wysyłka wyłączona
+        wyslij_do_klienta(db, do_kogo, temat, tresc)
+        return False, 'SMTP nie skonfigurowany — kopia maila jest w panelu (Maile)'
+    return wyslij_do_klienta(db, do_kogo, temat, tresc)
+
 
 
 def mail_klient_zapytanie(rez, dokumenty):

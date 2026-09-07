@@ -45,6 +45,20 @@
 </div>
 
 <div class="forma">
+  <h3>Rozliczenie przychodu (arkusz + podsumowanie kwartałów)</h3>
+  <form method="post" action="{{ url_for('rezerwacja_rozliczenie', rid=r['id']) }}">
+    <label>Na kogo wpływa przychód z tej rezerwacji</label>
+    <select name="rozliczenie">
+      <option value="wspolne" {% if r['rozliczenie']=='wspolne' %}selected{% endif %}>Wspólne</option>
+      <option value="maz" {% if r['rozliczenie']=='maz' %}selected{% endif %}>Mąż</option>
+      <option value="zona" {% if r['rozliczenie']=='zona' %}selected{% endif %}>Żona</option>
+    </select>
+    <p class="mala" style="margin-top:8px">Ustawia kolumnę w arkuszu Google i dzieli sumy w podsumowaniu kwartałów (do rozliczeń podatkowych).</p>
+    <p><button class="btn" type="submit">Zapisz rozliczenie</button></p>
+  </form>
+</div>
+
+<div class="forma">
   <h3>Zmień status</h3>
   <form method="post" action="{{ url_for('rezerwacja_status', rid=r['id']) }}">
     <label>Nowy status</label>

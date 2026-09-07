@@ -75,8 +75,10 @@ CREATE TABLE IF NOT EXISTS rezerwacje (
   tresc        TEXT DEFAULT '',     -- indywidualna wiadomość klienta
   pozycje      TEXT DEFAULT '[]',   -- JSON: skład zestawu własnego [{nazwa, cena}]
   personalizacje TEXT DEFAULT '[]', -- JSON: produkty spersonalizowane [{nazwa, cena, opis}] — płatne z góry, bezzwrotne
+  kwoty        TEXT DEFAULT '',     -- JSON: podsumowanie kwot z chwili zgłoszenia (do maili/arkusza/rozliczeń)
   status       TEXT DEFAULT 'zapytanie',
   -- statusy: zapytanie | platnosc_w_toku | zarezerwowany | odrzucono
+  rozliczenie  TEXT DEFAULT 'wspolne', -- na kogo wpływa przychód: maz / zona / wspolne (arkusz + podsumowanie kwartałów)
   priorytet    INTEGER DEFAULT 0,   -- 1 = stały partner (np. dekoratorka) — pokazujemy w adminie
   utworzono    TEXT,
   zmieniono    TEXT,
@@ -130,6 +132,18 @@ CREATE TABLE IF NOT EXISTS sheets_log (
   sygnatura TEXT DEFAULT '',
   status   TEXT,                    -- ok / blad / brak-url
   odpowiedz TEXT DEFAULT ''         -- komunikat / treść błędu
+);
+-- Szablony autoresponderów (treści edytowalne w panelu: Ustawienia -> Autorespondery)
+-- Zmienne: %(sygnatura)s %(imie)s %(email)s %(telefon)s %(temat)s %(tresc)s %(pakiet)s
+--          %(zakres)s %(dni)s %(data)s %(status)s %(powod)s %(pozycje)s %(personalizacje)s %(kwoty)s %(kwoty_lacznie)s
+--          %(kontakt_email)s %(rok)s %(kwartal)s
+CREATE TABLE IF NOT EXISTS szablony_maili (
+  klucz    TEXT PRIMARY KEY,        -- zapytanie / kaucja / potwierdzenie / odrzucono / rezerwacja-terminu / zamowienie / kontakt / test
+  nazwa    TEXT NOT NULL,
+  temat    TEXT NOT NULL,
+  tresc    TEXT NOT NULL,
+  aktywny  INTEGER DEFAULT 1,       -- 0 = wysyłka wyłączona (wtedy tylko kopia w Maile)
+  zmieniono TEXT
 );
 """
 
@@ -223,6 +237,87 @@ REALIZACJE = [
 ]
 
 
+# Szablony autoresponderów (domyślne — edytowalne w panelu: Ustawienia → Autorespondery).
+# Zmienne dostępne w treści: %(sygnatura)s %(imie)s %(email)s %(telefon)s %(temat)s %(tresc)s
+# %(pakiet)s %(zakres)s %(dni)s %(data)s %(status)s %(powod)s %(pozycje)s %(personalizacje)s
+# %(kwoty)s (rozpisane linie) %(kwoty_lacznie)s (sam RAZEM) %(kontakt_email)s %(rok)s %(kwartal)s
+SZABLONY_MAILI = [
+    ('zapytanie', 'Zapytanie o wynajem (autoresponder)',
+     'Twoje zapytanie %(sygnatura)s — Studio Sygnatura',
+     'Dzień dobry, %(imie)s,\n\n'
+     'dziękujemy za zapytanie o wynajem w Studio Sygnatura.\n\n'
+     'PODSUMOWANIE ZGŁOSZENIA\n'
+     'Sygnatura sprawy: %(sygnatura)s\n'
+     'Termin najmu: %(zakres)s\n'
+     'Pakiet: %(pakiet)s\n'
+     '%(telefon)s\n'
+     '%(pozycje)s\n'
+     '%(personalizacje)s\n'
+     '%(kwoty)s\n'
+     'JAK DZIAŁAMY\n'
+     '1. Twoje zapytanie jest widoczne w naszym kalendarzu jako „wysłano zapytanie" — termin nie jest zablokowany, dopóki nie wpłynie kaucja.\n'
+     '2. Odpowiadamy w ciągu 1 dnia roboczego (priorytet mają nasi stali partnerzy).\n'
+     '3. Rezerwacja staje się wiążąca po wpłacie KAUCJI za zestaw w terminie 7 dni. Po zaksięgowaniu wpłaty status zmienia się na „zarezerwowany" i termin blokujemy na sztywno.\n'
+     '4. Zapłacone = zarezerwowane.\n'
+     '5. Produkty spersonalizowane są wykonywane na zamówienie: płatne z góry i nie podlegają zwrotowi — po imprezie zostają u Ciebie.\n'
+     '6. Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+    ('kaucja', 'Kaucja w drodze',
+     'Kaucja w drodze — %(sygnatura)s',
+     'Dzień dobry, %(imie)s,\n\n'
+     'dziękujemy za wpłatę kaucji. Termin %(zakres)s (pakiet: %(pakiet)s) czeka teraz '
+     'na zaksięgowanie przelewu. Gdy wpłata dotrze, wyślemy potwierdzenie rezerwacji '
+     'i zablokujemy termin na sztywno.\n\n'
+     'Sprawa: %(sygnatura)s\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+    ('potwierdzenie', 'Termin potwierdzony (kaucja zaksięgowana)',
+     'Termin potwierdzony — %(sygnatura)s',
+     'Dzień dobry, %(imie)s,\n\n'
+     'mamy wpłatę kaucji — termin jest potwierdzony i zablokowany na sztywno. '
+     'Do zobaczenia na uroczystości!\n\n'
+     'Sprawa: %(sygnatura)s\nTermin najmu: %(zakres)s\nPakiet: %(pakiet)s\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+    ('odrzucono', 'Zapytanie odrzucone',
+     'Rezerwacja odrzucona — %(sygnatura)s',
+     'Dzień dobry, %(imie)s,\n\n'
+     'dziękujemy za zapytanie. Niestety nie możemy zrealizować tej rezerwacji%(powod)s.\n\n'
+     'Sprawa: %(sygnatura)s\nTermin najmu: %(zakres)s\nPakiet: %(pakiet)s\n\n'
+     'Zapraszamy przy innej okazji.\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+    ('rezerwacja-terminu', 'Rezerwacja terminu (formularz z tematem „Rezerwacja terminu")',
+     'Rezerwacja terminu przyjęta — %(sygnatura)s',
+     'Dzień dobry, %(imie)s,\n\n'
+     'dziękujemy za zgłoszenie rezerwacji terminu. Wstępnie wpisujemy Państwa termin '
+     'do naszego kalendarza jako „wysłano zapytanie".\n\n'
+     'Termin najmu: %(zakres)s\nPakiet: %(pakiet)s\nSygnatura sprawy: %(sygnatura)s\n'
+     '%(kwoty)s\n'
+     'Rezerwacja staje się wiążąca po wpłacie kaucji w terminie 7 dni. '
+     'Zapłacone = zarezerwowane.\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+    ('zamowienie', 'Potwierdzenie zamówienia (produkty personalizowane)',
+     'Potwierdzamy zamówienie — %(sygnatura)s',
+     'Dzień dobry, %(imie)s,\n\n'
+     'potwierdzamy przyjęcie zamówienia na produkty personalizowane '
+     '(wykonywane na zamówienie, płatne z góry, bezzwrotne — po wykonaniu zostają u Ciebie).\n\n'
+     '%(personalizacje)s\n'
+     '%(kwoty)s\n'
+     'Dziękujemy za zamówienie — zaczynamy pracę!\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+    ('kontakt', 'Autoresponder formularza kontaktowego',
+     'Studio Sygnatura — dziękujemy za wiadomość',
+     'Dzień dobry, %(imie)s,\n\n'
+     'dziękujemy za wiadomość. Trafiła do nas i odpowiemy najpóźniej '
+     'w ciągu 2 dni roboczych (zwykle szybciej).\n\n'
+     'W pilnych sprawach prosimy o dopisek „pilne" w temacie.\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+    ('test', 'Mail testowy SMTP',
+     'Test połączenia SMTP — Studio Sygnatura',
+     'Dzień dobry, %(imie)s,\n\n'
+     'to testowy e-mail wysłany z panelu administracyjnego Studio Sygnatura. '
+     'Jeśli go widzisz — połączenie SMTP działa poprawnie.\n\n'
+     'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
+]
+
 def domyslne_ustawienia():
     """Wartości startowe zakładki Ustawienia w panelu admina."""
     from werkzeug.security import generate_password_hash
@@ -275,7 +370,8 @@ def inicjuj(sciezka=None):
     # migracja starszych baz: dodaj kolumny najmu od-do (jeśli ich nie ma)
     kolumny = {r[1] for r in db.execute('PRAGMA table_info(rezerwacje)')}
     for kol, typ in [('data_od', 'TEXT'), ('data_do', 'TEXT'), ('dni', 'INTEGER DEFAULT 1'),
-                     ('pozycje', "TEXT DEFAULT '[]'"), ('personalizacje', "TEXT DEFAULT '[]'")]:
+                     ('pozycje', "TEXT DEFAULT '[]'"), ('personalizacje', "TEXT DEFAULT '[]'"),
+                     ('rozliczenie', "TEXT DEFAULT 'wspolne'"), ('kwoty', "TEXT DEFAULT ''")]:
         if kol not in kolumny:
             db.execute('ALTER TABLE rezerwacje ADD COLUMN %s %s' % (kol, typ))
     # stare rekordy miały tylko datę imprezy — domyślnie najem 3-dniowy (montaż dzień przed, demontaż dzień po)
@@ -348,6 +444,13 @@ def inicjuj(sciezka=None):
         for i, (nazwa, opis, cena) in enumerate(PERSONALIZACJE):
             db.execute('INSERT INTO personalizacje (nazwa, opis, cena, kolejnosc) VALUES (?,?,?,?)',
                        (nazwa, opis, cena, i))
+        db.commit()
+
+    # szablony autoresponderów — seed przy pustej tabeli (potem edycja w panelu)
+    if db.execute('SELECT COUNT(*) FROM szablony_maili').fetchone()[0] == 0:
+        for klucz, nazwa, temat, tresc in SZABLONY_MAILI:
+            db.execute('INSERT INTO szablony_maili (klucz, nazwa, temat, tresc, aktywny, zmieniono) '
+                       'VALUES (?,?,?,?,?,?)', (klucz, nazwa, temat, tresc, 1, datetime.date.today().isoformat()))
         db.commit()
 
     # portfolio (realizacje) — seed przy pustej tabeli; zdjęcia z ../uploads do data/uploads

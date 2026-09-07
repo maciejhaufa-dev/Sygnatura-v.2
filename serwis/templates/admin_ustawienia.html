@@ -12,12 +12,20 @@
     <input type="text" name="nadawca" value="{{ u.get('nadawca','') }}">
 
     <h3>SMTP — wysyłka e-maili (opcjonalne, do testów działa tryb lokalny)</h3>
-    <p class="mala">Dane od dostawcy poczty (np. dhosting, home.pl, Gmail z hasłem aplikacji).</p>
+    <p class="mala">Dane od dostawcy poczty (np. dhosting, home.pl, Gmail z hasłem aplikacji).
+    Treści autoresponderów: <a href="{{ url_for('admin_szablony') }}">Autorespondery</a>.</p>
     <label>Host SMTP</label><input type="text" name="smtp_host" value="{{ u.get('smtp_host','') }}" placeholder="smtp.twojadomena.pl">
     <label>Port</label><input type="text" name="smtp_port" value="{{ u.get('smtp_port','587') }}">
     <label>Login</label><input type="text" name="smtp_user" value="{{ u.get('smtp_user','') }}">
     <label>Hasło</label><input type="password" name="smtp_haslo" value="{{ u.get('smtp_haslo','') }}">
     <div class="rzad" style="margin-top:10px"><label><input type="checkbox" name="smtp_ssl" {% if u.get('smtp_ssl')=='1' %}checked{% endif %}> połączenie SSL (port 465)</label></div>
+    <div class="forma" style="border:1px dashed rgba(107,69,48,.4);padding:12px;margin:14px 0 0">
+      <h4 style="margin:0 0 8px">Test wysyłki (po zapisaniu ustawień)</h4>
+      <div class="rzad">
+        <input type="email" name="test_email" placeholder="twoj@email.pl">
+        <button class="btn" type="submit" formaction="{{ url_for('test_smtp') }}">Wyślij e-mail testowy</button>
+      </div>
+    </div>
 
     <h3>Google Sheets (webhook)</h3>
     <p class="mala">Każde zgłoszenie i każda zmiana statusu leci na ten adres jako JSON (skrypt pod spodem dopisuje wiersz w arkuszu).

@@ -443,3 +443,31 @@ klik „Start"/logo → 404, filtry realizacji martwe).
 - Podmiany w `wczytaj_v4` muszą obejmować też `index.html` → `/` (menu v4 linkuje do index.html = 404).
 - Menu rozjechało się, bo nowe szablony (realizacje/kontakt) dostały inne menu niż reszta — jedno
   źródło menu (partial + automatyczne .akt po request.path), nie kopie.
+
+## 30. STATUS (07.09.2026 — SMTP, autorespondery w panelu, rozliczenia w arkuszu)
+
+- [x] **Autorespondery edytowalne w panelu:** tabela `szablony_maili` (8 szablonów: zapytanie,
+  rezerwacja-terminu, zamowienie, kaucja, potwierdzenie, odrzucono, kontakt, test), zakładka
+  **Autorespondery** w adminie (temat+treść+aktywny per szablon), zmienne %(sygnatura)s itd.
+  (19 zmiennych, w tym %(kwoty)s i %(kwoty_lacznie)s); silnik `core.render_szablon/wyslij_szablon`.
+- [x] **Wybór szablonu po temacie formularza:** „Rezerwacja terminu" → rezerwacja-terminu;
+  zgłoszenie z personalizacjami → zamowienie (potwierdzenie jak z Allegro); reszta → zapytanie.
+  Zmiany statusów: płatność w toku → kaucja, zarezerwowany → potwierdzenie, odrzucono → odrzucono
+  (z powodem). Formularz kontaktowy → szablon kontakt.
+- [x] **Test SMTP w panelu:** Ustawienia → „Wyślij e-mail testowy" (adres + przycisk);
+  bez SMTP komunikat „SMTP nie skonfigurowany — kopia maila jest w panelu (Maile)".
+- [x] **Rozliczenia:** kolumna `rezerwacje.rozliczenie` (maz/zona/wspolne, edycja w szczegółach
+  rezerwacji + push do arkusza typ=rozliczenie), kolumna `rezerwacje.kwoty` (JSON kwot z chwili
+  zgłoszenia — do maili, arkusza i kwartałów); payload sheets: rozliczenie + kwoty_lacznie/
+  najem/pers/kaucja; webhook.gs v2: kolumny Rozliczenie+Kwoty i AUTOMATYCZNA zakładka
+  „Podsumowanie kwartałów" (rok, kwartał, Mąż/Żona/Wspólne/Razem — wg daty imprezy).
+- [x] Testy: szablony GET/POST 200/303, test SMTP → komunikat, rozliczenie 303 + zapis w bazie,
+  e2e rezerwacja (temat „Rezerwacja terminu") → autoresponder z szablonu (temat i treść OK),
+  kwoty w bazie, payload sheets z rozliczeniem i kwotami. Baza wyczyszczona.
+- [x] Commit i push.
+- [ ] **Czeka:** user konfiguruje SMTP (instrukcja w rozmowie) i podpina arkusz (sheets/README.md).
+
+### LEKCJE
+- Po dodaniu kolumny do INSERT liczyć placeholdery na nowo (znów 20/19 — ten sam błąd co w 13c).
+- Sandbox potrafi zresetować się W TRAKCIE sesji (proces + data/) — po każdym takim zdarzeniu:
+  pip install, restart serwisu, baza się odtwarza (demo), testy od nowa.

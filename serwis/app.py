@@ -245,8 +245,7 @@ def kontakt_form():
                 wiad = {'imie': dane['imie'], 'email': dane['email'], 'telefon': dane['telefon'],
                         'tresc': dane['tresc'], 'zgoda': True, 'data': core.teraz()}
                 core.wyslij_do_studia(db, 'Nowa wiadomość z formularza: %s' % dane['imie'], core.mail_kontakt_studio(wiad))
-                core.wyslij_mail(db, dane['email'], 'Studio Sygnatura — dziękujemy za wiadomość',
-                                 core.mail_kontakt_potwierdzenie(wiad), 'kontakt-klient')
+                core.wyslij_szablon(db, 'kontakt', wiad, dane['email'])
                 ok = True
         else:
             ok = True
@@ -576,10 +575,11 @@ def api_rezerwuj():
     pakiet_nazwa = p['nazwa'] if p else 'Zestaw własny'
     db.execute(
         'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, personalizacje, '
-        'status, utworzono, zmieniono, historia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        'kwoty, status, utworzono, zmieniono, historia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
         (sygnatura, data, data_od, data_do, dni, p['id'] if p else None, pakiet_nazwa, temat, imie, email, telefon, tresc,
          json.dumps(pozycje, ensure_ascii=False),
          json.dumps(pers_list, ensure_ascii=False),
+         json.dumps(kwoty, ensure_ascii=False),
          'zapytanie', teraz, teraz, json.dumps([{'kiedy': teraz, 'status': 'zapytanie', 'uwaga': 'zgłoszenie przez formularz'}], ensure_ascii=False)))
     db.commit()
     rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (sygnatura,)).fetchone()
@@ -598,11 +598,18 @@ def api_rezerwuj():
     # 1) e-mail do Studia (powiadomienie)
     core.wyslij_do_studia(db, 'Nowe zapytanie — %s — %s–%s' % (rez['pakiet_nazwa'], data_od, data_do),
                           core.mail_studio_zapytanie(rez_z_kwotami))
-    # 2) autoresponder do klienta (podsumowanie + procedura + dokumenty)
-    dok = json.loads(db.execute("SELECT wartosc FROM ustawienia WHERE klucz='dokumenty'").fetchone()['wartosc'] or '[]')
-    core.wyslij_do_klienta(db, email, 'Twoje zapytanie %s — Studio Sygnatura' % sygnatura,
-                           core.mail_klient_zapytanie(rez_z_kwotami, dok))
-    # 3) zapytanie do API Google Sheets (skonfigurujemy później — bez URL nic nie wysyła)
+    # 2) autoresponder do klienta — SZABLON z bazy (Ustawienia → Autorespondery);
+    #    temat formularza decyduje, który: „Rezerwacja terminu" → rezerwacja-terminu,
+    #    zapytanie z personalizacjami → zamowienie, pozostałe → zapytanie
+    temat_zgloszenia = (rez['temat'] or '').lower()
+    if 'rezerwac' in temat_zgloszenia and 'termin' in temat_zgloszenia:
+        klucz_szablonu = 'rezerwacja-terminu'
+    elif json.loads(rez['personalizacje'] or '[]'):
+        klucz_szablonu = 'zamowienie'
+    else:
+        klucz_szablonu = 'zapytanie'
+    core.wyslij_szablon(db, klucz_szablonu, rez_z_kwotami, email)
+    # 3) zapytanie do API Google Sheets (bez URL nic nie wysyła — log w Ustawieniach)
     core.push_do_sheets(db, rez)
 
     return redirect303(url_for('dziekuje', sygnatura=sygnatura))
@@ -900,14 +907,13 @@ def rezerwacja_status(rid):
     db.commit()
     r = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rid,)).fetchone()
 
-    # autorespondery przy zmianie statusu
-    dok = json.loads(db.execute("SELECT wartosc FROM ustawienia WHERE klucz='dokumenty'").fetchone()['wartosc'] or '[]')
-    if nowy == 'platnosc_w_toku':
-        core.wyslij_do_klienta(db, r['email'], 'Kaucja w drodze — %s' % r['sygnatura'], core.mail_klient_platnosc(r))
-    elif nowy == 'zarezerwowany':
-        core.wyslij_do_klienta(db, r['email'], 'Termin potwierdzony — %s' % r['sygnatura'], core.mail_klient_rezerwacja(r))
-    elif nowy == 'odrzucono':
-        core.wyslij_do_klienta(db, r['email'], 'Rezerwacja odrzucona — %s' % r['sygnatura'], core.mail_klient_odrzucono(r, powod))
+    # autorespondery przy zmianie statusu (treści edytowalne: Ustawienia → Autorespondery)
+    rez_z_kwotami = dict(r)
+    rez_z_kwotami['kwoty'] = json.loads(r['kwoty']) if r['kwoty'] else None
+    rez_z_kwotami['powod'] = powod
+    mapa_szablonow = {'platnosc_w_toku': 'kaucja', 'zarezerwowany': 'potwierdzenie', 'odrzucono': 'odrzucono'}
+    if nowy in mapa_szablonow:
+        core.wyslij_szablon(db, mapa_szablonow[nowy], rez_z_kwotami, r['email'])
     # aktualizacja arkusza Google (status leci do API)
     core.push_do_sheets(db, r)
     return redirect_msg('admin_rezerwacja', 'Status zmieniony na: %s' % core.STATUSY_PL[nowy], rid=rid)
@@ -1071,6 +1077,62 @@ def test_sheets():
         return redirect_msg('admin_ustawienia', 'Webhook Google Sheets odpowiedział poprawnie (%s). Sprawdź arkusz.' % komunikat)
     else:
         return redirect_msg('admin_ustawienia', 'Webhook NIE odpowiada: %s — sprawdź URL arkusza i skrypt.' % komunikat)
+
+
+@app.route('/admin/ustawienia/test-smtp', methods=['POST'])
+@admin_required
+def test_smtp():
+    db = get_db()
+    cel = (request.form.get('test_email') or '').strip()
+    if not cel:
+        return redirect_msg('admin_ustawienia', 'Podaj adres, na który wysłać test.')
+    test = {'imie': 'Test SMTP', 'temat': 'Test połączenia', 'tresc': 'To jest test wysyłki.',
+            'status': 'test', 'kwoty': None, 'sygnatura': 'TEST', 'email': cel,
+            'pakiet_nazwa': '', 'data': '', 'data_od': '', 'data_do': '', 'dni': 0, 'telefon': ''}
+    ok, blad = core.wyslij_szablon(db, 'test', test, cel)
+    if ok:
+        return redirect_msg('admin_ustawienia', 'E-mail testowy wysłany na %s. Sprawdź skrzynkę (i spam).' % cel)
+    return redirect_msg('admin_ustawienia', 'Błąd wysyłki: %s' % blad)
+
+
+# ---------------------------------------------------------------- ADMIN: autorespondery
+@app.route('/admin/szablony')
+@admin_required
+def admin_szablony():
+    db = get_db()
+    rows = db.execute('SELECT * FROM szablony_maili ORDER BY klucz').fetchall()
+    zmienne = ['%(sygnatura)s', '%(imie)s', '%(email)s', '%(telefon)s', '%(temat)s', '%(tresc)s',
+               '%(pakiet)s', '%(zakres)s', '%(dni)s', '%(data)s', '%(status)s', '%(powod)s',
+               '%(pozycje)s', '%(personalizacje)s', '%(kwoty)s', '%(kwoty_lacznie)s',
+               '%(kontakt_email)s', '%(rok)s', '%(kwartal)s']
+    return render_template('admin_szablony.html', rows=rows, zmienne=zmienne)
+
+
+@app.route('/admin/szablony/<klucz>', methods=['POST'])
+@admin_required
+def szablon_zapisz(klucz):
+    db = get_db()
+    temat = (request.form.get('temat') or '').strip()
+    tresc = request.form.get('tresc') or ''
+    aktywny = 1 if request.form.get('aktywny') else 0
+    db.execute('UPDATE szablony_maili SET temat=?, tresc=?, aktywny=?, zmieniono=? WHERE klucz=?',
+               (temat, tresc, aktywny, core.teraz(), klucz))
+    db.commit()
+    return redirect_msg('admin_szablony', 'Szablon „%s" zapisany.' % klucz)
+
+
+# ---------------------------------------------------------------- ADMIN: rozliczenie (na kogo wpływa przychód)
+@app.route('/admin/rezerwacje/<int:rid>/rozliczenie', methods=['POST'])
+@admin_required
+def rezerwacja_rozliczenie(rid):
+    db = get_db()
+    wartosc = request.form.get('rozliczenie', 'wspolne')
+    if wartosc not in ('maz', 'zona', 'wspolne'):
+        wartosc = 'wspolne'
+    db.execute('UPDATE rezerwacje SET rozliczenie=?, zmieniono=? WHERE id=?', (wartosc, core.teraz(), rid))
+    db.commit()
+    core.push_do_sheets(db, db.execute('SELECT * FROM rezerwacje WHERE id=?', (rid,)).fetchone(), typ='rozliczenie')
+    return redirect_msg('admin_rezerwacja', 'Rozliczenie zapisane.', rid=rid)
 
 
 @app.route('/admin/ustawienia/upload-dokument', methods=['POST'])
