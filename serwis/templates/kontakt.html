@@ -22,11 +22,7 @@ body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-fo
   display:flex;flex-direction:column;min-height:100vh}
 img{display:block;max-width:100%}
 a{text-decoration:none;color:inherit}
-.site-head{background:var(--butelkowa)}
-.menu{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2px;padding:10px clamp(10px,3vw,40px)}
-.menu a{color:var(--zloty);font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;padding:9px 13px;transition:background .2s}
 .menu a:hover{background:rgba(196,165,130,.14)}
-.menu a.on{background:rgba(196,165,130,.2)}
 main{flex:1;max-width:1000px;width:100%;margin:0 auto;padding:clamp(26px,5vw,54px) clamp(16px,4vw,44px)}
 .tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
 h1{font-size:clamp(30px,5vw,44px);font-weight:600;margin:6px 0 10px;line-height:1.15}
@@ -67,15 +63,7 @@ h1{font-size:clamp(30px,5vw,44px);font-weight:600;margin:6px 0 10px;line-height:
 </style>
 </head>
 <body>
-<header class="site-head">
-  <nav class="menu" aria-label="Menu główne">
-    <a href="/">Strona główna</a>
-    <a href="/realizacje/">Realizacje</a>
-    <a href="/wynajem/">Wynajem</a>
-    <a href="/personalizacja/">Personalizacja</a>
-    <a href="/kontakt/" class="on">Kontakt</a>
-  </nav>
-</header>
+{% include '_nav.html' %}
 <main>
   <span class="tag">Jesteśmy do dyspozycji</span>
   <h1>Napisz do nas</h1>

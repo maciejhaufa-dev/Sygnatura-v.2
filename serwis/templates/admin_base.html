@@ -71,6 +71,7 @@ ul.zwykla{margin:8px 0;padding-left:20px}
   <form class="wylog" method="post" action="{{ url_for('admin_logout') }}"><button type="submit">Wyloguj</button></form>
 </header>
 <div class="adm-wrap">
+  {% if request.args.get('msg') %}<div class="flash">{{ request.args.get('msg') }}</div>{% endif %}
   {% with wiad = get_flashed_messages() %}
     {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
   {% endwith %}

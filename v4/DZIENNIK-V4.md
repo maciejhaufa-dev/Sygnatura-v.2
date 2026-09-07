@@ -425,10 +425,19 @@ v4/
 u usera, logowanie panelu działa bez cookies. User zgłosił błędy (menu różne na każdej stronie,
 klik „Start"/logo → 404, filtry realizacji martwe).
 
-- [ ] **Do zrobienia (ta sesja):** ujednolicić menu (wspólny `_nav.html` dla wszystkich podstron publicznych),
-  naprawić linki logo/Start (index.html → /), stopki, usunąć martwy filtr kategorii w /realizacje/.
-- [ ] **Następne zadanie:** baza danych + podpięcie API Google Sheets (webhook Apps Script w core.push_do_sheets).
-- [ ] Po commicie user robi `git pull` + Reload na PythonAnywhere.
+- [x] **Menu ujednolicone:** `templates/_nav.html` (jeden partial: Start/Realizacje/Wynajem/Personalizacja/Kontakt
+  + aktywna pozycja po request.path) — wstawiony do 8 szablonów publicznych; menu v4 (build.py+index.html)
+  skrócone do tych samych pozycji (usunięte „wkrótce"/stuby); logo/Start prowadzą na `/` (był 404 przez index.html);
+  stopki /kontakt.html → /kontakt/; martwy filtr kategorii usunięty z /realizacje/; logo na hero jest linkiem.
+- [x] **Google Sheets:** tabela `sheets_log`; `core.push_do_sheets` z logiem (ok/błąd + odpowiedź) i typem
+  (rezerwacja/zmiana-statusu/test); przycisk **„Testuj webhook"** w Ustawieniach (endpoint test-sheets);
+  tabela „Ostatnie próby wysyłki" w Ustawieniach; skrypt `serwis/sheets/webhook.gs` (Apps Script,
+  setup + doPost, gotowy do wklejenia) + `serwis/sheets/README.md` (instrukcja 5-minutowa).
+- [x] **Komunikaty w panelu bez ciasteczek:** `redirect_msg()` — wiadomości lecą w adresie (?msg=...),
+  admin_base pokazuje request.args.msg — flash() ginął w iframe (bez cookies), teraz działa.
+- [x] Testy: menu spójne na 6 stronach, brand→/ na 8 stronach, test webhooka (bez URL → msg; zły URL →
+  log „Connection refused"), 10 zakładek admina 200, 8 tras publicznych 200.
+- [ ] **Po commicie:** user robi `git pull` + Reload na PythonAnywhere i podpina arkusz wg sheets/README.md.
 
 ### LEKCJE
 - Podmiany w `wczytaj_v4` muszą obejmować też `index.html` → `/` (menu v4 linkuje do index.html = 404).

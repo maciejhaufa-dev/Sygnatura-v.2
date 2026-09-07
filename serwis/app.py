@@ -96,6 +96,16 @@ def redirect303(cel, **kw):
     return redirect(cel, code=303)
 
 
+def redirect_msg(koniec, wiadomosc, **kw):
+    """Redirect 303 z komunikatem w adresie (?msg=...) — działa także wtedy,
+    gdy przeglądarka blokuje ciasteczka (panel w iframe/podglądzie), gdzie
+    zwykły flash() by zniknął. Szablony admin_base pokazują ?msg."""
+    from urllib.parse import quote
+    adres = url_for(koniec, **kw)
+    sep = '&' if '?' in adres else '?'
+    return redirect(adres + sep + 'msg=' + quote(wiadomosc), code=303)
+
+
 def admin_required(fn):
     @wraps(fn)
     def wrap(*a, **kw):
@@ -129,9 +139,11 @@ def wczytaj_v4(nazwa):
         abort(404)
     tresc = open(sciezka, encoding='utf-8').read()
     tresc = tresc.replace('assets/', '/assets/')
+    tresc = tresc.replace('wynajem.html">Personalizacja', '/personalizacja/">Personalizacja')
     tresc = tresc.replace('wynajem.html', '/wynajem/')
     tresc = tresc.replace('galeria.html', '/realizacje/')
     tresc = tresc.replace('kontakt.html', '/kontakt/')
+    tresc = tresc.replace('index.html', '/')
     tresc = tresc.replace('>Galeria<', '>Realizacje<')
     return render_template_string(tresc)
 
@@ -705,10 +717,9 @@ def kategorie_edytuj(kid):
 def kategorie_usun(kid):
     db = get_db()
     if db.execute('SELECT 1 FROM produkty WHERE kategoria_id=? LIMIT 1', (kid,)).fetchone():
-        flash('Nie można usunąć: kategoria ma przypisane produkty.')
-    else:
-        db.execute('DELETE FROM kategorie WHERE id=?', (kid,))
-        db.commit()
+        return redirect_msg('admin_kategorie', 'Nie można usunąć: kategoria ma przypisane produkty.')
+    db.execute('DELETE FROM kategorie WHERE id=?', (kid,))
+    db.commit()
     return redirect303(url_for('admin_kategorie'))
 
 
@@ -795,10 +806,9 @@ def pakiety_edytuj(pid):
 def pakiety_usun(pid):
     db = get_db()
     if db.execute('SELECT 1 FROM rezerwacje WHERE pakiet_id=? LIMIT 1', (pid,)).fetchone():
-        flash('Nie można usunąć: pakiet ma zgłoszenia. Zamiast tego odznacz „Dostępny na stronie".')
-    else:
-        db.execute('DELETE FROM pakiety WHERE id=?', (pid,))
-        db.commit()
+        return redirect_msg('admin_pakiety', 'Nie można usunąć: pakiet ma zgłoszenia. Zamiast tego odznacz „Dostępny na stronie".')
+    db.execute('DELETE FROM pakiety WHERE id=?', (pid,))
+    db.commit()
     return redirect303(url_for('admin_pakiety'))
 
 
@@ -881,8 +891,7 @@ def rezerwacja_status(rid):
         abort(404)
     nowy = request.form.get('status')
     if nowy not in core.STATUSY:
-        flash('Nieznany status.')
-        return redirect303(url_for('admin_rezerwacja', rid=rid))
+        return redirect_msg('admin_rezerwacja', 'Nieznany status.', rid=rid)
     powod = (request.form.get('powod') or '').strip()
     historia = json.loads(r['historia'] or '[]')
     historia.append({'kiedy': core.teraz(), 'status': nowy, 'uwaga': powod or 'zmiana statusu'})
@@ -901,8 +910,7 @@ def rezerwacja_status(rid):
         core.wyslij_do_klienta(db, r['email'], 'Rezerwacja odrzucona — %s' % r['sygnatura'], core.mail_klient_odrzucono(r, powod))
     # aktualizacja arkusza Google (status leci do API)
     core.push_do_sheets(db, r)
-    flash('Status zmieniony na: %s' % core.STATUSY_PL[nowy])
-    return redirect303(url_for('admin_rezerwacja', rid=rid))
+    return redirect_msg('admin_rezerwacja', 'Status zmieniony na: %s' % core.STATUSY_PL[nowy], rid=rid)
 
 
 @app.route('/admin/rezerwacje/<int:rid>/usun', methods=['POST'])
@@ -911,8 +919,7 @@ def rezerwacja_usun(rid):
     db = get_db()
     db.execute('DELETE FROM rezerwacje WHERE id=?', (rid,))
     db.commit()
-    flash('Zgłoszenie usunięte.')
-    return redirect303(url_for('admin_rezerwacje'))
+    return redirect_msg('admin_rezerwacje', 'Zgłoszenie usunięte.')
 
 
 # ---------------------------------------------------------------- ADMIN: realizacje (portfolio)
@@ -954,8 +961,7 @@ def realizacje_dodaj():
                 1 if request.form.get('widoczna') else 0, core.teraz()))
     db.commit()
     if blad:
-        flash('Zapisano, ale zdjęcie odrzucone: %s' % blad)
-    return redirect303(url_for('admin_realizacje'))
+        return redirect_msg('admin_realizacje', 'Zapisano, ale zdjęcie odrzucone: %s' % blad)
 
 
 @app.route('/admin/realizacje/<int:rid>/edytuj', methods=['POST'])
@@ -1028,8 +1034,7 @@ def mail_ponow(mid):
     m = db.execute('SELECT * FROM mail_outbox WHERE id=?', (mid,)).fetchone()
     if m:
         ok, blad = core.wyslij_mail(db, m['do_kogo'], m['temat'], m['tresc'], m['typ'])
-        flash('Wysłano ponownie.' if ok else ('Błąd: %s' % blad))
-    return redirect303(url_for('admin_maile'))
+        return redirect_msg('admin_maile', 'Wysłano ponownie.' if ok else ('Błąd: %s' % blad))
 
 
 # ---------------------------------------------------------------- ADMIN: ustawienia
@@ -1047,12 +1052,25 @@ def admin_ustawienia():
             from werkzeug.security import generate_password_hash
             db.execute("UPDATE ustawienia SET wartosc=? WHERE klucz='admin_hash'", (generate_password_hash(nowe_haslo),))
         db.commit()
-        flash('Ustawienia zapisane.')
-        return redirect303(url_for('admin_ustawienia'))
+        return redirect_msg('admin_ustawienia', 'Ustawienia zapisane.')
     u = {r['klucz']: r['wartosc'] for r in db.execute('SELECT klucz, wartosc FROM ustawienia').fetchall()}
     dokumenty = json.loads(u.get('dokumenty') or '[]')
     pliki = sorted(os.listdir(os.path.join(DATA, 'dokumenty'))) if os.path.isdir(os.path.join(DATA, 'dokumenty')) else []
-    return render_template('admin_ustawienia.html', u=u, dokumenty=dokumenty, pliki=pliki)
+    sheets_log = db.execute('SELECT * FROM sheets_log ORDER BY id DESC LIMIT 5').fetchall()
+    return render_template('admin_ustawienia.html', u=u, dokumenty=dokumenty, pliki=pliki, sheets_log=sheets_log)
+
+
+@app.route('/admin/ustawienia/test-sheets', methods=['POST'])
+@admin_required
+def test_sheets():
+    db = get_db()
+    test = {'sygnatura': 'TEST', 'temat': 'Test połączenia', 'imie': 'Panel admina',
+            'email': 'kontakt@studiosygnatura.pl', 'tresc': 'Testowy wpis z panelu — sprawdzenie webhooka.'}
+    ok, komunikat = core.push_do_sheets(db, test, typ='test')
+    if ok:
+        return redirect_msg('admin_ustawienia', 'Webhook Google Sheets odpowiedział poprawnie (%s). Sprawdź arkusz.' % komunikat)
+    else:
+        return redirect_msg('admin_ustawienia', 'Webhook NIE odpowiada: %s — sprawdź URL arkusza i skrypt.' % komunikat)
 
 
 @app.route('/admin/ustawienia/upload-dokument', methods=['POST'])

@@ -654,25 +654,21 @@ INDEX = r'''<!DOCTYPE html>
   </div>
   <nav class="menu" id="menu" aria-label="Menu główne">
     <a href="index.html" class="on">Start</a>
-    <a href="warsztat.html">Rzemiosło</a>
-    <a href="galeria.html">Galeria</a>
-    <a href="#" title="wkrótce">Metryczki</a>
-    <a href="#" title="wkrótce">Numery i szyldy</a>
+    <a href="galeria.html">Realizacje</a>
     <a href="wynajem.html">Wynajem</a>
-    <a href="wynajem.html#partnerzy">Współpraca</a>
-    <a href="#" title="wkrótce">Dla firm</a>
+    <a href="wynajem.html">Personalizacja</a>
     <a href="kontakt.html">Kontakt</a>
   </nav>
 </header>
 
 <main class="hero">
-    <div class="brand" aria-label="Studio Sygnatura">
+    <a class="brand" href="/" aria-label="Studio Sygnatura — strona główna">
       <img class="brand-sygnet" src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura — litera S z gałązką w okręgu">
       <div class="brand-txt">
         <div class="brand-word" role="img" aria-label="Sygnatura">@@HERO_LETTERS@@</div>
         <p class="brand-podpis">drewno · światło · detal</p>
       </div>
-    </div>
+    </a>
     <section class="panel" aria-label="Studio Sygnatura — zaproszenie">
       <div class="slow-row" role="img" aria-label="Pasja, styl, tradycja">
         <span class="slowo s1">Pasja</span><span class="slow-dash d1">–</span>

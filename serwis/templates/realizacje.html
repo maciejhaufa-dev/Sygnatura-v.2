@@ -24,26 +24,13 @@ img{display:block;max-width:100%}
 a{text-decoration:none;color:inherit}
 
 /* nagłówek */
-.site-head{background:var(--butelkowa)}
-.topbar{display:flex;justify-content:flex-end;gap:4px;padding:8px clamp(14px,3.5vw,44px);
-  background:rgba(251,247,240,.95);border-bottom:1px solid rgba(107,69,48,.16)}
-.iconbtn{width:40px;height:40px;display:grid;place-items:center;color:var(--brunatny);background:none;border:0;cursor:pointer}
-.menu{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2px;
-  padding:10px clamp(10px,3vw,40px)}
-.menu a{color:var(--zloty);font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;
-  padding:9px 13px;transition:background .2s}
 .menu a:hover{background:rgba(196,165,130,.14)}
-.menu a.on{background:rgba(196,165,130,.2)}
 
 /* treść */
 main{flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(26px,5vw,54px) clamp(16px,4vw,44px)}
 .tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
 h1{font-size:clamp(30px,5vw,44px);font-weight:600;color:var(--ink);margin:6px 0 8px}
 .lead{font-size:clamp(16px,1.8vw,19px);line-height:1.6;color:rgba(51,38,28,.9);max-width:640px;margin-bottom:26px}
-.filtry{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}
-.filtry a{border:1.5px solid var(--brunatny);color:var(--brunatny);padding:7px 16px;font-size:13px;
-  font-weight:700;letter-spacing:.12em;text-transform:uppercase;transition:all .2s}
-.filtry a:hover,.filtry a.on{background:var(--brunatny);color:var(--krem)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px}
 .karta{background:#fff;border:1px solid rgba(107,69,48,.25);display:flex;flex-direction:column;
   transition:box-shadow .25s,transform .25s}
@@ -68,26 +55,12 @@ h1{font-size:clamp(30px,5vw,44px);font-weight:600;color:var(--ink);margin:6px 0 
 </style>
 </head>
 <body>
-<header class="site-head">
-  <nav class="menu" aria-label="Menu główne">
-    <a href="/">Strona główna</a>
-    <a href="/realizacje/" class="on">Realizacje</a>
-    <a href="/wynajem/">Wynajem</a>
-    <a href="/personalizacja/">Personalizacja</a>
-    <a href="/kontakt/">Kontakt</a>
-  </nav>
-</header>
+{% include '_nav.html' %}
 <main>
   <span class="tag">Portfolio</span>
   <h1>Nasze realizacje</h1>
   <p class="lead">Rzeczy, które wyszły z naszej pracowni — dekoracje, szyldy, grawery i detale z drewna.
   Każda praca jest wykonywana na zamówienie, dlatego nie ma dwóch identycznych.</p>
-  {% if kategorie|length > 1 %}
-  <div class="filtry">
-    <a href="/realizacje/" class="on">Wszystkie</a>
-    {% for k in kategorie %}<a href="/realizacje/">{{ k }}</a>{% endfor %}
-  </div>
-  {% endif %}
   {% if rows %}
   <div class="grid">
     {% for r in rows %}

@@ -20,9 +20,31 @@
     <div class="rzad" style="margin-top:10px"><label><input type="checkbox" name="smtp_ssl" {% if u.get('smtp_ssl')=='1' %}checked{% endif %}> połączenie SSL (port 465)</label></div>
 
     <h3>Google Sheets (webhook)</h3>
-    <p class="mala">URL skryptu Apps Script — skonfigurujemy później. Każde zgłoszenie i każda zmiana statusu leci na ten adres jako JSON.</p>
+    <p class="mala">Każde zgłoszenie i każda zmiana statusu leci na ten adres jako JSON (skrypt pod spodem dopisuje wiersz w arkuszu).
+    Skrypt i instrukcja: <b>serwis/sheets/webhook.gs</b>. Po zapisaniu URL kliknij „Testuj”.</p>
     <label>URL arkusza (Apps Script web app)</label>
     <input type="text" name="sheets_url" value="{{ u.get('sheets_url','') }}" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="rzad" style="margin-top:12px">
+      <button class="btn btn-ghost" type="submit">Zapisz ustawienia</button>
+      <button class="btn" type="submit" formaction="{{ url_for('test_sheets') }}">Testuj webhook</button>
+    </div>
+    {% if sheets_log %}
+    <h4 style="margin:16px 0 6px">Ostatnie próby wysyłki</h4>
+    <table class="tabela">
+      <tr><th>Kiedy</th><th>Typ</th><th>Sygnatura</th><th>Status</th><th>Odpowiedź</th></tr>
+      {% for l in sheets_log %}
+      <tr>
+        <td style="white-space:nowrap">{{ l['kiedy'] }}</td>
+        <td>{{ l['typ'] }}</td>
+        <td>{{ l['sygnatura'] }}</td>
+        <td>{% if l['status']=='ok' %}<b style="color:var(--butelkowa)">ok</b>
+            {% elif l['status']=='brak-url' %}<span style="color:#8c6a2f">brak URL</span>
+            {% else %}<b style="color:#8c2f2f">błąd</b>{% endif %}</td>
+        <td style="font-size:13px">{{ l['odpowiedz'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
 
     <h3>Hasło do panelu</h3>
     <label>Nowe hasło (zostaw puste, żeby nie zmieniać)</label>

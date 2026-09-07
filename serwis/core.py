@@ -89,37 +89,54 @@ def wyslij_do_studia(db, temat, tresc):
 
 
 # ------------------------------------------------ Google Sheets (webhook Apps Script)
-def push_do_sheets(db, rezerwacja):
+def sheets_payload(rezerwacja, typ='rezerwacja'):
+    """Buduje JSON wysyłany do arkusza (klucz 'typ' mówi skryptowi,
+    czy to nowa rezerwacja, zmiana statusu, czy test)."""
+    dane = {
+        'typ': typ,
+        'sygnatura': rezerwacja.get('sygnatura') or '',
+        'utworzono': rezerwacja.get('utworzono') or teraz(),
+        'status': rezerwacja.get('status') or '',
+        'data': rezerwacja.get('data') or '',
+        'pakiet': rezerwacja.get('pakiet_nazwa') or '',
+        'temat': rezerwacja.get('temat') or '',
+        'imie': rezerwacja.get('imie') or '',
+        'email': rezerwacja.get('email') or '',
+        'telefon': rezerwacja.get('telefon') or '',
+        'tresc': rezerwacja.get('tresc') or '',
+        'data_od': rezerwacja.get('data_od') or '',
+        'data_do': rezerwacja.get('data_do') or '',
+        'dni': rezerwacja.get('dni') or 0,
+        'pozycje': rezerwacja.get('pozycje') or '[]',
+        'personalizacje': rezerwacja.get('personalizacje') or '[]',
+    }
+    return json.dumps(dane, ensure_ascii=False).encode('utf-8')
+
+
+def push_do_sheets(db, rezerwacja, typ='rezerwacja'):
     """Wysyła zgłoszenie do arkusza Google przez webhook Apps Scripta.
-    URL ustawisz w adminie: Ustawienia -> URL arkusza (skonfigurujemy później).
-    Bez URL nic się nie dzieje — rekord zostaje tylko w bazie."""
+    URL ustawisz w adminie: Ustawienia -> URL arkusza.
+    Bez URL nic się nie dzieje (status 'brak-url' w logu).
+    Zwraca (ok, komunikat). Każda próba jest zapisywana w tabeli sheets_log."""
     import urllib.request
     url = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='sheets_url'").fetchone()
     if not url or not url['wartosc'].strip():
-        return False
-    payload = json.dumps({
-        'sygnatura': rezerwacja['sygnatura'],
-        'utworzono': rezerwacja['utworzono'],
-        'status': rezerwacja['status'],
-        'data': rezerwacja['data'],
-        'pakiet': rezerwacja['pakiet_nazwa'],
-        'temat': rezerwacja['temat'],
-        'imie': rezerwacja['imie'],
-        'email': rezerwacja['email'],
-        'telefon': rezerwacja['telefon'],
-        'tresc': rezerwacja['tresc'],
-        'data_od': rezerwacja['data_od'],
-        'data_do': rezerwacja['data_do'],
-        'dni': rezerwacja['dni'],
-        'pozycje': rezerwacja['pozycje'],
-        'personalizacje': rezerwacja['personalizacje'],
-    }, ensure_ascii=False).encode('utf-8')
+        return False, 'brak URL webhooka (Ustawienia → URL arkusza)'
+    payload = sheets_payload(rezerwacja, typ)
     try:
-        req = urllib.request.Request(url['wartosc'].strip(), data=payload, headers={'Content-Type': 'application/json; charset=utf-8'})
+        req = urllib.request.Request(url['wartosc'].strip(), data=payload,
+                                     headers={'Content-Type': 'application/json; charset=utf-8'})
         with urllib.request.urlopen(req, timeout=15) as resp:
-            return resp.status in (200, 201, 204)
-    except Exception:
-        return False
+            ok = resp.status in (200, 201, 204)
+            komunikat = 'HTTP %d' % resp.status
+    except Exception as e:
+        ok = False
+        komunikat = str(e)[:200]
+    db.execute('INSERT INTO sheets_log (kiedy, typ, sygnatura, status, odpowiedz) VALUES (?,?,?,?,?)',
+               (teraz(), typ, rezerwacja.get('sygnatura') or '',
+                'ok' if ok else 'blad', komunikat))
+    db.commit()
+    return ok, komunikat
 
 
 # ------------------------------------------------ treści autoresponderów

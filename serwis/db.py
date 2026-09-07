@@ -122,6 +122,15 @@ CREATE TABLE IF NOT EXISTS admin_tokens (
   utworzono TEXT,
   wygasa   TEXT
 );
+-- Log prób wysyłki do Google Sheets (diagnostyka webhooka Apps Script)
+CREATE TABLE IF NOT EXISTS sheets_log (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  kiedy    TEXT,
+  typ      TEXT,                    -- rezerwacja / zmiana-statusu / test
+  sygnatura TEXT DEFAULT '',
+  status   TEXT,                    -- ok / blad / brak-url
+  odpowiedz TEXT DEFAULT ''         -- komunikat / treść błędu
+);
 """
 
 MIESIACE_PL = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',

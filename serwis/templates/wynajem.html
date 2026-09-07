@@ -10,17 +10,7 @@
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<header class="site-head">
-  <div class="wrap nav">
-    <a class="brand" href="/">SygNATURA</a>
-    <a href="/">Start</a>
-    <a href="/warsztat.html">Rzemiosło</a>
-    <a href="/galeria.html">Galeria</a>
-    <a href="/sklep.html">Sklep</a>
-    <a class="akt" href="/wynajem/">Wynajem</a>
-    <a href="/kontakt.html">Kontakt</a>
-  </div>
-</header>
+{% include '_nav.html' %}
 
 <section class="hero">
   <div class="wrap">
@@ -110,7 +100,7 @@
 <footer class="stopka">
   <div class="wrap">
     <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
-    <a href="/kontakt.html">Napisz do nas →</a>
+    <a href="/kontakt/">Napisz do nas →</a>
   </div>
 </footer>
 <script src="/static/app.js"></script>
