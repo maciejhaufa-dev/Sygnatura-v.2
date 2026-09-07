@@ -400,3 +400,21 @@ v4/
 - [x] Podgląd e2b jako doraźny adres publiczny: `https://8000-<E2B_SANDBOX_ID>.e2b.app/`
   (na żywo tylko podczas sesji).
 - [ ] **Czeka na usera:** założenie konta PythonAnywhere (login usera do wklejenia w WSGI).
+
+## 28. STATUS (07.09.2026 — rozdzielenie silnika od szaty graficznej)
+
+- [x] **`serwis/static/style.css`** — JEDEN wspólny arkusz dla wszystkich podstron publicznych
+  (scalony z 6 szablonów: kolory firmowe, menu, hero, karty pakietów/wydarzeń, kalendarz,
+  kompozytor, personalizacja, formularze, przyciski, stopka, media queries — bez duplikatów).
+- [x] **`serwis/static/app.js`** — wspólne skrypty (rok w stopce, szkielet menu mobilnego);
+  podpięty w 6 szablonach. Skrypty z danymi bazy (kalkulatory) zostają w HTML strony (Jinja).
+- [x] Trasa `/static/<path>` w app.py; 6 szablonów: bloki <style> → link do arkusza.
+- [x] README: tabela podziału silnik↔szata (co edytuje żona: style.css/templates/app.js, co panel).
+- [x] PYTHONANYWHERE-KROK-PO-KROKU.md: edycja wyglądu przez zakładkę Files + Reload
+  (+ ostrzeżenie, że edycje na PA nie wracają do repo — synchronizować).
+- [x] Testy: style.css/app.js 200, 10 tras 200, zero inline <style> na 6 stronach.
+- [ ] **Czeka:** aktualizacja na PA (git pull + Reload) — user potwierdzi działanie.
+
+### LEKCJE
+- Jeden wspólny arkusz zamiast kopiowanych bloków = jedna zmiana kolorystyki wszędzie.
+- JS zależny od danych z bazy musi zostać w szablonie (zmienne Jinja) — reszta do static/.

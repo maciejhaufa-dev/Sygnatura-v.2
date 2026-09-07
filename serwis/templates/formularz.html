@@ -7,69 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<style>
-:root{--brunatny:#6B4530;--butelkowa:#1F3A32;--zloty:#C4A582;--krem:#FBF7F0;--krem2:#F6EFE1;--ink:#33261C}
-*{box-sizing:border-box}
-body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
-a{color:var(--butelkowa)}
-.wrap{max-width:720px;margin:0 auto;padding:30px 16px 60px}
-.powrot{display:inline-block;margin-bottom:16px;font-size:15px}
-h1{color:var(--brunatny);font-size:30px;margin:0 0 4px}
-.podsum{color:rgba(51,38,28,.75);margin:0 0 20px;font-size:16px}
-.karta{background:#fff;border:2px solid var(--brunatny);padding:24px 22px;margin-bottom:20px}
-.karta .pkg{font-size:20px;font-weight:700;color:var(--butelkowa)}
-.karta .cena{color:var(--brunatny);font-weight:700}
-.flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:0 0 16px;font-size:15px}
-.pole{margin-bottom:16px}
-label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
-textarea{min-height:130px;resize:vertical}
-input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
-/* terminy */
-.terminy{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
-.terminy .rzad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-@media(max-width:520px){.terminy .rzad{grid-template-columns:1fr}}
-.terminy .info{font-size:13.5px;color:rgba(51,38,28,.7);margin:8px 0 0}
-.terminy .info b{color:var(--brunatny)}
-.dni-sum{font-size:14px;color:var(--butelkowa);font-weight:700;margin-top:8px}
-/* sygnatura */
-.opcje{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
-.opcje .rzad{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-.opcje .rzad:last-child{margin-bottom:0}
-.opcje input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
-.opcje .etyk{font-weight:700;color:var(--brunatny)}
-.opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
-#pole-syg{display:none;margin-top:10px}
-/* personalizacja */
-.pers-sekcja{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
-.pers-sekcja>label{text-transform:none;letter-spacing:0;font-size:15px;font-weight:700;color:var(--brunatny)}
-.pers-it{border:1px solid rgba(107,69,48,.35);background:#fff;padding:10px 12px;margin-top:10px}
-.pers-it b{display:block;font-size:15px;color:var(--ink)}
-.pers-it .meta{font-size:13px;color:rgba(51,38,28,.65);margin-bottom:6px}
-.pers-it .meta .cena{color:var(--butelkowa);font-weight:700}
-.pers-it .meta .bez{color:#8c2f2f;font-weight:700}
-.pers-it textarea{min-height:58px;margin-top:4px}
-.pers-link{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
-/* podsumowanie kwot */
-.kwoty{background:var(--butelkowa);color:var(--krem);padding:18px 20px;margin-bottom:16px}
-.kwoty h3{margin:0 0 10px;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--zloty)}
-.kwoty .linia{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:3px 0;color:rgba(251,247,240,.9)}
-.kwoty .linia b{color:var(--zloty)}
-.kwoty .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:10px;font-size:20px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
-.kwoty .uw{font-size:12.5px;color:rgba(251,247,240,.7);margin-top:10px;line-height:1.55}
-.przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 30px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
-.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
-.btn-line{background:transparent;color:var(--brunatny);border-color:var(--brunatny)}
-.btn-line:hover{background:var(--krem2);color:var(--brunatny)}
-.mala{font-size:13.5px;color:rgba(51,38,28,.6)}
-@media(max-width:560px){
-  h1{font-size:26px}
-  .karta{padding:18px 16px}
-  .przyciski .btn{flex:1;text-align:center}
-  .przyciski{flex-direction:column-reverse}
-}
-</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <div class="wrap">
@@ -276,5 +214,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
   pokazDni();
 })();
 </script>
+<script src="/static/app.js"></script>
 </body>
 </html>

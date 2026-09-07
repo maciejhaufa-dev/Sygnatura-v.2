@@ -4,6 +4,23 @@ Kompletny serwis z panelem administracyjnym: wynajem dekoracji, kalendarze per p
 zgłoszenia z sygnaturami, statusy, autorespondery, katalog i zarządzanie treścią.
 **Bez WordPressa, bez WooCommerce, bez kosztów** — czysty Python + HTML/CSS.
 
+## Podział: silnik (Python) ↔ szata graficzna (HTML/CSS/JS)
+
+Cały serwis jest tak rozdzielony, że **wygląd strony edytuje się bez znajomości Pythona**:
+
+| Co | Gdzie | Kto/co |
+|---|---|---|
+| **Logika** (trasy, baza, maile, kalendarze) | `app.py`, `db.py`, `core.py` | bot / programista |
+| **Wygląd wszystkich podstron** | **`static/style.css`** (jeden wspólny arkusz: kolory, czcionki, menu, przyciski, karty, kalendarz) | żona — zmiana tutaj działa na całej stronie |
+| **Wspólne skrypty JS** | `static/app.js` (menu, stopka — szkiclet na wspólne funkcje) | żona |
+| **Każda podstrona osobno** | `templates/*.html` (wynajem, pakiet, formularz, komponuje, personalizacja, realizacje, kontakt…) | żona — każdą stronę definiuje osobny plik HTML |
+| **Treści** (produkty, ceny, realizacje, wiadomości) | panel admina `/admin/` | żona — formularze w panelu |
+
+W szablonach HTML używa się `{{ zmienna }}` (Jinja2) tylko tam, gdzie wstawiane są dane z bazy
+(np. `{{ p.cena }}`). Strukturę i wygląd edytuje się jak zwykły HTML/CSS.
+Skrypty z danymi strony (np. kalkulator kwot z ceną pakietu) zostają w pliku HTML danej strony —
+bo ceny pochodzą z bazy i wstawia je silnik. Wszystko, co wspólne, trzymaj w `static/`.
+
 ## Uruchomienie lokalne (na Twoim komputerze)
 
 Potrzebny jest Python 3 (dowolna wersja 3.9+). W terminalu:

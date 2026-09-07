@@ -7,80 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<style>
-:root{
-  --brunatny:#6B4530; --butelkowa:#1F3A32; --zloty:#C4A582;
-  --krem:#FBF7F0; --krem2:#F6EFE1; --ink:#33261C;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
-a{color:var(--butelkowa)}
-img{max-width:100%}
-.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
-/* menu */
-.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
-.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
-.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
-.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
-.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
-/* hero */
-.hero{background:var(--butelkowa);color:var(--krem);padding:56px 0 44px;text-align:center}
-.hero h1{font-size:clamp(30px,5vw,44px);margin:0 0 10px;color:var(--zloty)}
-.hero p{max-width:640px;margin:0 auto;color:rgba(251,247,240,.85);font-size:18px}
-.hero .cta{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn{display:inline-block;background:var(--zloty);color:var(--butelkowa);border:1px solid var(--zloty);padding:11px 26px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:.02em}
-.btn:hover{background:var(--krem);border-color:var(--krem)}
-.btn-line{background:transparent;color:var(--zloty);border-color:var(--zloty)}
-.btn-line:hover{background:rgba(196,165,130,.12);border-color:var(--zloty)}
-.btn-ciemny{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa)}
-.btn-ciemny:hover{background:var(--brunatny);border-color:var(--brunatny)}
-/* sekcje */
-.sec{padding:44px 0 20px;scroll-margin-top:80px}
-.sec h2{font-size:clamp(24px,3.5vw,34px);color:var(--brunatny);margin:0 0 8px}
-.sec .sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 24px;font-size:17px}
-.center{text-align:center}
-.center .sub{margin-left:auto;margin-right:auto}
-/* kroki */
-.kroki{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-top:20px}
-.krok{background:#fff;border:1px solid rgba(107,69,48,.3);padding:18px 16px}
-.krok .num{display:inline-grid;place-items:center;width:32px;height:32px;background:var(--butelkowa);color:var(--zloty);font-weight:700;margin-bottom:10px}
-.krok b{display:block;margin-bottom:6px;color:var(--brunatny)}
-.krok p{margin:0;font-size:15px;color:rgba(51,38,28,.8)}
-/* wybor wydarzenia */
-.wyd{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:22px}
-.wyd-card{background:#fff;border:2px solid rgba(107,69,48,.45);padding:26px 20px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink)}
-.wyd-card:hover{border-color:var(--brunatny);box-shadow:0 18px 36px rgba(38,29,20,.12)}
-.wyd-card .ik{width:52px;height:52px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem2);margin-bottom:6px}
-.wyd-card .ik svg{width:30px;height:30px}
-.wyd-card h3{font-size:22px;color:var(--butelkowa);margin:0}
-.wyd-card p{margin:0;font-size:14.5px;color:rgba(51,38,28,.75);flex:1}
-.wyd-card .wiecej{color:var(--brunatny);font-weight:700;font-size:15px}
-.wyd-card.diy{background:var(--butelkowa);border-color:var(--butelkowa)}
-.wyd-card.diy h3,.wyd-card.diy .wiecej{color:var(--zloty)}
-.wyd-card.diy p{color:rgba(251,247,240,.8)}
-.wyd-card.diy .ik{border-color:var(--zloty);color:var(--zloty);background:transparent}
-/* katalog (statyczny, informacyjny) */
-.kat{margin-top:16px}
-.kat h4{font-size:19px;color:var(--brunatny);margin:22px 0 10px;border-left:4px solid var(--zloty);padding-left:10px}
-.kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.kat-card{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px}
-.kat-card b{display:block;color:var(--butelkowa);font-size:17px}
-.kat-card p{margin:4px 0;font-size:14px;color:rgba(51,38,28,.75)}
-.kat-card .cena{color:var(--brunatny);font-weight:700;font-size:15px}
-/* stopka */
-.stopka{background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px}
-.stopka .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.stopka a{color:var(--zloty)}
-@media(max-width:620px){
-  .nav a{padding:6px 9px;font-size:15px}
-  .nav .brand{width:100%}
-  .hero{padding:38px 0 30px}
-  .btn{width:100%;text-align:center}
-  .kroki{grid-template-columns:1fr}
-  .wyd{grid-template-columns:1fr}
-}
-</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <header class="site-head">
@@ -186,5 +113,6 @@ img{max-width:100%}
     <a href="/kontakt.html">Napisz do nas →</a>
   </div>
 </footer>
+<script src="/static/app.js"></script>
 </body>
 </html>

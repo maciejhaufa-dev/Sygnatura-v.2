@@ -57,6 +57,16 @@ cd ~/Sygnatura-v.2 && git pull && cd serwis && pip3 install --user flask pillow
 > Baza zostaje nienaruszona przy aktualizacjach (plik `data/serwis.db` nie jest
 > w repozytorium — migracje db.py podbijają schemat automatycznie przy starcie).
 
+### Edycja wyglądu (szata graficzna) bez programisty
+Wygląd strony edytuje się plikami — bez Pythona:
+- **zakładka Files** w PythonAnywhere → `Sygnatura-v.2/serwis/static/style.css` — kolory,
+  czcionki, menu, przyciski (zmiana działa od razu po odświeżeniu strony),
+- `Sygnatura-v.2/serwis/templates/*.html` — wygląd każdej podstrony osobno,
+- `Sygnatura-v.2/serwis/static/app.js` — wspólne skrypty.
+Po edycji HTML/JS kliknij **Reload** (Web). Treści (produkty, ceny, realizacje) zmienia się w panelu admina.
+> UWAGA: zmiany plików w PythonAnywhere **nie wracają do repozytorium** — jeśli coś ładnego
+> powstanie u żony, daj nam znać, a zsynchronizujemy to z repo (żeby nie zniknęło przy `git pull`).
+
 ## Ograniczenia planu FREE (akceptowalne na testy)
 - adres `TWOJ_LOGIN.pythonanywhere.com` (własna domena wymaga planu płatnego),
 - limit mocy obliczeniowej (spokojnie starczy na wizytówkę i panel),

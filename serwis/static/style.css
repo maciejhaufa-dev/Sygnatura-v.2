@@ -1,0 +1,251 @@
+/* ============================================================
+   STUDIO SYGNATURA — wspólny arkusz stylów serwisu
+   Ten plik steruje WYGLĄDEM wszystkich podstron publicznych:
+   /wynajem/, /personalizacja/, /komponuje/, formularz rezerwacji itd.
+   Zmień tutaj kolory/czcionki — zmiana zadziała wszędzie.
+   Kolory firmowe: butelkowa #1F3A32, brąz #6B4530, złoto #C4A582, krem #FBF7F0.
+   ============================================================ */
+:root{
+  --brunatny:#6B4530; --butelkowa:#1F3A32; --zloty:#C4A582;
+  --krem:#FBF7F0; --krem2:#F6EFE1; --ink:#33261C;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
+a{color:var(--butelkowa)}
+img{max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+/* ============ MENU (nagłówek) ============ */
+.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
+.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
+.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
+.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
+
+/* ============ NAGŁÓWKI I TEKSTY ============ */
+h1{color:var(--brunatny);font-size:clamp(26px,4vw,36px);margin:14px 0 6px}
+.sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 10px}
+.powrot{display:inline-block;margin:18px 0 0;font-size:15px}
+.mala{font-size:13.5px;color:rgba(51,38,28,.6)}
+.flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:12px 0 0;font-size:15px}
+
+/* ============ HERO I SEKCJE (wynajem) ============ */
+.hero{background:var(--butelkowa);color:var(--krem);padding:56px 0 44px;text-align:center}
+.hero h1{font-size:clamp(30px,5vw,44px);margin:0 0 10px;color:var(--zloty)}
+.hero p{max-width:640px;margin:0 auto;color:rgba(251,247,240,.85);font-size:18px}
+.hero .cta{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.sec{padding:44px 0 20px;scroll-margin-top:80px}
+.sec h2{font-size:clamp(24px,3.5vw,34px);color:var(--brunatny);margin:0 0 8px}
+.sec .sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 24px;font-size:17px}
+.center{text-align:center}
+.center .sub{margin-left:auto;margin-right:auto}
+.kroki{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-top:20px}
+.krok{background:#fff;border:1px solid rgba(107,69,48,.3);padding:18px 16px}
+.krok .num{display:inline-grid;place-items:center;width:32px;height:32px;background:var(--butelkowa);color:var(--zloty);font-weight:700;margin-bottom:10px}
+.krok b{display:block;margin-bottom:6px;color:var(--brunatny)}
+.krok p{margin:0;font-size:15px;color:rgba(51,38,28,.8)}
+
+/* ============ KARTY WYDARZEŃ (wynajem) ============ */
+.wyd{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:22px}
+.wyd-card{background:#fff;border:2px solid rgba(107,69,48,.45);padding:26px 20px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink)}
+.wyd-card:hover{border-color:var(--brunatny);box-shadow:0 18px 36px rgba(38,29,20,.12)}
+.wyd-card .ik{width:52px;height:52px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem2);margin-bottom:6px}
+.wyd-card .ik svg{width:30px;height:30px}
+.wyd-card h3{font-size:22px;color:var(--butelkowa);margin:0}
+.wyd-card p{margin:0;font-size:14.5px;color:rgba(51,38,28,.75);flex:1}
+.wyd-card .wiecej{color:var(--brunatny);font-weight:700;font-size:15px}
+.wyd-card.diy{background:var(--butelkowa);border-color:var(--butelkowa)}
+.wyd-card.diy h3,.wyd-card.diy .wiecej{color:var(--zloty)}
+.wyd-card.diy p{color:rgba(251,247,240,.8)}
+.wyd-card.diy .ik{border-color:var(--zloty);color:var(--zloty);background:transparent}
+
+/* ============ KARTY PAKIETÓW (wydarzenie) ============ */
+.pak{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-top:34px;align-items:stretch}
+.pak-card{position:relative;background:#fff;border:2px solid rgba(107,69,48,.5);padding:26px 20px 20px;display:flex;flex-direction:column;gap:10px}
+.pak-card.top{border-color:var(--brunatny);box-shadow:0 22px 44px rgba(38,29,20,.16)}
+.pak-tag{display:inline-block;align-self:flex-start;background:var(--krem2);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px}
+.pak-name{font-size:23px;font-weight:700;color:var(--butelkowa)}
+.pak-sub{font-size:14px;color:rgba(51,38,28,.7);margin-top:-6px}
+.pak-price{color:var(--brunatny);font-size:26px;font-weight:700}
+.pak-price small{display:block;font-size:11.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6)}
+.pak ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:15px;color:rgba(51,38,28,.9)}
+.pak li::before{content:"✦ ";color:var(--zloty)}
+.pak .btn{margin-top:auto;text-align:center}
+.note{margin-top:26px;font-size:14.5px;color:rgba(51,38,28,.65);background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px 16px}
+.note b{color:var(--brunatny)}
+
+/* ============ STRONA PAKIETU (karta + kalendarz) ============ */
+.glowna{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;margin-top:22px;align-items:start}
+@media(max-width:860px){.glowna{grid-template-columns:1fr}}
+.karta{background:#fff;border:2px solid rgba(107,69,48,.5);padding:26px 22px}
+.karta .tag{display:inline-block;background:var(--krem2);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px}
+.karta h1{font-size:28px;color:var(--butelkowa);margin:12px 0 4px}
+.karta .sub{font-size:14.5px;color:rgba(51,38,28,.7);margin:0 0 12px}
+.karta .cena{color:var(--brunatny);font-size:26px;font-weight:700;margin-bottom:12px}
+.karta ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:15px;color:rgba(51,38,28,.9)}
+.karta li::before{content:"✦ ";color:var(--zloty)}
+
+/* ============ KALENDARZ ============ */
+.cal{background:#fff;border:2px solid rgba(107,69,48,.5);padding:14px}
+.cal h2{font-size:20px;color:var(--brunatny);margin:0 0 10px}
+.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:8px 12px}
+.calhead b{font-size:16px;text-transform:capitalize}
+.calnav{display:flex;gap:2px}
+.calnav a{color:var(--zloty);text-decoration:none;font-size:19px;padding:0 8px}
+.calnav a.disabled{opacity:.3;pointer-events:none}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.calgrid i{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase;padding:2px 0}
+.cal-d{display:block;text-align:center;padding:6px 0;font-size:13.5px;text-decoration:none;background:var(--krem2);border:1px solid rgba(107,69,48,.25);color:var(--ink);cursor:pointer;font-family:inherit}
+a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:700}
+.cal-d.pusty{background:transparent;border-color:transparent;cursor:default}
+.cal-d.przeszly{background:transparent;border-color:transparent;color:rgba(51,38,28,.28);cursor:default}
+.cal-d.st-zapytanie{background:#FFF8E1;outline:2px solid var(--zloty);color:#7a5a10;cursor:pointer}
+.cal-d.st-platnosc,.cal-d.st-zarezerwowany{cursor:default}
+.cal-d.st-platnosc{background:#E8C97A;color:var(--butelkowa);font-weight:700}
+.cal-d.st-zarezerwowany{background:var(--brunatny);color:var(--krem);text-decoration:line-through}
+.callegend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:rgba(51,38,28,.75);margin-top:10px}
+.callegend i{display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(107,69,48,.3);background:var(--krem2)}
+.callegend i.st-zapytanie{background:#FFF8E1;outline:1px solid var(--zloty)}
+.callegend i.st-platnosc{background:#E8C97A}
+.callegend i.st-zarezerwowany{background:var(--brunatny)}
+.hint{margin-top:14px;font-size:14px;color:rgba(51,38,28,.7);background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:12px 14px}
+.hint b{color:var(--brunatny)}
+
+/* ============ KATALOG (wynajem + kompozytor) ============ */
+.kat{margin-top:16px}
+.kat h4{font-size:19px;color:var(--brunatny);margin:22px 0 10px;border-left:4px solid var(--zloty);padding-left:10px}
+.kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.kat-card{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px}
+.kat-card b{display:block;color:var(--butelkowa);font-size:17px}
+.kat-card p{margin:4px 0;font-size:14px;color:rgba(51,38,28,.75)}
+.kat-card .cena{color:var(--brunatny);font-weight:700;font-size:15px}
+
+/* ============ KOMPOZYTOR (katalog + podsumowanie) ============ */
+.komp{display:grid;grid-template-columns:1fr 330px;gap:24px;margin-top:18px;align-items:start}
+@media(max-width:920px){.komp{grid-template-columns:1fr}}
+.reguly{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px 16px;margin:14px 0 0;font-size:14.5px;color:rgba(51,38,28,.8)}
+.reguly b{color:var(--brunatny)}
+.komp-it{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.3);padding:12px;cursor:pointer}
+.komp-it:hover{border-color:var(--brunatny)}
+.komp-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.komp-it .ik{width:38px;height:38px;flex:none;border:1px solid rgba(107,69,48,.4);background:var(--krem2);display:grid;place-items:center;color:var(--brunatny);font-weight:700;font-size:15px}
+.komp-it b{display:block;font-size:15px;color:var(--ink)}
+.komp-it small{display:block;font-size:12px;color:rgba(51,38,28,.6);margin:2px 0}
+.komp-it .cena{font-size:14px;color:var(--butelkowa);font-weight:700}
+.pod{position:sticky;top:70px;background:var(--butelkowa);color:var(--krem);padding:22px}
+.pod h3{margin:0 0 4px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--zloty)}
+.pod .n{margin:0;font-size:12.5px;color:rgba(251,247,240,.75)}
+.pod .rabat{font-size:12.5px;color:rgba(251,247,240,.75);margin:12px 0 0;min-height:18px}
+.pod .rabat.on{color:var(--zloty);font-weight:700}
+.pod .suma{font-size:32px;font-weight:700;color:var(--zloty);margin:6px 0 0}
+.pod .suma small{display:block;font-size:11.5px;font-weight:400;color:rgba(251,247,240,.75);letter-spacing:.1em;text-transform:uppercase}
+.pod .wybrane{margin-top:14px;font-size:13px;border-top:1px solid rgba(196,165,130,.35);padding-top:10px}
+.pod .wybrane div{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.pod .wybrane span{color:var(--zloty);white-space:nowrap}
+.pod .note{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
+.pod .linia{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:rgba(251,247,240,.9);padding:2px 0}
+.pod .linia b{color:var(--zloty)}
+.pod .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:8px;font-size:18px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.pod .btn{margin-top:16px;width:100%;text-align:center;background:var(--zloty);color:var(--butelkowa)}
+.pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
+.pod .cal{padding:10px;margin:16px 0}
+.pod .calhead{padding:6px 10px}
+.pod .calhead b{font-size:14px}
+.pod .calnav a{font-size:18px;padding:0 8px}
+.pod .calgrid{margin-top:6px}
+.pod .calgrid i{font-size:10px}
+.pod .cal-d{padding:4px 0;font-size:12.5px}
+.pod .callegend{font-size:12.5px;margin-top:8px}
+.pod .callegend i{width:12px;height:12px;margin-right:5px}
+
+/* ============ PERSONALIZACJA ============ */
+.info{background:#fff;border:2px solid var(--brunatny);padding:18px 20px;margin:18px 0;font-size:15.5px}
+.info h2{font-size:20px;color:var(--butelkowa);margin:0 0 10px}
+.info ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.info b{color:var(--brunatny)}
+.pers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:18px 0}
+.pers-it{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px;cursor:pointer}
+.pers-it:hover{border-color:var(--brunatny)}
+.pers-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.pers-it b{display:block;font-size:15.5px;color:var(--ink)}
+.pers-it small{display:block;font-size:12.5px;color:rgba(51,38,28,.6);margin:2px 0}
+.pers-it .cena{font-size:14px;color:var(--butelkowa);font-weight:700}
+.pers-it .bez{font-size:12px;color:#8c2f2f;font-weight:700}
+.wybor{position:sticky;bottom:0;background:var(--butelkowa);color:var(--krem);padding:14px 0;margin-top:20px}
+.wybor .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.wybor .n{font-size:15px;color:rgba(251,247,240,.85)}
+.wybor .suma{font-size:22px;font-weight:700;color:var(--zloty)}
+.wybor .rabat{font-size:13px;color:var(--zloty);font-weight:700}
+
+/* ============ FORMULARZE ============ */
+.forma{background:#fff;border:2px solid var(--brunatny);padding:24px 22px;margin-top:20px}
+.pole{margin-bottom:16px}
+label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
+textarea{min-height:120px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
+.terminy{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.terminy .rzad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media(max-width:520px){.terminy .rzad{grid-template-columns:1fr}}
+.terminy .info{font-size:13.5px;color:rgba(51,38,28,.7);margin:8px 0 0}
+.terminy .info b{color:var(--brunatny)}
+.dni-sum{font-size:14px;color:var(--butelkowa);font-weight:700;margin-top:8px}
+.opcje{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.opcje .rzad{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.opcje .rzad:last-child{margin-bottom:0}
+.opcje input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
+.opcje .etyk{font-weight:700;color:var(--brunatny)}
+.opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
+#pole-syg{display:none;margin-top:10px}
+.pers-sekcja{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.pers-sekcja>label{text-transform:none;letter-spacing:0;font-size:15px;font-weight:700;color:var(--brunatny)}
+.pers-sekcja .pers-it{border:1px solid rgba(107,69,48,.35);background:#fff;padding:10px 12px;margin-top:10px}
+.pers-sekcja .pers-it b{display:block;font-size:15px;color:var(--ink)}
+.pers-sekcja .pers-it .meta{font-size:13px;color:rgba(51,38,28,.65);margin-bottom:6px}
+.pers-sekcja .pers-it .meta .cena{color:var(--butelkowa);font-weight:700}
+.pers-sekcja .pers-it .meta .bez{color:#8c2f2f;font-weight:700}
+.pers-sekcja .pers-it textarea{min-height:58px;margin-top:4px}
+.pers-link{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
+.kwoty{background:var(--butelkowa);color:var(--krem);padding:18px 20px;margin-bottom:16px}
+.kwoty h3{margin:0 0 10px;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--zloty)}
+.kwoty .linia{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:3px 0;color:rgba(251,247,240,.9)}
+.kwoty .linia b{color:var(--zloty)}
+.kwoty .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:10px;font-size:20px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.kwoty .uw{font-size:12.5px;color:rgba(251,247,240,.7);margin-top:10px;line-height:1.55}
+.kwoty-note{background:var(--butelkowa);color:rgba(251,247,240,.85);padding:14px 16px;margin-bottom:16px;font-size:13.5px}
+.kwoty-note b{color:var(--zloty)}
+.przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+
+/* ============ PRZYCISKI ============ */
+.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 30px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
+.btn-line{background:transparent;color:var(--brunatny);border-color:var(--brunatny)}
+.btn-line:hover{background:var(--krem2);color:var(--brunatny)}
+.btn-ciemny{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa)}
+.btn-ciemny:hover{background:var(--brunatny);border-color:var(--brunatny)}
+.wybor .btn{margin-left:auto}
+@media(max-width:620px){.wybor .btn{width:100%;margin-left:0;text-align:center}}
+
+/* ============ STOPKA ============ */
+.stopka{background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px}
+.stopka .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.stopka a{color:var(--zloty)}
+
+/* ============ TELEFON ============ */
+@media(max-width:620px){
+  .nav a{padding:6px 9px;font-size:15px}
+  .nav .brand{width:100%}
+  .hero{padding:38px 0 30px}
+  .btn{width:100%;text-align:center}
+  .kroki{grid-template-columns:1fr}
+  .wyd{grid-template-columns:1fr}
+  .pak{grid-template-columns:1fr}
+  .cal-d{padding:4px 0;font-size:12.5px}
+}
+@media(max-width:560px){
+  h1{font-size:26px}
+  .karta{padding:18px 16px}
+  .przyciski .btn{flex:1;text-align:center}
+  .przyciski{flex-direction:column-reverse}
+}

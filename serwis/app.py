@@ -171,6 +171,12 @@ def assets(nazwa):
     return send_from_directory(os.path.join(V4, 'assets'), nazwa)
 
 
+@app.route('/static/<path:nazwa>')
+def static_pliki(nazwa):
+    # wspólna szata graficzna serwisu (CSS/JS) — edytowalna bez Pythona
+    return send_from_directory(os.path.join(ROOT, 'static'), nazwa)
+
+
 # ---------------------------------------------------------------- PLAN MINIMUM: portfolio + kontakt
 @app.route('/realizacje/')
 def realizacje():

@@ -7,109 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<style>
-:root{--brunatny:#6B4530;--butelkowa:#1F3A32;--zloty:#C4A582;--krem:#FBF7F0;--krem2:#F6EFE1;--ink:#33261C}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
-a{color:var(--butelkowa)}
-.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
-.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
-.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
-.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
-.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
-.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
-.powrot{display:inline-block;margin:18px 0 0;font-size:15px}
-h1{color:var(--brunatny);font-size:clamp(26px,4vw,36px);margin:14px 0 6px}
-.sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 10px}
-.flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:12px 0 0;font-size:15px}
-.reguly{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px 16px;margin:14px 0 0;font-size:14.5px;color:rgba(51,38,28,.8)}
-.reguly b{color:var(--brunatny)}
-/* uklad: katalog + podsumowanie */
-.komp{display:grid;grid-template-columns:1fr 330px;gap:24px;margin-top:18px;align-items:start}
-@media(max-width:920px){.komp{grid-template-columns:1fr}}
-.kat h4{font-size:19px;color:var(--brunatny);margin:24px 0 10px;border-left:4px solid var(--zloty);padding-left:10px}
-.kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.komp-it{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.3);padding:12px;cursor:pointer}
-.komp-it:hover{border-color:var(--brunatny)}
-.komp-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
-.komp-it .ik{width:38px;height:38px;flex:none;border:1px solid rgba(107,69,48,.4);background:var(--krem2);display:grid;place-items:center;color:var(--brunatny);font-weight:700;font-size:15px}
-.komp-it b{display:block;font-size:15px;color:var(--ink)}
-.komp-it small{display:block;font-size:12px;color:rgba(51,38,28,.6);margin:2px 0}
-.komp-it .cena{font-size:14px;color:var(--butelkowa);font-weight:700}
-/* podsumowanie */
-.pod{position:sticky;top:70px;background:var(--butelkowa);color:var(--krem);padding:22px}
-.pod h3{margin:0 0 4px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--zloty)}
-.pod .n{margin:0;font-size:12.5px;color:rgba(251,247,240,.75)}
-.pod .rabat{font-size:12.5px;color:rgba(251,247,240,.75);margin:12px 0 0;min-height:18px}
-.pod .rabat.on{color:var(--zloty);font-weight:700}
-.pod .suma{font-size:32px;font-weight:700;color:var(--zloty);margin:6px 0 0}
-.pod .suma small{display:block;font-size:11.5px;font-weight:400;color:rgba(251,247,240,.75);letter-spacing:.1em;text-transform:uppercase}
-.pod .wybrane{margin-top:14px;font-size:13px;border-top:1px solid rgba(196,165,130,.35);padding-top:10px}
-.pod .wybrane div{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
-.pod .wybrane span{color:var(--zloty);white-space:nowrap}
-.pod .note{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
-.pod .linia{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:rgba(251,247,240,.9);padding:2px 0}
-.pod .linia b{color:var(--zloty)}
-.pod .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:8px;font-size:18px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
-.pers-sekcja{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
-.pers-sekcja>label{text-transform:none;letter-spacing:0;font-size:15px;font-weight:700;color:var(--brunatny)}
-.pers-it{border:1px solid rgba(107,69,48,.35);background:#fff;padding:10px 12px;margin-top:10px}
-.pers-it b{display:block;font-size:15px}
-.pers-it .meta{font-size:13px;color:rgba(51,38,28,.65);margin-bottom:6px}
-.pers-it .meta .cena{color:var(--butelkowa);font-weight:700}
-.pers-it .meta .bez{color:#8c2f2f;font-weight:700}
-.pers-link{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
-.kwoty-note{background:var(--butelkowa);color:rgba(251,247,240,.85);padding:14px 16px;margin-bottom:16px;font-size:13.5px}
-.kwoty-note b{color:var(--zloty)}
-.pod .btn{margin-top:16px;width:100%;text-align:center;background:var(--zloty);color:var(--butelkowa)}
-.pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
-/* kalendarz zajetosci */
-.cal{background:#fff;border:1px solid rgba(107,69,48,.35);padding:10px;margin:16px 0}
-.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:6px 10px}
-.calhead b{font-size:14px;text-transform:capitalize}
-.calnav a{color:var(--zloty);text-decoration:none;font-size:18px;padding:0 8px}
-.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px}
-.calgrid i{font-size:10px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase}
-.cal-d{display:block;text-align:center;padding:4px 0;font-size:12.5px;text-decoration:none;background:var(--krem2);border:1px solid rgba(107,69,48,.25);color:var(--ink);cursor:pointer;font-family:inherit}
-.cal-d.pusty{background:transparent;border-color:transparent;cursor:default}
-.cal-d.przeszly{background:transparent;border-color:transparent;color:rgba(51,38,28,.28);cursor:default}
-.cal-d.st-zapytanie{background:#FFF8E1;outline:2px solid var(--zloty);color:#7a5a10;cursor:pointer}
-.cal-d.st-platnosc,.cal-d.st-zarezerwowany{cursor:default}
-.cal-d.st-platnosc{background:#E8C97A;color:var(--butelkowa);font-weight:700}
-.cal-d.st-zarezerwowany{background:var(--brunatny);color:var(--krem);text-decoration:line-through}
-.callegend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:rgba(51,38,28,.75);margin-top:8px}
-.callegend i{display:inline-block;width:12px;height:12px;margin-right:5px;vertical-align:-1px;border:1px solid rgba(107,69,48,.3);background:var(--krem2)}
-.callegend i.st-zapytanie{background:#FFF8E1;outline:1px solid var(--zloty)}
-.callegend i.st-platnosc{background:#E8C97A}
-.callegend i.st-zarezerwowany{background:var(--brunatny)}
-/* formularz */
-.forma{background:#fff;border:2px solid var(--brunatny);padding:24px 22px;margin-top:20px}
-.pole{margin-bottom:16px}
-label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
-textarea{min-height:120px;resize:vertical}
-input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
-.terminy{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
-.terminy .rzad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-@media(max-width:520px){.terminy .rzad{grid-template-columns:1fr}}
-.terminy .info{font-size:13.5px;color:rgba(51,38,28,.7);margin:8px 0 0}
-.dni-sum{font-size:14px;color:var(--butelkowa);font-weight:700;margin-top:8px}
-.opcje{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
-.opcje .rzad{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-.opcje .rzad:last-child{margin-bottom:0}
-.opcje input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
-.opcje .etyk{font-weight:700;color:var(--brunatny)}
-.opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
-#pole-syg{display:none;margin-top:10px}
-.przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 30px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
-.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
-.btn-line{background:transparent;color:var(--brunatny);border-color:var(--brunatny)}
-.btn-line:hover{background:var(--krem2);color:var(--brunatny)}
-.mala{font-size:13.5px;color:rgba(51,38,28,.6)}
-@media(max-width:560px){.przyciski .btn{flex:1;text-align:center}.przyciski{flex-direction:column-reverse}}
-</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <header class="site-head">
@@ -437,5 +335,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
   aktualizujLink();
 })();
 </script>
+<script src="/static/app.js"></script>
 </body>
 </html>
