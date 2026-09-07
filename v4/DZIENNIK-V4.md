@@ -360,11 +360,12 @@ v4/
 - Nie interpretować zawartości warstw SVG („stajnia"/„pasterze" z poprzednich opisów = błędne). Czysta konwersja 1:1.
 - Etykiety warstw w pliku ≠ numeracja w głowie usera — nazywać pliki po zawartości, numery zachować z pliku.
 
-## 25. STATUS (07.09.2026 — plan minimum: wizytówka/portfolio) [W TOKU]
+## 25. STATUS (07.09.2026 — plan minimum: wizytówka/portfolio)
 
 - [x] Dziennik zbiorczy `DZIENNIK.md` w korzeniu repo (odtworzenie sesji po resecie).
-- [ ] Serwis: trasy `/realizacje/` + `/realizacje/<id>/` i `/kontakt/` (formularz z PKE art. 398).
-- [ ] Baza: tabele `realizacje` i `wiadomosci` (migracje w db.py + seed).
-- [ ] Admin: CRUD realizacji z uploadem zdjęć + skrzynka wiadomości.
-- [ ] Szablony: realizacje.html, realizacja_szczegoly.html, kontakt.html, admin_realizacje.html, admin_wiadomosci.html.
-- [ ] Nav v4: „Galeria" → „Realizacje" (linki do tras serwisu przez podmiany w wczytaj_v4).
+- [x] Serwis: trasy `/realizacje/` + `/realizacje/<id>/` i `/kontakt/` (formularz z PKE art. 398).
+- [x] Baza: tabele `realizacje` i `wiadomosci` (seed 3 realizacji ze zdjęciami z uploads).
+- [x] Admin: CRUD realizacji z uploadem zdjęć (data/uploads, /media/) + skrzynka wiadomości ze statusami.
+- [x] Szablony: realizacje.html, realizacja_szczegoly.html, kontakt.html, admin_realizacje.html, admin_wiadomosci.html + admin_wiadomosc.html.
+- [x] Nav v4 w serwisie: „Galeria" → „Realizacje" (podmiany w wczytaj_v4: galeria.html→/realizacje/, kontakt.html→/kontakt/).
+- [x] Testy: formularz (walidacja 4 błędów, poprawny POST → baza + 2 maile, honeypot bez zapisu), admin CRUD realizacji z uploadem (303), wiadomości (statusy), /realizacje/<id>/ 200 + 404, index z podmienionymi linkami, sanity 6 tras 200. Baza wyczyszczona po testach.

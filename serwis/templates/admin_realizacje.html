@@ -1,0 +1,53 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Realizacje — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Realizacje (portfolio)</h1>
+<p class="mala">Widoczne na stronie: <a href="{{ url_for('realizacje') }}">/realizacje/</a> (tylko te z zaznaczonym „Widoczna").
+Zdjęcia wgrywasz z komputera (JPG/PNG/WEBP, maks. 8 MB).</p>
+
+<style>
+.karta-r{background:#fff;border:1px solid rgba(107,69,48,.3);padding:12px;margin:12px 0;display:flex;gap:14px;flex-wrap:wrap}
+.karta-r img{width:120px;height:90px;object-fit:cover;border:1px solid rgba(107,69,48,.25);background:var(--krem2)}
+.karta-r .pol{flex:1;min-width:240px}
+.karta-r .pol input[type=text],.karta-r .pol textarea{width:100%;padding:7px;font-family:inherit;font-size:16px;border:1px solid rgba(107,69,48,.35);background:var(--krem);margin:3px 0}
+.karta-r .pol textarea{min-height:56px}
+.karta-r .pol label{display:inline-flex;align-items:center;gap:6px;font-size:14px;margin-right:14px}
+.karta-r input[type=file]{font-family:inherit;font-size:14px;margin:6px 0}
+.karta-r .guzy{display:flex;flex-direction:column;gap:8px;justify-content:center}
+</style>
+
+{% for r in rows %}
+<form class="karta-r" method="post" action="{{ url_for('realizacje_edytuj', rid=r['id']) }}" enctype="multipart/form-data">
+  {% if r['zdjecie'] %}
+  <img src="{{ url_for('media', nazwa=r['zdjecie']) }}" alt="{{ r['tytul'] }}">
+  {% else %}
+  <img src="" alt="brak zdjęcia" style="visibility:hidden">
+  {% endif %}
+  <div class="pol">
+    <input type="text" name="tytul" value="{{ r['tytul'] }}" placeholder="Tytuł">
+    <input type="text" name="kategoria" value="{{ r['kategoria'] }}" placeholder="Kategoria (np. szyldy i tablice)">
+    <textarea name="opis" placeholder="Opis">{{ r['opis'] }}</textarea>
+    <label>Kolejność <input type="number" name="kolejnosc" value="{{ r['kolejnosc'] }}" style="width:70px"></label>
+    <label><input type="checkbox" name="widoczna" {% if r['widoczna'] %}checked{% endif %}> Widoczna</label>
+    <div><input type="file" name="zdjecie" accept=".jpg,.jpeg,.png,.webp"></div>
+  </div>
+  <div class="guzy">
+    <button class="btn btn-ghost" type="submit" style="padding:6px 14px">Zapisz</button>
+    <button class="btn btn-niebez" type="submit" formaction="{{ url_for('realizacje_usun', rid=r['id']) }}">Usuń</button>
+  </div>
+</form>
+{% endfor %}
+
+<div class="forma">
+  <h3>Nowa realizacja</h3>
+  <form method="post" action="{{ url_for('realizacje_dodaj') }}" enctype="multipart/form-data">
+    <label>Tytuł *</label><input type="text" name="tytul" required>
+    <label>Kategoria</label><input type="text" name="kategoria" placeholder="np. dekoracje, szyldy i tablice">
+    <label>Opis (widoczny na stronie)</label><textarea name="opis"></textarea>
+    <label>Zdjęcie (JPG/PNG/WEBP, maks. 8 MB)</label><input type="file" name="zdjecie" accept=".jpg,.jpeg,.png,.webp">
+    <label>Kolejność (mniejsza = wyżej)</label><input type="number" name="kolejnosc" value="0">
+    <div class="rzad" style="margin-top:12px"><label><input type="checkbox" name="widoczna" checked> Widoczna na stronie</label></div>
+    <p><button class="btn" type="submit">Dodaj realizację</button></p>
+  </form>
+</div>
+{% endblock %}

@@ -12,7 +12,7 @@
 | Co | Gdzie | Status |
 |---|---|---|
 | **Serwis z bazą (Flask + SQLite)** — wynajem, personalizacja, panel admina, maile, Sheets | `serwis/` | działa lokalnie (127.0.0.1:8000), gotowy do wdrożenia |
-| **Plan minimum = wizytówka/portfolio** — landing, realizacje, kontakt | `serwis/` (trasy `/`, `/realizacje/`, `/kontakt/`) | w budowie (sesja 14) |
+| **Plan minimum = wizytówka/portfolio** — landing, realizacje, kontakt | `serwis/` (trasy `/`, `/realizacje/`, `/kontakt/`) | **DZIAŁA** (sesja 14); sklep/rejestr dołożymy później |
 | **Strona statyczna v4** (hero, splash, podstrony) — kopia jako GitHub Pages | `v4/` → `docs/` | gotowa (Pages włącza użytkownik — bot ma 403) |
 | **Szopka 3D** — projekt warstwowy, cięcia, LED | `pracownia/szopka/`, `uploads/Szopka 3D.svg` | konwersja warstw SVG→PNG zrobiona; wizualizacje v2/v3 przestarzałe |
 | **Logo** — zatwierdzone (sygNATURA + sygnet, #6B4530/#1F3A32/#C4A582/#FBF7F0) | `pracownia/logo/WEKTORY3/` | gotowe |
@@ -68,10 +68,14 @@ Gałąź pracy: **`arena/01a056f0-sygnatura-v-2`** (tylko na niej commitujemy). 
 
 ---
 
-## 3. PLAN MINIMUM — wizytówka/portfolio (od sesji 14)
+## 3. PLAN MINIMUM — wizytówka/portfolio (sesja 14 — ZROBIONE)
 
 **Cel:** działający serwis-baza, który można modyfikować i rozszerzać. Znajomi pytają o stronę →
 teraz: **landing + nasze realizacje + kontakt**. Sklep i rejestr najmu dochodzą później (kod wynajmu już jest).
+
+> **Stan: wdrożone i przetestowane (commit w sesji 14).** Linki na stronie: „Realizacje" → `/realizacje/`,
+> „Kontakt" → `/kontakt/` (podmiany w `wczytaj_v4`). Zdjęcia realizacji wgrywa się w panelu (Realizacje →
+> nowa realizacja → wybór pliku); startowo 3 wpisy przykładowe ze zdjęciami z uploads (opisy robocze).
 
 ### Zawartość
 - `/` — landing (istniejąca strona v4: hero, pasja/styl/tradycja, 4 przyciski)

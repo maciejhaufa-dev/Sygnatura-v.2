@@ -92,13 +92,18 @@ STATYCZNE = ['index.html', 'warsztat.html', 'galeria.html', 'sklep.html', 'konta
 
 def wczytaj_v4(nazwa):
     """Czyta stronę z folderu v4 i przepisuje ścieżki na trasy Flaska:
-    assets/ -> /assets/ oraz wynajem.html -> /wynajem/"""
+    assets/ -> /assets/ oraz wynajem.html -> /wynajem/
+    Plan minimum: linki „Galeria" i „Kontakt" prowadzą na trasy serwisu
+    (/realizacje/, /kontakt/), żeby działała baza i formularz."""
     sciezka = os.path.join(V4, nazwa)
     if not os.path.exists(sciezka):
         abort(404)
     tresc = open(sciezka, encoding='utf-8').read()
     tresc = tresc.replace('assets/', '/assets/')
     tresc = tresc.replace('wynajem.html', '/wynajem/')
+    tresc = tresc.replace('galeria.html', '/realizacje/')
+    tresc = tresc.replace('kontakt.html', '/kontakt/')
+    tresc = tresc.replace('>Galeria<', '>Realizacje<')
     return render_template_string(tresc)
 
 
@@ -135,6 +140,70 @@ def hero_picker():
 @app.route('/assets/<path:nazwa>')
 def assets(nazwa):
     return send_from_directory(os.path.join(V4, 'assets'), nazwa)
+
+
+# ---------------------------------------------------------------- PLAN MINIMUM: portfolio + kontakt
+@app.route('/realizacje/')
+def realizacje():
+    db = get_db()
+    rows = db.execute("SELECT * FROM realizacje WHERE widoczna=1 ORDER BY kolejnosc, id DESC").fetchall()
+    kategorie = [r['kategoria'] for r in db.execute(
+        "SELECT DISTINCT kategoria FROM realizacje WHERE widoczna=1 AND kategoria!='' ORDER BY kategoria").fetchall()]
+    return render_template('realizacje.html', rows=rows, kategorie=kategorie)
+
+
+@app.route('/realizacje/<int:rid>/')
+def realizacja_szczegoly(rid):
+    db = get_db()
+    row = db.execute('SELECT * FROM realizacje WHERE id=? AND widoczna=1', (rid,)).fetchone()
+    if not row:
+        abort(404)
+    return render_template('realizacja_szczegoly.html', r=row)
+
+
+@app.route('/media/<nazwa>')
+def media(nazwa):
+    # zdjęcia realizacji wgrane przez panel (data/uploads)
+    return send_from_directory(os.path.join(DATA, 'uploads'), nazwa)
+
+
+@app.route('/kontakt/', methods=['GET', 'POST'])
+def kontakt_form():
+    db = get_db()
+    bledy = []
+    dane = {'imie': '', 'email': '', 'telefon': '', 'tresc': ''}
+    ok = False
+    if request.method == 'POST':
+        honeypot = request.form.get('strona_www', '')
+        dane = {
+            'imie': (request.form.get('imie') or '').strip(),
+            'email': (request.form.get('email') or '').strip(),
+            'telefon': (request.form.get('telefon') or '').strip(),
+            'tresc': (request.form.get('tresc') or '').strip(),
+        }
+        zgoda = request.form.get('zgoda') == 'on'
+        if not honeypot:  # boty wypełniają ukryte pole — udajemy sukces, nic nie zapisujemy
+            if len(dane['imie']) < 2:
+                bledy.append('Podaj imię (min. 2 znaki).')
+            if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', dane['email']):
+                bledy.append('Podaj poprawny adres e-mail.')
+            if len(dane['tresc']) < 10:
+                bledy.append('Napisz kilka słów (min. 10 znaków) — w czym możemy pomóc?')
+            if not zgoda:
+                bledy.append('Zaznacz zgodę na kontakt — bez niej nie możemy odpisać (PKE art. 398).')
+            if not bledy:
+                db.execute('INSERT INTO wiadomosci (imie, email, telefon, tresc, zgoda, status, data) VALUES (?,?,?,?,?,?,?)',
+                           (dane['imie'], dane['email'], dane['telefon'], dane['tresc'], 1, 'nowa', core.teraz()))
+                db.commit()
+                wiad = {'imie': dane['imie'], 'email': dane['email'], 'telefon': dane['telefon'],
+                        'tresc': dane['tresc'], 'zgoda': True, 'data': core.teraz()}
+                core.wyslij_do_studia(db, 'Nowa wiadomość z formularza: %s' % dane['imie'], core.mail_kontakt_studio(wiad))
+                core.wyslij_mail(db, dane['email'], 'Studio Sygnatura — dziękujemy za wiadomość',
+                                 core.mail_kontakt_potwierdzenie(wiad), 'kontakt-klient')
+                ok = True
+        else:
+            ok = True
+    return render_template('kontakt.html', bledy=bledy, dane=dane, ok=ok)
 
 
 # ---------------------------------------------------------------- strona wynajmu
@@ -794,6 +863,103 @@ def rezerwacja_usun(rid):
     db.commit()
     flash('Zgłoszenie usunięte.')
     return redirect303(url_for('admin_rezerwacje'))
+
+
+# ---------------------------------------------------------------- ADMIN: realizacje (portfolio)
+def zapisz_zdjecie(plik):
+    """Zapisuje wgrane zdjęcie do data/uploads. Zwraca (nazwa_pliku, komunikat_bledu)."""
+    from werkzeug.utils import secure_filename
+    if not plik or not plik.filename:
+        return '', ''
+    nazwa = secure_filename(plik.filename)
+    rozsz = os.path.splitext(nazwa)[1].lower()
+    if rozsz not in ('.jpg', '.jpeg', '.png', '.webp'):
+        return '', 'Niedozwolony format pliku (dozwolone: JPG, PNG, WEBP).'
+    if plik.content_length and plik.content_length > 8 * 1024 * 1024:
+        return '', 'Plik za duży (maks. 8 MB).'
+    katalog = os.path.join(DATA, 'uploads')
+    os.makedirs(katalog, exist_ok=True)
+    baza_nazwy = os.path.splitext(nazwa)[0][:40]
+    nazwa = '%s_%d%s' % (baza_nazwy, int(datetime.datetime.now().timestamp()), rozsz)
+    plik.save(os.path.join(katalog, nazwa))
+    return nazwa, ''
+
+
+@app.route('/admin/realizacje')
+@admin_required
+def admin_realizacje():
+    db = get_db()
+    rows = db.execute('SELECT * FROM realizacje ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_realizacje.html', rows=rows)
+
+
+@app.route('/admin/realizacje/dodaj', methods=['POST'])
+@admin_required
+def realizacje_dodaj():
+    db = get_db()
+    zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
+    db.execute('INSERT INTO realizacje (tytul, kategoria, opis, zdjecie, kolejnosc, widoczna, utworzono) VALUES (?,?,?,?,?,?,?)',
+               (request.form.get('tytul', '').strip(), request.form.get('kategoria', '').strip(),
+                request.form.get('opis', '').strip(), zdj, int(request.form.get('kolejnosc') or 0),
+                1 if request.form.get('widoczna') else 0, core.teraz()))
+    db.commit()
+    if blad:
+        flash('Zapisano, ale zdjęcie odrzucone: %s' % blad)
+    return redirect303(url_for('admin_realizacje'))
+
+
+@app.route('/admin/realizacje/<int:rid>/edytuj', methods=['POST'])
+@admin_required
+def realizacje_edytuj(rid):
+    db = get_db()
+    row = db.execute('SELECT * FROM realizacje WHERE id=?', (rid,)).fetchone()
+    if not row:
+        abort(404)
+    zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
+    if not zdj:
+        zdj = row['zdjecie']
+    db.execute('UPDATE realizacje SET tytul=?, kategoria=?, opis=?, zdjecie=?, kolejnosc=?, widoczna=? WHERE id=?',
+               (request.form.get('tytul', '').strip(), request.form.get('kategoria', '').strip(),
+                request.form.get('opis', '').strip(), zdj, int(request.form.get('kolejnosc') or 0),
+                1 if request.form.get('widoczna') else 0, rid))
+    db.commit()
+    if blad:
+        flash('Zapisano, ale zdjęcie odrzucone: %s' % blad)
+    return redirect303(url_for('admin_realizacje'))
+
+
+@app.route('/admin/realizacje/<int:rid>/usun', methods=['POST'])
+@admin_required
+def realizacje_usun(rid):
+    db = get_db()
+    db.execute('DELETE FROM realizacje WHERE id=?', (rid,))
+    db.commit()
+    return redirect303(url_for('admin_realizacje'))
+
+
+# ---------------------------------------------------------------- ADMIN: wiadomości (formularz kontaktowy)
+@app.route('/admin/wiadomosci')
+@admin_required
+def admin_wiadomosci():
+    db = get_db()
+    rows = db.execute('SELECT * FROM wiadomosci ORDER BY id DESC').fetchall()
+    return render_template('admin_wiadomosci.html', rows=rows)
+
+
+@app.route('/admin/wiadomosci/<int:wid>', methods=['GET', 'POST'])
+@admin_required
+def admin_wiadomosc(wid):
+    db = get_db()
+    row = db.execute('SELECT * FROM wiadomosci WHERE id=?', (wid,)).fetchone()
+    if not row:
+        abort(404)
+    if request.method == 'POST':
+        nowy = request.form.get('status', 'nowa')
+        if nowy in ('nowa', 'przeczytana', 'odpowiedziano'):
+            db.execute('UPDATE wiadomosci SET status=? WHERE id=?', (nowy, wid))
+            db.commit()
+        return redirect303(url_for('admin_wiadomosc', wid=wid))
+    return render_template('admin_wiadomosc.html', w=row)
 
 
 # ---------------------------------------------------------------- ADMIN: maile (outbox)

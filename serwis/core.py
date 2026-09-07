@@ -296,3 +296,37 @@ def mail_klient_odrzucono(rez, powod=''):
         'Zapraszamy przy innej okazji.\n\n'
         'Pozdrawiamy,\nStudio Sygnatura\nkontakt@studiosygnatura.pl'
     ) % {'sygnatura': rez['sygnatura'], 'zakres': zakres_txt(rez), 'pakiet': rez['pakiet_nazwa']}
+
+
+# ------------------------------------------------ wiadomości kontaktowe (plan minimum)
+def mail_kontakt_studio(w):
+    """Treść maila do Studia po wysłaniu formularza kontaktowego."""
+    return (
+        'NOWA WIADOMOŚĆ Z FORMULARZA KONTAKTOWEGO\n\n'
+        'Imię i nazwisko: %(imie)s\n'
+        'E-mail: %(email)s\n'
+        '%(telefon)s'
+        'Data: %(data)s\n\n'
+        'TREŚĆ WIADOMOŚCI\n'
+        '%(tresc)s\n\n'
+        'Zgoda na kontakt (PKE art. 398): %(zgoda)s\n'
+    ) % {
+        'imie': w['imie'], 'email': w['email'],
+        'telefon': ('Telefon: %s\n' % w['telefon']) if w.get('telefon') else '',
+        'data': w.get('data') or teraz(),
+        'tresc': w['tresc'].strip(),
+        'zgoda': 'TAK' if w.get('zgoda') else 'BRAK (!!! — sprawdzić przed odpowiedzią)',
+    }
+
+
+def mail_kontakt_potwierdzenie(w):
+    """Autoresponder do osoby, która napisała przez formularz."""
+    return (
+        'Dzień dobry, %(imie)s,\n\n'
+        'dziękujemy za wiadomość. Trafiła do nas i odpowiemy najpóźniej '
+        'w ciągu 2 dni roboczych (zwykle szybciej).\n\n'
+        'W pilnych sprawach prosimy o dopisek „pilne" w temacie.\n\n'
+        'Pozdrawiamy,\n'
+        'Studio Sygnatura\n'
+        'kontakt@studiosygnatura.pl'
+    ) % {'imie': w['imie']}

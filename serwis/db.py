@@ -94,6 +94,28 @@ CREATE TABLE IF NOT EXISTS mail_outbox (
   wyslany  INTEGER DEFAULT 0,       -- 0 = tryb testowy (SMTP nie skonfigurowany)
   blad     TEXT DEFAULT ''
 );
+-- Realizacje (portfolio na stronie głównej serwisu)
+CREATE TABLE IF NOT EXISTS realizacje (
+  id        INTEGER PRIMARY KEY AUTOINCREMENT,
+  tytul     TEXT NOT NULL,
+  kategoria TEXT DEFAULT '',        -- np. dekoracje, szyldy, szopka, personalizacja
+  opis      TEXT DEFAULT '',
+  zdjecie   TEXT DEFAULT '',        -- nazwa pliku w data/uploads (puste = karta bez zdjęcia)
+  kolejnosc INTEGER DEFAULT 0,
+  widoczna  INTEGER DEFAULT 1,      -- 1 = pokazuj na stronie
+  utworzono TEXT
+);
+-- Wiadomości z formularza kontaktowego
+CREATE TABLE IF NOT EXISTS wiadomosci (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  imie     TEXT NOT NULL,
+  email    TEXT NOT NULL,
+  telefon  TEXT DEFAULT '',
+  tresc    TEXT NOT NULL,
+  zgoda    INTEGER DEFAULT 0,       -- 1 = zgoda PKE art. 398 (wymagana)
+  status   TEXT DEFAULT 'nowa',     -- nowa / przeczytana / odpowiedziano
+  data     TEXT
+);
 """
 
 MIESIACE_PL = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
@@ -169,6 +191,20 @@ PERSONALIZACJE = [
     ('Grawer okolicznościowy', 'Tabliczka z dedykacją — jubileusz, rocznica, pożegnanie', 89),
     ('Panel z cytatem', 'Sentencja, imiona i data — do powieszenia na ścianie', 149),
     ('Ramka rzeźbiona na zdjęcie', 'Data i okazja grawerowane na ramce', 169),
+]
+
+# Realizacje startowe (portfolio). Zdjęcia kopiowane z ../uploads przy inicjalizacji bazy.
+# Opisy robocze — użytkownik uzupełni w panelu (Realizacje).
+REALIZACJE = [
+    ('Tablica powitalna z grawerem', 'szyldy i tablice',
+     'Drewniana tablica powitalna z wymienną wkładką — grawer imion i daty. (Opis roboczy — uzupełnij w panelu.)',
+     'IMG_20260829_230633.jpg'),
+    ('Detale z pracowni', 'dekoracje',
+     'Detal z pracowni — drewno, grawer i światło. (Opis roboczy — uzupełnij w panelu.)',
+     'IMG_20260828_055528.jpg'),
+    ('Praca warsztatowa', 'dekoracje',
+     'Element wykonany w pracowni Studia Sygnatura. (Opis roboczy — uzupełnij w panelu.)',
+     'IMG_20260812_180537.jpg'),
 ]
 
 
@@ -297,6 +333,23 @@ def inicjuj(sciezka=None):
         for i, (nazwa, opis, cena) in enumerate(PERSONALIZACJE):
             db.execute('INSERT INTO personalizacje (nazwa, opis, cena, kolejnosc) VALUES (?,?,?,?)',
                        (nazwa, opis, cena, i))
+        db.commit()
+
+    # portfolio (realizacje) — seed przy pustej tabeli; zdjęcia z ../uploads do data/uploads
+    if db.execute('SELECT COUNT(*) FROM realizacje').fetchone()[0] == 0:
+        import shutil as _shutil
+        katalog_media = os.path.join(os.path.dirname(baza_plik), 'uploads')
+        os.makedirs(katalog_media, exist_ok=True)
+        uploads_src = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'uploads'))
+        for i, (tytul, kategoria, opis, zdj) in enumerate(REALIZACJE):
+            cel = os.path.join(katalog_media, zdj)
+            if zdj and not os.path.exists(cel):
+                src = os.path.join(uploads_src, zdj)
+                if os.path.exists(src):
+                    _shutil.copyfile(src, cel)
+            db.execute('INSERT INTO realizacje (tytul, kategoria, opis, zdjecie, kolejnosc, widoczna, utworzono) '
+                       'VALUES (?,?,?,?,?,?,?)',
+                       (tytul, kategoria, opis, zdj, i, 1, datetime.date.today().isoformat()))
         db.commit()
 
     # demo ładuje się TYLKO przy pierwszym w historii uruchomieniu (marker na dysku);

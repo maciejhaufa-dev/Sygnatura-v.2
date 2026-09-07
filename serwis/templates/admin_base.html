@@ -58,6 +58,8 @@ ul.zwykla{margin:8px 0;padding-left:20px}
   <nav>
     <a href="{{ url_for('admin_dash') }}" {% if aktywna=='dash' %}class="akt"{% endif %}>Pulpit</a>
     <a href="{{ url_for('admin_rezerwacje') }}" {% if aktywna=='rezerwacje' %}class="akt"{% endif %}>Rezerwacje</a>
+    <a href="{{ url_for('admin_realizacje') }}" {% if aktywna=='realizacje' %}class="akt"{% endif %}>Realizacje</a>
+    <a href="{{ url_for('admin_wiadomosci') }}" {% if aktywna=='wiadomosci' %}class="akt"{% endif %}>Wiadomości</a>
     <a href="{{ url_for('admin_kategorie') }}" {% if aktywna=='kategorie' %}class="akt"{% endif %}>Kategorie</a>
     <a href="{{ url_for('admin_produkty') }}" {% if aktywna=='produkty' %}class="akt"{% endif %}>Produkty</a>
     <a href="{{ url_for('admin_pakiety') }}" {% if aktywna=='pakiety' %}class="akt"{% endif %}>Pakiety</a>

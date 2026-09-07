@@ -18,11 +18,31 @@ Otwórz w przeglądarce:
 
 | Adres | Co to jest |
 |---|---|
-| http://127.0.0.1:8000 | strona (index, warsztat, galeria, sklep, kontakt) |
+| http://127.0.0.1:8000 | **strona główna (wizytówka)** — hero, pasja/styl/tradycja |
+| http://127.0.0.1:8000/realizacje/ | **portfolio** — karty realizacji z bazy (zdjęcia, opisy) |
+| http://127.0.0.1:8000/kontakt/ | **kontakt** — formularz (wiadomość → baza + e-mail; zgoda PKE art. 398) |
 | http://127.0.0.1:8000/wynajem/ | **wynajem z kalendarzami per pakiet** |
+| http://127.0.0.1:8000/personalizacja/ | produkty spersonalizowane (jednorazówki) |
 | http://127.0.0.1:8000/admin/ | **panel administracyjny** |
 
 **Hasło startowe do panelu: `sygnatura-2026`** — zmień od razu w zakładce *Ustawienia*.
+
+## Plan minimum: wizytówka / portfolio (sesja 14)
+
+Strona, którą można pokazać znajomym już teraz:
+- **Strona główna** `/` — statyczna v4 (hero, splash, 4 przyciski), serwowana przez serwis.
+- **Realizacje** `/realizacje/` — karty z bazy `realizacje` (tytuł, kategoria, opis, zdjęcie, kolejność,
+  widoczna/ukryta). W panelu: zakładka **Realizacje** — dodawanie/edycja/usuwanie + upload zdjęć
+  (JPG/PNG/WEBP, maks. 8 MB, katalog `data/uploads`, serwowane przez `/media/...`).
+  Startowo 3 przykładowe wpisy ze zdjęciami z `uploads/` (opisy robocze — podmień w panelu).
+- **Kontakt** `/kontakt/` — formularz (imię, e-mail, telefon opcjonalny, wiadomość, **wymagana zgoda
+  na kontakt — PKE art. 398**; pułapka antyspamowa). Wysłanie = wpis w bazie `wiadomosci`
+  + 2 e-maile (do Studia + autoresponder do klienta). W panelu: zakładka **Wiadomości**
+  (statusy: nowa / przeczytana / odpowiedziano). Bez skonfigurowanego SMTP maile lądują w zakładce *Maile*.
+- Menu statycznych stron v4 w serwisie prowadzi na trasy dynamiczne („Galeria" → Realizacje, Kontakt → formularz) —
+  podmiany w funkcji `wczytaj_v4()` w `app.py`.
+
+Sklep i rejestr najmu dołożymy później (tabele kategorie/produkty już są gotowe).
 
 ## Co potrafi serwis (workflow wynajmu)
 
@@ -47,6 +67,8 @@ Otwórz w przeglądarce:
 | Zakładka | Do czego służy |
 |---|---|
 | **Pulpit** | liczniki statusów, najbliższe terminy, ostatnie maile |
+| **Realizacje** | portfolio: dodawanie/edycja/usuwanie + upload zdjęć (strona /realizacje/) |
+| **Wiadomości** | skrzynka formularza kontaktowego (statusy: nowa / przeczytana / odpowiedziano) |
 | **Rezerwacje** | lista zgłoszeń, filtry statusów, szczegóły, historia zmian |
 | **Kategorie** | dodawanie / edycja / usuwanie kategorii katalogu |
 | **Produkty** | dodawanie / edycja / usuwanie produktów (nazwa, opis, cena/doba, dostępny) |
