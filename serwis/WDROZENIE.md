@@ -19,26 +19,20 @@ Poprawki responsywne już weszły (kalendarze, tabele admina przewijane poziomo,
 ### Etap 1 — „żywy organizm" do testów: PythonAnywhere (DARMOWY, zalecany)
 Dlaczego: trwały dysk (SQLite przeżywa restart), zawsze włączone, konsola w przeglądarce, zero karty kredytowej.
 
-1. Załóż konto na pythonanywhere.com (darmowy plan „Beginner").
-2. W konsoli (zakładka **Consoles → Bash**):
-   ```bash
-   git clone https://github.com/maciejhaufa-dev/Sygnatura-v.2.git
-   cd Sygnatura-v.2/serwis
-   pip3 install --user flask
-   ```
-3. Zakładka **Web → Add a new web app → Flask → wybierz Python 3.10**.
-4. W edytorze pliku WSGI podmień całość na:
-   ```python
-   import sys
-   sys.path.insert(0, '/home/TWOJLOGIN/Sygnatura-v.2/serwis')
-   from app import app as application
-   ```
-5. **Reload** strony. Serwis działa pod `https://TWOJLOGIN.pythonanywhere.com/`.
-6. Hasło panelu zmień w Ustawieniach (baza jest na dysku PA — trwała).
-7. SMTP: dane od dostawcy poczty (dhosting/home.pl/Gmail z hasłem aplikacji) w Ustawieniach — wtedy maile wychodzą naprawdę.
-8. Google Sheets: utworzyć arkusz + skrypt Apps Script (osobny krok — zrobimy razem).
-
-Ograniczenia darmowego PA: nie podepniemy własnej domeny (wymaga planu Hacker ~5 USD/mc), limit CPU. Do testów — w sam raz.
+> **Pełny przepis klik-po-kliku z komendami 1:1: `serwis/PYTHONANYWHERE-KROK-PO-KROKU.md`**
+> (konto, git clone, WSGI, Reload, zmiana hasła, SMTP, backup, aktualizacje).
+> Krótko:
+> 1. Konto na pythonanywhere.com (plan Beginner FREE).
+> 2. Bash: `git clone https://github.com/maciejhaufa-dev/Sygnatura-v.2.git`, checkout gałęzi
+>    `arena/01a056f0-sygnatura-v-2`, `pip3 install --user flask pillow`.
+> 3. Web → Add a new web app → Flask → Python 3.10; plik WSGI podmień na:
+>    ```python
+>    import sys
+>    sys.path.insert(0, '/home/TWOJLOGIN/Sygnatura-v.2/serwis')
+>    from app import app as application
+>    ```
+> 4. Reload → serwis pod `https://TWOJLOGIN.pythonanywhere.com/` (baza tworzy się sama przy imporcie app.py).
+> 5. Zmień hasło panelu; SMTP w Ustawieniach; backup = pobranie `data/serwis.db`.
 
 ### Etap 2 — produkcja: OVH VPS (masz już konto i domenę w OVH)
 1. Kup VPS (VLE-2 ~20-30 zł/mc, wystarczy).

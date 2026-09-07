@@ -56,6 +56,9 @@ if not os.path.exists(SECRET):
         f.write(os.urandom(24).hex())
 app.secret_key = open(SECRET).read()
 
+# baza tworzy się automatycznie (też przy starcie przez WSGI/gunicorn — nie tylko `python app.py`)
+baza_mod.inicjuj()
+
 # token logowania doklejany do linków panelu w szablonach (tak samo jak w trasach)
 app.jinja_env.globals['url_for'] = url_for
 

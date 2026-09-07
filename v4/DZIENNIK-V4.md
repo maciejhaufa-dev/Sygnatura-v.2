@@ -389,3 +389,14 @@ v4/
 - Podgląd e2b = iframe na innym originie → przeglądarki (szczególnie telefoniczne) blokują
   ciasteczka sesji. Logowanie musi działać bez cookies (token w adresie) — dotyczy też
   przyszłych wdrożeń testowych w ramkach.
+
+## 27. STATUS (07.09.2026 — przygotowanie wdrożenia w sieci)
+
+- [x] **app.py:** `baza_mod.inicjuj()` przy imporcie modułu — baza tworzy się też pod WSGI/gunicorn
+  (PythonAnywhere), nie tylko przy `python app.py`.
+- [x] **`serwis/PYTHONANYWHERE-KROK-PO-KROKU.md`** — instrukcja dla usera: konto FREE, git clone
+  + checkout gałęzi, WSGI (gotowy snippet), Reload, test, zmiana hasła, SMTP, backup, aktualizacje.
+- [x] **WDROZENIE.md** — Etap 1 skrócony do wskaźnika na nową instrukcję.
+- [x] Podgląd e2b jako doraźny adres publiczny: `https://8000-<E2B_SANDBOX_ID>.e2b.app/`
+  (na żywo tylko podczas sesji).
+- [ ] **Czeka na usera:** założenie konta PythonAnywhere (login usera do wklejenia w WSGI).
