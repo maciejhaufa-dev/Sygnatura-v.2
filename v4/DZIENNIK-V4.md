@@ -418,3 +418,19 @@ v4/
 ### LEKCJE
 - Jeden wspólny arkusz zamiast kopiowanych bloków = jedna zmiana kolorystyki wszędzie.
 - JS zależny od danych z bazy musi zostać w szablonie (zmienne Jinja) — reszta do static/.
+
+## 29. STATUS (07.09.2026 — punkt pracy: czyszczenie krzaków + start bazy/Sheets)
+
+**Gdzie skończyliśmy:** szata graficzna rozdzielona (static/style.css + app.js), serwis na PythonAnywhere
+u usera, logowanie panelu działa bez cookies. User zgłosił błędy (menu różne na każdej stronie,
+klik „Start"/logo → 404, filtry realizacji martwe).
+
+- [ ] **Do zrobienia (ta sesja):** ujednolicić menu (wspólny `_nav.html` dla wszystkich podstron publicznych),
+  naprawić linki logo/Start (index.html → /), stopki, usunąć martwy filtr kategorii w /realizacje/.
+- [ ] **Następne zadanie:** baza danych + podpięcie API Google Sheets (webhook Apps Script w core.push_do_sheets).
+- [ ] Po commicie user robi `git pull` + Reload na PythonAnywhere.
+
+### LEKCJE
+- Podmiany w `wczytaj_v4` muszą obejmować też `index.html` → `/` (menu v4 linkuje do index.html = 404).
+- Menu rozjechało się, bo nowe szablony (realizacje/kontakt) dostały inne menu niż reszta — jedno
+  źródło menu (partial + automatyczne .akt po request.path), nie kopie.
