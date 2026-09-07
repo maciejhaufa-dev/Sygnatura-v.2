@@ -342,3 +342,29 @@ v4/
 ### LEKCJE
 - INSERT z 19 placeholderami na 18 kolumn — liczyć kolumny po dodaniu pola (SQLite: „N values for M columns").
 - Regex podmieniający pierwszy `return` w funkcji łapie early-return `return ''` zamiast docelowego — po masowej podmianie weryfikować grep-em.
+
+## 24. STATUS (07.09.2026 — warstwy szopki: czysta konwersja SVG → PNG 1:1)
+
+- [x] `v4/tools/warstwy_png.py` — konwersja każdej warstwy z `uploads/Szopka 3D.svg` do PNG:
+  2400×2400 px = 200×200 mm (12 px/mm), czarne linie na białym, wspólny układ 1:1.
+  Pominięte: wypełnienia (podkłady robocze arkusza 754×378, skala 0,26458333), prowadnice Inkscape (28), ukrytych brak.
+- [x] Wynik: `pracownia/szopka/WARSTWY-PNG/` — 6 plików nazwanych po ZAWARTOŚCI (numeracja usera ≠ etykiety L0–L5!):
+  L0=niebo-rama, L1=pasterze-i-2-owce, L2=święta-rodzina-2-owce-2-anioły,
+  L3=owca-koza-2-płoty-zarys-szopki, L4=krowa-osioł-zarys-szopki-chmury, L5=rozgwieżdżone-niebo.
+- [x] Renderer linii: suma quadów segmentów + trójkąty mitrów (miterlimit 4), szerokość × skala transformu (jak Inkscape).
+- [x] Usunięte nietrafione rendery: `GRAWERY/` (cięcia postaci — błędna interpretacja warstw), stary `L0..L5.png`.
+- [x] Weryfikacja: niezależny test odległościowy (FP=0), porównanie bbox per element, podgląd ASCII warstw.
+- [ ] **Czeka:** ewentualna aktualizacja SVG przez usera → ponownie `python3 v4/tools/warstwy_png.py`.
+
+### LEKCJE
+- Nie interpretować zawartości warstw SVG („stajnia"/„pasterze" z poprzednich opisów = błędne). Czysta konwersja 1:1.
+- Etykiety warstw w pliku ≠ numeracja w głowie usera — nazywać pliki po zawartości, numery zachować z pliku.
+
+## 25. STATUS (07.09.2026 — plan minimum: wizytówka/portfolio) [W TOKU]
+
+- [x] Dziennik zbiorczy `DZIENNIK.md` w korzeniu repo (odtworzenie sesji po resecie).
+- [ ] Serwis: trasy `/realizacje/` + `/realizacje/<id>/` i `/kontakt/` (formularz z PKE art. 398).
+- [ ] Baza: tabele `realizacje` i `wiadomosci` (migracje w db.py + seed).
+- [ ] Admin: CRUD realizacji z uploadem zdjęć + skrzynka wiadomości.
+- [ ] Szablony: realizacje.html, realizacja_szczegoly.html, kontakt.html, admin_realizacje.html, admin_wiadomosci.html.
+- [ ] Nav v4: „Galeria" → „Realizacje" (linki do tras serwisu przez podmiany w wczytaj_v4).
