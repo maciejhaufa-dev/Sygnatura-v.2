@@ -22,12 +22,25 @@ import re
 import json
 import sqlite3
 import datetime
+import secrets
+from functools import wraps
 
 from flask import (Flask, g, request, render_template, render_template_string,
-                   redirect, url_for, session, send_from_directory, abort, flash)
+                   redirect, url_for as _flask_url_for, session, send_from_directory, abort, flash,
+                   has_request_context)
 
 import db as baza_mod
 import core
+
+
+def url_for(koniec, **kw):
+    """Wrapper na url_for: na stronach admina dokleja do adresu token logowania (klucz),
+    żeby panel działał także w przeglądarkach blokujących ciasteczka (iframe/podgląd/telefon)."""
+    if has_request_context():
+        klucz = request.args.get('klucz')
+        if klucz and str(koniec).startswith('admin') and str(koniec) != 'admin_login':
+            kw.setdefault('klucz', klucz)
+    return _flask_url_for(koniec, **kw)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 V4 = os.path.normpath(os.path.join(ROOT, '..', 'v4'))
@@ -42,6 +55,9 @@ if not os.path.exists(SECRET):
     with open(SECRET, 'w') as f:
         f.write(os.urandom(24).hex())
 app.secret_key = open(SECRET).read()
+
+# token logowania doklejany do linków panelu w szablonach (tak samo jak w trasach)
+app.jinja_env.globals['url_for'] = url_for
 
 MIESIACE = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
             'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień']
@@ -78,11 +94,21 @@ def redirect303(cel, **kw):
 
 
 def admin_required(fn):
-    from functools import wraps
     @wraps(fn)
     def wrap(*a, **kw):
         if not session.get('admin'):
-            return redirect303(url_for('admin_login', dalej=request.path))
+            # logowanie przez token w adresie (działa bez ciasteczek — iframe/podgląd/telefon)
+            klucz = request.args.get('klucz') or request.form.get('klucz') or request.headers.get('X-Admin-Klucz')
+            if klucz:
+                db = get_db()
+                row = db.execute('SELECT 1 FROM admin_tokens WHERE token=? AND wygasa>?', (klucz, core.teraz())).fetchone()
+                if row:
+                    session['admin'] = '1'
+                    session['admin_klucz'] = klucz
+                else:
+                    return redirect303(url_for('admin_login', dalej=request.path))
+            else:
+                return redirect303(url_for('admin_login', dalej=request.path))
         return fn(*a, **kw)
     return wrap
 
@@ -591,14 +617,29 @@ def admin_login():
         zapisane = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='admin_hash'").fetchone()
         if zapisane and check_password_hash(zapisane['wartosc'], haslo):
             session['admin'] = '1'
-            return redirect(request.args.get('dalej') or url_for('admin_dash'))
-        flash('Błędne hasło.')
+            # token logowania w adresie — panel działa też bez ciasteczek (iframe/podgląd/telefon)
+            token = secrets.token_urlsafe(24)
+            db.execute('DELETE FROM admin_tokens WHERE wygasa<?', (core.teraz(),))
+            db.execute('INSERT INTO admin_tokens (token, utworzono, wygasa) VALUES (?,?,?)',
+                       (token, core.teraz(), core.teraz_plus(12 * 3600)))
+            db.commit()
+            cel = request.args.get('dalej') or url_for('admin_dash')
+            if not cel.startswith('/admin'):
+                cel = url_for('admin_dash')
+            return redirect(cel + (('&' if '?' in cel else '?') + 'klucz=' + token), code=303)
+        flash('Błędne hasło — spróbuj jeszcze raz (możesz pokazać hasło, żeby sprawdzić literówkę).')
     return render_template('admin_login.html')
 
 
 @app.route('/admin/logout', methods=['POST'])
 def admin_logout():
+    db = get_db()
+    klucz = request.args.get('klucz') or request.form.get('klucz') or session.get('admin_klucz')
+    if klucz:
+        db.execute('DELETE FROM admin_tokens WHERE token=?', (klucz,))
+        db.commit()
     session.pop('admin', None)
+    session.pop('admin_klucz', None)
     return redirect303(url_for('index'))
 
 

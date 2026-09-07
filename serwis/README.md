@@ -27,6 +27,11 @@ Otwórz w przeglądarce:
 
 **Hasło startowe do panelu: `sygnatura-2026`** — zmień od razu w zakładce *Ustawienia*.
 
+**Logowanie działa też bez ciasteczek:** po zalogowaniu panel dostaje token w adresie (`/admin/?klucz=...`),
+który dokleja się do wszystkich linków panelu. Dzięki temu panel działa także w podglądach w ramce
+(iframe), na telefonach i w przeglądarkach blokujących ciasteczka. Token wygasa po 12 h;
+wylogowanie natychmiast go unieważnia. Na formularzu logowania jest checkbox **„Pokaż hasło"**.
+
 ## Plan minimum: wizytówka / portfolio (sesja 14)
 
 Strona, którą można pokazać znajomym już teraz:

@@ -21,6 +21,11 @@ STATUS_KLASA = {
 def teraz():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 
+
+def teraz_plus(sekundy):
+    """Bieżący czas + przesunięcie (do wygasania tokenów)."""
+    return (datetime.datetime.now() + datetime.timedelta(seconds=sekundy)).strftime('%Y-%m-%d %H:%M')
+
 def nowa_sygnatura(db):
     """Nadaje kolejną sygnaturę sprawy: SYG-2026-001, SYG-2026-002, ..."""
     row = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='licznik_sygnatur'").fetchone()

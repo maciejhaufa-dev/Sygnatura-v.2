@@ -116,6 +116,12 @@ CREATE TABLE IF NOT EXISTS wiadomosci (
   status   TEXT DEFAULT 'nowa',     -- nowa / przeczytana / odpowiedziano
   data     TEXT
 );
+-- Tokeny logowania do panelu (działają też bez ciasteczek — przeglądarki w iframe/podglądzie)
+CREATE TABLE IF NOT EXISTS admin_tokens (
+  token    TEXT PRIMARY KEY,
+  utworzono TEXT,
+  wygasa   TEXT
+);
 """
 
 MIESIACE_PL = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',

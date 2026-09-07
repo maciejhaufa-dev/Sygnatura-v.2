@@ -13,11 +13,14 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--
 h1{color:var(--butelkowa);font-size:26px;margin:0 0 6px}
 p{margin:0 0 18px;color:rgba(51,38,28,.7);font-size:15px}
 label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-input{width:100%;padding:10px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;margin-bottom:14px}
+input[type=password],input[type=text]{width:100%;padding:10px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;margin-bottom:8px}
 button{width:100%;background:var(--butelkowa);color:var(--zloty);border:0;padding:11px;font-family:inherit;font-size:17px;cursor:pointer}
 button:hover{background:var(--brunatny)}
 .flash{background:var(--butelkowa);color:var(--zloty);padding:9px 12px;margin-bottom:14px;font-size:15px}
 a{color:var(--brunatny);font-size:14px}
+.pokaz{display:flex;align-items:center;gap:8px;font-size:15px;margin:2px 0 14px;cursor:pointer;color:rgba(51,38,28,.75)}
+.pokaz input{width:17px;height:17px;accent-color:var(--butelkowa);cursor:pointer}
+.podpowiedz{font-size:13.5px;color:rgba(51,38,28,.6);background:var(--krem);border:1px dashed rgba(107,69,48,.35);padding:8px 10px;margin-top:14px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -30,9 +33,20 @@ a{color:var(--brunatny);font-size:14px}
   <form method="post">
     <label for="haslo">Hasło</label>
     <input id="haslo" name="haslo" type="password" autofocus required>
+    <label class="pokaz"><input type="checkbox" id="pokaz"> Pokaż hasło</label>
     <button type="submit">Zaloguj</button>
   </form>
+  <div class="podpowiedz">
+    Hasło startowe: <b>sygnatura-2026</b><br>
+    Zmienisz je po zalogowaniu w zakładce <b>Ustawienia</b>.
+  </div>
   <p style="margin-top:16px;text-align:center"><a href="{{ url_for('index') }}">← wróć na stronę</a></p>
 </div>
+<script>
+(function(){
+  var pokaz=document.getElementById('pokaz'),haslo=document.getElementById('haslo');
+  if(pokaz&&haslo){pokaz.addEventListener('change',function(){haslo.type=pokaz.checked?'text':'password';});}
+})();
+</script>
 </body>
 </html>

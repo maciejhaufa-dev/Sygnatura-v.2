@@ -369,3 +369,23 @@ v4/
 - [x] Szablony: realizacje.html, realizacja_szczegoly.html, kontakt.html, admin_realizacje.html, admin_wiadomosci.html + admin_wiadomosc.html.
 - [x] Nav v4 w serwisie: „Galeria" → „Realizacje" (podmiany w wczytaj_v4: galeria.html→/realizacje/, kontakt.html→/kontakt/).
 - [x] Testy: formularz (walidacja 4 błędów, poprawny POST → baza + 2 maile, honeypot bez zapisu), admin CRUD realizacji z uploadem (303), wiadomości (statusy), /realizacje/<id>/ 200 + 404, index z podmienionymi linkami, sanity 6 tras 200. Baza wyczyszczona po testach.
+
+## 26. STATUS (07.09.2026 — naprawa logowania do panelu: token bez ciasteczek)
+
+- [x] **Diagnoza z logów:** u usera w podglądzie hasło było POPRAWNE (302), ale przeglądarka
+  nie odsyłała ciasteczka sesji (panel działa w iframe — cookies blokowane) → `/admin/` od razu
+  wracał na login. Efekt: „wpisuję hasło i nic się nie dzieje".
+- [x] **Fix:** logowanie wydaje token (tabela `admin_tokens`, 12 h ważności), redirect
+  `/admin/?klucz=...`; `admin_required` honoruje token z adresu/formularza/nagłówka;
+  wrapper `url_for` w app.py + global Jinja dokleja `klucz` do WSZYSTKICH linków panelu;
+  wylogowanie usuwa token z bazy. Złe/brakujące tokeny → login.
+- [x] Login page: checkbox **„Pokaż hasło"** + podpowiedź hasła startowego; lepszy komunikat błędu.
+- [x] Testy (curl, BEZ ciasteczek): złe hasło → komunikat; dobre → 303 z kluczem; panel i 9 zakładek
+  200 z samym kluczem; POST formularza z kluczem → 303 z kluczem w redirect; zły token → login;
+  wylogowanie unieważnia token (panel → 303); sprzątanie po testach.
+- [x] Commit i push.
+
+### LEKCJE
+- Podgląd e2b = iframe na innym originie → przeglądarki (szczególnie telefoniczne) blokują
+  ciasteczka sesji. Logowanie musi działać bez cookies (token w adresie) — dotyczy też
+  przyszłych wdrożeń testowych w ramkach.
