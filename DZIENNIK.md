@@ -189,3 +189,49 @@ Wykonane:
 Uwagi techniczne:
 - Sandbox resetował się 2× w tej sesji (git → 2284074, .venv usunięty). Procedura odtworzenia: zapis edytowanych plików do /tmp → `git fetch origin arena/01a056f0-sygnatura-v-2` + `git reset --hard` → przywrócenie plików → `python3 -m venv .venv && .venv/bin/pip install flask` → start procesu.
 - Popup działa też przy powrocie z kroku Dane (w= w formularzach).
+
+---
+
+# ⛳ PUNKT KONTROLNY (koniec sesji 19) — pełny snapshot stanu pracy
+
+**Data:** 2026-09-08 · **Gałąź:** `arena/01a056f0-sygnatura-v-2` · **HEAD:** `f211ebc` (wypchnięty; origin = HEAD, tree czysty)
+**PR:** #1 OPEN (base main, head arena/01a056f0-sygnatura-v-2, 41 commitów, ~170 plików, +18k linii — obejmuje całą historię, bo main = „Add files via upload").
+**Serwis lokalnie:** Flask 127.0.0.1:8000 (start: `cd serwis && /home/user/Sygnatura-v.2/.venv/bin/python app.py`), admin `/admin/` hasło `sygnatura-2026`.
+
+## ⚠️ PROCEDURA ODTWORZENIA PO RESECIE SANDBOXA (zdarzył się 2× w sesji 19 — bez paniki, wszystko jest w repo)
+Sandbox resetuje: git cofa HEAD do `2284074`, usuwa `.venv`, czasem zabija proces Flask. PLIKI W KATALOGU ROBOCZYM ZOSTAJĄ.
+1. Zapisz niezcommitowane zmiany: `cp` edytowanych plików do /tmp (NAJPIERW to, zanim git reset).
+2. `git fetch origin arena/01a056f0-sygnatura-v-2:refs/remotes/origin/arena/01a056f0-sygnatura-v-2` + `git reset --hard origin/arena/01a056f0-sygnatura-v-2`.
+3. Przywróć pliki z /tmp (jeśli były niezcommitowane zmiany).
+4. `cd /home/user/Sygnatura-v.2 && python3 -m venv .venv && .venv/bin/pip install -q flask` (pip systemowy blokuje PEP 668; ewentualnie pillow do obróbki zdjęć).
+5. Start serwisu przez start_process: cwd=`/home/user/Sygnatura-v.2/serwis`, komenda `/home/user/Sygnatura-v.2/.venv/bin/python app.py`, name „Serwis Sygnatura".
+6. Baza `serwis/data/serwis.db` przeżywa reset (nie jest w gicie — .gitignore); przy starcie `db.inicjuj()` robi migracje (kolumny: sklep_produkty.obraz, wiadomosci.temat, rezerwacje.*, pakiety.cena_liczba).
+
+## 🗺️ MAPA REPOZYTORIUM
+- `serwis/` — Flask+SQLite (silnik): `app.py` (trasy+logika), `db.py` (schemat+seed+migracje), `core.py` (maile/sygnatury/rabaty/sheets), `templates/`, `static/style.css` (v=6), `static/media/sklep/*.jpg` (zdjęcia produktów), `sheets/webhook.gs` (arkusz).
+- `v4/` — STRONA GŁÓWNA (landing): `index.html` (serwowany przez Flask na `/`, przez `wczytaj_v4()`), `build.py` (generator HTML z szablonów + Pillow), `assets/` (hero, litery logotypu), `DZIENNIK-V4.md`.
+- `docs/` — kopia GitHub Pages (statyczna wizytówka; menu zsynchronizowane, ale Pages nie odpala Flaska).
+- `pracownia/` — materiały usera: `szopka/WARSTWY-PNG/` (konwersja 1:1 do cięcia), `szopka/WIZUALIZACJE/v3/` (wizualizacje — `WIZ3_foto_noc.png` = zdjęcie szopki w sklepie), `szopka/CIECIE-user/` (pliki usera).
+- `DZIENNIK.md` (ten plik), `PODSUMOWANIE-rozmowy-v1-v3.md`, `serwis/README.md`, `serwis/WDROZENIE.md`, `serwis/PYTHONANYWHERE-KROK-PO-KROKU.md`.
+
+## ✅ STAN FUNKCJONALNY (co działa i jest przetestowane)
+- **Kreator /zamowienia/**: hub 3 kafle; A wynajem (Kalendarz→Pakiet→Personalizacja→Dane→Podsumowanie→Dziękujemy), B personalizacja (3→4→5→6), C sklep (Katalog→3→4→5→6); bloki 4/5/6 wspólne (`/zamowienia/dane|podsumowanie|zamow|dziekuje/`); szkice bez cookies (`w=` w URL, cleanup >48h); powroty aktualizują szkic.
+- **Rachunek** (`_kwoty_box.html`): Lp.|Pozycja|Ilość|Cena jedn.|Wartość; kaucja jako osobna pozycja (wynajem); PODSUMOWANIE (bez kaucji) / RAZEM; w podsumowaniu NA GÓRZE, w bloku Dane i na stronie Dziękujemy (pseudo-szkic z rezerwacji).
+- **Sklep**: karty ze zdjęciem+ceny, licznik −/+, „Dodaj do zamówienia", sticky koszyk, JS blokuje pusty koszyk; personalizacja po katalogu wyraźnie oznaczona.
+- **Personalizacja B**: checkbox „Mój własny projekt" + popup (bez produktu + opis ≥10 zn.) → `/kontakt/?temat=projekt&opis=...` z tematem „Zapytanie o projekt spersonalizowany" i wklejonym opisem; „Anuluj" = powrót do katalogu; walidacja też po stronie serwera.
+- **Menu** (wszędzie): Strona główna / Zamówienia / Pracownia / Nasze realizacje / Współpraca / Kontakt. Podstrony: `/pracownia/` (o nas, treść ROBOCZA), `/wspolpraca/` (B2B + indywidualna sygnatura partnera, treść ROBOCZA), `/regulamin/`, `/jak-pracujemy/`, `/realizacje/`, `/kontakt/` (select tematu: wynajem/personalizacja/projekt/sklep/współpraca/inne).
+- **Maile**: do Studia „NOWE ZAMÓWIENIE — TYP" + autorespondery z szablonów bazy; bez SMTP kopia w `mail_outbox` (panel → Maile). Na PythonAnywhere FREE tylko smtp.gmail.com:587 + hasło aplikacji.
+- **Admin**: rezerwacje (statusy: zapytanie/platnosc_w_toku/zarezerwowany/odrzucono; zmiana statusu wysyła szablony kaucja/potwierdzenie/odrzucono), sklep (CRUD + obraz + miniaturka), personalizacje, pakiety, produkty, realizacje, wiadomości (z tematem), maile, ustawienia (SMTP/sheets/kody rabatowe `KOD:procent`), szablony, rozliczenia mąż/żona/wspólne.
+- **Kwoty**: wynajem=stawka×doby+kaucja 300+pers; personalizacja=pers przedpłata; sklep=produkty×szt.+pers; rabat pers −5% od 3; kod rabatowy od całości bez kaucji; klucz `razem_po`.
+
+## 📋 OTWARTE DECYZJE / TO-DO (nic nie ucieknie)
+1. **Landing page — NASTĘPNY KROK (decyzja usera):** nowa forma strony głównej. Prace w `v4/index.html` (+ `build.py` jako źródło) — serwowany przez Flask na `/`; kopia Pages w `docs/index.html` do synchronizacji na końcu.
+2. Kaucja jednostkowa per produkt najmu — gdy wynajem rozbije się na pojedyncze produkty (teraz: „za najem, 1 komplet, 300 zł").
+3. Zdjęcia produktów sklepu: szopka = prawdziwa wizualizacja; szyld/love/ramka = makiety AI do podmiany (`serwis/static/media/sklep/` + pole „Obraz" w `/admin/sklep`).
+4. Treści ROBOCZE do przejrzenia przez Studio: `templates/pracownia.html`, `templates/wspolpraca.html`, `templates/regulamin.html`, `templates/jak_pracujemy.html`; ceny sklepu i pakietów.
+5. Instrukcja webhook.gs (arkusz Google) dla usera — w ROZMOWIE, nie w plikach md.
+6. Koszt wysyłki kuriera (teraz „potwierdzimy w odpowiedzi") — do decyzji.
+7. Etap 2: Oracle Cloud Always Free + domena; PythonAnywhere: `git pull` + Reload przy aktualizacjach.
+
+## 🧭 USTALENIA STAŁE (nie zmieniać bez zgody usera)
+Menu 6 pozycji w tej kolejności; kolory #6B4530/#1F3A32/#C4A582/#FBF7F0; logo sygNATURA+sygnet; hero bez cięcia + animacje grają ZAWSZE + menu responsywne; „Zamawiam z obowiązkiem zapłaty"; doby od protokołu zdawczo-odbiorczego; kaucja+przedpłata; rabat 5% od 3 pers; „min. 2 tygodnie" przy personalizacji; wycena pomysłu własnego 2 dni robocze pod tą samą sygnaturą; PKE art. 398 (zgoda wymagana); GitHub Pages = tylko statyczna wizytówka; silnik (Python) / look (HTML+CSS+JS) rozdzielone; produkty BOŻONARODZENIOWE priorytetem (szopka warstwowa = flagowiec); nie generować SVG (PNG/JPG sylwetki, obrys robi user); pliki pod cięcie = sam outline.
