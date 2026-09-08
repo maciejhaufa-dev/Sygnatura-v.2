@@ -259,9 +259,11 @@ def kontakt_form():
         else:
             ok = True
     else:
-        # preselekcja tematu z linku (np. /kontakt/?temat=wspolpraca)
+        # preselekcja tematu z linku (np. /kontakt/?temat=wspolpraca lub ?temat=projekt)
         t = request.args.get('temat', '').strip()
         dane['temat'] = t if t in TEMATY_KONTAKT else 'inne'
+        # opis projektu spersonalizowanego z kreatora (popup „własny projekt") — wklejany do wiadomości
+        dane['tresc'] = request.args.get('opis', '').strip()
     return render_template('kontakt.html', bledy=bledy, dane=dane, ok=ok,
                            tematy=TEMATY_KONTAKT)
 
@@ -857,6 +859,7 @@ def z_wynajem_pakiet():
 TEMATY_KONTAKT = {
     'wynajem': 'Wynajem dekoracji',
     'personalizacja': 'Personalizacja i prezenty',
+    'projekt': 'Zapytanie o projekt spersonalizowany',
     'sklep': 'Sklep i produkty',
     'wspolpraca': 'Współpraca (dla firm)',
     'inne': 'Inny temat',
@@ -974,7 +977,10 @@ def z_wynajem_pers():
 
 @app.route('/zamowienia/personalizacja/', methods=['GET', 'POST'])
 def z_pers_samodzielna():
-    """B: BLOK 3 jako samodzielny przepływ — personalizacja bez terminu i pakietu."""
+    """B: BLOK 3 jako samodzielny przepływ — personalizacja bez terminu i pakietu.
+    Specjalny przypadek: własny projekt BEZ wybranych produktów → monit (popup) z wyborem:
+    „Chcę wysłać zapytanie" → formularz kontaktowy z tematem „Zapytanie o projekt spersonalizowany"
+    i wklejonym opisem; „Anuluj" → powrót do katalogu personalizacji."""
     db = get_db()
     klucz = request.values.get('w', '')
     szkic = szkic_pobierz(db, klucz) if klucz else None
@@ -984,26 +990,35 @@ def z_pers_samodzielna():
     wybrane = [x['id'] for x in (szkic.get('pers') or [])] if szkic else []
     opisy = {x['id']: x.get('opis', '') for x in (szkic.get('pers') or [])} if szkic else {}
     pomysl = szkic.get('pomysl', '') if szkic else ''
+    projekt = bool(szkic and szkic.get('projekt_wlasny'))
     bledy = []
     if request.method == 'POST':
         pers_list, bledy = pers_z_formularza(db, request.form)
         pomysl = (request.form.get('pomysl') or '').strip()
+        projekt = request.form.get('projekt_wlasny') == 'on'
+        # własny projekt bez produktu = zapytanie przez formularz kontaktowy (nie zamówienie)
+        if not pers_list and projekt and len(pomysl) >= 10:
+            from urllib.parse import urlencode
+            adres = url_for('kontakt_form') + '?' + urlencode({'temat': 'projekt', 'opis': pomysl})
+            return redirect(adres, code=303)
         if not pers_list and len(pomysl) < 10:
             bledy.append('Wybierz co najmniej jeden produkt do personalizacji albo opisz swój pomysł (min. 10 znaków).')
         if not bledy:
             if szkic:
                 szkic['pers'] = pers_list
                 szkic['pomysl'] = pomysl
+                szkic['projekt_wlasny'] = projekt
                 szkic_zapisz(db, klucz, szkic)
                 return redirect303(url_for('zamowienia_dane', w=klucz))
             nowy = szkic_podstawowy('personalizacja')
-            nowy.update({'pers': pers_list, 'pomysl': pomysl, 'dostawa': 'wysylka'})
+            nowy.update({'pers': pers_list, 'pomysl': pomysl, 'dostawa': 'wysylka',
+                         'projekt_wlasny': projekt})
             klucz2 = szkic_nowy(db, nowy)
             return redirect303(url_for('zamowienia_dane', w=klucz2))
         wybrane = [int(x) for x in request.form.getlist('pers') if x.isdigit()]
         opisy = {k: request.form.get('pers_opis_%d' % k, '') for k in wybrane}
     return render_template('z_pers_1.html', pozycje=pozycje, wybrane=wybrane, opisy=opisy,
-                           pomysl=pomysl, bledy=bledy, w=klucz)
+                           pomysl=pomysl, bledy=bledy, w=klucz, projekt=projekt)
 
 
 @app.route('/zamowienia/sklep/', methods=['GET', 'POST'])

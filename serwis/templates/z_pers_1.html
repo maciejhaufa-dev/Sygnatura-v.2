@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=5">
+<link rel="stylesheet" href="/static/style.css?v=6">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -48,7 +48,11 @@
     </div>
 
     <div class="pole" style="margin-top:18px">
-      <label for="pomysl">Nie znalazłeś tego, czego szukasz? Opisz nam swój pomysł, a my zajmiemy się jego realizacją.</label>
+      <div class="projekt-cb">
+        <input type="checkbox" name="projekt_wlasny" id="projekt_wlasny" {% if projekt %}checked{% endif %}>
+        <label for="projekt_wlasny"><b>Mój własny projekt</b> — chcę zrealizować coś spoza asortymentu (zapytanie o wycenę zamiast zamówienia)</label>
+      </div>
+      <label for="pomysl">Opisz nam swój pomysł, a my zajmiemy się jego realizacją.</label>
       <textarea id="pomysl" name="pomysl" rows="3" placeholder="Np. drewniana ramka z imionami chrzestnych, tablica z sentencją wg własnego tekstu, prezent na rocznicę…">{{ pomysl }}</textarea>
     </div>
 
@@ -56,6 +60,24 @@
       <button class="btn" type="submit" name="akcja" value="dalej">Dalej: Twoje dane →</button>
     </div>
   </form>
+</div>
+
+{# Popup: własny projekt bez wybranych produktów → zapytanie przez formularz kontaktowy #}
+<div class="modal" id="modal-projekt" hidden>
+  <div class="modal-karta" role="dialog" aria-modal="true" aria-labelledby="mp-tytul">
+    <h2 id="mp-tytul">Widzimy, że nie znalazłeś w naszym asortymencie tego, czego szukasz.</h2>
+    <p>Czy chciałbyś wysłać zapytanie dotyczące Twojego spersonalizowanego projektu?
+    Informację zwrotną dotyczącą wyceny prześlemy Ci w wiadomości zwrotnej w terminie <b>2 dni roboczych</b>.</p>
+    <div class="modal-przyciski">
+      <form method="post" action="{{ url_for('z_pers_samodzielna', w=w) if w else url_for('z_pers_samodzielna') }}" id="f-projekt">
+        {% if w %}<input type="hidden" name="w" value="{{ w }}">{% endif %}
+        <input type="hidden" name="projekt_wlasny" value="on">
+        <input type="hidden" name="pomysl" id="mp-pomysl">
+        <button class="btn" type="submit">Tak, chcę wysłać zapytanie →</button>
+      </form>
+      <button class="btn btn-line" type="button" id="mp-anuluj">Anuluj — wracam do katalogu</button>
+    </div>
+  </div>
 </div>
 
 <footer class="stopka">
@@ -70,7 +92,9 @@
   var form = document.getElementById('f-pers');
   var boxBledy = document.getElementById('js-bledy');
   var lista = document.getElementById('js-bledy-list');
-  var wymaganyPomysl = {{ 'true' if typ_sklep is defined and True else 'false' }};
+  var modal = document.getElementById('modal-projekt');
+  var pomysl = document.getElementById('pomysl');
+  var cbProjekt = document.getElementById('projekt_wlasny');
 
   document.querySelectorAll('.z-pers-it input[type=checkbox]').forEach(function(cb){
     cb.addEventListener('change', function(){
@@ -84,35 +108,61 @@
     });
   });
 
-  // przycisk „Pomiń ten krok" nie wymaga walidacji (działa też w Safari)
-  form.querySelectorAll('button[name=akcja]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      form.dataset.pomijam = btn.value === 'pomijam' ? '1' : '';
-    });
+  function ileZaznaczonych(){
+    return document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').length;
+  }
+
+  function pokazPopup(){
+    document.getElementById('mp-pomysl').value = pomysl.value.trim();
+    modal.hidden = false;
+    modal.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  function ukryjPopup(){
+    modal.hidden = true;
+    boxBledy.hidden = true;
+  }
+
+  // „Anuluj" w popupie = powrót do katalogu produktów personalizacji
+  var anuluj = document.getElementById('mp-anuluj');
+  if (anuluj) anuluj.addEventListener('click', function(){
+    cbProjekt.checked = false;
+    ukryjPopup();
+    pomysl.focus();
   });
 
   form.addEventListener('submit', function(ev){
-    if (form.dataset.pomijam === '1') return;
     var bledy = [];
+    var zaznaczone = ileZaznaczonych();
     document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').forEach(function(cb){
       var ta = cb.closest('.pers-it').querySelector('.z-pers-opis textarea');
       if (!ta.value || ta.value.trim().length < 3){
         bledy.push({ta: ta, nazwa: cb.closest('.pers-it').querySelector('b').textContent.trim()});
       }
     });
-    var pomysl = document.getElementById('pomysl');
-    if (wymaganyPomysl){
-      var ileZaznaczonych = document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').length;
-      if (!ileZaznaczonych && (!pomysl || pomysl.value.trim().length < 10)){
-        bledy.push({ta: pomysl, nazwa: 'opisz swój pomysł (min. 10 znaków) albo zaznacz produkt'});
-      }
+    var tylkoPomysl = !zaznaczone && pomysl.value.trim().length >= 10;
+
+    // własny projekt bez produktu → popup z pytaniem o wysłanie zapytania (nie zamówienie)
+    if (!zaznaczone && cbProjekt.checked && tylkoPomysl){
+      ev.preventDefault();
+      boxBledy.hidden = true;
+      pokazPopup();
+      return;
+    }
+
+    if (!zaznaczone && !tylkoPomysl){
+      bledy.push({ta: pomysl, nazwa: 'opisz swój pomysł (min. 10 znaków) albo zaznacz produkt'});
     }
     if (bledy.length){
       ev.preventDefault();
+      ukryjPopup();
       lista.innerHTML = '';
       bledy.forEach(function(b){
         var li = document.createElement('li');
-        li.textContent = 'Uzupełnij pole „' + b.nazwa + '\" — co i jak ma być spersonalizowane.';
+        if (b.ta === pomysl){
+          li.textContent = 'Uzupełnij: ' + b.nazwa + '.';
+        } else {
+          li.textContent = 'Uzupełnij pole „' + b.nazwa + '" — co i jak ma być spersonalizowane.';
+        }
         lista.appendChild(li);
       });
       boxBledy.hidden = false;

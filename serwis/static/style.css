@@ -471,3 +471,19 @@ textarea.pole-blad, input.pole-blad{border-color:#8c2f2f !important;background:#
   .rach-glowka .r-ile,.rach-glowka .r-cena{display:none}
   .rach-razem b{font-size:20px}
 }
+
+/* ============ POPUP: własny projekt bez produktu (krok B) ============ */
+.projekt-cb{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;padding:10px 12px;
+  background:#FFF8E1;border:1px solid var(--zloty);font-size:15px}
+.projekt-cb input{width:18px;height:18px;flex:none;margin-top:2px;accent-color:var(--butelkowa)}
+.projekt-cb label{margin:0;text-transform:none;letter-spacing:0;font-size:15px;line-height:1.5}
+.projekt-cb b{color:var(--brunatny)}
+.modal{position:fixed;inset:0;z-index:200;background:rgba(31,58,50,.55);display:grid;place-items:center;
+  padding:18px}
+.modal[hidden]{display:none}
+.modal-karta{background:var(--krem);border:1.5px solid var(--brunatny);box-shadow:0 30px 70px rgba(31,58,50,.4);
+  max-width:560px;width:100%;padding:clamp(22px,4vw,34px);text-align:center}
+.modal-karta h2{font-size:clamp(20px,3vw,26px);color:var(--butelkowa);margin-bottom:12px;line-height:1.25}
+.modal-karta p{font-size:16.5px;line-height:1.6;color:rgba(51,38,28,.9)}
+.modal-przyciski{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.modal-przyciski .btn{margin-top:0}

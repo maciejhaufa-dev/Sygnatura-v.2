@@ -171,3 +171,21 @@ Do decyzji użytkownika:
 - Kaucja w rachunku jest zapisana jako „za najem (1 komplet) — 300 zł". Gdy wynajem zacznie składać się z POJEDYNCZYCH produktów (każdy z własną kaucją), rachunek wypisze każdą kaucję osobno — na razie dane mają jeden pakiet.
 - Zdjęcia szyldu/liter/ramki to makiety — podmień na prawdziwe fotki (wgraj do serwis/static/media/sklep/ i podaj nazwę pliku w /admin/sklep).
 - Treści /pracownia/ i /wspolpraca/ są robocze — do przejrzenia w templates/pracownia.html i templates/wspolpraca.html.
+
+---
+
+## Sesja 19 — popup „własny projekt" w personalizacji B (bez produktu → zapytanie przez formularz kontaktowy)
+
+Uwaga użytkownika: w sekcji B ktoś może nie wybrać produktu, tylko opisać własny pomysł. Taki przypadek nie może iść do zamówienia — ma być monit (popup): „Widzimy, że nie znalazłeś w naszym asortymencie tego, czego szukasz. Czy chciałbyś wysłać zapytanie dot. Twojego spersonalizowanego projektu? Informacja zwrotna dot. wyceny zostanie przesłana w wiadomości zwrotnej w terminie 2 dni roboczych" + 2 przyciski:
+- „Chcę wysłać zapytanie" → formularz kontaktowy z wklejonym opisem i tematem ustawionym automatycznie na „Zapytanie o projekt spersonalizowany" (klient uzupełnia tylko dane kontaktowe i klika wyślij; dalej wszystko jak przy zwykłym zapytaniu z formularza),
+- „Anuluj" → powrót do katalogu produktów personalizacji.
+
+Wykonane:
+- `z_pers_1.html` (krok B): checkbox „Mój własny projekt — chcę zrealizować coś spoza asortymentu (zapytanie o wycenę zamiast zamówienia)" + modal `#modal-projekt` z treścią wg uwagi i przyciskami (formularz `f-projekt` z hidden `projekt_wlasny=on` + `pomysl`; „Anuluj" czyści checkbox i zamyka popup). JS: „Dalej" przy braku produktów + zaznaczony projekt + opis ≥10 znaków → popup zamiast wysyłki formularza zamówienia.
+- `app.py z_pers_samodzielna`: POST z `projekt_wlasny=on` bez produktów i opisem ≥10 znaków → redirect 303 na `/kontakt/?temat=projekt&opis=<opis>`; zapisuje `projekt_wlasny` w szkicu (przydatne przy edycji).
+- `app.py TEMATY_KONTAKT`: nowy temat `projekt` = „Zapytanie o projekt spersonalizowany"; `kontakt_form` (GET) przyjmuje `?opis=` i wkleja go do treści wiadomości, preselekcja tematu przez `?temat=`.
+- Testy curl: popup w HTML, redirect z wklejonym opisem, select `projekt selected`, wysyłka zapytania (wiadomość zapisana z tematem „Zapytanie o projekt spersonalizowany"), przepływ z produktem + projekt → normalnie do bloku Dane, opis <10 znaków → błąd walidacji bez redirectu. Dane testowe posprzątane.
+
+Uwagi techniczne:
+- Sandbox resetował się 2× w tej sesji (git → 2284074, .venv usunięty). Procedura odtworzenia: zapis edytowanych plików do /tmp → `git fetch origin arena/01a056f0-sygnatura-v-2` + `git reset --hard` → przywrócenie plików → `python3 -m venv .venv && .venv/bin/pip install flask` → start procesu.
+- Popup działa też przy powrocie z kroku Dane (w= w formularzach).
