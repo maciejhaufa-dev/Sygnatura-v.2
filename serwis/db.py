@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS sklep_produkty (
   opis      TEXT DEFAULT '',
   cena      REAL DEFAULT 0,         -- cena brutto za sztukę (pełna przedpłata)
   dostepny  INTEGER DEFAULT 1,      -- 1 = widoczny w katalogu sklepu
+  obraz     TEXT DEFAULT '',        -- nazwa pliku w static/media/sklep/ (puste = kafelek zastępczy)
   kolejnosc INTEGER DEFAULT 0
 );
 -- Zgłoszenia / rezerwacje klientów
@@ -122,6 +123,7 @@ CREATE TABLE IF NOT EXISTS wiadomosci (
   imie     TEXT NOT NULL,
   email    TEXT NOT NULL,
   telefon  TEXT DEFAULT '',
+  temat    TEXT DEFAULT 'Inny temat',  -- temat zapytania wybrany w formularzu
   tresc    TEXT NOT NULL,
   zgoda    INTEGER DEFAULT 0,       -- 1 = zgoda PKE art. 398 (wymagana)
   status   TEXT DEFAULT 'nowa',     -- nowa / przeczytana / odpowiedziano
@@ -242,10 +244,10 @@ PERSONALIZACJE = [
 
 # Produkty SKLEPU startowe (ceny ROBOCZE — użytkownik poprawi w panelu: Sklep)
 SKLEP = [
-    ('Szopka bożonarodzeniowa (warstwowa)', 'Ręcznie cięta szopka warstwowa 20×20 cm, podświetlenie LED 2700 K na baterie. Unikat z naszej pracowni.', 249),
-    ('Szyld powitalny „Witajcie"', 'Drewniany szyld 60×40 cm — do zawieszenia na drzwi, ganek lub ścianę.', 189),
-    ('Litery podświetlane LOVE', 'Zestaw liter 25 cm z podświetleniem LED 2700 K — do salonu, na kominek, na półkę.', 249),
-    ('Ramka z sentencją', 'Drewniana ramka z grawerem wybranej sentencji — wymiar do ustalenia.', 89),
+    ('Szopka bożonarodzeniowa (warstwowa)', 'Ręcznie cięta szopka warstwowa 20×20 cm, podświetlenie LED 2700 K na baterie. Unikat z naszej pracowni.', 249, 'szopka.jpg'),
+    ('Szyld powitalny „Witajcie"', 'Drewniany szyld 60×40 cm — do zawieszenia na drzwi, ganek lub ścianę.', 189, 'szyld.jpg'),
+    ('Litery podświetlane LOVE', 'Zestaw liter 25 cm z podświetleniem LED 2700 K — do salonu, na kominek, na półkę.', 249, 'love.jpg'),
+    ('Ramka z sentencją', 'Drewniana ramka z grawerem wybranej sentencji — wymiar do ustalenia.', 89, 'ramka.jpg'),
 ]
 
 # Realizacje startowe (portfolio). Zdjęcia kopiowane z ../uploads przy inicjalizacji bazy.
@@ -320,11 +322,12 @@ SZABLONY_MAILI = [
      'Rezerwacja staje się wiążąca po wpłacie kaucji w terminie 7 dni. '
      'Zapłacone = zarezerwowane.\n\n'
      'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'),
-    ('zamowienie', 'Potwierdzenie zamówienia (produkty personalizowane)',
+    ('zamowienie', 'Potwierdzenie zamówienia (sklep / personalizacja)',
      'Potwierdzamy zamówienie — %(sygnatura)s',
      'Dzień dobry, %(imie)s,\n\n'
-     'potwierdzamy przyjęcie zamówienia na produkty personalizowane '
-     '(wykonywane na zamówienie, płatne z góry, bezzwrotne — po wykonaniu zostają u Ciebie).\n\n'
+     'potwierdzamy przyjęcie Twojego zamówienia. Wszystkie kwoty znajdziesz poniżej; '
+     'dane do przelewu i szczegóły dostawy potwierdzimy w kolejnej wiadomości. '
+     'Produkty personalizowane wykonujemy na zamówienie — są płatne z góry i bezzwrotne.\n\n'
      '%(personalizacje)s\n'
      '%(kwoty)s\n'
      'Dziękujemy za zamówienie — zaczynamy pracę!\n\n'
@@ -414,6 +417,26 @@ def inicjuj(sciezka=None):
     kol_pak = {r[1] for r in db.execute('PRAGMA table_info(pakiety)')}
     if 'cena_liczba' not in kol_pak:
         db.execute('ALTER TABLE pakiety ADD COLUMN cena_liczba REAL DEFAULT 0')
+    # migracja sklepu: zdjęcie produktu (obraz)
+    kol_sklep = {r[1] for r in db.execute('PRAGMA table_info(sklep_produkty)')}
+    if 'obraz' not in kol_sklep:
+        db.execute("ALTER TABLE sklep_produkty ADD COLUMN obraz TEXT DEFAULT ''")
+    # migracja wiadomości: temat zapytania z formularza kontaktowego
+    kol_wiad = {r[1] for r in db.execute('PRAGMA table_info(wiadomosci)')}
+    if 'temat' not in kol_wiad:
+        db.execute("ALTER TABLE wiadomosci ADD COLUMN temat TEXT DEFAULT 'Inny temat'")
+    # aktualizacja szablonu autorespondera 'zamowienie' — neutralny tekst dla sklepu i personalizacji
+    # (pomijamy, jeśli Studio już edytowało treść w panelu — sprawdzamy starą nazwę)
+    db.execute("UPDATE szablony_maili SET nazwa=?, tresc=? WHERE klucz='zamowienie' AND nazwa='Potwierdzenie zamówienia (produkty personalizowane)'",
+               ('Potwierdzenie zamówienia (sklep / personalizacja)',
+                'Dzień dobry, %(imie)s,\n\n'
+                'potwierdzamy przyjęcie Twojego zamówienia. Wszystkie kwoty znajdziesz poniżej; '
+                'dane do przelewu i szczegóły dostawy potwierdzimy w kolejnej wiadomości. '
+                'Produkty personalizowane wykonujemy na zamówienie — są płatne z góry i bezzwrotne.\n\n'
+                '%(personalizacje)s\n'
+                '%(kwoty)s\n'
+                'Dziękujemy za zamówienie — zaczynamy pracę!\n\n'
+                'Pozdrawiamy,\nStudio Sygnatura\n%(kontakt_email)s'))
     db.commit()
     mapa_cen = {nazwa: cena_liczba for (_, nazwa, _, _, cena_liczba, _, _) in PAKIETY}
     for nazwa, cena_liczba in mapa_cen.items():
@@ -480,10 +503,15 @@ def inicjuj(sciezka=None):
 
     # sklep (produkty na własność) — seed przy pustej tabeli
     if db.execute('SELECT COUNT(*) FROM sklep_produkty').fetchone()[0] == 0:
-        for i, (nazwa, opis, cena) in enumerate(SKLEP):
-            db.execute('INSERT INTO sklep_produkty (nazwa, opis, cena, kolejnosc) VALUES (?,?,?,?)',
-                       (nazwa, opis, cena, i))
+        for i, (nazwa, opis, cena, obraz) in enumerate(SKLEP):
+            db.execute('INSERT INTO sklep_produkty (nazwa, opis, cena, obraz, kolejnosc) VALUES (?,?,?,?,?)',
+                       (nazwa, opis, cena, obraz, i))
         db.commit()
+    # starsze bazy: dopisz zdjęcia produktów sklepu, jeśli kolumna jest pusta
+    for i, (nazwa, opis, cena, obraz) in enumerate(SKLEP):
+        db.execute('UPDATE sklep_produkty SET obraz=? WHERE nazwa=? AND (obraz IS NULL OR obraz="")',
+                   (obraz, nazwa))
+    db.commit()
 
     # szablony autoresponderów — seed przy pustej tabeli (potem edycja w panelu)
     if db.execute('SELECT COUNT(*) FROM szablony_maili').fetchone()[0] == 0:

@@ -5,6 +5,7 @@
 <h1>Wiadomość #{{ w['id'] }}</h1>
 <div class="forma" style="max-width:760px">
   <p><b>Od:</b> {{ w['imie'] }} &lt;{{ w['email'] }}&gt;{% if w['telefon'] %} · tel. {{ w['telefon'] }}{% endif %}</p>
+  <p><b>Temat:</b> {{ w['temat'] }}</p>
   <p><b>Data:</b> {{ w['data'] }} · zgoda na kontakt (PKE art. 398): {% if w['zgoda'] %}<b>TAK</b>{% else %}<b style="color:#8c2f2f">BRAK</b>{% endif %}</p>
   <hr style="border:none;border-top:1px solid rgba(107,69,48,.25);margin:14px 0">
   <p style="white-space:pre-wrap">{{ w['tresc'] }}</p>

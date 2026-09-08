@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=5">
+<link rel="stylesheet" href="/static/style.css?v=6">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -21,9 +21,13 @@
   {% include '_progress.html' %}
   <a class="powrot" href="{{ url_for('zamowienia_dane', w=szkic['_klucz']) }}">← popraw dane</a>
   <h1>Podsumowanie zamówienia</h1>
-  <p class="sub">Sprawdź wszystko raz jeszcze. Po wysłaniu dostaniesz e-mail z sygnaturą sprawy, dokumentami i danymi do przelewu.</p>
+  <p class="sub">Sprawdź wszystko raz jeszcze. Poniżej znajdziesz pełne zestawienie (rachunek) — pozycja po pozycji. Po wysłaniu dostaniesz e-mail z sygnaturą sprawy, dokumentami i danymi do przelewu.</p>
 
   {% if msg %}<div class="flash">{{ msg }}</div>{% endif %}
+
+  <div class="z-pod-sec kwoty rachunek-sec">
+    {% include '_kwoty_box.html' %}
+  </div>
 
   <div class="z-pod">
     {% if typ == 'wynajem' %}
@@ -80,10 +84,6 @@
         Dostawa: <b>{{ dostawa_label }}</b>
         {% if szkic.get('adres') and szkic.get('dostawa') in ('dowoz', 'wysylka') %}<br>Adres: {{ szkic['adres'] }}{% endif %}
       </p>
-    </div>
-
-    <div class="z-pod-sec kwoty">
-      {% include '_kwoty_box.html' %}
     </div>
 
     <form method="post" action="{{ url_for('zamowienia_zamow') }}" class="forma">

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=5">
+<link rel="stylesheet" href="/static/style.css?v=6">
 <style>
 :root{
   --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
@@ -42,6 +42,8 @@ h1{font-size:clamp(30px,5vw,44px);font-weight:600;margin:6px 0 10px;line-height:
 .forma input[type=text],.forma input[type=email],.forma input[type=tel],.forma textarea{
   width:100%;padding:10px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);
   font-family:inherit;font-size:16.5px}
+.forma select{width:100%;padding:10px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);
+  font-family:inherit;font-size:16.5px;color:var(--ink)}
 .forma textarea{min-height:130px;resize:vertical}
 .forma .zgoda{display:flex;gap:10px;align-items:flex-start;margin:16px 0 6px}
 .forma .zgoda input{width:17px;height:17px;flex:none;margin-top:3px;accent-color:var(--butelkowa)}
@@ -101,6 +103,12 @@ h1{font-size:clamp(30px,5vw,44px);font-weight:600;margin:6px 0 10px;line-height:
         <input type="email" id="email" name="email" value="{{ dane['email'] }}" required>
         <label for="telefon">Telefon (opcjonalnie)</label>
         <input type="tel" id="telefon" name="telefon" value="{{ dane['telefon'] }}">
+        <label for="temat">Temat zapytania *</label>
+        <select id="temat" name="temat">
+          {% for klucz, nazwa in tematy.items() %}
+          <option value="{{ klucz }}" {% if dane['temat'] == klucz %}selected{% endif %}>{{ nazwa }}</option>
+          {% endfor %}
+        </select>
         <label for="tresc">Wiadomość *</label>
         <textarea id="tresc" name="tresc" required>{{ dane['tresc'] }}</textarea>
         <div class="zgoda">

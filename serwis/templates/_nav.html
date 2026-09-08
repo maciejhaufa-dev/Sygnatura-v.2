@@ -2,9 +2,11 @@
   <div class="wrap nav">
     <a class="brand" href="/">SygNATURA</a>
     {% set sc = request.path %}
-    <a href="/" {% if sc == '/' %}class="akt"{% endif %}>Start</a>
-    <a href="/realizacje/" {% if sc.startswith('/realizacje') %}class="akt"{% endif %}>Realizacje</a>
+    <a href="/" {% if sc == '/' %}class="akt"{% endif %}>Strona główna</a>
     <a href="/zamowienia/" {% if sc.startswith('/zamowienia') %}class="akt"{% endif %}>Zamówienia</a>
+    <a href="/pracownia/" {% if sc.startswith('/pracownia') %}class="akt"{% endif %}>Pracownia</a>
+    <a href="/realizacje/" {% if sc.startswith('/realizacje') %}class="akt"{% endif %}>Nasze realizacje</a>
+    <a href="/wspolpraca/" {% if sc.startswith('/wspolpraca') %}class="akt"{% endif %}>Współpraca</a>
     <a href="/kontakt/" {% if sc.startswith('/kontakt') %}class="akt"{% endif %}>Kontakt</a>
   </div>
 </header>

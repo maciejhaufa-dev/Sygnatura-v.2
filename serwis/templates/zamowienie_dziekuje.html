@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=5">
+<link rel="stylesheet" href="/static/style.css?v=6">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -25,13 +25,13 @@
     <div class="z-pod-sec" style="text-align:left">
       <p>
         <b>{{ rez['pakiet_nazwa'] }}</b>
-        {% if typ == 'wynajem' %}<br>Termin najmu: {{ rez['data_od'] }} – {{ rez['data_do'] }} (impreza: {{ rez['data'] }}, {{ rez['dni'] }} {{ 'doba' if rez['dni'] == 1 else ('doby' if rez['dni'] < 5 else 'dób') }})
-        <br>Podsumowanie (bez kaucji): <b>{{ '%.0f'|format((kwoty.get('razem_po', 0) or 0) - (kwoty.get('kaucja', 0) or 0)) }} zł</b>
-        <br><span class="mala">w tym kaucja zwrotna 300 zł (przy odbiorze: {{ '%.0f'|format(kwoty.get('razem_po', 0)) }} zł)</span>
-        {% else %}
-        <br>RAZEM: <b>{{ '%.0f'|format(kwoty.get('razem_po', 0)) }} zł</b>
-        {% endif %}
+        {% if typ == 'wynajem' %}<br>Termin najmu: {{ rez['data_od'] }} – {{ rez['data_do'] }} (impreza: {{ rez['data'] }}, {{ rez['dni'] }} {{ 'doba' if rez['dni'] == 1 else ('doby' if rez['dni'] < 5 else 'dób') }}){% endif %}
       </p>
+      {% if kwoty %}
+      <div class="z-pod-sec kwoty rachunek-sec">
+        {% include '_kwoty_box.html' %}
+      </div>
+      {% endif %}
       {% if pomysl %}
       <div class="pomysl-box" style="text-align:left">
         <b>Twój pomysł własny</b> zostanie wyceniony osobno — ofertę wyślemy e-mailem pod tą samą sygnaturą sprawy w ciągu <b>2 dni roboczych</b>. Kwoty powyżej go nie obejmują.

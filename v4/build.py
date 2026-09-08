@@ -653,10 +653,12 @@ INDEX = r'''<!DOCTYPE html>
     <button class="iconbtn burger" id="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">@@ICON_BURGER@@</button>
   </div>
   <nav class="menu" id="menu" aria-label="Menu główne">
-    <a href="index.html" class="on">Start</a>
-    <a href="galeria.html">Realizacje</a>
-    <a href="wynajem.html">Zamówienia</a>
-        <a href="kontakt.html">Kontakt</a>
+    <a href="/" class="on">Strona główna</a>
+    <a href="/zamowienia/">Zamówienia</a>
+    <a href="/pracownia/">Pracownia</a>
+    <a href="/realizacje/">Nasze realizacje</a>
+    <a href="/wspolpraca/">Współpraca</a>
+    <a href="/kontakt/">Kontakt</a>
   </nav>
 </header>
 
@@ -676,10 +678,10 @@ INDEX = r'''<!DOCTYPE html>
       </div>
       <p class="hero-text">Kosmos pełen jest szlachetnych minerałów, ale drewno jest tylko na Ziemi. Odkryj niezwykły świat, w którym drewno, światło i głębia współtworzą teatr jakości i stylu. Każdy detal rodzi się z dłoni, które znają materiał, i z oka, które czuje estetykę. Tak ożywiamy wnętrza — dodajemy im duszę, ciepły blask i klimat, w którym dom staje się domem.</p>
       <div class="btn-row">
-        <a class="btn btn-solid" href="warsztat.html">Sprawdź, jak pracujemy</a>
-        <a class="btn btn-solid" href="galeria.html">Poznaj nasze prace</a>
-        <a class="btn btn-solid" href="sklep.html">Znajdź coś dla siebie</a>
-        <a class="btn btn-solid" href="kontakt.html">Napisz do nas</a>
+        <a class="btn btn-solid" href="/jak-pracujemy/">Sprawdź, jak pracujemy</a>
+        <a class="btn btn-solid" href="/realizacje/">Poznaj nasze prace</a>
+        <a class="btn btn-solid" href="/zamowienia/sklep/">Znajdź coś dla siebie</a>
+        <a class="btn btn-solid" href="/kontakt/">Napisz do nas</a>
       </div>
     </section>
 </main>
@@ -698,7 +700,7 @@ INDEX = r'''<!DOCTYPE html>
       <a class="regbtn" href="#" title="wkrótce">Regulamin serwisu</a>
     </div>
     <div class="foot-right">
-      <a href="kontakt.html">Kontakt</a><span class="foot-sep">/</span><a href="#" title="wkrótce">FAQ</a>
+      <a href="/kontakt/">Kontakt</a><span class="foot-sep">/</span><a href="#" title="wkrótce">FAQ</a>
     </div>
 </footer>
 
@@ -793,7 +795,7 @@ WYNAJEM = r'''<!DOCTYPE html>
     <a href="wynajem.html" class="on">Wynajem</a>
     <a href="wynajem.html#partnerzy">Współpraca</a>
     <a href="#" title="wkrótce">Dla firm</a>
-    <a href="kontakt.html">Kontakt</a>
+    <a href="/kontakt/">Kontakt</a>
   </nav>
 </header>
 <main>
@@ -895,7 +897,7 @@ WYNAJEM = r'''<!DOCTYPE html>
 
   <section class="sec cta-end">
     <h2>Masz już datę? Sprawdźmy dostępność.</h2>
-    <a class="btn btn-solid" href="kontakt.html">Napisz do nas</a>
+    <a class="btn btn-solid" href="/kontakt/">Napisz do nas</a>
   </section>
 </main>
 <footer class="site-foot">
@@ -912,7 +914,7 @@ WYNAJEM = r'''<!DOCTYPE html>
     <a class="regbtn" href="#" title="wkrótce">Regulamin serwisu</a>
   </div>
   <div class="foot-right">
-    <a href="kontakt.html">Kontakt</a><span class="foot-sep">/</span><a href="#" title="wkrótce">FAQ</a>
+    <a href="/kontakt/">Kontakt</a><span class="foot-sep">/</span><a href="#" title="wkrótce">FAQ</a>
   </div>
 </footer>
 <script>

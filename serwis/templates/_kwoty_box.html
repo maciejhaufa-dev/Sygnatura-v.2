@@ -1,27 +1,139 @@
-{# _kwoty_box.html — wspólny box podsumowania kosztów (blok 4 i 5).
-   Wymaga: kwoty (dict z kwoty_zamowienia), typ (opcjonalnie), szkic (opcjonalnie). #}
-{% set typ_k = kwoty.get('typ') or typ %}
-<div class="kwoty">
+{# _kwoty_box.html — RACHUNEK / zestawienie zamówienia (blok 4 i 5, strona „Dziękujemy").
+   Wymaga: kwoty (dict z kwoty_zamowienia), typ (opcjonalnie), szkic (opcjonalnie).
+   Kolumny: Lp. | Pozycja | Ilość | Cena jedn. | Wartość — pod spodem sumy i kaucja (wynajem). #}
+{% set typ_k = kwoty.get('typ') or typ or 'wynajem' %}
+{% set poz = szkic.get('pozycje') or [] %}
+{% set pers = szkic.get('pers') or [] %}
+{% set pakiet = szkic.get('pakiet') or {} %}
+{% set lp = namespace(v=0) %}
+{% set dni = kwoty.get('dni') or 0 %}
+{% set najem = kwoty.get('najem') or 0 %}
+{% set kaucja = kwoty.get('kaucja') or 0 %}
+{% set razem_po = kwoty.get('razem_po') or kwoty.get('razem') or 0 %}
+{% set cena_doba = (najem / dni) if dni else 0 %}
+{% set dni_nazwa = ('doba' if dni == 1 else ('doby' if dni < 5 else 'dób')) %}
+
+<div class="rachunek">
+  <div class="rach-naglowek">
+    {% if typ_k == 'wynajem' %}Rachunek najmu{% else %}Rachunek zamówienia{% endif %}
+    <span class="mala">{% if not kwoty.get('rabat_kod') %}kwoty szacunkowe — potwierdzimy w odpowiedzi{% else %}kwoty po rabacie{% endif %}</span>
+  </div>
+
+  <div class="rach-wiersz rach-glowka">
+    <span class="r-lp">Lp.</span>
+    <span class="r-poz">Pozycja</span>
+    <span class="r-ile">Ilość</span>
+    <span class="r-cena">Cena jedn.</span>
+    <span class="r-wart">Wartość</span>
+  </div>
+
   {% if typ_k == 'wynajem' %}
-  <h3>Koszty wynajmu</h3>
-  <div class="linia"><span>Najem: {{ kwoty['stawka_txt'] }} × {{ kwoty['dni'] }} {{ 'doba' if kwoty['dni'] == 1 else ('doby' if kwoty['dni'] < 5 else 'dób') }}</span><b>{{ '%.0f'|format(kwoty['najem']) }} zł</b></div>
-  <div class="linia linia-mala"><span>w tym kaucja zwrotna (najem)</span><b>300 zł</b></div>
-  {% else %}
-  <h3>Podsumowanie kosztów</h3>
-  {% if typ_k == 'sklep' %}
-  <div class="linia"><span>Produkty ze sklepu ({{ szkic['pozycje']|length }} poz.)</span><b>{{ '%.0f'|format(kwoty['pozycje_suma']) }} zł</b></div>
+    {# 1. najem pakietu (stawka × doby) #}
+    {% set lp.v = lp.v + 1 %}
+    <div class="rach-wiersz">
+      <span class="r-lp">{{ lp.v }}</span>
+      <span class="r-poz"><b>{{ pakiet.get('nazwa') or 'Pakiet dekoracji' }}</b>
+        <span class="r-pod">{{ kwoty.get('stawka_txt') or '' }} — najem na czas imprezy (montaż dzień przed, demontaż dzień po)</span>
+        <span class="r-mob">{{ dni }} {{ dni_nazwa }} × {{ '%.0f'|format(cena_doba) }} zł</span>
+      </span>
+      <span class="r-ile">{{ dni }} {{ dni_nazwa }}</span>
+      <span class="r-cena">{{ '%.0f'|format(cena_doba) }} zł / doba</span>
+      <span class="r-wart">{{ '%.0f'|format(najem) }} zł</span>
+    </div>
+    {# 2. kaucja zwrotna za najem — osobna pozycja rachunku (transparentnie) #}
+    {% set lp.v = lp.v + 1 %}
+    <div class="rach-wiersz">
+      <span class="r-lp">{{ lp.v }}</span>
+      <span class="r-poz"><b>Kaucja zwrotna za najem (1 komplet)</b>
+        <span class="r-pod">zwracamy w całości po oddaniu kompletu bez uszkodzeń</span>
+        <span class="r-mob">300 zł</span>
+      </span>
+      <span class="r-ile">1</span>
+      <span class="r-cena">300 zł</span>
+      <span class="r-wart">300 zł</span>
+    </div>
+  {% elif typ_k == 'sklep' %}
+    {% for pr in poz %}
+      {% set lp.v = lp.v + 1 %}
+      <div class="rach-wiersz">
+        <span class="r-lp">{{ lp.v }}</span>
+        <span class="r-poz"><b>{{ pr['nazwa'] }}</b>
+          <span class="r-mob">{{ pr['ile'] }} szt. × {{ '%.0f'|format(pr['cena']) }} zł</span>
+        </span>
+        <span class="r-ile">{{ pr['ile'] }} szt.</span>
+        <span class="r-cena">{{ '%.0f'|format(pr['cena']) }} zł</span>
+        <span class="r-wart">{{ '%.0f'|format(pr['cena'] * pr['ile']) }} zł</span>
+      </div>
+    {% endfor %}
   {% endif %}
+
+  {% for pr in pers %}
+    {% set lp.v = lp.v + 1 %}
+    <div class="rach-wiersz">
+      <span class="r-lp">{{ lp.v }}</span>
+      <span class="r-poz"><b>{{ pr['nazwa'] }}</b> <span class="r-tag">personalizacja</span>
+        {% if pr.get('opis') %}<span class="r-pod">Opis: {{ pr['opis'] }}</span>{% endif %}
+        <span class="r-mob">1 szt. × {{ '%.0f'|format(pr['cena']) }} zł</span>
+      </span>
+      <span class="r-ile">1 szt.</span>
+      <span class="r-cena">{{ '%.0f'|format(pr['cena']) }} zł</span>
+      <span class="r-wart">{{ '%.0f'|format(pr['cena']) }} zł</span>
+    </div>
+  {% endfor %}
+
+  {% if lp.v == 0 and szkic.get('pomysl') %}
+    {% set lp.v = lp.v + 1 %}
+    <div class="rach-wiersz">
+      <span class="r-lp">{{ lp.v }}</span>
+      <span class="r-poz"><b>Pomysł własny (spoza katalogu)</b>
+        <span class="r-pod">{{ szkic['pomysl'][:120] }}{% if szkic['pomysl']|length > 120 %}…{% endif %}</span>
+      </span>
+      <span class="r-ile">1</span>
+      <span class="r-cena">wycena osobno</span>
+      <span class="r-wart">—</span>
+    </div>
   {% endif %}
-  {% if kwoty['pers_netto'] %}
-  <div class="linia"><span>Personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% if kwoty['pers_rabat'] %} (rabat −5%){% endif %}</span><b>{{ '%.0f'|format(kwoty['pers_netto']) }} zł</b></div>
+
+  {% if kwoty.get('pers_rabat') %}
+    {% set lp.v = lp.v + 1 %}
+    <div class="rach-wiersz">
+      <span class="r-lp">{{ lp.v }}</span>
+      <span class="r-poz"><b>Rabat na personalizację</b>
+        <span class="r-pod">−5% przy min. 3 produktach personalizowanych</span>
+      </span>
+      <span class="r-ile">—</span>
+      <span class="r-cena">—</span>
+      <span class="r-wart r-minus">−{{ kwoty['pers_rabat'] }} zł</span>
+    </div>
   {% endif %}
-  {% if kwoty['rabat_kod'] %}
-  <div class="linia"><span>Rabat z kodu {{ kwoty['kod'] }}</span><b>−{{ kwoty['rabat_kod'] }} zł</b></div>
+  {% if kwoty.get('rabat_kod') %}
+    {% set lp.v = lp.v + 1 %}
+    <div class="rach-wiersz">
+      <span class="r-lp">{{ lp.v }}</span>
+      <span class="r-poz"><b>Rabat z kodu {{ kwoty.get('kod') }}</b></span>
+      <span class="r-ile">—</span>
+      <span class="r-cena">—</span>
+      <span class="r-wart r-minus">−{{ kwoty['rabat_kod'] }} zł</span>
+    </div>
   {% endif %}
-  <div class="razem-bez"><span>{{ 'PODSUMOWANIE (bez kaucji)' if typ_k == 'wynajem' else 'RAZEM DO ZAPŁATY' }}</span><b>{{ '%.0f'|format(kwoty['razem_po'] - kwoty['kaucja']) }} zł</b></div>
-  {% if typ_k == 'wynajem' %}
-  <div class="kaucja-linia">+ kaucja zwrotna 300 zł — wraca w całości po oddaniu kompletu bez uszkodzeń (przy odbiorze: {{ '%.0f'|format(kwoty['razem_po']) }} zł)</div>
+
+  {% if lp.v == 0 %}
+    <div class="rach-wiersz"><span class="r-poz" style="grid-column:1/-1">Brak pozycji — wróć do wcześniejszego kroku i wybierz produkty.</span></div>
   {% endif %}
+
+  {% if lp.v > 0 %}
+  <div class="rach-razem">
+    {% if typ_k == 'wynajem' %}
+    <span>{{ 'PODSUMOWANIE (bez kaucji)' }}</span><b>{{ '%.0f'|format(razem_po - kaucja) }} zł</b>
+    {% else %}
+    <span>RAZEM DO ZAPŁATY</span><b>{{ '%.0f'|format(razem_po) }} zł</b>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% if typ_k == 'wynajem' and kaucja %}
+  <div class="rach-kaucja">+ kaucja zwrotna 300 zł → <b>razem przy odbiorze: {{ '%.0f'|format(razem_po) }} zł</b> (kaucja wraca w całości po zwrocie kompletu)</div>
+  {% endif %}
+
   <p class="uw">
     {% if typ_k == 'wynajem' %}
       <b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
@@ -37,6 +149,5 @@
     {% if szkic.get('pomysl') %}
       <span class="pomysl-uw">Twój pomysł własny zostanie <b>wyceniony osobno</b> — ofertę wyślemy e-mailem pod tą samą sygnaturą sprawy w ciągu <b>2 dni roboczych</b>. Kwoty powyżej nie obejmują tej części.</span>
     {% endif %}
-    {% if not kwoty.get('rabat_kod') %}Kwoty potwierdzimy w odpowiedzi na zamówienie.{% endif %}
   </p>
 </div>

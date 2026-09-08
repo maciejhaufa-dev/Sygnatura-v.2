@@ -144,3 +144,30 @@ wiadomosci(id, imie, email, telefon, tresc, zgoda, data, status)  -- status: now
 - Regex podmieniający `return` łapie early-return — weryfikować grep-em.
 - SVG szopki: etykiety warstw L0–L5 w pliku ≠ numeracja użytkownika — nazywać pliki po ZAWARTOŚCI.
 - Nie generować SVG sylwetek kodem; nie interpretować zawartości warstw — czysta konwersja 1:1.
+
+---
+
+## Sesja 18 — rachunek w podsumowaniu, sklep z koszykiem, nowe menu (strona główna / zamówienia / pracownia / nasze realizacje / współpraca / kontakt)
+
+Uwagi użytkownika z rozmowy:
+1. Podsumowanie ma odzwierciedlać RACHUNEK: lp. | pozycja (co) | ile szt. | cena jedn. (personalizacja w drugiej linii) + pod listą suma kosztów i policzona kaucja (wynajem). Kaucja jako osobna, transparentna pozycja rachunku.
+2. Sklep: zdjęcia + ceny produktów, licznik „− cyfra +" zamiast pola, „dodaj do zamówienia" pod każdym produktem → wirtualny koszyk widoczny w podsumowaniu. Personalizacja po sklepie ma być widoczna.
+3. Finalny układ menu: strona główna / zamówienia / pracownia / nasze realizacje / współpraca / kontakt.
+4. Pracownia = „o nas"; Współpraca = podstrona dla dekoratorów, hoteli, kwiaciarni, firm eventowych i imprez firmowych — stały partner dostaje indywidualną sygnaturę (priorytet, rabaty).
+5. Kontakt: zwykły formularz z tematem do wyboru + dane + wysyłka zapytania.
+
+Wykonane:
+- `_kwoty_box.html` przepisany na RACHUNEK (kolumny Lp./Pozycja/Ilość/Cena jedn./Wartość, mobilnie zwijane). Wiersze: najem (stawka × doby) + KAUCJA jako osobna pozycja (wynajem), produkty sklepu (ile × cena), personalizacje (opis w drugiej linii), rabat pers −5%, rabat z kodu; pod spodem PODSUMOWANIE (bez kaucji) / RAZEM + „razem przy odbiorze". Defensywny (kwoty.get) — działa też dla starych rekordów.
+- `z_podsumowanie.html`: rachunek PRZENIESIONY NA GÓRĘ (nad sekcje szczegółów); `zamowienie_dziekuje.html` też pokazuje rachunek (pseudo-szkic budowany w `zamowienia_dziekuje`; fix: `sqlite3.Row` → `dict(rez)`).
+- Sklep (`z_sklep_1.html`): karty produktów ze ZDJĘCIEM (static/media/sklep/), ceną, licznikiem −/+, „Dodaj do zamówienia" i STICKY KOSZYKIEM („Koszyk: N szt. · X zł" + „Dalej: personalizacja →"); JS blokuje pusty koszyk. Wyraźny callout, że po katalogu jest krok personalizacji. Server-side bez zmian (ile_<id>).
+- `sklep_produkty.obraz` (kolumna + migracja + seed + CRUD w `/admin/sklep` z podglądem miniaturki); zdjęcia: szopka = PRAWDZIWA wizualizacja usera (WIZ3_foto_noc), szyld/litery/ramka = makiety AI do podmiany na realne fotki.
+- Menu `_nav.html` + landing v4 (index.html + źródło w build.py) + kopia Pages (docs/index.html): strona główna / zamówienia / pracownia / nasze realizacje / współpraca / kontakt. CTA hero na stronie głównej → żywe trasy (/jak-pracujemy/, /realizacje/, /zamowienia/sklep/, /kontakt/).
+- Nowe podstrony `/pracownia/` (o nas — treść ROBOCZA) i `/wspolpraca/` (B2B: dekoratorzy/hotele/kwiaciarnie/eventy/imprezy firmowe, indywidualna sygnatura partnera, priorytet, rabaty — treść ROBOCZA) + trasy w app.py.
+- Kontakt: select TEMATU (TEMATY_KONTAKT: wynajem/personalizacja/sklep/współpraca/inne), preselekcja przez ?temat=wspolpraca (link z podstrony Współpraca), kolumna `wiadomosci.temat` + migracja, temat w mailu do Studia i w panelu (lista + podgląd).
+- Autoresponder 'zamowienie': neutralny tekst (sklep + personalizacja) + migracja istniejącego szablonu w bazie.
+- Testy curl: przepływ C (2×szopka+ramka → 587 zł rachunek → SYG-2026-001 → dziekuje z rachunkiem), A (199×3 doby + kaucja 300 + pers 39 → 636 bez kaucji / 936 przy odbiorze), B (3 pers → rabat −7 → 130 zł), kontakt z tematem (zapis + mail). Dane testowe posprzątane.
+
+Do decyzji użytkownika:
+- Kaucja w rachunku jest zapisana jako „za najem (1 komplet) — 300 zł". Gdy wynajem zacznie składać się z POJEDYNCZYCH produktów (każdy z własną kaucją), rachunek wypisze każdą kaucję osobno — na razie dane mają jeden pakiet.
+- Zdjęcia szyldu/liter/ramki to makiety — podmień na prawdziwe fotki (wgraj do serwis/static/media/sklep/ i podaj nazwę pliku w /admin/sklep).
+- Treści /pracownia/ i /wspolpraca/ są robocze — do przejrzenia w templates/pracownia.html i templates/wspolpraca.html.

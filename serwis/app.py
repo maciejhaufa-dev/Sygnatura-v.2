@@ -222,7 +222,7 @@ def media(nazwa):
 def kontakt_form():
     db = get_db()
     bledy = []
-    dane = {'imie': '', 'email': '', 'telefon': '', 'tresc': ''}
+    dane = {'imie': '', 'email': '', 'telefon': '', 'tresc': '', 'temat': 'inne'}
     ok = False
     if request.method == 'POST':
         honeypot = request.form.get('strona_www', '')
@@ -231,7 +231,10 @@ def kontakt_form():
             'email': (request.form.get('email') or '').strip(),
             'telefon': (request.form.get('telefon') or '').strip(),
             'tresc': (request.form.get('tresc') or '').strip(),
+            'temat': (request.form.get('temat') or '').strip(),
         }
+        if dane['temat'] not in TEMATY_KONTAKT:
+            dane['temat'] = 'inne'
         zgoda = request.form.get('zgoda') == 'on'
         if not honeypot:  # boty wypełniają ukryte pole — udajemy sukces, nic nie zapisujemy
             if len(dane['imie']) < 2:
@@ -243,17 +246,24 @@ def kontakt_form():
             if not zgoda:
                 bledy.append('Zaznacz zgodę na kontakt — bez niej nie możemy odpisać (PKE art. 398).')
             if not bledy:
-                db.execute('INSERT INTO wiadomosci (imie, email, telefon, tresc, zgoda, status, data) VALUES (?,?,?,?,?,?,?)',
-                           (dane['imie'], dane['email'], dane['telefon'], dane['tresc'], 1, 'nowa', core.teraz()))
+                db.execute('INSERT INTO wiadomosci (imie, email, telefon, tresc, temat, zgoda, status, data) VALUES (?,?,?,?,?,?,?,?)',
+                           (dane['imie'], dane['email'], dane['telefon'], dane['tresc'],
+                            TEMATY_KONTAKT[dane['temat']], 1, 'nowa', core.teraz()))
                 db.commit()
                 wiad = {'imie': dane['imie'], 'email': dane['email'], 'telefon': dane['telefon'],
-                        'tresc': dane['tresc'], 'zgoda': True, 'data': core.teraz()}
+                        'temat': TEMATY_KONTAKT[dane['temat']], 'tresc': dane['tresc'], 'zgoda': True,
+                        'data': core.teraz()}
                 core.wyslij_do_studia(db, 'Nowa wiadomość z formularza: %s' % dane['imie'], core.mail_kontakt_studio(wiad))
                 core.wyslij_szablon(db, 'kontakt', wiad, dane['email'])
                 ok = True
         else:
             ok = True
-    return render_template('kontakt.html', bledy=bledy, dane=dane, ok=ok)
+    else:
+        # preselekcja tematu z linku (np. /kontakt/?temat=wspolpraca)
+        t = request.args.get('temat', '').strip()
+        dane['temat'] = t if t in TEMATY_KONTAKT else 'inne'
+    return render_template('kontakt.html', bledy=bledy, dane=dane, ok=ok,
+                           tematy=TEMATY_KONTAKT)
 
 
 @app.route('/regulamin/')
@@ -266,6 +276,18 @@ def regulamin():
 def jak_pracujemy():
     """Jak pracujemy (podstrona) — treść edytowalna w szablonie."""
     return render_template('jak_pracujemy.html')
+
+
+@app.route('/pracownia/')
+def pracownia():
+    """Pracownia = „o nas" — kim jesteśmy, co robimy, skąd się wzięła Sygnatura."""
+    return render_template('pracownia.html')
+
+
+@app.route('/wspolpraca/')
+def wspolpraca():
+    """Współpraca B2B: dekoratorzy, hotele, kwiaciarnie, firmy eventowe, imprezy firmowe."""
+    return render_template('wspolpraca.html')
 
 
 # ---------------------------------------------------------------- strona wynajmu
@@ -832,6 +854,15 @@ def z_wynajem_pakiet():
                            statusy=core.STATUSY_PL)
 
 
+TEMATY_KONTAKT = {
+    'wynajem': 'Wynajem dekoracji',
+    'personalizacja': 'Personalizacja i prezenty',
+    'sklep': 'Sklep i produkty',
+    'wspolpraca': 'Współpraca (dla firm)',
+    'inne': 'Inny temat',
+}
+
+
 DOSTAWA_WARIANTY = {
     'wynajem': {
         'dowoz': ('Dowóz i montaż przez Studio', 'Przywozimy dekoracje na miejsce imprezy, montujemy i odbieramy po wydarzeniu.'),
@@ -1199,7 +1230,9 @@ def zamowienia_dziekuje():
     kwoty = {}
     typ = 'wynajem'
     pomysl = ''
+    szkic = {}
     if rez:
+        rez = dict(rez)
         try:
             kwoty = json.loads(rez['kwoty'] or '{}')
         except Exception:
@@ -1209,8 +1242,20 @@ def zamowienia_dziekuje():
             pomysl = (json.loads(rez['dodatkowe'] or '{}') or {}).get('pomysl') or ''
         except Exception:
             pomysl = ''
+        # pseudo-szkic do wspólnego rachunku (_kwoty_box.html)
+        try:
+            szkic['pozycje'] = json.loads(rez['pozycje'] or '[]')
+        except Exception:
+            szkic['pozycje'] = []
+        try:
+            szkic['pers'] = json.loads(rez['personalizacje'] or '[]')
+        except Exception:
+            szkic['pers'] = []
+        szkic['pakiet'] = {'nazwa': rez['pakiet_nazwa'] or 'Pakiet dekoracji'}
+        szkic['pomysl'] = pomysl
+        szkic['dostawa'] = rez.get('dostawa') or ''
     return render_template('zamowienie_dziekuje.html', rez=rez, kwoty=kwoty, sygnatura=syg,
-                           typ=typ, pomysl=pomysl)
+                           typ=typ, pomysl=pomysl, szkic=szkic)
 
 
 # ---------------------------------------------------------------- pliki (dokumenty)
@@ -1456,9 +1501,10 @@ def admin_sklep():
 @admin_required
 def sklep_dodaj():
     db = get_db()
-    db.execute('INSERT INTO sklep_produkty (nazwa, opis, cena, dostepny) VALUES (?,?,?,?)',
+    db.execute('INSERT INTO sklep_produkty (nazwa, opis, cena, dostepny, obraz) VALUES (?,?,?,?,?)',
                (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
-                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0))
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0,
+                request.form.get('obraz', '').strip()))
     db.commit()
     return redirect303(url_for('admin_sklep'))
 
@@ -1467,9 +1513,10 @@ def sklep_dodaj():
 @admin_required
 def sklep_edytuj(pid):
     db = get_db()
-    db.execute('UPDATE sklep_produkty SET nazwa=?, opis=?, cena=?, dostepny=? WHERE id=?',
+    db.execute('UPDATE sklep_produkty SET nazwa=?, opis=?, cena=?, dostepny=?, obraz=? WHERE id=?',
                (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
-                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0, pid))
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0,
+                request.form.get('obraz', '').strip(), pid))
     db.commit()
     return redirect303(url_for('admin_sklep'))
 

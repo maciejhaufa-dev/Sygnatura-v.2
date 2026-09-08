@@ -485,6 +485,7 @@ def mail_kontakt_studio(w):
         'Imię i nazwisko: %(imie)s\n'
         'E-mail: %(email)s\n'
         '%(telefon)s'
+        'Temat zapytania: %(temat)s\n'
         'Data: %(data)s\n\n'
         'TREŚĆ WIADOMOŚCI\n'
         '%(tresc)s\n\n'
@@ -492,6 +493,7 @@ def mail_kontakt_studio(w):
     ) % {
         'imie': w['imie'], 'email': w['email'],
         'telefon': ('Telefon: %s\n' % w['telefon']) if w.get('telefon') else '',
+        'temat': w.get('temat') or 'Inny temat',
         'data': w.get('data') or teraz(),
         'tresc': w['tresc'].strip(),
         'zgoda': 'TAK' if w.get('zgoda') else 'BRAK (!!! — sprawdzić przed odpowiedzią)',
