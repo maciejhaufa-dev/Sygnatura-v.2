@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krok 4: Twoje dane — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set etap = 4 %}{% set pers_pom = szkic.get('pers_pom') %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('z_wynajem_pers', data=szkic['data'], data_od=szkic['data_od'], data_do=szkic['data_do'], pakiet=szkic['pakiet_id']) }}">← wróć do personalizacji</a>
+  <h1>Krok 4 · Twoje dane i zgody</h1>
+  <p class="sub">Zamówienie: <b>{{ szkic['pakiet']['nazwa'] }}</b> · {{ szkic['data_od'] }} – {{ szkic['data_do'] }} ({{ szkic['dni'] }} {{ 'doba' if szkic['dni'] == 1 else ('doby' if szkic['dni'] < 5 else 'dób') }})
+     {% if szkic['pers'] %}· personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% endif %}</p>
+
+  {% if bledy %}
+  <div class="bledy-box">
+    <ul>{% for b in bledy %}<li>{{ b }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('z_wynajem_dane', w=szkic['_klucz']) }}" class="forma">
+    <input type="hidden" name="w" value="{{ szkic['_klucz'] }}">
+
+    <div class="pole">
+      <label for="imie">Imię i nazwisko *</label>
+      <input type="text" id="imie" name="imie" value="{{ d.imie }}" required>
+    </div>
+    <div class="pole">
+      <label for="email">Adres e-mail *</label>
+      <input type="email" id="email" name="email" value="{{ d.email }}" placeholder="adres@poczta.pl" required>
+      <p class="mala" style="margin:4px 0 0">Na ten adres wyślemy podsumowanie zamówienia, sygnaturę sprawy i dokumenty.</p>
+    </div>
+    <div class="pole">
+      <label for="telefon">Telefon (opcjonalnie)</label>
+      <input type="tel" id="telefon" name="telefon" value="{{ d.telefon }}" placeholder="opcjonalnie">
+    </div>
+
+    <div class="opcje">
+      <label style="margin-bottom:8px">Sygnatura sprawy</label>
+      <div class="rzad">
+        <input type="radio" id="tryb-nowa" name="tryb_sygnatury" value="nowa" {% if tryb != 'istniejaca' %}checked{% endif %}>
+        <div>
+          <div class="etyk"><label for="tryb-nowa" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Nadaj nową sygnaturę</label></div>
+          <div class="opis">System automatycznie nada numer sprawy (np. SYG-2026-001) i wyśle go w e-mailu.</div>
+        </div>
+      </div>
+      <div class="rzad">
+        <input type="radio" id="tryb-istniejaca" name="tryb_sygnatury" value="istniejaca" {% if tryb == 'istniejaca' %}checked{% endif %}>
+        <div>
+          <div class="etyk"><label for="tryb-istniejaca" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Mam sygnaturę sprawy</label></div>
+          <div class="opis">Jeśli już z nami rozmawiałeś — dopiszemy do niej to zamówienie.</div>
+          <div id="pole-syg">
+            <label for="sygnatura">Twoja sygnatura sprawy</label>
+            <input type="text" id="sygnatura" name="sygnatura" value="{{ sygnatura }}" placeholder="np. SYG-2026-001">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="opcje">
+      <label style="margin-bottom:8px">Forma dostawy</label>
+      <div class="rzad">
+        <input type="radio" id="dowoz" name="dostawa" value="dowoz" {% if dostawa == 'dowoz' %}checked{% endif %}>
+        <div>
+          <div class="etyk"><label for="dowoz" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Dowóz i montaż przez Studio</label></div>
+          <div class="opis">Przywozimy dekoracje na miejsce imprezy, montujemy i odbieramy po wydarzeniu.</div>
+        </div>
+      </div>
+      <div class="rzad">
+        <input type="radio" id="odbior" name="dostawa" value="odbior" {% if dostawa == 'odbior' %}checked{% endif %}>
+        <div>
+          <div class="etyk"><label for="odbior" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Odbiór osobisty w pracowni</label></div>
+          <div class="opis">Odbierasz i zwracasz dekoracje osobiście — szczegóły prześlemy w odpowiedzi.</div>
+        </div>
+      </div>
+      <div id="pole-adres" {% if dostawa != 'dowoz' %}hidden{% endif %} style="margin-top:10px">
+        <label for="adres">Adres imprezy (miejscowość, ulica, kod) *</label>
+        <input type="text" id="adres" name="adres" value="{{ adres }}" placeholder="np. Poznań, ul. Kwiatowa 12, 60-001">
+      </div>
+    </div>
+
+    <div class="pole">
+      <label for="kod">Kod rabatowy (opcjonalnie)</label>
+      <input type="text" id="kod" name="kod" value="{{ kod }}" placeholder="jeśli masz kod — wpisz tutaj">
+      <p class="mala" style="margin:4px 0 0">Poprawny kod naliczymy w podsumowaniu.</p>
+    </div>
+
+    <div class="opcje">
+      <label style="margin-bottom:8px">Zgody (wymagane)</label>
+      <div class="rzad">
+        <input type="checkbox" id="zgoda_pke" name="zgoda_pke" {% if zgody.get('pke') %}checked{% endif %}>
+        <div><div class="etyk"><label for="zgoda_pke" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Zgoda na kontakt</label></div>
+        <div class="opis">Wyrażam zgodę na kontakt ze strony Studio Sygnatura w sprawie zamówienia (podstawa: PKE art. 398). Bez tej zgody nie możemy odpowiedzieć.</div></div>
+      </div>
+      <div class="rzad">
+        <input type="checkbox" id="zgoda_procedura" name="zgoda_procedura" {% if zgody.get('procedura') %}checked{% endif %}>
+        <div><div class="etyk"><label for="zgoda_procedura" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Zapoznałem się z procedurą najmu</label></div>
+        <div class="opis">Procedura: zapytanie → odpowiedź Studia → wpłata kaucji (7 dni) → rezerwacja wiążąca. Dokumenty (procedura, regulamin) dołączymy w e-mailu z potwierdzeniem — do zapoznania i podpisu przy odbiorze.</div></div>
+      </div>
+      {% if szkic['pers'] %}
+      <div class="rzad">
+        <input type="checkbox" id="zgoda_pers" name="zgoda_pers" {% if zgody.get('pers') %}checked{% endif %}>
+        <div><div class="etyk"><label for="zgoda_pers" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Oświadczenie o produktach personalizowanych</label></div>
+        <div class="opis">Rozumiem, że produkty spersonalizowane są wykonywane na zamówienie: <b>płatne z góry i nie podlegają zwrotowi</b> — po imprezie zostają u mnie.</div></div>
+      </div>
+      {% endif %}
+      <div class="rzad">
+        <input type="checkbox" id="zgoda_dane" name="zgoda_dane" {% if zgody.get('dane') %}checked{% endif %}>
+        <div><div class="etyk"><label for="zgoda_dane" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Dane tylko do realizacji</label></div>
+        <div class="opis">Podane dane wykorzystamy wyłącznie do realizacji tego zamówienia.</div></div>
+      </div>
+    </div>
+
+    <div class="kwoty">
+      <h3>Podsumowanie kosztów (szacunkowe)</h3>
+      <div class="linia"><span>Najem: {{ kwoty['stawka_txt'] }} × {{ kwoty['dni'] }} {{ 'doba' if kwoty['dni'] == 1 else ('doby' if kwoty['dni'] < 5 else 'dób') }}</span><b>{{ '%.0f'|format(kwoty['najem']) }} zł</b></div>
+      <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
+      <div class="linia"><span>Personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% if kwoty['pers_rabat'] %} (rabat −5%){% endif %}</span><b>{{ '%.0f'|format(kwoty['pers_netto']) }} zł</b></div>
+      {% if kwoty['rabat_kod'] %}
+      <div class="linia"><span>Rabat z kodu {{ kwoty['kod'] }}</span><b>−{{ kwoty['rabat_kod'] }} zł</b></div>
+      {% endif %}
+      <div class="razem"><span>RAZEM</span><span>{{ '%.0f'|format(kwoty['razem_po']) }} zł</span></div>
+      <p class="uw"><b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
+      Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł. Kwoty potwierdzimy w odpowiedzi na zamówienie.</p>
+    </div>
+
+    <div class="przyciski" style="justify-content:flex-end">
+      <button class="btn" type="submit">Przejdź do podsumowania →</button>
+    </div>
+  </form>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var dowoz = document.getElementById('dowoz');
+  var odbior = document.getElementById('odbior');
+  var adres = document.getElementById('pole-adres');
+  function akt(){
+    adres.hidden = !dowoz.checked;
+    document.getElementById('adres').required = dowoz.checked;
+  }
+  dowoz.addEventListener('change', akt);
+  odbior.addEventListener('change', akt);
+  akt();
+
+  var nowa = document.getElementById('tryb-nowa');
+  var ist = document.getElementById('tryb-istniejaca');
+  var poleSyg = document.getElementById('pole-syg');
+  function aktSyg(){
+    poleSyg.style.display = ist.checked ? 'block' : 'none';
+    document.getElementById('sygnatura').required = ist.checked;
+  }
+  nowa.addEventListener('change', aktSyg);
+  ist.addEventListener('change', aktSyg);
+  aktSyg();
+})();
+</script>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

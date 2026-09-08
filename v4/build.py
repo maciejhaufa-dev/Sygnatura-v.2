@@ -655,9 +655,8 @@ INDEX = r'''<!DOCTYPE html>
   <nav class="menu" id="menu" aria-label="Menu główne">
     <a href="index.html" class="on">Start</a>
     <a href="galeria.html">Realizacje</a>
-    <a href="wynajem.html">Wynajem</a>
-    <a href="wynajem.html">Personalizacja</a>
-    <a href="kontakt.html">Kontakt</a>
+    <a href="wynajem.html">Zamówienia</a>
+        <a href="kontakt.html">Kontakt</a>
   </nav>
 </header>
 

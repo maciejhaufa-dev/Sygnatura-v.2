@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krok 1: Termin — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set etap = 1 %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('zamowienia') }}">← wszystkie zamówienia</a>
+  <h1>Krok 1 · Wybierz termin wydarzenia</h1>
+  <p class="sub">Kliknij w kalendarzu datę imprezy. Domyślnie dekoracje zakładamy <b>dzień przed</b> i odbieramy <b>dzień po</b> — razem 3 doby. Zakres możesz zmienić poniżej.</p>
+
+  {% if msg %}<div class="flash">{{ msg }}</div>{% endif %}
+
+  {% if p %}
+  <div class="note" style="margin:0 0 14px"><b>Wybrany wcześniej pakiet:</b> {{ p.nazwa }} ({{ p.tier }}) — po wyborze terminu zobaczysz go na liście pakietów.</div>
+  {% endif %}
+
+  <form method="get" action="{{ url_for('z_wynajem_pakiet') }}" id="f-termin">
+    {% if p %}<input type="hidden" name="pakiet" value="{{ p.id }}">{% endif %}
+    <input type="hidden" name="data" id="i-data" value="{{ data }}">
+    <div class="glowna z-krok">
+      <div class="cal" id="kalendarz">
+        <h2>Kalendarz dostępności</h2>
+        <div class="calhead">
+          <b>{{ mies_nazwa }} {{ rok }}</b>
+          <span class="calnav">
+            <a href="{{ url_for('z_wynajem_termin', rok=poprz[0], mies=poprz[1], pakiet=(p.id if p else 0)) }}#kalendarz">&#8249;</a>
+            <a href="{{ url_for('z_wynajem_termin', rok=nast[0], mies=nast[1], pakiet=(p.id if p else 0)) }}#kalendarz">&#8250;</a>
+          </span>
+        </div>
+        <div class="calgrid">
+          {% for d in ['Pn','Wt','Śr','Cz','Pt','So','Nd'] %}<i>{{ d }}</i>{% endfor %}
+          {% for dzien in dni %}
+            {% if not dzien.nr %}
+              <span class="cal-d pusty"></span>
+            {% elif dzien.zajety %}
+              <span class="cal-d {{ dzien.klasa }}" title="{{ dzien.tytul }}">{{ dzien.nr }}</span>
+            {% else %}
+              <button type="button" class="cal-d wybor {% if dzien.data == data %}akt{% endif %}"
+                      data-d="{{ dzien.data }}" title="{{ dzien.tytul or 'Kliknij, aby wybrać tę datę imprezy' }}">{{ dzien.nr }}</button>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <div class="callegend">
+          <span><i></i> wolny</span>
+          <span><i class="st-zapytanie"></i> wysłano zapytanie — nadal można pytać</span>
+          <span><i class="st-platnosc"></i> płatność w toku</span>
+          <span><i class="st-zarezerwowany"></i> zarezerwowany</span>
+        </div>
+      </div>
+
+      <div class="karta">
+        <h2 style="font-size:21px;color:var(--butelkowa);margin:0 0 8px">Twój termin</h2>
+        <div class="pole">
+          <label for="data">Data imprezy</label>
+          <input type="date" id="data" value="{{ data }}">
+        </div>
+        <div class="rzad-2">
+          <div class="pole">
+            <label for="data_od">Termin od (montaż)</label>
+            <input type="date" id="data_od" name="data_od" value="{{ data_od }}">
+          </div>
+          <div class="pole">
+            <label for="data_do">Termin do (demontaż)</label>
+            <input type="date" id="data_do" name="data_do" value="{{ data_do }}">
+          </div>
+        </div>
+        <div class="dni-sum" id="dni-sum"></div>
+        <p class="mala" style="margin-top:10px">
+          <b>Dlaczego 3 doby?</b> Dekoracji nie da się fizycznie zamontować i zdjąć w dniu imprezy:
+          <b>dzień przed</b> zakładamy (montaż), <b>dzień po</b> zdejmujemy i odbieramy (demontaż + zwrot).
+          Najem 1-dniowy tylko w wyjątkowych sytuacjach — uzasadnisz go w wiadomości, a my rozpatrzymy ręcznie.
+        </p>
+        <button class="btn" type="submit" id="dalej" disabled>Dalej: wybierz pakiet →</button>
+        <p class="mala" style="margin-top:8px">Krok 2 pokaże pakiety dostępne w wybranym zakresie.</p>
+      </div>
+    </div>
+  </form>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var iData = document.getElementById('i-data');
+  var dData = document.getElementById('data');
+  var dOd = document.getElementById('data_od');
+  var dDo = document.getElementById('data_do');
+  var dalej = document.getElementById('dalej');
+  var suma = document.getElementById('dni-sum');
+  // nie pozwalamy wybrać przeszłości (data min = dzisiaj)
+  dData.min = new Date().toISOString().split('T')[0];
+
+  function przesun(d, k){
+    var x = new Date(d + 'T12:00:00');
+    x.setDate(x.getDate() + k);
+    return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+  }
+  function dniN(){
+    if (dOd.value && dDo.value && dOd.value <= dDo.value){
+      return Math.round((new Date(dDo.value) - new Date(dOd.value)) / 86400000) + 1;
+    }
+    return 0;
+  }
+  function przelicz(){
+    var dni = dniN();
+    suma.textContent = dni ? ('Łącznie: ' + dni + (dni === 1 ? ' doba' : dni < 5 ? ' doby' : ' dób') + ' najmu') : '';
+    dalej.disabled = !(dData.value && dni > 0);
+  }
+  function ustawDate(d){
+    dData.value = d;
+    iData.value = d;
+    dOd.value = przesun(d, -1);
+    dDo.value = przesun(d, 1);
+    document.querySelectorAll('.cal-d.wybor').forEach(function(b){
+      b.classList.toggle('akt', b.dataset.d === d);
+    });
+    przelicz();
+  }
+  document.querySelectorAll('.cal-d.wybor').forEach(function(b){
+    b.addEventListener('click', function(){ ustawDate(b.dataset.d); });
+  });
+  dData.addEventListener('change', function(){
+    if (dData.value){
+      iData.value = dData.value;
+      dOd.value = przesun(dData.value, -1);
+      dDo.value = przesun(dData.value, 1);
+    }
+    przelicz();
+  });
+  dOd.addEventListener('change', przelicz);
+  dDo.addEventListener('change', przelicz);
+  przelicz();
+  {% if data %}{% if not data_od %}ustawDate('{{ data }}');{% endif %}{% endif %}
+})();
+</script>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

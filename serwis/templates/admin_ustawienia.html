@@ -27,6 +27,11 @@
       </div>
     </div>
 
+    <h3>Kody rabatowe</h3>
+    <p class="mala">Każdy kod w osobnej linii: KOD:procent (np. WESELE5:5). Klient wpisze kod w kreatorze zamówienia, a rabat naliczy się od kwoty najmu + personalizacji (nie od kaucji).</p>
+    <label>Kody (KOD:procent)</label>
+    <textarea name="kody_rabatowe" rows="3" placeholder="WESELE5:5&#10;SYGNATURA10:10">{{ u.get('kody_rabatowe','') }}</textarea>
+
     <h3>Google Sheets (webhook)</h3>
     <p class="mala">Każde zgłoszenie i każda zmiana statusu leci na ten adres jako JSON (skrypt pod spodem dopisuje wiersz w arkuszu).
     Skrypt i instrukcja: <b>serwis/sheets/webhook.gs</b>. Po zapisaniu URL kliknij „Testuj”.</p>

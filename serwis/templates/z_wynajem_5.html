@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krok 5: Podsumowanie — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set etap = 5 %}{% set pers_pom = szkic.get('pers_pom') %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('z_wynajem_dane', w=szkic['_klucz']) }}">← popraw dane</a>
+  <h1>Krok 5 · Podsumowanie zamówienia</h1>
+  <p class="sub">Sprawdź wszystko raz jeszcze. Po wysłaniu dostaniesz e-mail z sygnaturą sprawy, dokumentami i danymi do przelewu.</p>
+
+  {% if msg %}<div class="flash">{{ msg }}</div>{% endif %}
+
+  <div class="z-pod">
+    <div class="z-pod-sec">
+      <h2>Termin</h2>
+      <p>Impreza: <b>{{ szkic['data'] }}</b><br>
+         Najem: <b>{{ szkic['data_od'] }} – {{ szkic['data_do'] }}</b> ({{ szkic['dni'] }} {{ 'doba' if szkic['dni'] == 1 else ('doby' if szkic['dni'] < 5 else 'dób') }})<br>
+         <span class="mala">dzień przed — montaż · dzień po — demontaż i zwrot</span></p>
+    </div>
+
+    <div class="z-pod-sec">
+      <h2>Pakiet</h2>
+      <p><b>{{ szkic['pakiet']['nazwa'] }}</b> ({{ szkic['pakiet']['tier'] }}) — {{ szkic['pakiet']['cena'] }}
+         {% if szkic['pakiet']['opis'] %}<br><span class="mala">{{ szkic['pakiet']['opis'] }}</span>{% endif %}</p>
+      <ul class="z-ul">
+        {% for poz in szkic['pakiet']['pozycje'].splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}
+      </ul>
+    </div>
+
+    <div class="z-pod-sec">
+      <h2>Personalizacja</h2>
+      {% if szkic['pers'] %}
+        <ul class="z-ul">
+          {% for pr in szkic['pers'] %}
+          <li><b>{{ pr['nazwa'] }}</b> — {{ '%.0f'|format(pr['cena']) }} zł{% if pr['opis'] %}<br><span class="mala">Opis: {{ pr['opis'] }}</span>{% endif %}</li>
+          {% endfor %}
+        </ul>
+        <p class="mala">Produkty spersonalizowane: płatne z góry, bezzwrotne — po imprezie zostają u Ciebie.</p>
+      {% else %}
+        <p class="mala">Bez personalizacji (krok pominięty).</p>
+      {% endif %}
+      {% if szkic['pomysl'] %}
+      <p><b>Twój pomysł (spoza katalogu):</b><br>{{ szkic['pomysl'] }}</p>
+      {% endif %}
+    </div>
+
+    <div class="z-pod-sec">
+      <h2>Dane i dostawa</h2>
+      <p>
+        {{ szkic['klient']['imie'] }} · {{ szkic['klient']['email'] }}{% if szkic['klient']['telefon'] %} · tel. {{ szkic['klient']['telefon'] }}{% endif %}<br>
+        Sygnatura: {% if szkic['sygnatura'] %}{{ szkic['sygnatura'] }}{% else %}nadamy nową{% endif %}<br>
+        Dostawa: <b>{% if szkic['dostawa'] == 'dowoz' %}Dowóz i montaż przez Studio{% else %}Odbiór osobisty w pracowni{% endif %}</b>
+        {% if szkic['dostawa'] == 'dowoz' and szkic['adres'] %}<br>Adres: {{ szkic['adres'] }}{% endif %}
+      </p>
+    </div>
+
+    <div class="z-pod-sec kwoty">
+      <h3>Podsumowanie kosztów</h3>
+      <div class="linia"><span>Najem: {{ kwoty['stawka_txt'] }} × {{ kwoty['dni'] }} {{ 'doba' if kwoty['dni'] == 1 else ('doby' if kwoty['dni'] < 5 else 'dób') }}</span><b>{{ '%.0f'|format(kwoty['najem']) }} zł</b></div>
+      <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
+      <div class="linia"><span>Personalizacja{% if kwoty['pers_rabat'] %} (z rabatem −5%){% endif %}</span><b>{{ '%.0f'|format(kwoty['pers_netto']) }} zł</b></div>
+      {% if kwoty['rabat_kod'] %}
+      <div class="linia"><span>Rabat z kodu {{ kwoty['kod'] }}</span><b>−{{ kwoty['rabat_kod'] }} zł</b></div>
+      {% elif szkic['kod'] %}
+      <div class="linia"><span>Kod {{ szkic['kod'] }}</span><b>nie rozpoznany</b></div>
+      {% endif %}
+      <div class="razem"><span>RAZEM</span><span>{{ '%.0f'|format(kwoty['razem_po']) }} zł</span></div>
+      <p class="uw">Kaucja zwrotna wraca po oddaniu kompletu bez uszkodzeń. Personalizacja płatna z góry i bezzwrotna.
+      Doby najmu liczymy od protokołu zdawczo-odbiorczego do odbioru — płatność za każdą rozpoczętą dobę.</p>
+    </div>
+
+    <form method="post" action="{{ url_for('z_wynajem_zamow') }}" class="forma">
+      <input type="hidden" name="w" value="{{ szkic['_klucz'] }}">
+      <div class="pole">
+        <label for="tresc">Wiadomość dla nas (opcjonalnie)</label>
+        <textarea id="tresc" name="tresc" rows="4" placeholder="Kilka słów od Ciebie — instrukcje, liczba gości, pytania…"></textarea>
+      </div>
+      <p class="mala">Wysyłając zamówienie zobowiązujesz się do zapłaty zgodnie z podsumowaniem (przelew — dane otrzymasz w e-mailu z potwierdzeniem). Kliknięcie poniżej = akceptacja powyższego podsumowania.</p>
+      <div class="przyciski" style="justify-content:flex-end">
+        <button class="btn" type="submit">Zamawiam z obowiązkiem zapłaty</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

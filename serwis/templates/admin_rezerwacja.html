@@ -16,6 +16,9 @@
     <tr><th>Imię i nazwisko</th><td>{{ r['imie'] or '—' }}</td></tr>
     <tr><th>E-mail</th><td><a href="mailto:{{ r['email'] }}">{{ r['email'] }}</a></td></tr>
     <tr><th>Telefon</th><td>{{ r['telefon'] or '—' }}</td></tr>
+    <tr><th>Dostawa</th><td>{{ r['dostawa'] or '—' }}</td></tr>
+    {% if r['adres'] %}<tr><th>Adres</th><td>{{ r['adres'] }}</td></tr>{% endif %}
+    {% if r['kod'] %}<tr><th>Kod rabatowy</th><td>{{ r['kod'] }}</td></tr>{% endif %}
     <tr><th>Treść zapytania</th><td style="white-space:pre-wrap">{{ r['tresc'] or '—' }}</td></tr>
     {% if pozycje %}
     <tr><th>Skład zestawu własnego</th><td>

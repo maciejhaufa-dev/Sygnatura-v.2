@@ -277,3 +277,97 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
   .przyciski .btn{flex:1;text-align:center}
   .przyciski{flex-direction:column-reverse}
 }
+
+/* ============ KREATOR ZAMÓWIEŃ (hub + progres + kroki) ============ */
+/* --- hub: 3 kafle --- */
+.hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:24px;margin-top:34px}
+.hub-col{background:#FFFDF8;border:2px solid rgba(107,69,48,.6);box-shadow:0 22px 46px rgba(38,29,20,.16);
+  display:flex;flex-direction:column}
+.hub-head{background:var(--butelkowa);color:var(--zloty);text-align:center;font-size:21px;font-weight:700;
+  letter-spacing:.03em;padding:15px 12px}
+.hub-body{padding:20px 20px 8px;flex:1}
+.hub-body p{margin:0;font-size:16px;line-height:1.65;color:rgba(51,38,28,.85)}
+.hub-col .btn{margin:16px 20px 22px;text-align:center}
+
+/* --- progres bar (5 kamieni milowych, wypełnia się na złoto) --- */
+.prog{display:flex;align-items:flex-start;margin:16px 0 4px;max-width:900px}
+.prg-it{display:flex;flex-direction:column;align-items:center;gap:5px;flex:none;width:64px;text-align:center}
+.prg-kolo{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  background:var(--krem2);border:2px solid rgba(107,69,48,.4);color:rgba(51,38,28,.55);
+  font-size:13px;font-weight:700}
+.prg-lab{font-size:11.5px;line-height:1.25;color:rgba(51,38,28,.55);text-transform:uppercase;letter-spacing:.04em}
+.prg-linia{flex:1;height:3px;background:var(--krem2);border:1px solid rgba(107,69,48,.25);
+  border-width:1px 0;margin-top:13px;min-width:8px}
+.prg-it.zrob .prg-kolo{background:var(--zloty);border-color:var(--zloty);color:var(--butelkowa)}
+.prg-it.zrob .prg-lab{color:var(--brunatny);font-weight:700}
+.prg-linia.zrob{background:var(--zloty);border-color:var(--zloty)}
+.prg-it.akt .prg-kolo{background:var(--butelkowa);border-color:var(--butelkowa);color:var(--zloty)}
+.prg-it.akt .prg-lab{color:var(--butelkowa);font-weight:700}
+@media(max-width:560px){
+  .prg-it{width:52px}
+  .prg-lab{font-size:9.5px}
+  .prg-kolo{width:26px;height:26px;font-size:12px}
+  .prg-linia{margin-top:11px}
+}
+
+/* --- kroki kreatora --- */
+.z-krok{grid-template-columns:1.15fr 1fr}
+.rzad-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.rzad-2{grid-template-columns:1fr}}
+.cal-d.wybor{font-family:inherit;font-size:14px}
+.cal-d.wybor.akt{background:var(--butelkowa);border-color:var(--butelkowa);color:var(--zloty);font-weight:700}
+.bledy-box{background:#FFF4E0;border:1px solid var(--zloty);padding:12px 16px;margin:12px 0;font-size:15.5px}
+.bledy-box ul{margin:0;padding-left:20px}
+.bledy-box li{margin:4px 0}
+
+/* --- krok 2: pakiety dostępne/niedostępne --- */
+.pak.z-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.pak-card.nd{border-style:dashed;opacity:.92}
+.pak-card.nd .pak-name{color:rgba(51,38,28,.65)}
+.z-nd summary{cursor:pointer;font-size:16.5px;font-weight:700;color:var(--brunatny);
+  border:1px solid rgba(107,69,48,.4);background:#fff;padding:12px 16px}
+.z-nd[open] summary{border-bottom:none}
+.z-nd-list{margin-top:0;border:1px solid rgba(107,69,48,.4);border-top:none;padding:16px;background:rgba(251,247,240,.5)}
+
+/* --- krok 3: personalizacja --- */
+.z-skip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:12px 14px;margin:14px 0 4px;
+  font-size:15.5px;color:var(--brunatny);font-weight:700}
+.pers.z-3{margin-top:14px}
+.z-pers-it{align-items:flex-start}
+.z-pers-it input{margin-top:5px}
+.z-pers-tresc{flex:1}
+.z-pers-tresc b{font-size:16.5px}
+.z-pers-tresc small{display:block;font-size:13px;color:rgba(51,38,28,.6);margin:3px 0}
+.z-pers-tresc .cena{font-size:14.5px;color:var(--butelkowa);font-weight:700}
+.z-pers-tresc .bez{font-size:12.5px;color:#8c2f2f;font-weight:700}
+.z-pers-opis{margin-top:8px}
+.z-pers-opis label{display:block;font-size:12.5px;color:var(--brunatny);margin-bottom:3px;
+  text-transform:none;letter-spacing:0}
+.z-pers-opis textarea{min-height:52px;width:100%}
+
+/* --- krok 5: podsumowanie --- */
+.z-pod{max-width:760px;margin-top:16px}
+.z-pod-sec{background:#fff;border:1px solid rgba(107,69,48,.35);padding:16px 18px;margin-bottom:14px}
+.z-pod-sec h2{font-size:19px;color:var(--butelkowa);margin:0 0 8px}
+.z-pod-sec h3{margin:0 0 10px;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--zloty)}
+.z-pod-sec p{margin:4px 0;font-size:16px;line-height:1.6}
+.z-ul{margin:6px 0 0;padding-left:20px;font-size:15.5px}
+.z-ul li{margin:4px 0}
+.z-pod-sec.kwoty{background:var(--butelkowa);color:var(--krem);border-color:var(--butelkowa)}
+.z-pod-sec.kwoty .linia{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:3px 0;color:rgba(251,247,240,.9)}
+.z-pod-sec.kwoty .linia b{color:var(--zloty)}
+.z-pod-sec.kwoty .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:10px;font-size:20px;
+  font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.z-pod-sec.kwoty .uw{font-size:12.5px;color:rgba(251,247,240,.7);margin-top:10px;line-height:1.55}
+.z-pod-sec.kwoty .mala{color:rgba(251,247,240,.7)}
+
+/* --- podziękowanie --- */
+.z-dzieki{max-width:640px;margin:26px auto 40px;background:#fff;border:2px solid var(--brunatny);
+  padding:34px 28px;text-align:center}
+.z-dzieki h1{color:var(--butelkowa);font-size:30px;margin:0 0 10px}
+.z-dzieki .syg{display:inline-block;background:var(--butelkowa);color:var(--zloty);padding:8px 18px;
+  font-size:20px;letter-spacing:.06em;margin:8px 0 16px}
+.z-dzieki p{font-size:16.5px;line-height:1.6;margin:8px 0}
+.z-dzieki .z-pod-sec{margin-top:14px}
+.z-dzieki .btn{margin-top:14px}

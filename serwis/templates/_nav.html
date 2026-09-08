@@ -4,8 +4,7 @@
     {% set sc = request.path %}
     <a href="/" {% if sc == '/' %}class="akt"{% endif %}>Start</a>
     <a href="/realizacje/" {% if sc.startswith('/realizacje') %}class="akt"{% endif %}>Realizacje</a>
-    <a href="/wynajem/" {% if sc.startswith('/wynajem') %}class="akt"{% endif %}>Wynajem</a>
-    <a href="/personalizacja/" {% if sc.startswith('/personalizacja') %}class="akt"{% endif %}>Personalizacja</a>
+    <a href="/zamowienia/" {% if sc.startswith('/zamowienia') %}class="akt"{% endif %}>Zamówienia</a>
     <a href="/kontakt/" {% if sc.startswith('/kontakt') %}class="akt"{% endif %}>Kontakt</a>
   </div>
 </header>

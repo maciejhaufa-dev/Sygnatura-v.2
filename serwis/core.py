@@ -117,10 +117,13 @@ def sheets_payload(rezerwacja, typ='rezerwacja'):
         'pozycje': rezerwacja.get('pozycje') or '[]',
         'personalizacje': rezerwacja.get('personalizacje') or '[]',
         'rozliczenie': rezerwacja.get('rozliczenie') or 'wspolne',
-        'kwoty_lacznie': (kw or {}).get('razem') if kw else '',
+        'kwoty_lacznie': (kw or {}).get('razem_po', (kw or {}).get('razem')) if kw else '',
         'kwoty_najem': (kw or {}).get('najem') if kw else '',
         'kwoty_pers': (kw or {}).get('pers_netto') if kw else '',
         'kwoty_kaucja': 300 if kw else '',
+        'dostawa': rezerwacja.get('dostawa') or '',
+        'adres': rezerwacja.get('adres') or '',
+        'kod': rezerwacja.get('kod') or '',
     }
     return json.dumps(dane, ensure_ascii=False).encode('utf-8')
 
@@ -226,12 +229,14 @@ def kwoty_txt(rez):
     if not kw:
         return ''
     linie = ['PODSUMOWANIE KWOT (szacunkowe):',
-             'Najem: %.0f zł (%s × %s dn.)' % (kw['najem'], kw['stawka_txt'], kw['dni']),
+             'Najem: %.0f zł (%s × %s dn.)' % (kw.get('najem', 0), kw.get('stawka_txt', ''), kw.get('dni', 0)),
              'Kaucja zwrotna (najem): 300 zł',
-             'Personalizacja (płatna z góry, bezzwrotna): %.0f zł' % kw['pers_netto'],
-             'RAZEM: %.0f zł' % kw['razem']]
+             'Personalizacja (płatna z góry, bezzwrotna): %.0f zł' % kw.get('pers_netto', 0)]
     if kw.get('pers_rabat'):
         linie.insert(3, 'w tym rabat na personalizację −5%%: −%d zł' % kw['pers_rabat'])
+    if kw.get('rabat_kod'):
+        linie.append('Rabat z kodu %s: −%d zł' % (kw.get('kod', ''), kw['rabat_kod']))
+    linie.append('RAZEM: %.0f zł' % (kw.get('razem_po', kw.get('razem', 0))))
     return '\n'.join(linie) + '\n'
 
 
@@ -240,7 +245,23 @@ def kwota_lacznie(rez):
     kw = rez.get('kwoty') if isinstance(rez, dict) else None
     if not kw:
         return ''
-    return '%.0f zł' % kw['razem']
+    return '%.0f zł' % (kw.get('razem_po', kw.get('razem', 0)))
+
+
+def rabat_od_kodu(db, kod):
+    """Kod rabatowy z ustawień (linie: KOD:procent, np. WESELE5:5).
+    Zwraca (procent, opis_bledu). Wielkość liter bez znaczenia."""
+    kod = (kod or '').strip()
+    if not kod:
+        return 0, ''
+    row = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='kody_rabatowe'").fetchone()
+    for linia in ((row['wartosc'] if row else '') or '').splitlines():
+        czesci = [c.strip() for c in linia.split(':')]
+        if len(czesci) == 2 and czesci[0].lower() == kod.lower() and czesci[1].isdigit():
+            p = int(czesci[1])
+            if 1 <= p <= 100:
+                return p, ''
+    return 0, 'Nie rozpoznano kodu rabatowego — pomijamy go (możesz go dopisać w wiadomości, a my sprawdzimy ręcznie).'
 
 
 # ------------------------------------------------ autorespondery (szablony z bazy)
@@ -248,11 +269,18 @@ def podstawienia(rez):
     """Zmienne dostępne w szablonach autoresponderów: %(sygnatura)s itd."""
     kw = rez.get('kwoty') if isinstance(rez, dict) else None
     telefon = (rez.get('telefon') or '').strip()
+    dostawa = (rez.get('dostawa') or '').strip()
+    dostawa_txt = ''
+    if dostawa:
+        dostawa_txt = 'Forma dostawy: %s\n' % dostawa
+        if (rez.get('adres') or '').strip():
+            dostawa_txt += 'Adres: %s\n' % rez['adres'].strip()
     return {
         'sygnatura': rez.get('sygnatura') or '',
         'imie': (rez.get('imie') or '').strip() or 'Państwo',
         'email': rez.get('email') or '',
         'telefon': ('Telefon: %s\n' % telefon) if telefon else '',
+        'dostawa': dostawa_txt,
         'temat': rez.get('temat') or '',
         'tresc': (rez.get('tresc') or '').strip() or '(brak treści)',
         'pakiet': rez.get('pakiet_nazwa') or '',
@@ -355,6 +383,15 @@ def mail_klient_zapytanie(rez, dokumenty):
 
 
 def mail_studio_zapytanie(rez):
+    dostawa = (rez.get('dostawa') or '').strip()
+    dostawa_txt = ''
+    if dostawa:
+        dostawa_txt = 'Forma dostawy: %s\n' % dostawa
+        if (rez.get('adres') or '').strip():
+            dostawa_txt += 'Adres: %s\n' % rez['adres'].strip()
+    kod_txt = ''
+    if (rez.get('kod') or '').strip():
+        kod_txt = 'Kod rabatowy: %s\n' % rez['kod'].strip()
     return (
         'NOWE ZAPYTANIE O WYNAJEM\n\n'
         'Sygnatura: %(sygnatura)s\n'
@@ -365,6 +402,8 @@ def mail_studio_zapytanie(rez):
         'Imię i nazwisko: %(imie)s\n'
         'E-mail: %(email)s\n'
         '%(telefon)s'
+        '%(dostawa)s'
+        '%(kod)s'
         '\nTreść:\n%(tresc)s\n'
         '%(pozycje)s'
         '%(personalizacje)s'
@@ -374,6 +413,7 @@ def mail_studio_zapytanie(rez):
         'sygnatura': rez['sygnatura'], 'utworzono': rez['utworzono'], 'zakres': zakres_txt(rez),
         'pakiet': rez['pakiet_nazwa'], 'imie': rez['imie'], 'email': rez['email'],
         'telefon': ('Telefon: %s\n' % rez['telefon']) if rez['telefon'] else '',
+        'dostawa': dostawa_txt, 'kod': kod_txt,
         'tresc': (rez['tresc'].strip() or '(brak treści)'),
         'pozycje': pozycje_txt(rez),
         'personalizacje': personalizacje_txt(rez),

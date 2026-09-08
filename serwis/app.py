@@ -139,8 +139,10 @@ def wczytaj_v4(nazwa):
         abort(404)
     tresc = open(sciezka, encoding='utf-8').read()
     tresc = tresc.replace('assets/', '/assets/')
-    tresc = tresc.replace('wynajem.html">Personalizacja', '/personalizacja/">Personalizacja')
-    tresc = tresc.replace('wynajem.html', '/wynajem/')
+    # „Wynajem"/„Personalizacja" w menu prowadzą teraz do hubu ZAMÓWIENIA (kreator 5 kroków)
+    tresc = tresc.replace('wynajem.html">Personalizacja', '/zamowienia/">Zamówienia')
+    tresc = tresc.replace('wynajem.html', '/zamowienia/')
+    tresc = tresc.replace('>Wynajem<', '>Zamówienia<')
     tresc = tresc.replace('galeria.html', '/realizacje/')
     tresc = tresc.replace('kontakt.html', '/kontakt/')
     tresc = tresc.replace('index.html', '/')
@@ -349,6 +351,156 @@ def wczytaj_pers(db, parametr):
     return [x for x in pers_ids if x in widziane], personalizacje
 
 
+# ---------------------------------------------------------------- kreator zamówienia (szkice)
+def szkic_nowy(db, dane):
+    """Tworzy szkic zamówienia (kreator krokowy) i zwraca klucz wędrujący w adresie (?w=...).
+    Stare szkice (ponad 48 h) są sprzątane przy okazji."""
+    db.execute('DELETE FROM szkice WHERE utworzono < ?', (core.teraz_plus(-48 * 3600),))
+    klucz = secrets.token_urlsafe(18)
+    db.execute('INSERT INTO szkice (klucz, typ, dane, utworzono) VALUES (?,?,?,?)',
+               (klucz, dane.get('typ', 'wynajem'), json.dumps(dane, ensure_ascii=False), core.teraz()))
+    db.commit()
+    return klucz
+
+
+def szkic_pobierz(db, klucz):
+    if not klucz:
+        return None
+    row = db.execute('SELECT * FROM szkice WHERE klucz=?', (klucz,)).fetchone()
+    if not row:
+        return None
+    try:
+        dane = json.loads(row['dane'] or '{}')
+    except Exception:
+        dane = {}
+    dane['_klucz'] = row['klucz']
+    return dane
+
+
+def szkic_zapisz(db, klucz, dane):
+    db.execute('UPDATE szkice SET dane=? WHERE klucz=?', (json.dumps(dane, ensure_ascii=False), klucz))
+    db.commit()
+
+
+def kwoty_zamowienia(db, p, pozycje, pers_list, dni, kod=''):
+    """Podsumowanie kwot: najem × doby + kaucja + personalizacja (rabat −5% od 3 szt.)
+    + ewentualny rabat z kodu. Zwraca słownik dla maili/arkusza/podsumowania."""
+    if p:
+        stawka = p['cena_liczba'] or 0
+        stawka_txt = p['cena']
+    else:
+        stawka = sum(float(x.get('cena') or 0) for x in pozycje)
+        stawka_txt = '%d zł / doba (zestaw własny)' % stawka
+    pers_suma = sum(float(x.get('cena') or 0) for x in pers_list)
+    pers_rabat = round(pers_suma * 0.05) if len(pers_list) >= 3 else 0
+    pers_netto = pers_suma - pers_rabat
+    najem_kwota = round(stawka * dni)
+    razem = najem_kwota + 300 + pers_netto
+    kod = (kod or '').strip()
+    rabat_proc, _ = core.rabat_od_kodu(db, kod)
+    rabat_kod = round((najem_kwota + pers_netto) * rabat_proc / 100) if rabat_proc else 0
+    return {'najem': najem_kwota, 'stawka_txt': stawka_txt, 'dni': dni,
+            'pers_suma': pers_suma, 'pers_rabat': pers_rabat, 'pers_netto': pers_netto,
+            'kaucja': 300, 'razem': razem, 'kod': kod, 'rabat_kod': rabat_kod,
+            'razem_po': razem - rabat_kod}
+
+
+def finalizuj_zamowienie(db, zam):
+    """Tworzy rezerwację ze słownika zam (wspólne dla starego i nowego przepływu).
+    Wysyła maile (Studio + autoresponder wg tematu) i push do arkusza Google.
+    Zwraca (rez, kwoty, blad) — przy blad='' zamówienie zostało utworzone."""
+    pakiet_id = zam.get('pakiet_id') or 0
+    p = None
+    if pakiet_id:
+        p = db.execute('SELECT * FROM pakiety WHERE id=?', (pakiet_id,)).fetchone()
+        if not p:
+            return None, None, 'Nie znaleziono pakietu — wróć do wyboru pakietu.'
+    data = zam.get('data') or ''
+    data_od = zam.get('data_od') or ''
+    data_do = zam.get('data_do') or ''
+    try:
+        d_ev = datetime.date.fromisoformat(data)
+        d_od = datetime.date.fromisoformat(data_od)
+        d_do = datetime.date.fromisoformat(data_do)
+    except ValueError:
+        return None, None, 'Podaj poprawne daty (RRRR-MM-DD).'
+    if not (d_od <= d_ev <= d_do):
+        return None, None, 'Data imprezy musi się mieścić między „od" a „do".'
+    if d_od < datetime.date.today():
+        return None, None, 'Termin nie może zaczynać się w przeszłości.'
+    dni = (d_do - d_od).days + 1
+
+    # konflikt w całym zakresie — ponownie (termin mógł zostać zajęty w międzyczasie)
+    blok, pyt = konflikty_zakresu(db, pakiet_id, d_od, d_do)
+    if blok:
+        opis = ', '.join('%s (%s)' % (d, core.STATUSY_PL[s]) for d, s in blok[:5])
+        return None, None, 'Termin został w międzyczasie zajęty: %s. Wróć do kalendarza i wybierz inny zakres.' % opis
+
+    pozycje = zam.get('pozycje') or []
+    pers_list = zam.get('pers') or []
+    tresc = (zam.get('tresc') or '').strip()
+    if dni == 1 and len(tresc) < 20:
+        return None, None, 'Najem na 1 dobę to wyjątek — dekoracje zakładamy dzień przed i ściągamy dzień po imprezie. Krótko uzasadnij w wiadomości, a rozpatrzymy to ręcznie.'
+    email = (zam.get('email') or '').strip()
+    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+        return None, None, 'Podaj poprawny adres e-mail.'
+    sygnatura = (zam.get('sygnatura') or '').strip().upper()
+    if not sygnatura:
+        sygnatura = core.nowa_sygnatura(db)
+    temat = (zam.get('temat') or 'Rezerwacja terminu').strip()
+    imie = (zam.get('imie') or '').strip()
+    telefon = (zam.get('telefon') or '').strip()
+    dostawa = (zam.get('dostawa') or '').strip()
+    adres = (zam.get('adres') or '').strip()
+    kod = (zam.get('kod') or '').strip()
+    dodatkowe = json.dumps({'pomysl': zam.get('pomysl') or '', 'zgody': zam.get('zgody') or {}},
+                           ensure_ascii=False)
+    # pomysł własny (personalizacja spoza katalogu) dopisujemy do treści — widoczny w panelu i mailach
+    if zam.get('pomysl'):
+        tresc = (tresc + '\n\nPOMYSŁ WŁASNY (personalizacja spoza katalogu):\n' + zam['pomysl']).strip()
+
+    kwoty = kwoty_zamowienia(db, p, pozycje, pers_list, dni, kod)
+    teraz = core.teraz()
+    pakiet_nazwa = p['nazwa'] if p else 'Zestaw własny'
+    db.execute(
+        'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, personalizacje, '
+        'kwoty, status, rozliczenie, dostawa, adres, kod, dodatkowe, utworzono, zmieniono, historia) '
+        'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        (sygnatura, data, data_od, data_do, dni, p['id'] if p else None, pakiet_nazwa, temat, imie, email, telefon, tresc,
+         json.dumps(pozycje, ensure_ascii=False),
+         json.dumps(pers_list, ensure_ascii=False),
+         json.dumps(kwoty, ensure_ascii=False),
+         'zapytanie', zam.get('rozliczenie') or 'wspolne', dostawa, adres, kod, dodatkowe,
+         teraz, teraz, json.dumps([{'kiedy': teraz, 'status': 'zapytanie', 'uwaga': 'zgłoszenie przez kreator zamówienia'}], ensure_ascii=False)))
+    db.commit()
+    rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (sygnatura,)).fetchone()
+
+    # informacja dla Studia o istniejących zapytaniach w zakresie (nie blokują, ale warto wiedzieć)
+    if pyt:
+        db.execute('UPDATE rezerwacje SET tresc=? WHERE id=?',
+                   ((rez['tresc'] + '\n\nUWAGA: w zakresie są dni z istniejącymi zapytaniami: ' + ', '.join(pyt)).strip(), rez['id']))
+        db.commit()
+        rez = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rez['id'],)).fetchone()
+
+    rez_z_kwotami = dict(rez)
+    rez_z_kwotami['kwoty'] = kwoty
+    # 1) e-mail do Studia (powiadomienie)
+    core.wyslij_do_studia(db, 'Nowe zapytanie — %s — %s–%s' % (rez['pakiet_nazwa'], data_od, data_do),
+                          core.mail_studio_zapytanie(rez_z_kwotami))
+    # 2) autoresponder do klienta — szablon z bazy wg tematu / personalizacji
+    temat_zgloszenia = (rez['temat'] or '').lower()
+    if 'rezerwac' in temat_zgloszenia and 'termin' in temat_zgloszenia:
+        klucz_szablonu = 'rezerwacja-terminu'
+    elif pers_list:
+        klucz_szablonu = 'zamowienie'
+    else:
+        klucz_szablonu = 'zapytanie'
+    core.wyslij_szablon(db, klucz_szablonu, rez_z_kwotami, email)
+    # 3) arkusz Google (bez URL nic nie wysyła — log w Ustawieniach)
+    core.push_do_sheets(db, rez)
+    return rez, kwoty, ''
+
+
 @app.route('/wynajem/')
 def wynajem():
     """Strona główna wynajmu: WYBÓR TYPU WYDARZENIA — bez kalendarzy."""
@@ -508,27 +660,6 @@ def api_rezerwuj():
     except Exception:
         pers_ids = []
     pers_param = ','.join(str(x) for x in pers_ids)
-    try:
-        d_ev = datetime.date.fromisoformat(data)
-        d_od = datetime.date.fromisoformat(data_od)
-        d_do = datetime.date.fromisoformat(data_do)
-    except ValueError:
-        flash('Podaj poprawne daty (RRRR-MM-DD).')
-        return wroc(data, data_od, data_do, pers_param)
-    if not (d_od <= d_ev <= d_do):
-        flash('Data imprezy musi się mieścić między „od" a „do".')
-        return wroc(data, data_od, data_do, pers_param)
-    if d_od < datetime.date.today():
-        flash('Termin nie może zaczynać się w przeszłości.')
-        return wroc(data, data_od, data_do, pers_param)
-    dni = (d_do - d_od).days + 1
-
-    # konflikt w całym zakresie (dzień po dniu)
-    blok, pyt = konflikty_zakresu(db, pakiet_id, d_od, d_do)
-    if blok:
-        opis = ', '.join('%s (%s)' % (d, core.STATUSY_PL[s]) for d, s in blok[:5])
-        flash('Termin niedostępny w dniach: %s. Wybierz inny zakres.' % opis)
-        return wroc(data, data_od, data_do, pers_param)
 
     # zestaw własny: skład z katalogu
     pozycje = []
@@ -556,11 +687,6 @@ def api_rezerwuj():
                 return wroc(data, data_od, data_do, pers_param)
             pers_list.append({'nazwa': pr['nazwa'], 'cena': pr['cena'], 'opis': opis})
 
-    email = (request.form.get('email') or '').strip()
-    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
-        flash('Podaj poprawny adres e-mail.')
-        return wroc(data, data_od, data_do, pers_param)
-
     # checkboxy: value=nowa / value=istniejaca (zaznaczony "istniejaca" ma priorytet)
     tryb = 'istniejaca' if 'istniejaca' in request.form.getlist('tryb_sygnatury') else 'nowa'
     sygnatura = ''
@@ -569,77 +695,24 @@ def api_rezerwuj():
         if not sygnatura:
             flash('Wpisz sygnaturę sprawy albo zaznacz „nadaj nową sygnaturę".')
             return wroc(data, data_od, data_do, pers_param)
-    else:
-        sygnatura = core.nowa_sygnatura(db)
 
-    temat = (request.form.get('temat') or 'Rezerwacja terminu').strip()
-    imie = (request.form.get('imie') or '').strip()
-    telefon = (request.form.get('telefon') or '').strip()
-    tresc = (request.form.get('tresc') or '').strip()
-
-    # najem na 1 dobę tylko z uzasadnieniem (montaż/demontaż wymaga min. 3 dób)
-    if dni == 1 and len(tresc) < 20:
-        flash('Najem na 1 dobę to wyjątek — dekoracje zakładamy dzień przed i ściągamy dzień po imprezie. '
-              'Krótko uzasadnij w wiadomości, a rozpatrzymy to ręcznie.')
+    # wspólna finalizacja (walidacja dat/konfliktów/maila + zapis + maile + arkusz)
+    zam = {
+        'pakiet_id': pakiet_id,
+        'data': data, 'data_od': data_od, 'data_do': data_do,
+        'pozycje': pozycje, 'pers': pers_list,
+        'imie': (request.form.get('imie') or '').strip(),
+        'email': (request.form.get('email') or '').strip(),
+        'telefon': (request.form.get('telefon') or '').strip(),
+        'temat': (request.form.get('temat') or 'Rezerwacja terminu').strip(),
+        'sygnatura': sygnatura,
+        'tresc': (request.form.get('tresc') or '').strip(),
+    }
+    rez, kwoty, blad = finalizuj_zamowienie(db, zam)
+    if blad:
+        flash(blad)
         return wroc(data, data_od, data_do, pers_param)
-
-    # PODSUMOWANIE KWOT: najem × doby + kaucja + personalizacja z góry (rabat −5% od 3 szt.)
-    if p:
-        stawka = p['cena_liczba'] or 0
-        stawka_txt = p['cena']
-    else:
-        stawka = sum(float(x['cena']) for x in pozycje)
-        stawka_txt = '%d zł / doba (zestaw własny)' % stawka
-    pers_suma = sum(float(x['cena']) for x in pers_list)
-    pers_rabat = round(pers_suma * 0.05) if len(pers_list) >= 3 else 0
-    pers_netto = pers_suma - pers_rabat
-    najem_kwota = round(stawka * dni)
-    kwoty = {'najem': najem_kwota, 'stawka_txt': stawka_txt, 'dni': dni,
-             'pers_suma': pers_suma, 'pers_rabat': pers_rabat, 'pers_netto': pers_netto,
-             'razem': najem_kwota + 300 + pers_netto}
-
-    teraz = core.teraz()
-    pakiet_nazwa = p['nazwa'] if p else 'Zestaw własny'
-    db.execute(
-        'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, personalizacje, '
-        'kwoty, status, utworzono, zmieniono, historia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        (sygnatura, data, data_od, data_do, dni, p['id'] if p else None, pakiet_nazwa, temat, imie, email, telefon, tresc,
-         json.dumps(pozycje, ensure_ascii=False),
-         json.dumps(pers_list, ensure_ascii=False),
-         json.dumps(kwoty, ensure_ascii=False),
-         'zapytanie', teraz, teraz, json.dumps([{'kiedy': teraz, 'status': 'zapytanie', 'uwaga': 'zgłoszenie przez formularz'}], ensure_ascii=False)))
-    db.commit()
-    rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (sygnatura,)).fetchone()
-
-    # informacja dla Studia o istniejących zapytaniach w zakresie (nie blokują, ale warto wiedzieć)
-    if pyt:
-        db.execute('UPDATE rezerwacje SET tresc=? WHERE id=?',
-                   ((rez['tresc'] + '\n\nUWAGA: w zakresie są dni z istniejącymi zapytaniami: ' + ', '.join(pyt)).strip(), rez['id']))
-        db.commit()
-        rez = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rez['id'],)).fetchone()
-
-    # kwoty dołączamy do kopii rekordu (maile pokazują pełne podsumowanie)
-    rez_z_kwotami = dict(rez)
-    rez_z_kwotami['kwoty'] = kwoty
-
-    # 1) e-mail do Studia (powiadomienie)
-    core.wyslij_do_studia(db, 'Nowe zapytanie — %s — %s–%s' % (rez['pakiet_nazwa'], data_od, data_do),
-                          core.mail_studio_zapytanie(rez_z_kwotami))
-    # 2) autoresponder do klienta — SZABLON z bazy (Ustawienia → Autorespondery);
-    #    temat formularza decyduje, który: „Rezerwacja terminu" → rezerwacja-terminu,
-    #    zapytanie z personalizacjami → zamowienie, pozostałe → zapytanie
-    temat_zgloszenia = (rez['temat'] or '').lower()
-    if 'rezerwac' in temat_zgloszenia and 'termin' in temat_zgloszenia:
-        klucz_szablonu = 'rezerwacja-terminu'
-    elif json.loads(rez['personalizacje'] or '[]'):
-        klucz_szablonu = 'zamowienie'
-    else:
-        klucz_szablonu = 'zapytanie'
-    core.wyslij_szablon(db, klucz_szablonu, rez_z_kwotami, email)
-    # 3) zapytanie do API Google Sheets (bez URL nic nie wysyła — log w Ustawieniach)
-    core.push_do_sheets(db, rez)
-
-    return redirect303(url_for('dziekuje', sygnatura=sygnatura))
+    return redirect303(url_for('dziekuje', sygnatura=rez['sygnatura']))
 
 
 @app.route('/wynajem/dziekuje')
@@ -654,6 +727,248 @@ def dziekuje():
         except Exception:
             pers_n = 0
     return render_template('dziekuje.html', rez=rez, sygnatura=syg, pers_n=pers_n)
+
+
+# ---------------------------------------------------------------- kreator: ZAMÓWIENIA (hub + 5 kroków)
+@app.route('/zamowienia/')
+def zamowienia():
+    """Hub zamówień: 3 kafle — Wynajem dekoracji / Personalizacja / Sklep."""
+    return render_template('zamowienia.html')
+
+
+@app.route('/zamowienia/wynajem/')
+def z_wynajem_termin():
+    """KROK 1: wybór terminu wydarzenia (kalendarz całej puli + zakres od–do)."""
+    db = get_db()
+    rok = int(request.args.get('rok') or datetime.date.today().year)
+    mies = int(request.args.get('mies') or datetime.date.today().month)
+    dni = siatka_miesiaca(db, None, rok, mies)
+    poprz = (rok - 1, 12) if mies == 1 else (rok, mies - 1)
+    nast = (rok + 1, 1) if mies == 12 else (rok, mies + 1)
+    data = request.args.get('data', '')
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    if data and not data_od:
+        data_od, data_do = zakres_domyslny(data)
+    pakiet_id = int(request.args.get('pakiet') or 0)
+    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pakiet_id,)).fetchone() if pakiet_id else None
+    return render_template('z_wynajem_1.html', dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
+                           poprz=poprz, nast=nast, data=data, data_od=data_od, data_do=data_do, p=p,
+                           msg=request.args.get('msg', ''))
+
+
+@app.route('/zamowienia/wynajem/pakiet/')
+def z_wynajem_pakiet():
+    """KROK 2: pakiety dostępne w wybranym zakresie + lista niedostępnych."""
+    db = get_db()
+    data = request.args.get('data', '')
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    try:
+        d_ev = datetime.date.fromisoformat(data)
+        d_od = datetime.date.fromisoformat(data_od)
+        d_do = datetime.date.fromisoformat(data_do)
+    except ValueError:
+        return redirect_msg('z_wynajem_termin', 'Najpierw wybierz termin wydarzenia w kalendarzu.')
+    if not (d_od <= d_ev <= d_do):
+        return redirect_msg('z_wynajem_termin', 'Zakres terminów jest niepoprawny — wybierz datę ponownie.')
+    dni_n = (d_do - d_od).days + 1
+    pakiet_param = int(request.args.get('pakiet') or 0)
+    dostepne, niedostepne = [], []
+    for p in db.execute('SELECT * FROM pakiety WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall():
+        blok, pyt = konflikty_zakresu(db, p['id'], d_od, d_do)
+        (niedostepne if blok else dostepne).append({'p': p, 'blok': blok, 'pyt': pyt})
+    return render_template('z_wynajem_2.html', data=data, data_od=data_od, data_do=data_do, dni=dni_n,
+                           dostepne=dostepne, niedostepne=niedostepne, pakiet_param=pakiet_param,
+                           statusy=core.STATUSY_PL)
+
+
+@app.route('/zamowienia/wynajem/personalizacja/', methods=['GET', 'POST'])
+def z_wynajem_pers():
+    """KROK 3: dodaj personalizację (można pominąć). POST tworzy szkic i idzie do kroku 4."""
+    db = get_db()
+    data = request.values.get('data', '')
+    data_od = request.values.get('data_od', '')
+    data_do = request.values.get('data_do', '')
+    pakiet_id = int(request.values.get('pakiet') or 0)
+    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pakiet_id,)).fetchone() if pakiet_id else None
+    try:
+        d_ev = datetime.date.fromisoformat(data)
+        d_od = datetime.date.fromisoformat(data_od)
+        d_do = datetime.date.fromisoformat(data_do)
+        if not (d_od <= d_ev <= d_do):
+            raise ValueError
+    except ValueError:
+        return redirect_msg('z_wynajem_termin', 'Najpierw wybierz termin wydarzenia.')
+    if not p:
+        return redirect_msg('z_wynajem_pakiet', 'Najpierw wybierz pakiet.', data=data, data_od=data_od, data_do=data_do)
+    dni_n = (d_do - d_od).days + 1
+    pozycje = db.execute('SELECT * FROM personalizacje WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    if request.method == 'POST':
+        pomijam = request.form.get('akcja') == 'pomijam'
+        wybrane = [int(x) for x in request.form.getlist('pers') if x.isdigit()]
+        pers_list, bledy = [], []
+        for pid3 in wybrane:
+            pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+            if not pr:
+                continue
+            opis = (request.form.get('pers_opis_%d' % pid3) or '').strip()
+            if not opis:
+                bledy.append('Dopisz opis do „%s" — co i jak ma być spersonalizowane.' % pr['nazwa'])
+            else:
+                pers_list.append({'id': pr['id'], 'nazwa': pr['nazwa'], 'cena': pr['cena'], 'opis': opis})
+        if bledy:
+            return render_template('z_wynajem_3.html', data=data, data_od=data_od, data_do=data_do,
+                                   p=p, dni=dni_n, pozycje=pozycje, wybrane=wybrane,
+                                   opisy={k: request.form.get('pers_opis_%d' % k, '') for k in wybrane},
+                                   pomysl=(request.form.get('pomysl') or '').strip(), bledy=bledy)
+        szkic = {
+            'typ': 'wynajem',
+            'data': data, 'data_od': data_od, 'data_do': data_do, 'dni': dni_n,
+            'pakiet_id': p['id'],
+            'pakiet': {'id': p['id'], 'nazwa': p['nazwa'], 'tier': p['tier'], 'cena': p['cena'],
+                       'cena_liczba': p['cena_liczba'], 'opis': p['opis'], 'pozycje': p['pozycje']},
+            'pers': pers_list,
+            'pomysl': (request.form.get('pomysl') or '').strip() if not pomijam else '',
+            'pers_pom': pomijam,
+            'klient': {}, 'sygnatura_tryb': 'nowa', 'sygnatura': '',
+            'dostawa': 'dowoz', 'adres': '', 'kod': '', 'zgody': {},
+        }
+        klucz = szkic_nowy(db, szkic)
+        return redirect303(url_for('z_wynajem_dane', w=klucz))
+    return render_template('z_wynajem_3.html', data=data, data_od=data_od, data_do=data_do,
+                           p=p, dni=dni_n, pozycje=pozycje, wybrane=[], opisy={}, pomysl='', bledy=[])
+
+
+@app.route('/zamowienia/wynajem/dane/', methods=['GET', 'POST'])
+def z_wynajem_dane():
+    """KROK 4: dane klienta, zgody, dostawa, kod rabatowy."""
+    db = get_db()
+    klucz = request.values.get('w', '')
+    szkic = szkic_pobierz(db, klucz)
+    if not szkic:
+        return redirect_msg('z_wynajem_termin', 'Twoja sesja wygasła lub link jest niepełny — zacznij od wyboru terminu.')
+    bledy = []
+    p_sk = db.execute('SELECT * FROM pakiety WHERE id=?', (szkic['pakiet_id'],)).fetchone()
+    if request.method == 'POST':
+        d = {
+            'imie': (request.form.get('imie') or '').strip(),
+            'email': (request.form.get('email') or '').strip(),
+            'telefon': (request.form.get('telefon') or '').strip(),
+        }
+        tryb = 'istniejaca' if request.form.get('tryb_sygnatury') == 'istniejaca' else 'nowa'
+        sygnatura = (request.form.get('sygnatura') or '').strip().upper()
+        dostawa = 'dowoz' if request.form.get('dostawa') == 'dowoz' else 'odbior'
+        adres = (request.form.get('adres') or '').strip()
+        kod = (request.form.get('kod') or '').strip()
+        zgody = {
+            'pke': request.form.get('zgoda_pke') == 'on',
+            'procedura': request.form.get('zgoda_procedura') == 'on',
+            'dane': request.form.get('zgoda_dane') == 'on',
+            'pers': request.form.get('zgoda_pers') == 'on',
+        }
+        if len(d['imie']) < 2:
+            bledy.append('Podaj imię i nazwisko (min. 2 znaki).')
+        if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', d['email']):
+            bledy.append('Podaj poprawny adres e-mail.')
+        if tryb == 'istniejaca' and not sygnatura:
+            bledy.append('Wpisz swoją sygnaturę sprawy albo zaznacz „nadaj nową sygnaturę".')
+        if dostawa == 'dowoz' and len(adres) < 10:
+            bledy.append('Podaj adres (miejscowość, ulica, kod) — dowozimy i montujemy dekoracje na miejscu imprezy.')
+        if not zgody['pke']:
+            bledy.append('Zaznacz zgodę na kontakt (PKE art. 398) — bez niej nie możemy odpowiedzieć.')
+        if not zgody['procedura']:
+            bledy.append('Potwierdź zapoznanie się z procedurą najmu i dokumentami.')
+        if not zgody['dane']:
+            bledy.append('Potwierdź, że podane dane zostaną użyte wyłącznie do realizacji zamówienia.')
+        if szkic.get('pers') and not zgody['pers']:
+            bledy.append('Zaznacz oświadczenie o produktach personalizowanych (bezzwrotne, płatne z góry).')
+        if kod:
+            _, blad_kodu = core.rabat_od_kodu(db, kod)
+            if blad_kodu:
+                bledy.append(blad_kodu)
+        if bledy:
+            kwoty = kwoty_zamowienia(db, p_sk, [], szkic.get('pers') or [], szkic.get('dni', 3), kod)
+            return render_template('z_wynajem_4.html', szkic=szkic, bledy=bledy, kwoty=kwoty,
+                                   d=d, tryb=tryb, sygnatura=sygnatura, dostawa=dostawa, adres=adres, kod=kod, zgody=zgody)
+        szkic['klient'] = d
+        szkic['sygnatura_tryb'] = tryb
+        szkic['sygnatura'] = sygnatura
+        szkic['dostawa'] = dostawa
+        szkic['adres'] = adres
+        szkic['kod'] = kod
+        szkic['zgody'] = zgody
+        szkic_zapisz(db, klucz, szkic)
+        return redirect303(url_for('z_wynajem_podsumowanie', w=klucz))
+    d = szkic.get('klient') or {'imie': '', 'email': '', 'telefon': ''}
+    kwoty = kwoty_zamowienia(db, p_sk, [], szkic.get('pers') or [], szkic.get('dni', 3), szkic.get('kod', ''))
+    return render_template('z_wynajem_4.html', szkic=szkic, bledy=[], kwoty=kwoty,
+                           d=d, tryb=szkic.get('sygnatura_tryb', 'nowa'), sygnatura=szkic.get('sygnatura', ''),
+                           dostawa=szkic.get('dostawa', 'dowoz'), adres=szkic.get('adres', ''),
+                           kod=szkic.get('kod', ''), zgody=szkic.get('zgody') or {})
+
+
+@app.route('/zamowienia/wynajem/podsumowanie/')
+def z_wynajem_podsumowanie():
+    """KROK 5: podsumowanie całości + wiadomość + „Zamawiam z obowiązkiem zapłaty"."""
+    db = get_db()
+    klucz = request.args.get('w', '')
+    szkic = szkic_pobierz(db, klucz)
+    if not szkic:
+        return redirect_msg('z_wynajem_termin', 'Twoja sesja wygasła — zacznij od wyboru terminu.')
+    if not szkic.get('klient'):
+        return redirect303(url_for('z_wynajem_dane', w=klucz))
+    p = db.execute('SELECT * FROM pakiety WHERE id=?', (szkic['pakiet_id'],)).fetchone()
+    kwoty = kwoty_zamowienia(db, p, [], szkic.get('pers') or [], szkic.get('dni', 3), szkic.get('kod', ''))
+    return render_template('z_wynajem_5.html', szkic=szkic, kwoty=kwoty,
+                           msg=request.args.get('msg', ''))
+
+
+@app.route('/zamowienia/wynajem/zamow/', methods=['POST'])
+def z_wynajem_zamow():
+    """Finalizacja: tworzy rezerwację, maile, arkusz — i czyści szkic."""
+    db = get_db()
+    klucz = request.form.get('w', '')
+    szkic = szkic_pobierz(db, klucz)
+    if not szkic:
+        return redirect_msg('z_wynajem_termin', 'Twoja sesja wygasła — zacznij od wyboru terminu.')
+    if not szkic.get('klient'):
+        return redirect303(url_for('z_wynajem_dane', w=klucz))
+    klient = szkic['klient']
+    zam = {
+        'pakiet_id': szkic['pakiet_id'],
+        'data': szkic['data'], 'data_od': szkic['data_od'], 'data_do': szkic['data_do'],
+        'pozycje': [], 'pers': szkic.get('pers') or [], 'pomysl': szkic.get('pomysl') or '',
+        'imie': klient.get('imie', ''), 'email': klient.get('email', ''),
+        'telefon': klient.get('telefon', ''),
+        'temat': 'Rezerwacja terminu',
+        'sygnatura': szkic.get('sygnatura', '') if szkic.get('sygnatura_tryb') == 'istniejaca' else '',
+        'dostawa': 'Dowóz i montaż przez Studio' if szkic.get('dostawa') == 'dowoz' else 'Odbiór osobisty w pracowni',
+        'adres': szkic.get('adres', ''), 'kod': szkic.get('kod', ''),
+        'zgody': szkic.get('zgody') or {},
+        'tresc': (request.form.get('tresc') or '').strip(),
+    }
+    rez, kwoty, blad = finalizuj_zamowienie(db, zam)
+    if blad:
+        return redirect_msg('z_wynajem_podsumowanie', blad, w=klucz)
+    db.execute('DELETE FROM szkice WHERE klucz=?', (klucz,))
+    db.commit()
+    return redirect303(url_for('zamowienia_dziekuje', sygnatura=rez['sygnatura']))
+
+
+@app.route('/zamowienia/dziekuje/')
+def zamowienia_dziekuje():
+    """Podziękowanie za zamówienie (po finalizacji kreatora)."""
+    db = get_db()
+    syg = request.args.get('sygnatura', '')
+    rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (syg,)).fetchone() if syg else None
+    kwoty = {}
+    if rez:
+        try:
+            kwoty = json.loads(rez['kwoty'] or '{}')
+        except Exception:
+            kwoty = {}
+    return render_template('zamowienie_dziekuje.html', rez=rez, kwoty=kwoty, sygnatura=syg)
 
 
 # ---------------------------------------------------------------- pliki (dokumenty)
@@ -1076,7 +1391,7 @@ def mail_ponow(mid):
 def admin_ustawienia():
     db = get_db()
     if request.method == 'POST':
-        pola = ['kontakt_email', 'nadawca', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_haslo', 'sheets_url']
+        pola = ['kontakt_email', 'nadawca', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_haslo', 'sheets_url', 'kody_rabatowe']
         for p in pola:
             db.execute('UPDATE ustawienia SET wartosc=? WHERE klucz=?', (request.form.get(p, '').strip(), p))
         db.execute("UPDATE ustawienia SET wartosc=? WHERE klucz='smtp_ssl'", ('1' if request.form.get('smtp_ssl') else '0',))

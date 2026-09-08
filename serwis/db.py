@@ -137,6 +137,15 @@ CREATE TABLE IF NOT EXISTS sheets_log (
 -- Zmienne: %(sygnatura)s %(imie)s %(email)s %(telefon)s %(temat)s %(tresc)s %(pakiet)s
 --          %(zakres)s %(dni)s %(data)s %(status)s %(powod)s %(pozycje)s %(personalizacje)s %(kwoty)s %(kwoty_lacznie)s
 --          %(kontakt_email)s %(rok)s %(kwartal)s
+-- Szkice zamówień (kreator krokowy: termin -> pakiet -> personalizacja -> dane -> podsumowanie).
+-- Klucz wędruje w adresie (?w=...) — działa bez ciasteczek (iframe/podgląd/telefon).
+CREATE TABLE IF NOT EXISTS szkice (
+  id        INTEGER PRIMARY KEY AUTOINCREMENT,
+  klucz     TEXT UNIQUE NOT NULL,
+  typ       TEXT DEFAULT 'wynajem',  -- wynajem / personalizacja / sklep
+  dane      TEXT DEFAULT '{}',       -- JSON: cały stan kreatora
+  utworzono TEXT
+);
 CREATE TABLE IF NOT EXISTS szablony_maili (
   klucz    TEXT PRIMARY KEY,        -- zapytanie / kaucja / potwierdzenie / odrzucono / rezerwacja-terminu / zamowienie / kontakt / test
   nazwa    TEXT NOT NULL,
@@ -326,6 +335,7 @@ def domyslne_ustawienia():
         'nadawca': 'Studio Sygnatura <kontakt@studiosygnatura.pl>',
         'smtp_host': '', 'smtp_port': '587', 'smtp_user': '', 'smtp_haslo': '', 'smtp_ssl': '0',
         'sheets_url': '',  # URL webhooka Google Sheets (Apps Script) — skonfigurujemy później
+        'kody_rabatowe': '',  # kody rabatowe, KAŻDY W OSOBNEJ LINII: KOD:procent (np. WESELE5:5)
         'admin_hash': generate_password_hash('sygnatura-2026'),  # HASŁO STARTOWE — ZMIEŃ W USTAWIENIACH
         'licznik_sygnatur': '0',
         'dokumenty': json.dumps([
@@ -366,12 +376,17 @@ def inicjuj(sciezka=None):
     db = sqlite3.connect(baza_plik)
     db.row_factory = sqlite3.Row
     db.executescript(SCHEMAT)
+    # klucz ustawień dla kodów rabatowych (dla starszych baz — bez nadpisywania istniejącej wartości)
+    db.execute("INSERT OR IGNORE INTO ustawienia (klucz, wartosc) VALUES ('kody_rabatowe', '')")
+    db.commit()
 
     # migracja starszych baz: dodaj kolumny najmu od-do (jeśli ich nie ma)
     kolumny = {r[1] for r in db.execute('PRAGMA table_info(rezerwacje)')}
     for kol, typ in [('data_od', 'TEXT'), ('data_do', 'TEXT'), ('dni', 'INTEGER DEFAULT 1'),
                      ('pozycje', "TEXT DEFAULT '[]'"), ('personalizacje', "TEXT DEFAULT '[]'"),
-                     ('rozliczenie', "TEXT DEFAULT 'wspolne'"), ('kwoty', "TEXT DEFAULT ''")]:
+                     ('rozliczenie', "TEXT DEFAULT 'wspolne'"), ('kwoty', "TEXT DEFAULT ''"),
+                     ('dostawa', "TEXT DEFAULT ''"), ('adres', "TEXT DEFAULT ''"),
+                     ('kod', "TEXT DEFAULT ''"), ('dodatkowe', "TEXT DEFAULT ''")]:
         if kol not in kolumny:
             db.execute('ALTER TABLE rezerwacje ADD COLUMN %s %s' % (kol, typ))
     # stare rekordy miały tylko datę imprezy — domyślnie najem 3-dniowy (montaż dzień przed, demontaż dzień po)
@@ -436,7 +451,7 @@ def inicjuj(sciezka=None):
             db.execute('INSERT INTO pakiety (ev, nazwa, opis, cena, cena_liczba, tier, pozycje) VALUES (?,?,?,?,?,?,?)',
                        (ev, nazwa, opis, cena, cena_liczba, tier, pozycje))
         for klucz, wartosc in domyslne_ustawienia().items():
-            db.execute('INSERT INTO ustawienia (klucz, wartosc) VALUES (?,?)', (klucz, wartosc))
+            db.execute('INSERT OR IGNORE INTO ustawienia (klucz, wartosc) VALUES (?,?)', (klucz, wartosc))
         db.commit()
 
     # katalog personalizacji (jednorazówki) — seed przy pustej tabeli
