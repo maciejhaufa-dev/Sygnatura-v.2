@@ -129,11 +129,11 @@ def admin_required(fn):
 # ---------------------------------------------------------------- strony statyczne (kopie z v4)
 STATYCZNE = ['index.html', 'warsztat.html', 'galeria.html', 'sklep.html', 'kontakt.html', 'hero-picker.html']
 
-def wczytaj_v4(nazwa):
+def wczytaj_v4(nazwa, **ctx):
     """Czyta stronę z folderu v4 i przepisuje ścieżki na trasy Flaska:
-    assets/ -> /assets/ oraz wynajem.html -> /wynajem/
-    Plan minimum: linki „Galeria" i „Kontakt" prowadzą na trasy serwisu
-    (/realizacje/, /kontakt/), żeby działała baza i formularz."""
+    assets/ -> /assets/ oraz wynajem.html -> /zamowienia/.
+    Strona główna (index.html) dostaje kontekst z bazy (slider: nowości, bestsellery,
+    ostatnia realizacja) — brak zmiennych = szablon pokazuje treści zastępcze."""
     sciezka = os.path.join(V4, nazwa)
     if not os.path.exists(sciezka):
         abort(404)
@@ -147,12 +147,59 @@ def wczytaj_v4(nazwa):
     tresc = tresc.replace('kontakt.html', '/kontakt/')
     tresc = tresc.replace('index.html', '/')
     tresc = tresc.replace('>Galeria<', '>Realizacje<')
-    return render_template_string(tresc)
+    return render_template_string(tresc, **ctx)
+
+
+def top_produkty_sklepu(db, limit=3):
+    """Najczęściej zamawiane produkty sklepu — liczone z rezerwacji (pozycje JSON).
+    Gdy brak zamówień, zwraca pierwsze produkty z katalogu (kolejność sklepowa)."""
+    licznik = {}
+    try:
+        for r in db.execute("SELECT pozycje FROM rezerwacje WHERE pozycje IS NOT NULL AND pozycje!='' AND pozycje!='[]'").fetchall():
+            for p in json.loads(r['pozycje'] or '[]'):
+                nazwa = p.get('nazwa')
+                if nazwa:
+                    licznik[nazwa] = licznik.get(nazwa, 0) + int(p.get('ile') or 1)
+    except Exception:
+        licznik = {}
+    rows = db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    rows = sorted(rows, key=lambda x: (-licznik.get(x['nazwa'], 0), x['kolejnosc'] or 0, x['id']))
+    return rows[:limit]
 
 
 @app.route('/')
 def index():
-    return wczytaj_v4('index.html')
+    """Strona główna (landing v5): slider czerpie dane z bazy — nowości, bestsellery, ostatnia realizacja."""
+    db = get_db()
+    nowosci = db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 ORDER BY id DESC LIMIT 3').fetchall()
+    top = top_produkty_sklepu(db, 3)
+    realizacja = db.execute("SELECT * FROM realizacje WHERE widoczna=1 ORDER BY id DESC LIMIT 1").fetchone()
+    return wczytaj_v4('index.html', nowosci=nowosci, top=top, realizacja=realizacja)
+
+
+@app.route('/szukaj/')
+def szukaj():
+    """Wyszukiwarka strony głównej — przeszukuje sklep, personalizacje, pakiety i realizacje."""
+    db = get_db()
+    q = (request.args.get('q') or '').strip()
+    wyniki = []
+    if len(q) >= 2:
+        like = '%' + q.replace('%', '').replace('_', '') + '%'
+        for r in db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'sklep', 'grupa': 'Sklep', 'tytul': r['nazwa'], 'opis': r['opis'],
+                           'meta': '%.0f zł / szt.' % (r['cena'] or 0), 'url': url_for('z_sklep_katalog'),
+                           'obraz': ('/static/media/sklep/' + r['obraz']) if r['obraz'] else ''})
+        for r in db.execute('SELECT * FROM personalizacje WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'personalizacja', 'grupa': 'Personalizacja', 'tytul': r['nazwa'], 'opis': r['opis'],
+                           'meta': '%.0f zł' % (r['cena'] or 0), 'url': url_for('z_pers_samodzielna'), 'obraz': ''})
+        for r in db.execute('SELECT * FROM pakiety WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'pakiet', 'grupa': 'Pakiety na wynajem', 'tytul': r['nazwa'], 'opis': r['opis'],
+                           'meta': r['cena'] or '', 'url': url_for('z_wynajem_termin'), 'obraz': ''})
+        for r in db.execute('SELECT * FROM realizacje WHERE widoczna=1 AND (tytul LIKE ? OR opis LIKE ?) ORDER BY id DESC LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'realizacja', 'grupa': 'Realizacje', 'tytul': r['tytul'], 'opis': r['opis'],
+                           'meta': r['kategoria'] or '', 'url': url_for('realizacja_szczegoly', rid=r['id']),
+                           'obraz': ('/media/' + r['zdjecie']) if r['zdjecie'] else ''})
+    return render_template('szukaj.html', q=q, wyniki=wyniki)
 
 
 @app.route('/warsztat.html')

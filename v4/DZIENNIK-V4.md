@@ -490,3 +490,15 @@ klik „Start"/logo → 404, filtry realizacji martwe).
 - [x] Test: nagłówek no-cache, v3 na 4 sprawdzonych podstronach, 200.
 - [ ] User: git pull + Reload; przy dalszym rozjechaniu — wyczyścić cache telefonu (incognito).
 - [ ] Maile: GitHub Pages NIE wysyła/sprawdza poczty — tylko panel (Maile → Stan) + webmail.ovh.pl.
+
+---
+
+## 2026-09-08 — LANDING v5 (układ kwaterowy, decyzja użytkownika)
+
+Nowa forma strony głównej (zastępuje splash+hero+litery z v4):
+- **Układ 4 części:** czarny pasek górny (tel. 510 767 076 + kontakt@studiosygnatura.pl) → lewa górna ćwiartka (kwadrat z sygnetem + sygNATURA, pod spodem pionowe menu: Strona główna / Zamówienia / Pracownia / Nasze realizacje / Współpraca / Kontakt, pod menu social media IG/FB/Pinterest) → wąski pasek obok logo (wyszukiwarka po słowach kluczowych + ikony koszyka i panelu klienta) → prawa dolna ćwiartka = SLIDER 4 slajdów (Nowości / Najczęściej zamawiane / Aktualności — ostatnia realizacja / Oferta sezonowa) z autoplay 5 s w pętli, strzałkami ‹›, kropkami i swipe na dotyku → sekcja „Jak działamy" (3 kroki) + CTA „Zarezerwuj termin" / „Złóż zamówienie" → stopka: Regulamin · Jak pracujemy · © Sygnatura 2026.
+- Slider zasilany Z BAZY przez Flask (`app.py index()` → `wczytaj_v4('index.html', nowosci=, top=, realizacja=)`): nowości = 3 najnowsze produkty sklepu, bestsellery = licznik zamówień z rezerwacji (fallback: pierwsze z katalogu), aktualności = ostatnia realizacja. Szablon ma treści zastępcze (Jinja `{% if %}`), więc działa też bez kontekstu.
+- Nowa trasa `/szukaj/` + `templates/szukaj.html`: przeszukuje sklep_produkty, personalizacje, pakiety, realizacje (LIKE na nazwa/opis), min. 2 znaki, wyniki pogrupowane z miniaturkami.
+- ⚠️ **build.py NIE regeneruje już strony głównej** — index.html jest utrzymywany ręcznie (v5). Uruchomienie build.py nadpisałoby starym layoutem (ostrzeżenie dodane na górze skryptu).
+- Koszyk/panel klienta = na razie ikony-linki (koszyk → /zamowienia/sklep/, panel → /zamowienia/); pełne konta klientów wymagałyby bazy użytkowników — do decyzji.
+- Kopię Pages (docs/index.html) zsynchronizować na końcu (wymaga statycznych ścieżek assets i wygenerowania slajdów bez Jinja).

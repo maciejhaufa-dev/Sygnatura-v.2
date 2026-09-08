@@ -235,3 +235,28 @@ Sandbox resetuje: git cofa HEAD do `2284074`, usuwa `.venv`, czasem zabija proce
 
 ## 🧭 USTALENIA STAŁE (nie zmieniać bez zgody usera)
 Menu 6 pozycji w tej kolejności; kolory #6B4530/#1F3A32/#C4A582/#FBF7F0; logo sygNATURA+sygnet; hero bez cięcia + animacje grają ZAWSZE + menu responsywne; „Zamawiam z obowiązkiem zapłaty"; doby od protokołu zdawczo-odbiorczego; kaucja+przedpłata; rabat 5% od 3 pers; „min. 2 tygodnie" przy personalizacji; wycena pomysłu własnego 2 dni robocze pod tą samą sygnaturą; PKE art. 398 (zgoda wymagana); GitHub Pages = tylko statyczna wizytówka; silnik (Python) / look (HTML+CSS+JS) rozdzielone; produkty BOŻONARODZENIOWE priorytetem (szopka warstwowa = flagowiec); nie generować SVG (PNG/JPG sylwetki, obrys robi user); pliki pod cięcie = sam outline.
+
+---
+
+## Sesja 20 — NOWY LANDING PAGE (układ kwaterowy + slider z bazy + wyszukiwarka)
+
+Decyzja użytkownika: przebudowa strony głównej na nowoczesny layout podzielony na 4 części:
+- czarny pasek u góry: tel. 510 767 076 + kontakt@studiosygnatura.pl,
+- lewa górna ćwiartka: kwadrat z logo (sygnet + sygNATURA), pod nim pionowo przyciski menu, pod menu linki social media,
+- obok logo wąski pasek: wyszukiwarka po słowach kluczowych + na końcu po prawej koszyk/panel klienta (na razie ikony-linki, bo pełne konta wymagałyby bazy użytkowników),
+- okno główne (prawa dolna ćwiartka): slider 3–4 slajdy z przewijaniem prawo/lewo, kropkami wskaźnikowymi i autoplay w pętli co kilka sekund: 1) Nowości, 2) Najczęściej zamawiane, 3) Aktualności (ostatni wpis o realizacji), 4) oferta sezonowa (opcjonalna — jest),
+- pod sliderem opis „jak działamy" + CTA „Zarezerwuj termin" / „Złóż zamówienie",
+- stopka: Regulamin + © Sygnatura 2026.
+
+Wykonane:
+- `v4/index.html` napisany od nowa (self-contained CSS+JS, animacje grają zawsze: puls kwadratu logo, ken-burns na aktywnym slajdzie). Grid: side (sticky, butelkowa zieleń) / head (search+ikony) / main (slider 16:8.6, max 600px) / cta / foot. Responsywne: <980px side na górę z poziomym menu, <640px mini-karty w slajdach 1 kolumna. Slider: autoplay 5 s, loop, strzałki ‹ ›, kropki (aktywna wydłużona), pauza na hover, swipe touchstart/touchend.
+- Slajdy ZASILANE Z BAZY: `app.py wczytaj_v4(nazwa, **ctx)` przyjmuje kontekst; `index()` podaje `nowosci` (3 najnowsze produkty sklepu), `top` (licznik zamówień z rezerwacje.pozycje — helper `top_produkty_sklepu`, fallback: pierwsze z katalogu), `realizacja` (ostatnia widoczna). Jinja `{% if %}` z treściami zastępczymi — szablon działa też bez kontekstu (np. Pages).
+- Nowa trasa `/szukaj/` + `templates/szukaj.html`: przeszukuje sklep_produkty / personalizacje / pakiety / realizacje (LIKE, min. 2 znaki, wyniki pogrupowane z miniaturkami i ceną; brak wyników → sugestia formularza kontaktowego). Formularz wyszukiwarki na landingu → `/szukaj/?q=`.
+- `build.py`: ostrzeżenie na górze — NIE uruchamiać (nadpisze nowy index.html starym layoutem v4); `v4/DZIENNIK-V4.md` opis v5.
+- Testy curl: / 200 (topbar z telefonem i mailem, menu-vert 6 pozycji, 4 slajdy z tytułami, dane produktów i realizacji z bazy, brak podwójnych slashy po zamianie assets/); /szukaj/: szopka→1 wynik, litery→2 (sklep+personalizacja), 1 znak→komunikat, brak→komunikat; /assets/hero.jpg 200; JS slidera obecny (setInterval 5000, dots, touch).
+
+Do decyzji / dalej:
+- Pełny panel klienta (konta, historia zamówień) — wymaga tabeli użytkowników; teraz ikony prowadzą do kreatora.
+- Kopia Pages (docs/index.html) do zsynchronizowania z nowym layoutem (statyczna wersja slajdów, ścieżki assets bez Flaska) — na końcu prac nad landingiem.
+- Można iterować treści slajdów, zdjęcia (slajd 4 używa assets/hero.jpg), kolory/kadry — user ocenia w podglądzie.
+- UWAGA: user napisał e-mail „kontakt@studiowygnatura.pl" — uznano literówkę, na stronie jest kontakt@studiosygnatura.pl (jak w całym serwisie). Potwierdzić.

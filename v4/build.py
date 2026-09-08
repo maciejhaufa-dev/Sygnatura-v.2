@@ -3,6 +3,12 @@
 """
 Studio Sygnatura — v4 build (wersja 2, po uwagach użytkownika 31.08.2026).
 
+⚠️ UWAGA (od 2026-09-08): NIE URUCHAMIAJ tego skryptu!
+index.html jest teraz utrzymywany RĘCZNIE jako nowy layout „kwaterowy" (v5)
+z sliderem zasilanym z bazy przez Flask. Uruchomienie build.py nadpisze go
+STARYM layoutem (splash + hero + litery). Ten skrypt zostaje wyłącznie jako
+archiwum generowania starych stron (hero-picker, stuby).
+
 Uwagi wcielone:
 - litery logotypu jako OSOBNE pliki PNG (koniec ze sprite+calc → koniec „Ssssss")
 - prostokąty OSTRE (zero zaokrągleń)

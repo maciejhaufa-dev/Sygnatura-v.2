@@ -2,439 +2,402 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-<title>Studio Sygnatura — rzeczy z drewna, światła i detalu</title>
-<meta name="description" content="Studio Sygnatura — rodzinna pracownia. Rzeczy z drewna robione z pasją, stylem i tradycją: metryczki, numery, szyldy, dekoracje.">
-<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio Sygnatura — dekoracje, personalizacja, sklep z duszą</title>
+<meta name="description" content="Studio Sygnatura — rodzinna manufaktura. Wynajem dekoracji na wydarzenia, personalizowane prezenty i sklep z dekoracjami z drewna i światła.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
 <style>
 :root{
   --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
-  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C;
-  --serif:"Cormorant Garamond","Playfair Display",Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
-  --script:"Great Vibes","Alex Brush","Brush Script MT",cursive;
+  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C; --czern:#0E0E0C;
+  --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
-  display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased}
 img{display:block;max-width:100%}
 a{text-decoration:none;color:inherit}
-button{font-family:inherit}
 
-/* ================= SPLASH ================= */
-#splash{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
-  background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
-  transition:opacity .8s ease,visibility .8s ease}
-#splash::before{content:"";position:absolute;inset:0;
-  background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
-  radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
-#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.splash-card{position:relative;display:flex;flex-direction:column;align-items:center;
-  gap:clamp(14px,2.6vw,22px);background:rgba(251,247,240,.97);border:2px solid var(--brunatny);
-  border-radius:0;padding:clamp(28px,5vw,46px) clamp(34px,8vw,64px);
-  box-shadow:0 42px 90px rgba(15,26,21,.45);
-  --sygW:clamp(84px,20vw,126px);
-  animation:card-soft 1.1s cubic-bezier(.22,.61,.36,1) .3s both}
-.splash-sygnet{width:var(--sygW);height:auto;animation:rise-soft 1.2s cubic-bezier(.22,.61,.36,1) .75s both}
-.splash-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847)}
+/* ============ GÓRNY CZARNY PASEK: telefon + e-mail ============ */
+.topbar{background:var(--czern);color:rgba(251,247,240,.92);font-size:13.5px;letter-spacing:.04em}
+.topbar .wrap{max-width:1500px;margin:0 auto;padding:8px clamp(14px,3vw,36px);
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar a{display:inline-flex;align-items:center;gap:8px;transition:color .2s}
+.topbar a:hover{color:var(--zloty)}
+.topbar svg{width:15px;height:15px;flex:none}
+.topbar .top-note{color:rgba(196,165,130,.85);font-style:italic}
 
-/* litery logotypu */
-.lbox,.fall{display:inline-block;flex:none}
-.wl{height:1em;width:auto;display:block}
-.fall{opacity:0;animation:softfall .9s cubic-bezier(.22,.61,.36,1) forwards}
+/* ============ SIATKA KWATEROWA ============ */
+.page{display:grid;grid-template-columns:minmax(250px,290px) 1fr;
+  grid-template-areas:"side head" "side main" "side cta" "foot foot";
+  max-width:1500px;margin:0 auto;min-height:100vh}
 
-@keyframes card-soft{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
-@keyframes rise-soft{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
+/* --- lewa górna ćwiartka: logo + menu + social --- */
+.side{grid-area:side;background:linear-gradient(180deg,var(--butelkowa) 0%,#17302A 100%);
+  color:var(--krem);display:flex;flex-direction:column;padding:30px 26px 26px;position:sticky;top:0;
+  height:100vh;min-height:560px}
+.brand-blok{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.brand-kwadrat{width:128px;height:128px;background:var(--krem);border:1px solid var(--zloty);
+  display:grid;place-items:center;box-shadow:0 16px 40px rgba(0,0,0,.35);animation:kwadrat 6s ease-in-out infinite}
+.brand-kwadrat img{width:82px;height:82px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
+@keyframes kwadrat{0%,100%{box-shadow:0 16px 40px rgba(0,0,0,.35)}50%{box-shadow:0 16px 52px rgba(196,165,130,.38)}}
+.brand-nazwa{font-size:30px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
+.brand-nazwa em{font-style:normal;color:var(--krem)}
+.brand-tag{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.55)}
 
-/* ================= NAGŁÓWEK ================= */
-/* nagłówek NAD zdjęciem hero (menu przykrywa górę zdjęcia — zdjęcie nie jest ucinane pod spodem) */
-.site-head{position:absolute;top:0;left:0;right:0;z-index:40}
-.topbar{display:flex;justify-content:flex-end;align-items:center;gap:4px;
-  padding:8px clamp(14px,3.5vw,44px);background:rgba(251,247,240,.95);
-  border-bottom:1px solid rgba(107,69,48,.16)}
-.iconbtn{width:40px;height:40px;display:grid;place-items:center;color:var(--brunatny);
-  border-radius:0;background:none;border:0;cursor:pointer}
-.iconbtn:hover{background:var(--krem-2)}
-.iconbtn svg{width:21px;height:21px}
-.burger{display:none}
-.menu{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2px;
-  background:var(--butelkowa);padding:10px clamp(10px,3vw,40px);box-shadow:0 14px 30px rgba(15,26,21,.28)}
-.menu a{color:var(--zloty);font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;
-  padding:9px 13px;transition:background .2s}
-.menu a:hover{background:rgba(196,165,130,.14)}
-.menu a.on{background:rgba(196,165,130,.2)}
+/* menu pionowe — jedno pod drugim */
+.menu-vert{display:flex;flex-direction:column;gap:2px;margin-top:26px;flex:1}
+.menu-vert a{position:relative;color:var(--krem);font-size:15.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;padding:12px 14px;border:1px solid transparent;transition:all .25s}
+.menu-vert a::after{content:"";position:absolute;left:14px;bottom:6px;width:0;height:1px;
+  background:var(--zloty);transition:width .3s}
+.menu-vert a:hover{color:var(--zloty);border-color:rgba(196,165,130,.35);background:rgba(196,165,130,.08)}
+.menu-vert a:hover::after{width:34px}
+.menu-vert a.on{color:var(--zloty);border-color:rgba(196,165,130,.55);background:rgba(196,165,130,.14)}
+.menu-vert a.on::after{width:34px}
 
-/* ================= HERO ================= */
-/* TŁO NA HERO użytkownika — pełna szerokość, bez cięcia boków (100% auto);
-   logo DUŻE po lewej na wysokości napisu „Cześć", panel u dołu PO PRAWEJ (rozciągnięty, 4 przyciski obok siebie) */
-.hero{flex:1;position:relative;display:flex;flex-direction:column;min-height:100svh;
-  background-color:#CECBB6;background-image:url('assets/hero.jpg');
-  background-size:100% auto;background-position:center 22%;background-repeat:no-repeat}
-.brand{position:absolute;top:clamp(96px,15%,170px);left:clamp(24px,4vw,72px);z-index:2;
-  display:flex;flex-direction:column;align-items:flex-start;gap:clamp(12px,1.6vw,18px);
-  --sygW:clamp(110px,13vw,176px)}
-.brand-sygnet{width:var(--sygW);height:auto;filter:drop-shadow(0 10px 24px rgba(30,20,10,.28));
-  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 3.9s forwards}
-.brand-txt{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
-.brand-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847);
-  filter:drop-shadow(0 6px 14px rgba(30,20,10,.30))}
-.brand-podpis{font-size:clamp(11px,1.2vw,14px);letter-spacing:.34em;text-transform:uppercase;color:var(--brunatny);
-  white-space:nowrap;text-shadow:0 1px 0 rgba(251,247,240,.65);
-  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.05s forwards}
-.panel{position:absolute;bottom:clamp(14px,2.6vh,30px);right:clamp(24px,4vw,72px);z-index:3;
-  width:min(1140px,calc(100% - clamp(48px,8vw,144px)));
-  background:#FFFDF8;border:2px solid var(--brunatny);border-radius:0;
-  padding:clamp(20px,2.6vw,36px);box-shadow:0 34px 70px rgba(20,15,8,.42);
-  opacity:0;animation:panel-up .85s cubic-bezier(.22,.61,.36,1) 3.7s forwards}
-@keyframes panel-up{from{opacity:.4;transform:translateY(14%)}to{opacity:1;transform:none}}
-.slow-row{display:flex;align-items:baseline;gap:clamp(10px,1.4vw,16px);flex-wrap:wrap}
-.slowo{font-family:var(--serif);color:var(--zloty);font-weight:600;
-  font-size:clamp(26px,3.2vw,42px);line-height:1.1;letter-spacing:.05em;
-  text-shadow:0 1px 0 rgba(107,69,48,.25),0 6px 16px rgba(20,15,8,.18);
-  opacity:0;animation:wipe .8s cubic-bezier(.22,.61,.36,1) forwards}
-.slowo.s1{animation-delay:4.3s}.slowo.s2{animation-delay:4.6s}.slowo.s3{animation-delay:4.9s}
-.slow-dash{color:var(--brunatny);font-size:clamp(18px,2.2vw,26px);font-weight:600;
-  opacity:0;animation:rise-soft .6s cubic-bezier(.22,.61,.36,1) forwards}
-.slow-dash.d1{animation-delay:4.5s}.slow-dash.d2{animation-delay:4.8s}
-.hero-text{font-size:clamp(14.5px,1.4vw,16.5px);line-height:1.65;color:rgba(51,38,28,.96);
-  margin-top:clamp(10px,1.4vw,14px);
-  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.2s forwards}
-.btn-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:clamp(14px,2vw,20px)}
-.btn-row .btn{opacity:0;animation:rise-soft .9s cubic-bezier(.22,.61,.36,1) forwards}
-.btn-row .btn:nth-child(1){animation-delay:5.5s}.btn-row .btn:nth-child(2){animation-delay:5.62s}
-.btn-row .btn:nth-child(3){animation-delay:5.74s}.btn-row .btn:nth-child(4){animation-delay:5.86s}
-@keyframes wipe{0%{clip-path:inset(0 100% 0 0);opacity:0}100%{clip-path:inset(0 -1% 0 0);opacity:1}}
-.btn{width:100%;text-align:center;padding:13px 10px;border-radius:0;font-size:12px;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;transition:all .25s}
-.btn-solid{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa)}
-.btn-solid:hover{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
-.btn-outline{background:transparent;color:var(--brunatny);border:1.5px solid var(--brunatny)}
-.btn-outline:hover{background:var(--brunatny);color:var(--krem)}
+/* social media pod menu */
+.social{display:flex;gap:10px;margin-top:18px;justify-content:center}
+.social a{width:40px;height:40px;border:1px solid rgba(196,165,130,.5);display:grid;place-items:center;
+  color:var(--zloty);transition:all .25s}
+.social a:hover{background:var(--zloty);color:var(--butelkowa)}
+.social svg{width:19px;height:19px}
+.side .side-stopka{font-size:11.5px;color:rgba(251,247,240,.45);text-align:center;letter-spacing:.06em}
 
-/* ================= STOPKA ================= */
-.site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
-  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px)}
-.foot-social{display:flex;align-items:center;gap:14px}
-.foot-label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--zloty-soft)}
-.soc-icons{display:flex;gap:8px}
-.soc-icons a{width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(196,165,130,.45);
-  border-radius:50%;color:var(--zloty);transition:all .25s}
-.soc-icons a:hover{background:var(--zloty);color:var(--butelkowa)}
-.soc-icons svg{width:16px;height:16px}
-.foot-mid{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
-.copy{font-size:13px;letter-spacing:.04em}
-.regbtn{border:1px solid rgba(196,165,130,.6);color:var(--zloty);font-size:10.5px;letter-spacing:.14em;
-  text-transform:uppercase;padding:5px 13px;border-radius:0;transition:all .25s}
-.regbtn:hover{background:var(--zloty);color:var(--butelkowa)}
-.foot-right{display:flex;align-items:center;gap:10px;font-size:13.5px}
-.foot-right a:hover{color:var(--zloty)}
-.foot-sep{opacity:.4}
+/* --- nagłówek głównej kolumny: wyszukiwarka + koszyk/panel --- */
+.head{grid-area:head;display:flex;align-items:center;gap:16px;
+  padding:20px clamp(18px,3vw,40px) 6px;background:var(--krem)}
+.szukaj{display:flex;align-items:stretch;flex:1;max-width:520px;border:1px solid rgba(107,69,48,.4);
+  background:#fff;transition:border-color .25s,box-shadow .25s}
+.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(31,58,50,.12)}
+.szukaj input{flex:1;border:none;background:transparent;padding:11px 14px;font-family:inherit;
+  font-size:16px;color:var(--ink);outline:none;min-width:0}
+.szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:46px;cursor:pointer;
+  display:grid;place-items:center;transition:background .25s}
+.szukaj button:hover{background:var(--brunatny)}
+.szukaj svg{width:18px;height:18px}
+.head-ikony{display:flex;gap:10px;margin-left:auto}
+.head-ikony a{position:relative;width:46px;height:46px;border:1px solid rgba(107,69,48,.4);background:#fff;
+  display:grid;place-items:center;color:var(--brunatny);transition:all .25s}
+.head-ikony a:hover{border-color:var(--butelkowa);color:var(--butelkowa);background:var(--krem-2)}
+.head-ikony svg{width:20px;height:20px}
+.head-ikony .kropka{position:absolute;top:-6px;right:-6px;width:10px;height:10px;border-radius:50%;
+  background:var(--zloty);border:2px solid var(--krem)}
 
-/* ================= RESPONSYWNOŚĆ ================= */
-@media (max-width:1023px){
-  /* telefon/tablet: pas zdjęcia pełnej szerokości POD nagłówkiem — „Cześć" w całości;
-     logo na pasie po lewej (na wysokości napisu), panel rozciągnięty na dole */
-  .hero{background-position:0 112px}
-  .brand{top:120px;left:14px;flex-direction:row;align-items:flex-start;gap:12px;--sygW:clamp(46px,13vw,64px)}
-  .brand-txt{gap:6px}
-  .brand-podpis{font-size:10px;letter-spacing:.26em}
-  .panel{left:14px;right:14px;width:auto;padding:18px 16px}
-  .slowo{font-size:clamp(24px,6.4vw,32px)}
-  .btn-row{grid-template-columns:1fr 1fr}
+/* --- okno główne: slider --- */
+.main{grid-area:main;padding:8px clamp(18px,3vw,40px) 0}
+.slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
+  background:var(--butelkowa);aspect-ratio:16/8.6;max-height:600px}
+.sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
+.sl-slide{flex:0 0 100%;position:relative;display:flex;align-items:flex-end;overflow:hidden}
+.sl-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.sl-slide.akt .sl-bg{animation:kenburns 14s ease-in-out infinite alternate}
+@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.08)}}
+.sl-cien{position:absolute;inset:0;background:linear-gradient(200deg,rgba(14,14,12,.25) 0%,rgba(14,14,12,.78) 72%)}
+.sl-tresc{position:relative;z-index:2;width:100%;padding:clamp(20px,4vw,46px);color:var(--krem)}
+.sl-tag{display:inline-block;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);
+  border:1px solid rgba(196,165,130,.7);padding:5px 12px;margin-bottom:12px;background:rgba(14,14,12,.35)}
+.sl-tresc h2{font-size:clamp(26px,3.6vw,46px);font-weight:600;line-height:1.08;text-shadow:0 3px 18px rgba(0,0,0,.5)}
+.sl-tresc p{font-size:clamp(15px,1.4vw,17.5px);line-height:1.55;max-width:640px;margin-top:10px;
+  color:rgba(251,247,240,.92)}
+.sl-btn{display:inline-block;margin-top:18px;background:var(--zloty);color:var(--butelkowa);
+  font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:12px 26px;
+  transition:all .25s;border:1.5px solid var(--zloty)}
+.sl-btn:hover{background:transparent;color:var(--zloty)}
+
+/* mini-karty produktów w slajdach */
+.sl-karty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;max-width:760px}
+.sl-karta{display:flex;gap:12px;align-items:center;background:rgba(251,247,240,.95);color:var(--ink);
+  padding:10px 12px;transition:transform .25s,box-shadow .25s}
+.sl-karta:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.sl-karta img{width:56px;height:56px;object-fit:cover;flex:none}
+.sl-karta .nazwa{font-size:14.5px;font-weight:700;line-height:1.2}
+.sl-karta .cena{font-size:13px;color:var(--brunatny);font-weight:700;margin-top:2px}
+.sl-karta .pusty{width:56px;height:56px;flex:none;background:linear-gradient(135deg,var(--krem-2),var(--zloty-soft));
+  display:grid;place-items:center;font-size:24px;color:var(--brunatny)}
+
+/* strzałki i kropki slidera */
+.sl-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:46px;height:46px;
+  border-radius:50%;border:1px solid rgba(196,165,130,.8);background:rgba(14,14,12,.45);color:var(--zloty);
+  font-family:inherit;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;
+  transition:all .25s;padding-bottom:4px}
+.sl-nav:hover{background:var(--zloty);color:var(--butelkowa)}
+.sl-nav.prev{left:14px}.sl-nav.next{right:14px}
+.sl-dots{position:absolute;bottom:16px;left:0;right:0;z-index:5;display:flex;gap:8px;justify-content:center}
+.sl-dots button{width:9px;height:9px;border-radius:10px;border:none;background:rgba(251,247,240,.45);
+  cursor:pointer;padding:0;transition:all .3s}
+.sl-dots button.akt{width:30px;background:var(--zloty)}
+
+/* --- jak działamy + CTA --- */
+.cta{grid-area:cta;padding:26px clamp(18px,3vw,40px) 40px}
+.jak{padding:26px 28px;background:#fff;border:1px solid rgba(107,69,48,.25)}
+.jak h2{font-size:22px;color:var(--butelkowa);margin-bottom:4px}
+.jak .pod{font-size:14.5px;color:rgba(51,38,28,.7);margin-bottom:18px}
+.kroki{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.krok{border-left:2px solid var(--zloty);padding-left:14px}
+.krok .num{font-size:13px;font-weight:700;letter-spacing:.24em;color:var(--brunatny)}
+.krok b{display:block;font-size:16.5px;color:var(--ink);margin:4px 0 4px}
+.krok p{font-size:14px;line-height:1.55;color:rgba(51,38,28,.8)}
+.cta-btn{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px}
+.cta-btn .btn{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa);
+  font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  padding:14px 30px;cursor:pointer;transition:all .25s;display:inline-block}
+.cta-btn .btn:hover{background:var(--zloty);color:var(--butelkowa)}
+.cta-btn .btn.outline{background:transparent;color:var(--butelkowa)}
+.cta-btn .btn.outline:hover{background:var(--brunatny);border-color:var(--brunatny);color:var(--krem)}
+
+/* --- stopka --- */
+.foot{grid-area:foot;background:var(--butelkowa);color:var(--krem);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px clamp(18px,3vw,40px);font-size:14.5px}
+.foot a{color:var(--zloty);border-bottom:1px solid transparent;transition:border-color .25s}
+.foot a:hover{border-color:var(--zloty)}
+.foot .sep{opacity:.4;margin:0 10px}
+
+/* ============ RESPONSYWNOŚĆ ============ */
+@media (max-width:980px){
+  .page{grid-template-columns:1fr;grid-template-areas:"head" "side" "main" "cta" "foot"}
+  .side{position:static;height:auto;min-height:0;padding:22px 18px}
+  .brand-kwadrat{width:96px;height:96px}
+  .brand-kwadrat img{width:62px;height:62px}
+  .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:18px}
+  .menu-vert a{padding:9px 12px;font-size:14px}
+  .menu-vert a::after{display:none}
+  .social{margin-top:14px}
+  .slider{aspect-ratio:16/10;max-height:none}
+  .head{padding:14px 18px 4px}
+  .kroki{grid-template-columns:1fr}
 }
-@media (max-width:860px){
-  .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
-  .menu.open{display:flex}
-  .menu a{padding:11px 12px}
-  .burger{display:grid}
+@media (max-width:640px){
+  .topbar .wrap{justify-content:center;text-align:center}
+  .top-note{display:none}
+  .head{flex-wrap:wrap}
+  .szukaj{order:3;max-width:none;flex-basis:100%}
+  .head-ikony{margin-left:0}
+  .sl-karty{grid-template-columns:1fr}
+  .sl-karta img{width:46px;height:46px}
+  .sl-nav{width:38px;height:38px;font-size:20px}
+  .slider{aspect-ratio:4/3.4}
 }
-/* niskie ekrany desktopowe: ciaśniejszy panel + kadr zdjęcia tak, żeby „Cześć" mieściło się nad panelem */
-@media (min-width:1024px) and (max-height:860px){
-  .hero{background-position:center 28%}
-  .brand{top:clamp(84px,12%,120px);--sygW:clamp(96px,11vw,150px)}
-  .panel{padding:14px 22px}
-  .slowo{font-size:clamp(24px,3vw,34px)}
-  .hero-text{font-size:13.5px;line-height:1.5}
-  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
-  .btn-row{gap:10px;margin-top:12px}
-  .slow-row{gap:10px}
-}
-/* bardzo szerokie monitory: kadr zdjęcia niżej (więcej góry), ciaśniejszy panel */
-@media (min-width:1024px) and (min-aspect-ratio:21/10){
-  .hero{background-position:center 18%}
-  .panel{padding:14px 22px}
-  .slowo{font-size:clamp(24px,3vw,34px)}
-  .hero-text{font-size:13.5px;line-height:1.5}
-  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
-}
-@media (max-width:520px){
-  .btn{font-size:10.5px;letter-spacing:.1em;padding:12px 8px}
-  .btn-row{grid-template-columns:1fr}
-  .site-foot{flex-direction:column;gap:14px;padding:18px 16px}
-  .foot-social{flex-direction:column;gap:10px}
-  .splash-card{padding:26px 30px}
-  .brand{top:118px}
-  .hero-cta{flex-direction:column;align-items:center}
-  .hero-cta .btn,.cta-end .btn{width:100%;max-width:340px}
-}
-
-/* ================= PODSTRONY (stuby) ================= */
-body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
-.stub-head{background:var(--butelkowa);padding:16px clamp(16px,4vw,44px);display:flex;align-items:center}
-.stub-brand{display:flex;align-items:center;gap:14px;color:var(--zloty)}
-.stub-brand img{width:52px;height:52px}
-.stub-brand span{font-weight:700;font-size:15px;letter-spacing:.2em;text-transform:uppercase}
-.stub-main{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 18px;background:var(--krem)}
-.stub-card{max-width:560px;width:100%;text-align:center;background:#fff;
-  border:1.5px solid rgba(107,69,48,.5);border-radius:0;padding:clamp(30px,6vw,52px);
-  display:flex;flex-direction:column;align-items:center;gap:14px;
-  box-shadow:0 24px 50px rgba(38,29,20,.16)}
-.stub-card h1{font-size:clamp(24px,5vw,34px);font-weight:600;color:var(--ink)}
-.stub-tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
-.stub-card p{color:rgba(51,38,28,.85);line-height:1.7;font-size:15.5px}
-.stub-card .btn{margin-top:8px}
-.back{color:var(--brunatny);font-size:13.5px;letter-spacing:.08em;border-bottom:1px solid transparent}
-.back:hover{border-color:var(--brunatny)}
-
-/* ================= PODSTRONA: WYNAJEM ================= */
-body.page{background:var(--krem)}
-.page .site-head{position:sticky}
-.page-hero{background:var(--butelkowa);color:var(--krem);text-align:center;padding:clamp(34px,6vh,64px) clamp(16px,5vw,56px)}
-.page-tag{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);margin-bottom:14px}
-.page-hero h1{font-size:clamp(30px,5.4vw,48px);font-weight:600}
-.page-hero .lead{max-width:760px;margin:16px auto 0;color:var(--zloty-soft);font-size:clamp(15px,1.7vw,18px);line-height:1.7}
-.hero-cta{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:26px}
-.hero-cta .btn{width:auto;padding:14px 30px}
-.btn-ghost{background:transparent;color:var(--zloty);border:1.5px solid var(--zloty)}
-.btn-ghost:hover{background:var(--zloty);color:var(--butelkowa)}
-.sec{max-width:1120px;margin:0 auto;padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
-.sec-h2{font-size:clamp(24px,3.4vw,34px);color:var(--butelkowa);font-weight:600}
-.sec-h2.center{text-align:center}
-.sec-h2.center::after{content:"";display:block;width:64px;height:3px;background:var(--zloty);margin:12px auto 0}
-.sec-sub{text-align:center;max-width:720px;margin:14px auto 0;color:rgba(51,38,28,.8);font-size:15.5px;line-height:1.7}
-.kroki{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-top:28px}
-.krok{background:#fff;border:1px solid rgba(107,69,48,.4);padding:22px 18px;border-radius:0}
-.krok .num{display:block;font-size:26px;font-weight:700;color:var(--zloty);margin-bottom:8px}
-.krok b{color:var(--brunatny);font-size:15.5px}
-.krok p{margin-top:6px;font-size:13.5px;line-height:1.6;color:rgba(51,38,28,.8)}
-/* terminarz v3 — interaktywny, per pakiet */
-.cal{background:var(--krem);border:1px solid rgba(107,69,48,.35);padding:12px;border-radius:0;margin-top:14px}
-.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:8px 12px}
-.calhead b{font-size:15px;text-transform:capitalize}
-.calnav button{background:none;border:0;color:var(--zloty);font-size:20px;cursor:pointer;padding:0 10px;line-height:1}
-.calnav button:disabled{opacity:.35;cursor:default}
-.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
-.calgrid i{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase}
-.calgrid button{border:1px solid rgba(107,69,48,.28);background:#fff;color:var(--ink);font-size:13px;padding:6px 0;cursor:pointer;font-family:var(--serif);border-radius:0}
-.calgrid button:hover{border-color:var(--brunatny)}
-.calgrid button.busy{background:var(--brunatny);color:var(--krem);text-decoration:line-through;opacity:.9;cursor:not-allowed}
-.calgrid button.past{background:transparent;border-color:transparent;color:rgba(51,38,28,.28);cursor:not-allowed}
-.calgrid button.sel{background:var(--butelkowa);color:var(--zloty);font-weight:700;border-color:var(--butelkowa)}
-.callegend{margin-top:8px;font-size:12px;color:rgba(51,38,28,.7);display:flex;gap:16px;flex-wrap:wrap}
-.callegend em{font-style:normal}
-.callegend i{display:inline-block;width:12px;height:12px;border:1px solid rgba(107,69,48,.35);margin-right:6px;vertical-align:-1px;background:#fff}
-.callegend i.b{background:var(--brunatny);border-color:var(--brunatny)}
-.calpick{margin-top:8px;font-size:13px;color:var(--brunatny);min-height:20px}
-.calpick b{color:var(--butelkowa)}
-.cal-note{margin-top:12px;text-align:center;font-size:13px;color:rgba(51,38,28,.65)}
-/* formularz rezerwacji */
-.rez{background:#fff;border:1px solid rgba(107,69,48,.5);padding:clamp(24px,4vw,40px);border-radius:0;max-width:660px;margin:0 auto}
-.rez-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
-.rez-row{margin-bottom:14px}
-.rez-row label{display:block;font-size:13px;color:var(--brunatny);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase}
-.rez-row input,.rez-row textarea,.rez-row select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:var(--serif);font-size:15px;border-radius:0;color:var(--ink)}
-.rez-row input:focus,.rez-row textarea:focus,.rez-row select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
-.rez-row .rez-read{background:var(--krem-2);font-weight:600;color:var(--butelkowa)}
-#rez-info{text-align:center;margin:0 auto 18px;max-width:560px}
-#rez-ok{display:none;margin-top:16px;background:var(--butelkowa);color:var(--zloty);padding:16px;font-size:14px;line-height:1.65}
-.kat{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:28px}
-.kat-card{background:#fff;border:1px solid rgba(107,69,48,.45);padding:20px;border-radius:0;display:flex;flex-direction:column;gap:9px}
-.kat-ico{color:var(--brunatny)}
-.kat-ico svg{width:34px;height:34px}
-.kat-card h3{font-size:18.5px;color:var(--butelkowa);font-weight:600}
-.kat-card p{font-size:14px;line-height:1.65;color:rgba(51,38,28,.85);flex:1}
-.kat-price{margin-top:auto;border-top:1px dashed rgba(107,69,48,.4);padding-top:10px;font-size:14px;font-weight:700;color:var(--brunatny)}
-.pak{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:26px;margin-top:36px;align-items:stretch}
-.pak-card{position:relative;background:#fff;border:2px solid rgba(107,69,48,.5);border-radius:0;padding:30px 22px 24px;display:flex;flex-direction:column;gap:12px}
-.pak-card.top{border-color:var(--brunatny);box-shadow:0 26px 54px rgba(38,29,20,.2)}
-.pak-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--butelkowa);color:var(--zloty);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:6px 16px;white-space:nowrap}
-.pak-name{font-size:22px;font-weight:700;color:var(--butelkowa);text-align:center}
-.pak-sub{text-align:center;font-size:13px;color:rgba(51,38,28,.7)}
-.pak-price{text-align:center;color:var(--brunatny);font-size:27px;font-weight:700}
-.pak-price small{display:block;font-size:11.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6);margin-bottom:2px}
-.pak ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:rgba(51,38,28,.9);line-height:1.45}
-.pak li::before{content:"✦ ";color:var(--zloty)}
-.pak .btn{width:100%;margin-top:auto}
-/* pakiety zgrupowane wg typu wydarzenia */
-.pak-grupa{margin-top:44px}
-.pak-grupa:first-child{margin-top:8px}
-.pak-grupa-h{display:flex;align-items:center;gap:14px;border-bottom:2px solid rgba(107,69,48,.35);padding-bottom:12px;margin-bottom:8px}
-.pak-grupa-h .ik{width:44px;height:44px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem);flex:none}
-.pak-grupa-h .ik svg{width:26px;height:26px}
-.pak-grupa-h h3{font-size:24px;color:var(--butelkowa);font-weight:700}
-.pak-grupa-h p{margin:0;font-size:13px;color:rgba(51,38,28,.65)}
-.pak-tag{display:inline-block;margin-left:auto;background:var(--krem);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;white-space:nowrap}
-.pak-grupa .pak{margin-top:20px}
-/* kompozytor (własny zestaw) */
-.pak-diy{background:#fff;border:2px solid rgba(107,69,48,.5);padding:clamp(18px,3vw,28px);margin-top:24px}
-.pak-diy-h{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.pak-diy-h .ik{width:44px;height:44px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem);flex:none}
-.pak-diy-h .ik svg{width:26px;height:26px}
-.pak-diy-h h3{font-size:22px;color:var(--butelkowa);font-weight:700;margin:0}
-.pak-diy-h p{margin:0;font-size:13px;color:rgba(51,38,28,.65)}
-.pak-diy .hint{margin:10px 0 0;font-size:13px;color:rgba(51,38,28,.65)}
-.pak-diy .hint b{color:var(--butelkowa)}
-.komp{display:grid;grid-template-columns:1fr 320px;gap:24px;margin-top:16px;align-items:start}
-@media(max-width:900px){.komp{grid-template-columns:1fr}}
-.komp-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:10px}
-.komp-sel{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--krem);border:1px solid rgba(107,69,48,.35);padding:9px 12px;font-size:13.5px}
-.komp-sel b{color:var(--ink);font-weight:600}
-.komp-sel span{color:var(--butelkowa);font-weight:700;white-space:nowrap}
-.komp-it{display:flex;gap:12px;align-items:flex-start;background:var(--krem-2);border:1px solid rgba(107,69,48,.3);padding:12px;cursor:pointer}
-.komp-it:hover{border-color:var(--brunatny)}
-.komp-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
-.komp-it .ik{width:38px;height:38px;flex:none;border:1px solid rgba(107,69,48,.4);background:#fff;display:grid;place-items:center;color:var(--brunatny)}
-.komp-it .ik svg{width:22px;height:22px}
-.komp-it b{display:block;font-size:14.5px;color:var(--ink)}
-.komp-it small{display:block;font-size:11.5px;color:rgba(51,38,28,.6);margin:2px 0}
-.komp-it .cena{font-size:13.5px;color:var(--butelkowa);font-weight:700}
-.komp-pod{position:sticky;top:120px;background:var(--butelkowa);color:var(--krem);padding:24px 22px}
-.komp-pod h4{margin:0 0 4px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--zloty)}
-.komp-pod .n{margin:0;font-size:12.5px;color:rgba(251,247,240,.75)}
-.komp-pod .rabat{font-size:12.5px;color:rgba(251,247,240,.75);margin:14px 0 0;min-height:18px}
-.komp-pod .rabat.on{color:var(--zloty);font-weight:700}
-.komp-pod .suma{font-size:36px;font-weight:700;color:var(--zloty);margin:6px 0 0}
-.komp-pod .suma small{display:block;font-size:11.5px;font-weight:400;color:rgba(251,247,240,.75);letter-spacing:.1em;text-transform:uppercase}
-.komp-pod .dopisz{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
-.komp-pod .btn{margin-top:16px;width:100%;background:var(--zloty);color:var(--butelkowa)}
-.komp-pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
-/* filtry katalogu (dropdowny) */
-.cat-filtry{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
-.cat-filtry select{appearance:none;padding:10px 36px 10px 14px;border:1px solid rgba(107,69,48,.5);background:var(--krem) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="%236B4530"/></svg>') no-repeat right 12px center;font-family:var(--serif);font-size:14px;color:var(--ink);border-radius:0;cursor:pointer}
-.cat-filtry select:focus{outline:2px solid var(--zloty)}
-.kat-none{display:none;font-size:13.5px;color:rgba(51,38,28,.6);margin:14px 0 0}
-.partner-sec{background:var(--butelkowa);color:var(--krem);padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);scroll-margin-top:120px}
-.partner-sec .inner{max-width:1120px;margin:0 auto}
-.partner-sec h2{font-size:clamp(24px,3.4vw,34px);font-weight:600;text-align:center}
-.partner-sec h2::after{content:"";display:block;width:64px;height:3px;background:var(--zloty);margin:12px auto 0}
-.partner-sec .sub{text-align:center;max-width:680px;margin:14px auto 0;color:var(--zloty-soft);font-size:15.5px;line-height:1.7}
-.part-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:30px}
-.part-card{border:1px solid rgba(196,165,130,.5);padding:20px;border-radius:0}
-.part-card b{display:block;color:var(--zloty);font-size:16.5px;margin-bottom:8px}
-.part-card p{font-size:13.5px;line-height:1.65;color:var(--zloty-soft)}
-.partner-sec .cta{text-align:center;margin-top:30px}
-.partner-sec .cta .btn{width:auto;padding:14px 34px}
-.cta-end{text-align:center}
-.cta-end h2{font-size:clamp(24px,3.4vw,32px);color:var(--butelkowa);font-weight:600;margin-bottom:18px}
-.cta-end .btn{width:auto;display:inline-block;padding:14px 34px}
-
-/* ================= PICKER HERO ================= */
-.picker-head{background:var(--butelkowa);color:var(--krem);padding:22px clamp(16px,4vw,44px)}
-.picker-head h1{font-size:22px;font-weight:600}
-.picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
-.picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
-  background:url('assets/hero.jpg') center 40%/cover no-repeat}
-.picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
-  padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
-.picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;
-  padding:26px clamp(16px,4vw,44px) 60px}
-.picker-item{border:2px solid transparent;cursor:pointer;padding:6px;background:#fff;
-  border-radius:0;transition:border-color .2s}
-.picker-item img{width:100%;height:110px;object-fit:cover}
-.picker-item b{display:block;margin-top:6px;font-size:13px}
-.picker-item span{display:block;font-size:10.5px;color:#8A7B69;word-break:break-all}
-.picker-item.sel{border-color:var(--brunatny)}
 </style>
 </head>
 <body>
 
-<div id="splash" aria-hidden="true">
-  <div class="splash-card">
-    <img class="splash-sygnet" src="assets/sygnet.svg" alt="">
-    <div class="splash-word" role="img" aria-label="Sygnatura"><span class="fall" style="animation-delay:1.25s"><img class="wl sw l0" src="assets/letters/l0.png" alt=""></span><span class="fall" style="margin-left:0.33220em;animation-delay:1.38s"><img class="wl sw l1" src="assets/letters/l1.png" alt=""></span><span class="fall" style="margin-left:0.32203em;animation-delay:1.51s"><img class="wl sw l2" src="assets/letters/l2.png" alt=""></span><span class="fall" style="margin-left:0.50169em;animation-delay:1.64s"><img class="wl sw l3" src="assets/letters/l3.png" alt=""></span><span class="fall" style="margin-left:0.41695em;animation-delay:1.77s"><img class="wl sw l4" src="assets/letters/l4.png" alt=""></span><span class="fall" style="margin-left:0.24068em;animation-delay:1.90s"><img class="wl sw l5" src="assets/letters/l5.png" alt=""></span><span class="fall" style="margin-left:0.41356em;animation-delay:2.03s"><img class="wl sw l6" src="assets/letters/l6.png" alt=""></span><span class="fall" style="margin-left:0.53559em;animation-delay:2.16s"><img class="wl sw l7" src="assets/letters/l7.png" alt=""></span><span class="fall" style="margin-left:0.36949em;animation-delay:2.29s"><img class="wl sw l8" src="assets/letters/l8.png" alt=""></span></div>
+<!-- czarny pasek: kontakt -->
+<div class="topbar">
+  <div class="wrap">
+    <span>
+      <a href="tel:+48510767076"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg>
+      510 767 076</a>
+      <span class="sep" style="opacity:.35;margin:0 10px">|</span>
+      <a href="mailto:kontakt@studiosygnatura.pl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+      kontakt@studiosygnatura.pl</a>
+    </span>
+    <span class="top-note">odpowiadamy w 1–2 dni robocze</span>
   </div>
 </div>
 
-<header class="site-head">
-  <div class="topbar">
-    <a class="iconbtn" href="#" title="Koszyk — wkrótce" aria-label="Koszyk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></a>
-    <a class="iconbtn" href="#" title="Konto — wkrótce" aria-label="Konto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg></a>
-    <button class="iconbtn burger" id="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<div class="page">
+
+  <!-- LEWA GÓRNA ĆWIARTKA: logo, menu, social -->
+  <aside class="side">
+    <div class="brand-blok">
+      <div class="brand-kwadrat"><img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura — litera S z gałązką w okręgu"></div>
+      <div class="brand-nazwa">syg<em>NATURA</em></div>
+      <div class="brand-tag">drewno · światło · detal</div>
+    </div>
+
+    <nav class="menu-vert" aria-label="Menu główne">
+      <a href="/" class="on">Strona główna</a>
+      <a href="/zamowienia/">Zamówienia</a>
+      <a href="/pracownia/">Pracownia</a>
+      <a href="/realizacje/">Nasze realizacje</a>
+      <a href="/wspolpraca/">Współpraca</a>
+      <a href="/kontakt/">Kontakt</a>
+    </nav>
+
+    <div class="social">
+      <a href="#" aria-label="Instagram" title="Instagram — wkrótce"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" aria-label="Facebook" title="Facebook — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg></a>
+      <a href="#" aria-label="Pinterest" title="Pinterest — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>
+    </div>
+    <div class="side-stopka">pracownia: woj. mazowieckie</div>
+  </aside>
+
+  <!-- WĄSKI PASEK: wyszukiwarka + koszyk/panel -->
+  <div class="head">
+    <form class="szukaj" action="/szukaj/" method="get" role="search">
+      <input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">
+      <button type="submit" aria-label="Szukaj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+    </form>
+    <div class="head-ikony">
+      <a href="/zamowienia/sklep/" title="Koszyk — wybierz produkty ze sklepu" aria-label="Koszyk"><span class="kropka"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></a>
+      <a href="/zamowienia/" title="Twoje zamówienia" aria-label="Panel klienta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg></a>
+    </div>
   </div>
-  <nav class="menu" id="menu" aria-label="Menu główne">
-    <a href="/" class="on">Strona główna</a>
-    <a href="/zamowienia/">Zamówienia</a>
-    <a href="/pracownia/">Pracownia</a>
-    <a href="/realizacje/">Nasze realizacje</a>
-    <a href="/wspolpraca/">Współpraca</a>
-    <a href="/kontakt/">Kontakt</a>
-  </nav>
-</header>
 
-<main class="hero">
-    <a class="brand" href="/" aria-label="Studio Sygnatura — strona główna">
-      <img class="brand-sygnet" src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura — litera S z gałązką w okręgu">
-      <div class="brand-txt">
-        <div class="brand-word" role="img" aria-label="Sygnatura"><span class="fall" style="animation-delay:3.95s"><img class="wl hw l0" src="assets/letters/l0.png" alt=""></span><span class="fall" style="margin-left:0.33220em;animation-delay:4.07s"><img class="wl hw l1" src="assets/letters/l1.png" alt=""></span><span class="fall" style="margin-left:0.32203em;animation-delay:4.19s"><img class="wl hw l2" src="assets/letters/l2.png" alt=""></span><span class="fall" style="margin-left:0.50169em;animation-delay:4.31s"><img class="wl hw l3" src="assets/letters/l3.png" alt=""></span><span class="fall" style="margin-left:0.41695em;animation-delay:4.43s"><img class="wl hw l4" src="assets/letters/l4.png" alt=""></span><span class="fall" style="margin-left:0.24068em;animation-delay:4.55s"><img class="wl hw l5" src="assets/letters/l5.png" alt=""></span><span class="fall" style="margin-left:0.41356em;animation-delay:4.67s"><img class="wl hw l6" src="assets/letters/l6.png" alt=""></span><span class="fall" style="margin-left:0.53559em;animation-delay:4.79s"><img class="wl hw l7" src="assets/letters/l7.png" alt=""></span><span class="fall" style="margin-left:0.36949em;animation-delay:4.91s"><img class="wl hw l8" src="assets/letters/l8.png" alt=""></span></div>
-        <p class="brand-podpis">drewno · światło · detal</p>
-      </div>
-    </a>
-    <section class="panel" aria-label="Studio Sygnatura — zaproszenie">
-      <div class="slow-row" role="img" aria-label="Pasja, styl, tradycja">
-        <span class="slowo s1">Pasja</span><span class="slow-dash d1">–</span>
-        <span class="slowo s2">Styl</span><span class="slow-dash d2">–</span>
-        <span class="slowo s3">Tradycja</span>
-      </div>
-      <p class="hero-text">Kosmos pełen jest szlachetnych minerałów, ale drewno jest tylko na Ziemi. Odkryj niezwykły świat, w którym drewno, światło i głębia współtworzą teatr jakości i stylu. Każdy detal rodzi się z dłoni, które znają materiał, i z oka, które czuje estetykę. Tak ożywiamy wnętrza — dodajemy im duszę, ciepły blask i klimat, w którym dom staje się domem.</p>
-      <div class="btn-row">
-        <a class="btn btn-solid" href="/jak-pracujemy/">Sprawdź, jak pracujemy</a>
-        <a class="btn btn-solid" href="/realizacje/">Poznaj nasze prace</a>
-        <a class="btn btn-solid" href="/zamowienia/sklep/">Znajdź coś dla siebie</a>
-        <a class="btn btn-solid" href="/kontakt/">Napisz do nas</a>
-      </div>
-    </section>
-</main>
+  <!-- PRAWA DOLNA ĆWIARTKA: slider -->
+  <main class="main">
+    <div class="slider" id="slider" aria-label="Najważniejsze informacje — przewijane slajdy">
+      <div class="sl-track" id="sl-track">
 
-<footer class="site-foot">
-    <div class="foot-social">
-      <span class="foot-label">Śledź nasze działania</span>
-      <div class="soc-icons">
-        <a href="#" aria-label="Instagram" title="Instagram — wkrótce"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" stroke="none"/></svg></a>
-        <a href="#" aria-label="Facebook" title="Facebook — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg></a>
-        <a href="#" aria-label="Pinterest" title="Pinterest — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>
+        <!-- 1. NOWOŚCI -->
+        <div class="sl-slide">
+          <div class="sl-bg" style="background-image:url('/static/media/sklep/szopka.jpg')"></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Nowości</span>
+            <h2>Najnowsze produkty z pracowni</h2>
+            <p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.</p>
+            <div class="sl-karty">
+              {% if nowosci %}{% for r in nowosci[:3] %}
+              <a class="sl-karta" href="/zamowienia/sklep/">
+                {% if r['obraz'] %}<img src="/static/media/sklep/{{ r['obraz'] }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
+                <span><span class="nazwa">{{ r['nazwa'] }}</span><br><span class="cena">{{ '%.0f'|format(r['cena']) }} zł / szt.</span></span>
+              </a>
+              {% endfor %}{% else %}
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/szopka.jpg" alt="Szopka bożonarodzeniowa"><span><span class="nazwa">Szopka bożonarodzeniowa (warstwowa)</span><br><span class="cena">249 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/szyld.jpg" alt="Szyld powitalny"><span><span class="nazwa">Szyld powitalny „Witajcie"</span><br><span class="cena">189 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/love.jpg" alt="Litery LOVE"><span><span class="nazwa">Litery podświetlane LOVE</span><br><span class="cena">249 zł / szt.</span></span></a>
+              {% endif %}
+            </div>
+            <a class="sl-btn" href="/zamowienia/sklep/">Zobacz w sklepie →</a>
+          </div>
+        </div>
+
+        <!-- 2. NAJCZĘŚCIEJ ZAMAWIANE -->
+        <div class="sl-slide">
+          <div class="sl-bg" style="background-image:url('/static/media/sklep/szyld.jpg')"></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Bestsellery</span>
+            <h2>Najczęściej zamawiane</h2>
+            <p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p>
+            <div class="sl-karty">
+              {% if top %}{% for r in top[:3] %}
+              <a class="sl-karta" href="/zamowienia/sklep/">
+                {% if r['obraz'] %}<img src="/static/media/sklep/{{ r['obraz'] }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
+                <span><span class="nazwa">{{ r['nazwa'] }}</span><br><span class="cena">{{ '%.0f'|format(r['cena']) }} zł / szt.</span></span>
+              </a>
+              {% endfor %}{% else %}
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/ramka.jpg" alt="Ramka z sentencją"><span><span class="nazwa">Ramka z sentencją</span><br><span class="cena">89 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/szopka.jpg" alt="Szopka bożonarodzeniowa"><span><span class="nazwa">Szopka bożonarodzeniowa (warstwowa)</span><br><span class="cena">249 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/love.jpg" alt="Litery LOVE"><span><span class="nazwa">Litery podświetlane LOVE</span><br><span class="cena">249 zł / szt.</span></span></a>
+              {% endif %}
+            </div>
+            <a class="sl-btn" href="/zamowienia/sklep/">Zamów teraz →</a>
+          </div>
+        </div>
+
+        <!-- 3. AKTUALNOŚCI (ostatnia realizacja) -->
+        <div class="sl-slide">
+          <div class="sl-bg" {% if realizacja and realizacja['zdjecie'] %}style="background-image:url('/media/{{ realizacja['zdjecie'] }}')"{% else %}style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"{% endif %}></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Aktualności z pracowni</span>
+            {% if realizacja %}
+            <h2>{{ realizacja['tytul'] }}</h2>
+            <p>{{ (realizacja['opis'] or 'Zajrzyj do naszych realizacji — pokazujemy, z czego i jak powstają nasze rzeczy.')[:150] }}{% if realizacja['opis'] and realizacja['opis']|length > 150 %}…{% endif %}</p>
+            <a class="sl-btn" href="/realizacje/{{ realizacja['id'] }}/">Czytaj wpis →</a>
+            {% else %}
+            <h2>Z pracowni prosto do Was</h2>
+            <p>Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.</p>
+            <a class="sl-btn" href="/realizacje/">Zobacz realizacje →</a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 4. OFERTA SEZONOWA -->
+        <div class="sl-slide">
+          <div class="sl-bg" style="background-image:url('assets/hero.jpg')"></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Oferta sezonowa</span>
+            <h2>Sezon świąteczny — czas na szopkę</h2>
+            <p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p>
+            <a class="sl-btn" href="/zamowienia/sklep/">Sprawdź ofertę →</a>
+          </div>
+        </div>
+
+      </div>
+      <button class="sl-nav prev" type="button" aria-label="Poprzedni slajd">‹</button>
+      <button class="sl-nav next" type="button" aria-label="Następny slajd">›</button>
+      <div class="sl-dots" id="sl-dots"></div>
+    </div>
+  </main>
+
+  <!-- JAK DZIAŁAMY + CTA -->
+  <section class="cta">
+    <div class="jak">
+      <h2>Jak działamy</h2>
+      <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
+      <div class="kroki">
+        <div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>
+        <div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>
+        <div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>
+      </div>
+      <div class="cta-btn">
+        <a class="btn" href="/zamowienia/wynajem/">Zarezerwuj termin</a>
+        <a class="btn outline" href="/zamowienia/">Złóż zamówienie</a>
       </div>
     </div>
-    <div class="foot-mid">
-      <span class="copy">© Studio Sygnatura</span>
-      <a class="regbtn" href="#" title="wkrótce">Regulamin serwisu</a>
-    </div>
-    <div class="foot-right">
-      <a href="/kontakt/">Kontakt</a><span class="foot-sep">/</span><a href="#" title="wkrótce">FAQ</a>
-    </div>
-</footer>
+  </section>
+
+  <!-- STOPKA -->
+  <footer class="foot">
+    <span><a href="/regulamin/">Regulamin</a><span class="sep">·</span><a href="/jak-pracujemy/">Jak pracujemy</a></span>
+    <span>© Sygnatura 2026</span>
+  </footer>
+</div>
 
 <script>
 (function(){
-  var splash=document.getElementById('splash');
-  var show=3800;
-  document.documentElement.style.overflow='hidden';
-  setTimeout(function(){
-    if(splash)splash.classList.add('hide');
-    document.documentElement.style.overflow='';
-  },show);
-  setTimeout(function(){if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);},show+700);
-  var burger=document.getElementById('burger'),menu=document.getElementById('menu');
-  if(burger&&menu){burger.addEventListener('click',function(){
-    var open=menu.classList.toggle('open');
-    burger.setAttribute('aria-expanded',open?'true':'false');
-  });}
+  /* ===== slider: autoplay w pętli, strzałki, kropki ===== */
+  var slider=document.getElementById('slider');
+  var track=document.getElementById('sl-track');
+  var slides=track.children;
+  var dotsWrap=document.getElementById('sl-dots');
+  var n=slides.length, i=0, timer=null, pauza=false;
+  if(!slider||!track||n===0)return;
+  var dots=[];
+  for(var k=0;k<n;k++){
+    var b=document.createElement('button');
+    b.type='button';
+    b.setAttribute('aria-label','Slajd '+(k+1));
+    (function(idx){b.addEventListener('click',function(){idz(idx);restart();});})(k);
+    dotsWrap.appendChild(b);dots.push(b);
+  }
+  function idz(idx){
+    i=(idx+n)%n;
+    track.style.transform='translateX(-'+(i*100)+'%)';
+    for(var k=0;k<n;k++){
+      slides[k].classList.toggle('akt',k===i);
+      dots[k].classList.toggle('akt',k===i);
+    }
+  }
+  function nastepny(){idz(i+1);}
+  function restart(){
+    if(timer)clearInterval(timer);
+    timer=setInterval(nastepny,5000);
+  }
+  slider.querySelector('.sl-nav.prev').addEventListener('click',function(){idz(i-1);restart();});
+  slider.querySelector('.sl-nav.next').addEventListener('click',function(){nastepny();restart();});
+  /* pauza po najechaniu */
+  slider.addEventListener('mouseenter',function(){if(timer)clearInterval(timer);});
+  slider.addEventListener('mouseleave',restart);
+  /* proste przesunięcie palcem na dotyku */
+  var x0=null;
+  slider.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;if(timer)clearInterval(timer);},{passive:true});
+  slider.addEventListener('touchend',function(e){
+    if(x0===null)return;
+    var dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>40){idz(dx<0?i+1:i-1);}
+    x0=null;restart();
+  });
+  idz(0);restart();
 })();
 </script>
-<noscript><style>#splash{display:none}</style></noscript>
 </body>
 </html>
