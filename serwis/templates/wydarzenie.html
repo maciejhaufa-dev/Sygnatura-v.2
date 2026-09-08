@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=3">
+<link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -19,8 +19,14 @@
   </div>
 </section>
 
+{% set pers_str = pers_ids|map('string')|join(',') %}
 <div class="wrap">
-  <a class="powrot" href="{{ url_for('wynajem') }}">← wszystkie wydarzenia</a>
+  {% set krok = 1 %}{% include '_kroki.html' %}
+  {% set pers_nastepny = url_for('wynajem_wydarzenie', ev=ev, pers=pers_str) %}
+  {% set pers_bez = url_for('wynajem_wydarzenie', ev=ev) %}
+  {% include '_pers_bar.html' %}
+
+  <a class="powrot" href="{{ url_for('wynajem', pers=pers_str) }}">← wszystkie wydarzenia</a>
 
   <div class="pak">
     {% for p in pakiety %}
@@ -30,14 +36,14 @@
       <div class="pak-sub">{{ p.opis or '' }}</div>
       <div class="pak-price"><small>wypożyczenie / doba</small>{{ p.cena }}</div>
       <ul>{% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}</ul>
-      <a class="btn" href="{{ url_for('pakiet_szczegoly', pid=p.id) }}">Zobacz wolne terminy</a>
+      <a class="btn" href="{{ url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) }}">Zobacz wolne terminy</a>
     </div>
     {% endfor %}
   </div>
 
   <div style="text-align:center;margin-top:26px">
     <a class="btn" style="background:transparent;color:var(--butelkowa);border:1px solid var(--butelkowa)"
-       href="{{ url_for('personalizacja', next=url_for('wynajem_wydarzenie', ev=ev)) }}">+ Dodaj produkty spersonalizowane</a>
+       href="{{ url_for('personalizacja', next=url_for('wynajem_wydarzenie', ev=ev, pers=pers_str), pers=pers_str) }}">+ Dodaj produkty spersonalizowane</a>
     <p style="font-size:13.5px;color:rgba(51,38,28,.65);margin:10px 0 0">Personalizacja (imiona, daty, treści) jest wybierana osobno — jednorazówki płatne z góry, niepodlegające zwrotowi.</p>
   </div>
 

@@ -7,13 +7,17 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=3">
+<link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
+{% set pers_str = pers_ids|map('string')|join(',') %}
 <div class="wrap">
-  <a class="powrot" href="{{ url_for('pakiet_szczegoly', pid=p.id) }}#kalendarz">← wróć do kalendarza</a>
+  {% set krok = 3 %}
+  {% set krok2_url = url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) %}
+  {% include '_kroki.html' %}
+  <a class="powrot" href="{{ url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) }}#kalendarz">← wróć do kalendarza</a>
   <h1>Rezerwacja terminu</h1>
-  <p class="podsum">Wypełnij formularz — po wysłaniu dostaniesz e-mail z podsumowaniem, sygnaturą sprawy i dokumentami do zapoznania.</p>
+  <p class="podsum">Ostatni krok: wypełnij formularz — po wysłaniu dostaniesz e-mail z podsumowaniem, sygnaturą sprawy i dokumentami do zapoznania.</p>
 
   {% with wiad = get_flashed_messages() %}
     {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
@@ -77,7 +81,7 @@
       {% else %}
         <p class="mala" style="margin:8px 0 0">Nic nie wybrano. Każdy dodany produkt dostanie tu osobne pole opisu.</p>
       {% endif %}
-      <a class="pers-link" href="{{ url_for('personalizacja', next=url_for('rezerwuj', pid=p.id, data=data, data_od=data_od, data_do=data_do, pers=','.join(pers_ids|map('string')))) }}">+ Dodaj produkty spersonalizowane</a>
+      <a class="pers-link" href="{{ url_for('personalizacja', next=url_for('rezerwuj', pid=p.id, data=data, data_od=data_od, data_do=data_do, pers=pers_str), pers=pers_str) }}">+ Dodaj produkty spersonalizowane</a>
       <p class="mala" style="margin:8px 0 0">Rabat −5% od 3 produktów · personalizacja płatna z góry, kaucja za wynajem obowiązuje zawsze.</p>
     </div>
 
@@ -133,7 +137,7 @@
     </div>
 
     <div class="przyciski">
-      <a class="btn btn-line" href="{{ url_for('pakiet_szczegoly', pid=p.id) }}#kalendarz">Zmień termin</a>
+      <a class="btn btn-line" href="{{ url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) }}#kalendarz">Zmień termin</a>
       <button class="btn" type="submit">Wyślij zapytanie</button>
     </div>
     <p class="mala" style="margin-top:14px">Wysyłając formularz akceptujesz kontakt e-mail w sprawie zapytania (art. 398 PKE). Termin rezerwuje kaucja w terminie 7 dni.</p>

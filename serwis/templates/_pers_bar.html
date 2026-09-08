@@ -1,0 +1,17 @@
+{# _pers_bar.html — pasek „masz wybrane produkty spersonalizowane", widoczny na kolejnych
+   krokach zamówienia, żeby wybór NIE GINĄŁ przy nawigacji.
+   Wymaga w kontekście: personalizacje (obiekty z bazy), pers_nastepny (URL bieżącej strony Z pers),
+   pers_bez (URL bieżącej strony BEZ pers). #}
+{% if personalizacje %}
+<div class="pers-bar">
+  <span class="ik">🖌</span>
+  <span class="tekst">
+    <b>Wybrano {{ personalizacje|length }} {{ 'produkt spersonalizowany' if personalizacje|length == 1
+        else ('produkty spersonalizowane' if personalizacje|length < 5 else 'produktów spersonalizowanych') }}:</b>
+    {% for pr in personalizacje %}{{ pr['nazwa'] }}{% if not loop.last %}, {% endif %}{% endfor %}.
+    {% set pers_str = '' %}{% for pr in personalizacje %}{% set pers_str = pers_str ~ pr['id'] ~ ('' if loop.last else ',') %}{% endfor %}
+    <a class="edytuj" href="{{ url_for('personalizacja', next=pers_nastepny, pers=pers_str) }}">zmień</a>
+    <a class="wyczysc" href="{{ pers_bez }}">usuń wybór</a>
+  </span>
+</div>
+{% endif %}

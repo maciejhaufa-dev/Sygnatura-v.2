@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=3">
+<link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -22,6 +22,11 @@
     </div>
   </div>
 </section>
+
+{% set pers_str = pers_ids|map('string')|join(',') %}
+{% set pers_nastepny = url_for('wynajem', pers=pers_str) %}
+{% set pers_bez = url_for('wynajem') %}
+<div class="wrap">{% include '_pers_bar.html' %}</div>
 
 <section class="sec" id="jak">
   <div class="wrap">
@@ -42,7 +47,7 @@
     <p class="sub center">Pakiety są zbudowane pod wydarzenie, nie pod styl — na start wszystkie w jednej, spójnej stylistyce. W każdym pakiecie trzy poziomy: ESENCJA / MID / FULL.</p>
     <div class="wyd">
       {% for g in grupy %}
-      <a class="wyd-card" href="{{ url_for('wynajem_wydarzenie', ev=g.ev) }}">
+      <a class="wyd-card" href="{{ url_for('wynajem_wydarzenie', ev=g.ev, pers=pers_str) }}">
         <span class="ik">
           {% if g.ev == 'komunijny' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 3v26"/><path d="M9 9h14"/><path d="M7 22h18"/></svg>
           {% elif g.ev == 'weselny' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M15.5 8h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 15.5 8z"/><path d="M11 12h10l-1.5 6.5h-7z"/><path d="M14 18.5L12 21h8l-2-2.5"/></svg>
@@ -54,7 +59,7 @@
         <span class="wiecej">{{ g.ile }} poziomy pakietu →</span>
       </a>
       {% endfor %}
-      <a class="wyd-card" href="{{ url_for('personalizacja', next=url_for('wynajem')) }}">
+      <a class="wyd-card" href="{{ url_for('personalizacja', next=url_for('wynajem', pers=pers_str), pers=pers_str) }}">
         <span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 26V12l10-7 10 7v14"/><path d="M11 26v-7h10v7"/><circle cx="16" cy="13.5" r="1.4"/></svg></span>
         <h3>Dodaj produkty spersonalizowane</h3>
         <p>Imiona, daty, sentencje — wykonywane na zamówienie. Jednorazówki: płatne z góry i nie podlegają zwrotowi (zostają u Ciebie).</p>

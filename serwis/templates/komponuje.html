@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=3">
+<link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -232,18 +232,22 @@
     if (cb) cb.checked = true;
   });
 
-  /* link do personalizacji niesie aktualny stan (termin + pozycje) */
+  /* link do personalizacji niesie aktualny stan (termin + pozycje + personalizacje) */
   function aktualizujLink(){
     var a = document.getElementById('pers-link');
     if (!a) return;
     var ids = [];
     document.querySelectorAll('.komp-it input:checked').forEach(function(cb){ ids.push(parseInt(cb.value)); });
+    var persIds = [];
+    try { persIds = JSON.parse(document.getElementById('pers').value || '[]'); } catch(e){ persIds = []; }
     var q = [];
     if (dEv.value) q.push('data=' + dEv.value);
     if (dOd.value) q.push('data_od=' + dOd.value);
     if (dDo.value) q.push('data_do=' + dDo.value);
     q.push('pozycje=' + encodeURIComponent(JSON.stringify(ids)));
-    a.href = '/personalizacja/?next=' + encodeURIComponent('/wynajem/komponuje/?' + q.join('&'));
+    if (persIds.length) q.push('pers=' + persIds.join(','));
+    var p = (persIds.length ? ('pers=' + persIds.join(',') + '&') : '');
+    a.href = '/personalizacja/?' + p + 'next=' + encodeURIComponent('/wynajem/komponuje/?' + q.join('&'));
   }
 
   /* dni najmu */

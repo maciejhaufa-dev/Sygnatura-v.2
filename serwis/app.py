@@ -333,6 +333,22 @@ def konflikty_zakresu(db, pakiet_id, od, do):
     return blok, pyt
 
 
+def wczytaj_pers(db, parametr):
+    """Wybrane produkty spersonalizowane (parametr pers='1,2') — lista id + obiekty z bazy.
+    Wybór wędruje przez całą ścieżkę zamówienia (wynajem -> wydarzenie -> pakiet -> formularz),
+    żeby nic nie ginęło przy nawigacji."""
+    pers_ids = [int(x) for x in (parametr or '').split(',') if x.strip().isdigit()]
+    widziane, personalizacje = set(), []
+    for pid3 in pers_ids:
+        if pid3 in widziane:
+            continue
+        widziane.add(pid3)
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            personalizacje.append(pr)
+    return [x for x in pers_ids if x in widziane], personalizacje
+
+
 @app.route('/wynajem/')
 def wynajem():
     """Strona główna wynajmu: WYBÓR TYPU WYDARZENIA — bez kalendarzy."""
@@ -350,7 +366,9 @@ def wynajem():
     produkty_wg = {}
     for pr in produkty:
         produkty_wg.setdefault(pr['kategoria_id'], []).append(pr)
-    return render_template('wynajem.html', grupy=grupy, kategorie=kategorie, produkty_wg=produkty_wg)
+    pers_ids, personalizacje = wczytaj_pers(db, request.args.get('pers', ''))
+    return render_template('wynajem.html', grupy=grupy, kategorie=kategorie, produkty_wg=produkty_wg,
+                           pers_ids=pers_ids, personalizacje=personalizacje)
 
 
 @app.route('/wynajem/komponuje/')
@@ -411,7 +429,9 @@ def wynajem_wydarzenie(ev):
     pakiety = db.execute('SELECT * FROM pakiety WHERE ev=? AND dostepny=1 ORDER BY kolejnosc, id', (ev,)).fetchall()
     if not pakiety:
         abort(404)
-    return render_template('wydarzenie.html', ev=ev, nazwa=EV_GRUPY[ev][0], opis=EV_GRUPY[ev][1], pakiety=pakiety)
+    pers_ids, personalizacje = wczytaj_pers(db, request.args.get('pers', ''))
+    return render_template('wydarzenie.html', ev=ev, nazwa=EV_GRUPY[ev][0], opis=EV_GRUPY[ev][1],
+                           pakiety=pakiety, pers_ids=pers_ids, personalizacje=personalizacje)
 
 
 @app.route('/wynajem/pakiet/<int:pid>/')
@@ -426,8 +446,10 @@ def pakiet_szczegoly(pid):
     dni = siatka_miesiaca(db, p['id'], rok, mies)
     poprz = (rok - 1, 12) if mies == 1 else (rok, mies - 1)
     nast = (rok + 1, 1) if mies == 12 else (rok, mies + 1)
+    pers_ids, personalizacje = wczytaj_pers(db, request.args.get('pers', ''))
     return render_template('pakiet.html', p=p, dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
-                           poprz=poprz, nast=nast, ev_nazwa=EV_GRUPY.get(p['ev'], ('Inne', ''))[0])
+                           poprz=poprz, nast=nast, ev_nazwa=EV_GRUPY.get(p['ev'], ('Inne', ''))[0],
+                           pers_ids=pers_ids, personalizacje=personalizacje)
 
 
 @app.route('/wynajem/pakiet/<int:pid>/rezerwuj')
@@ -479,19 +501,26 @@ def api_rezerwuj():
     data = (request.form.get('data') or '').strip()
     data_od = (request.form.get('data_od') or '').strip()
     data_do = (request.form.get('data_do') or '').strip()
+    # wybrane produkty spersonalizowane — parsujemy od razu, żeby NIE GINĘŁY
+    # przy poprawianiu formularza po błędzie walidacji
+    try:
+        pers_ids = [int(x) for x in json.loads(request.form.get('pers') or '[]')]
+    except Exception:
+        pers_ids = []
+    pers_param = ','.join(str(x) for x in pers_ids)
     try:
         d_ev = datetime.date.fromisoformat(data)
         d_od = datetime.date.fromisoformat(data_od)
         d_do = datetime.date.fromisoformat(data_do)
     except ValueError:
         flash('Podaj poprawne daty (RRRR-MM-DD).')
-        return wroc(data, data_od, data_do)
+        return wroc(data, data_od, data_do, pers_param)
     if not (d_od <= d_ev <= d_do):
         flash('Data imprezy musi się mieścić między „od" a „do".')
-        return wroc(data, data_od, data_do)
+        return wroc(data, data_od, data_do, pers_param)
     if d_od < datetime.date.today():
         flash('Termin nie może zaczynać się w przeszłości.')
-        return wroc(data, data_od, data_do)
+        return wroc(data, data_od, data_do, pers_param)
     dni = (d_do - d_od).days + 1
 
     # konflikt w całym zakresie (dzień po dniu)
@@ -499,7 +528,7 @@ def api_rezerwuj():
     if blok:
         opis = ', '.join('%s (%s)' % (d, core.STATUSY_PL[s]) for d, s in blok[:5])
         flash('Termin niedostępny w dniach: %s. Wybierz inny zakres.' % opis)
-        return wroc(data, data_od, data_do)
+        return wroc(data, data_od, data_do, pers_param)
 
     # zestaw własny: skład z katalogu
     pozycje = []
@@ -514,27 +543,23 @@ def api_rezerwuj():
                 pozycje.append({'nazwa': pr['nazwa'], 'cena': pr['cena_doba']})
         if not pozycje:
             flash('Zaznacz co najmniej jeden produkt z katalogu.')
-            return wroc(data, data_od, data_do)
+            return wroc(data, data_od, data_do, pers_param)
 
     # produkty spersonalizowane (jednorazówki) — KAŻDY z własnym opisem
     pers_list = []
-    try:
-        pers_ids = [int(x) for x in json.loads(request.form.get('pers') or '[]')]
-    except Exception:
-        pers_ids = []
     for pid3 in pers_ids:
         pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
         if pr:
             opis = (request.form.get('pers_opis_%d' % pr['id']) or '').strip()
             if not opis:
                 flash('Uzupełnij opis personalizacji: %s (co i jak ma być spersonalizowane).' % pr['nazwa'])
-                return wroc(data, data_od, data_do, pers=','.join(str(x) for x in pers_ids))
+                return wroc(data, data_od, data_do, pers_param)
             pers_list.append({'nazwa': pr['nazwa'], 'cena': pr['cena'], 'opis': opis})
 
     email = (request.form.get('email') or '').strip()
     if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
         flash('Podaj poprawny adres e-mail.')
-        return wroc(data, data_od, data_do)
+        return wroc(data, data_od, data_do, pers_param)
 
     # checkboxy: value=nowa / value=istniejaca (zaznaczony "istniejaca" ma priorytet)
     tryb = 'istniejaca' if 'istniejaca' in request.form.getlist('tryb_sygnatury') else 'nowa'
@@ -543,7 +568,7 @@ def api_rezerwuj():
         sygnatura = (request.form.get('sygnatura') or '').strip().upper()
         if not sygnatura:
             flash('Wpisz sygnaturę sprawy albo zaznacz „nadaj nową sygnaturę".')
-            return wroc(data, data_od, data_do)
+            return wroc(data, data_od, data_do, pers_param)
     else:
         sygnatura = core.nowa_sygnatura(db)
 
@@ -556,7 +581,7 @@ def api_rezerwuj():
     if dni == 1 and len(tresc) < 20:
         flash('Najem na 1 dobę to wyjątek — dekoracje zakładamy dzień przed i ściągamy dzień po imprezie. '
               'Krótko uzasadnij w wiadomości, a rozpatrzymy to ręcznie.')
-        return wroc(data, data_od, data_do)
+        return wroc(data, data_od, data_do, pers_param)
 
     # PODSUMOWANIE KWOT: najem × doby + kaucja + personalizacja z góry (rabat −5% od 3 szt.)
     if p:

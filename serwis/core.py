@@ -164,23 +164,28 @@ def procedura_txt(dokumenty):
 
 
 def zakres_txt(rez):
-    """Czytelny opis terminu: od–do + data imprezy + liczba dób."""
-    od = rez['data_od'] or rez['data']
-    do = rez['data_do'] or rez['data']
-    dni = rez['dni'] or 1
-    return '%s – %s  (impreza: %s, %s dn.)' % (od, do, rez['data'], dni)
+    """Czytelny opis terminu: od–do + data imprezy + liczba dób.
+    Dla wiadomości bez terminu (np. formularz kontaktowy) zwraca ''."""
+    if not (rez.get('data') or rez.get('data_od') or rez.get('data_do')):
+        return ''
+    od = rez.get('data_od') or rez.get('data') or ''
+    do = rez.get('data_do') or rez.get('data') or ''
+    dni = rez.get('dni') or 1
+    if od and do:
+        return '%s – %s  (impreza: %s, %s dn.)' % (od, do, rez.get('data') or '', dni)
+    return rez.get('data') or ''
 
 
 def pozycje_txt(rez):
     """Skład zestawu własnego z wyliczeniem (jeśli rezerwacja ma pozycje)."""
     try:
-        poz = json.loads(rez['pozycje'] or '[]')
+        poz = json.loads(rez.get('pozycje') or '[]')
     except Exception:
         poz = []
     if not poz:
         return ''
     suma = sum(float(p.get('cena') or 0) for p in poz)
-    dni = rez['dni'] or 1
+    dni = rez.get('dni') or 1
     rabat = round(suma * 0.05) if len(poz) >= 10 else 0
     linie = ['SKŁAD ZESTAWU (własny):']
     linie += ['• %s — %.0f zł' % (p.get('nazwa', ''), p.get('cena') or 0) for p in poz]
@@ -194,7 +199,7 @@ def pozycje_txt(rez):
 def personalizacje_txt(rez):
     """Produkty spersonalizowane z opisami — płatne z góry, bezzwrotne."""
     try:
-        pers = json.loads(rez['personalizacje'] or '[]')
+        pers = json.loads(rez.get('personalizacje') or '[]')
     except Exception:
         pers = []
     if not pers:

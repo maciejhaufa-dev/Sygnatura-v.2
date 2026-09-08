@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=3">
+<link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -70,8 +70,17 @@
   document.getElementById('wybor-dodaj').addEventListener('click', function(){
     var ids = [];
     cbs.forEach(function(cb){ if (cb.checked) ids.push(cb.value); });
-    var sep = NEX.indexOf('?') > -1 ? '&' : '?';
-    window.location.href = NEX + sep + 'pers=' + ids.join(',');
+    // zamieniamy stary parametr pers (jeśli jest), zamiast doklejać drugi
+    var hash = '';
+    var u = NEX;
+    var h = u.indexOf('#');
+    if (h > -1){ hash = u.slice(h); u = u.slice(0, h); }
+    var base = u.split('?')[0];
+    var params = (u.split('?')[1] || '').split('&').filter(function(kv){
+      return kv && kv.split('=')[0] !== 'pers';
+    });
+    params.push('pers=' + ids.join(','));
+    window.location.href = base + '?' + params.join('&') + hash;
   });
   przelicz();
 })();

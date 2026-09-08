@@ -30,6 +30,34 @@ h1{color:var(--brunatny);font-size:clamp(26px,4vw,36px);margin:14px 0 6px}
 .mala{font-size:13.5px;color:rgba(51,38,28,.6)}
 .flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:12px 0 0;font-size:15px}
 
+/* ============ PASEK KROKÓW (postęp zamówienia) ============ */
+.kroki-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 0;font-size:14px}
+.krok-it{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(107,69,48,.28);
+  color:rgba(51,38,28,.55);padding:6px 12px 6px 7px}
+.krok-it i{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:var(--krem2);border:1px solid rgba(107,69,48,.4);font-style:normal;font-weight:700;font-size:13px}
+.krok-it a{color:var(--brunatny);text-decoration:none}
+.krok-it.akt{background:var(--butelkowa);border-color:var(--butelkowa);color:var(--zloty);font-weight:700}
+.krok-it.akt i{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
+.krok-it.zrob{background:#fff}
+.krok-it.zrob i{background:var(--brunatny);color:var(--krem);border-color:var(--brunatny)}
+.krok-sep{flex:0 0 16px;height:1px;background:rgba(107,69,48,.35)}
+@media(max-width:560px){
+  .krok-sep{flex-basis:6px}
+  .krok-it{padding:5px 9px 5px 5px;font-size:13px}
+  .krok-it i{width:21px;height:21px;font-size:12px}
+}
+
+/* ============ PASEK WYBRANEJ PERSONALIZACJI ============ */
+.pers-bar{display:flex;align-items:flex-start;gap:12px;background:#FFF8E1;border:1px solid var(--zloty);
+  padding:12px 14px;margin:16px 0 0;font-size:15px;color:rgba(51,38,28,.9)}
+.pers-bar .ik{font-size:20px;line-height:1.2}
+.pers-bar b{color:var(--brunatny)}
+.pers-bar a{font-weight:700;margin-left:6px}
+.pers-bar .edytuj{color:var(--butelkowa)}
+.pers-bar .wyczysc{color:#8c2f2f}
+.pers-bar .tekst{flex:1;line-height:1.5}
+
 /* ============ HERO I SEKCJE (wynajem) ============ */
 .hero{background:var(--butelkowa);color:var(--krem);padding:56px 0 44px;text-align:center}
 .hero h1{font-size:clamp(30px,5vw,44px);margin:0 0 10px;color:var(--zloty)}
