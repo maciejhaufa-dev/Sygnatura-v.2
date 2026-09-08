@@ -120,7 +120,7 @@ def sheets_payload(rezerwacja, typ='rezerwacja'):
         'kwoty_lacznie': (kw or {}).get('razem_po', (kw or {}).get('razem')) if kw else '',
         'kwoty_najem': (kw or {}).get('najem') if kw else '',
         'kwoty_pers': (kw or {}).get('pers_netto') if kw else '',
-        'kwoty_kaucja': 300 if kw else '',
+        'kwoty_kaucja': (kw or {}).get('kaucja') or '',
         'dostawa': rezerwacja.get('dostawa') or '',
         'adres': rezerwacja.get('adres') or '',
         'kod': rezerwacja.get('kod') or '',
@@ -180,13 +180,23 @@ def zakres_txt(rez):
 
 
 def pozycje_txt(rez):
-    """Skład zestawu własnego z wyliczeniem (jeśli rezerwacja ma pozycje)."""
+    """Skład zamówienia: zestaw własny (najem) LUB produkty ze sklepu (ile szt.)."""
     try:
         poz = json.loads(rez.get('pozycje') or '[]')
     except Exception:
         poz = []
     if not poz:
         return ''
+    sklep = any('ile' in p for p in poz)
+    if sklep:
+        suma = sum(float(p.get('cena') or 0) * int(p.get('ile') or 1) for p in poz)
+        linie = ['PRODUKTY ZE SKLEPU:']
+        for p in poz:
+            ile = int(p.get('ile') or 1)
+            linie.append('• %s — %.0f zł%s' % (p.get('nazwa', ''), p.get('cena') or 0,
+                                               (' × %d szt.' % ile) if ile > 1 else ''))
+        linie.append('Suma produktów: %.0f zł (płatne z góry)' % suma)
+        return '\n'.join(linie) + '\n'
     suma = sum(float(p.get('cena') or 0) for p in poz)
     dni = rez.get('dni') or 1
     rabat = round(suma * 0.05) if len(poz) >= 10 else 0
@@ -224,16 +234,21 @@ def personalizacje_txt(rez):
 
 
 def kwoty_txt(rez):
-    """Podsumowanie kwot (najem × doby + kaucja + personalizacja z góry)."""
+    """Podsumowanie kwot — wspólne dla wynajmu / personalizacji / sklepu."""
     kw = rez['kwoty'] if isinstance(rez, dict) and rez.get('kwoty') else None
     if not kw:
         return ''
-    linie = ['PODSUMOWANIE KWOT (szacunkowe):',
-             'Najem: %.0f zł (%s × %s dn.)' % (kw.get('najem', 0), kw.get('stawka_txt', ''), kw.get('dni', 0)),
-             'Kaucja zwrotna (najem): 300 zł',
-             'Personalizacja (płatna z góry, bezzwrotna): %.0f zł' % kw.get('pers_netto', 0)]
-    if kw.get('pers_rabat'):
-        linie.insert(3, 'w tym rabat na personalizację −5%%: −%d zł' % kw['pers_rabat'])
+    linie = ['PODSUMOWANIE KWOT' + ('' if kw.get('rabat_kod') else ' (szacunkowe)') + ':']
+    if kw.get('najem'):
+        linie.append('Najem: %.0f zł (%s × %s dn.)' % (kw['najem'], kw.get('stawka_txt', ''), kw.get('dni', 0)))
+    if kw.get('kaucja'):
+        linie.append('Kaucja zwrotna (najem): 300 zł')
+    if kw.get('pozycje_suma'):
+        linie.append('Produkty ze sklepu: %.0f zł' % kw['pozycje_suma'])
+    if kw.get('pers_netto'):
+        linie.append('Personalizacja (płatna z góry, bezzwrotna): %.0f zł' % kw['pers_netto'])
+        if kw.get('pers_rabat'):
+            linie.append('  w tym rabat na personalizację −5%%: −%d zł' % kw['pers_rabat'])
     if kw.get('rabat_kod'):
         linie.append('Rabat z kodu %s: −%d zł' % (kw.get('kod', ''), kw['rabat_kod']))
     linie.append('RAZEM: %.0f zł' % (kw.get('razem_po', kw.get('razem', 0))))
@@ -383,21 +398,23 @@ def mail_klient_zapytanie(rez, dokumenty):
 
 
 def mail_studio_zapytanie(rez):
-    dostawa = (rez.get('dostawa') or '').strip()
+    typ_txt = {'wynajem': 'WYNAJEM', 'personalizacja': 'PERSONALIZACJA (samodzielna)', 'sklep': 'SKLEP'}.get(
+        rez.get('typ') if isinstance(rez, dict) else 'wynajem', 'ZAMÓWIENIE')
+    linia_terminu = 'Termin najmu: %(zakres)s\n' if (rez.get('data') or '').strip() else ''
     dostawa_txt = ''
-    if dostawa:
-        dostawa_txt = 'Forma dostawy: %s\n' % dostawa
+    if (rez.get('dostawa') or '').strip():
+        dostawa_txt = 'Forma dostawy: %s\n' % rez['dostawa'].strip()
         if (rez.get('adres') or '').strip():
             dostawa_txt += 'Adres: %s\n' % rez['adres'].strip()
     kod_txt = ''
     if (rez.get('kod') or '').strip():
         kod_txt = 'Kod rabatowy: %s\n' % rez['kod'].strip()
     return (
-        'NOWE ZAPYTANIE O WYNAJEM\n\n'
+        'NOWE ZAMÓWIENIE — %(typ)s\n\n'
         'Sygnatura: %(sygnatura)s\n'
         'Data zgłoszenia: %(utworzono)s\n'
         'Status: zapytanie\n'
-        'Termin najmu: %(zakres)s\n'
+        '%(linia_terminu)s'
         'Pakiet: %(pakiet)s\n'
         'Imię i nazwisko: %(imie)s\n'
         'E-mail: %(email)s\n'
@@ -410,6 +427,8 @@ def mail_studio_zapytanie(rez):
         '%(kwoty)s'
         '\nPanel admina: /admin (zmień status po weryfikacji).'
     ) % {
+        'typ': typ_txt,
+        'linia_terminu': linia_terminu,
         'sygnatura': rez['sygnatura'], 'utworzono': rez['utworzono'], 'zakres': zakres_txt(rez),
         'pakiet': rez['pakiet_nazwa'], 'imie': rez['imie'], 'email': rez['email'],
         'telefon': ('Telefon: %s\n' % rez['telefon']) if rez['telefon'] else '',

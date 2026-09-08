@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Krok 3: Personalizacja — Studio Sygnatura</title>
+<title>Zamów personalizację — Studio Sygnatura</title>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
@@ -13,10 +13,10 @@
 {% include '_nav.html' %}
 
 <div class="wrap">
-  {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] %}{% set etap = 3 %}{% include '_progress.html' %}
-  <a class="powrot" href="{{ url_for('z_wynajem_pakiet', data=data, data_od=data_od, data_do=data_do) }}">← zmień pakiet</a>
-  <h1>Krok 3 · Dodaj personalizację</h1>
-  <p class="sub">Pakiet: <b>{{ p.nazwa }}</b> ({{ p.tier }}). Personalizacja to osobne produkty — jednorazówki wykonywane pod Ciebie: <b>płatne z góry i bezzwrotne</b> (po imprezie zostają u Ciebie). Rabat −5% od 3 produktów.</p>
+  {% set etapy = ['Personalizacja','Dane','Podsumowanie'] %}{% set etap = 1 %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('zamowienia') }}">← wszystkie zamówienia</a>
+  <h1>Zamów personalizację</h1>
+  <p class="sub">Nie jesteśmy fabryką, tylko rodzinną manufakturą tworzącą unikaty. Wybierz, co mamy spersonalizować — każdy produkt opisz po swojemu (imiona, data, treść, dedykacja…). Produkty personalizowane są <b>płatne z góry i bezzwrotne</b>; rabat −5% od 3 produktów.</p>
 
   {% if bledy %}
   <div class="bledy-box">
@@ -24,17 +24,8 @@
   </div>
   {% endif %}
 
-  <form method="post" action="{{ url_for('z_wynajem_pers', w=w) if w else url_for('z_wynajem_pers') }}" id="f-pers">
+  <form method="post" action="{{ url_for('z_pers_samodzielna', w=w) if w else url_for('z_pers_samodzielna') }}" id="f-pers">
     {% if w %}<input type="hidden" name="w" value="{{ w }}">{% endif %}
-    <input type="hidden" name="data" value="{{ data }}">
-    <input type="hidden" name="data_od" value="{{ data_od }}">
-    <input type="hidden" name="data_do" value="{{ data_do }}">
-    <input type="hidden" name="pakiet" value="{{ p.id }}">
-
-    <div class="z-skip">
-      <span>Nie potrzebujesz personalizacji?</span>
-      <button class="btn btn-line" type="submit" name="akcja" value="pomijam">Pomiń ten krok →</button>
-    </div>
 
     <div class="pers z-3">
       {% for pr in pozycje %}
@@ -57,7 +48,7 @@
 
     <div class="pole" style="margin-top:18px">
       <label for="pomysl">Nie znalazłeś tego, czego szukasz? Opisz nam swój pomysł, a my zajmiemy się jego realizacją.</label>
-      <textarea id="pomysl" name="pomysl" rows="3" placeholder="Np. drewniana ramka z imionami chrzestnych, tablica z sentencją wg własnego tekstu…">{{ pomysl }}</textarea>
+      <textarea id="pomysl" name="pomysl" rows="3" placeholder="Np. drewniana ramka z imionami chrzestnych, tablica z sentencją wg własnego tekstu, prezent na rocznicę…">{{ pomysl }}</textarea>
     </div>
 
     <div class="przyciski" style="justify-content:flex-end">

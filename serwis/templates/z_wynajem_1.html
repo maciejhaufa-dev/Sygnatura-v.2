@@ -13,7 +13,7 @@
 {% include '_nav.html' %}
 
 <div class="wrap">
-  {% set etap = 1 %}{% include '_progress.html' %}
+  {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] %}{% set etap = 1 %}{% include '_progress.html' %}
   <a class="powrot" href="{{ url_for('zamowienia') }}">← wszystkie zamówienia</a>
   <h1>Krok 1 · Wybierz termin wydarzenia</h1>
   <p class="sub">Kliknij w kalendarzu datę imprezy. Domyślnie dekoracje zakładamy <b>dzień przed</b> i odbieramy <b>dzień po</b> — razem 3 doby. Zakres możesz zmienić poniżej.</p>

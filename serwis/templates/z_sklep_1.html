@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Katalog produktów — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set etapy = ['Katalog','Personalizacja','Dane','Podsumowanie'] %}{% set etap = 1 %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('zamowienia') }}">← wszystkie zamówienia</a>
+  <h1>Katalog produktów</h1>
+  <p class="sub">Wiele z naszych prac zdobi prywatne domy i lokale eventowe. Wybierz coś dla siebie i stwórz niepowtarzalny klimat dla swojego wnętrza. Produkty płatne z góry — dane do przelewu dostaniesz w e-mailu z potwierdzeniem.</p>
+
+  {% if bledy %}
+  <div class="bledy-box">
+    <ul>{% for b in bledy %}<li>{{ b }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('z_sklep_katalog', w=w) if w else url_for('z_sklep_katalog') }}" id="f-sklep">
+    {% if w %}<input type="hidden" name="w" value="{{ w }}">{% endif %}
+
+    <div class="pers z-3">
+      {% for pr in produkty %}
+      <div class="pers-it z-pers-it">
+        <div class="z-pers-tresc" style="flex:1">
+          <b>{{ pr.nazwa }}</b>
+          <small>{{ pr.opis }}</small>
+          <span class="cena">{{ '%.0f'|format(pr.cena) }} zł / szt.</span>
+        </div>
+        <div class="z-ile">
+          <label for="ile_{{ pr.id }}">szt.</label>
+          <input type="number" id="ile_{{ pr.id }}" name="ile_{{ pr.id }}" min="0" max="20"
+                 value="{{ ilosci.get(pr.id, 0) }}">
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="przyciski" style="justify-content:flex-end">
+      <button class="btn" type="submit">Dalej: dodaj personalizację →</button>
+    </div>
+    <p class="mala">W kolejnym kroku możesz dodać do zakupów personalizację (grawer, imiona, dedykację) — albo go pominąć.</p>
+  </form>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

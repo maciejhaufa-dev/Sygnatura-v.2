@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Krok 4: Twoje dane — Studio Sygnatura</title>
+<title>Twoje dane — Studio Sygnatura</title>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
@@ -13,11 +13,30 @@
 {% include '_nav.html' %}
 
 <div class="wrap">
-  {% set etap = 4 %}{% set pers_pom = szkic.get('pers_pom') %}{% include '_progress.html' %}
-  <a class="powrot" href="{{ url_for('z_wynajem_pers', data=szkic['data'], data_od=szkic['data_od'], data_do=szkic['data_do'], pakiet=szkic['pakiet_id']) }}">← wróć do personalizacji</a>
-  <h1>Krok 4 · Twoje dane i zgody</h1>
-  <p class="sub">Zamówienie: <b>{{ szkic['pakiet']['nazwa'] }}</b> · {{ szkic['data_od'] }} – {{ szkic['data_do'] }} ({{ szkic['dni'] }} {{ 'doba' if szkic['dni'] == 1 else ('doby' if szkic['dni'] < 5 else 'dób') }})
-     {% if szkic['pers'] %}· personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% endif %}</p>
+  {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] if typ == 'wynajem' else (['Personalizacja','Dane','Podsumowanie'] if typ == 'personalizacja' else ['Katalog','Personalizacja','Dane','Podsumowanie']) %}
+  {% set etap = etapy|length - 1 %}
+  {% set pominiety = 3 if typ == 'wynajem' else (2 if typ == 'sklep' else 0) %}
+  {% if not (typ == 'wynajem' and szkic.get('pers_pom')) and not (typ == 'sklep' and szkic.get('pers_pom')) %}{% set pominiety = 0 %}{% endif %}
+  {% include '_progress.html' %}
+
+  {% if typ == 'wynajem' %}
+    <a class="powrot" href="{{ url_for('z_wynajem_pers', data=szkic['data'], data_od=szkic['data_od'], data_do=szkic['data_do'], pakiet=szkic['pakiet_id'], w=szkic['_klucz']) }}">← wróć do personalizacji</a>
+  {% elif typ == 'personalizacja' %}
+    <a class="powrot" href="{{ url_for('z_pers_samodzielna', w=szkic['_klucz']) }}">← wróć do personalizacji</a>
+  {% else %}
+    <a class="powrot" href="{{ url_for('z_sklep_pers', w=szkic['_klucz']) }}">← wróć do personalizacji</a>
+  {% endif %}
+  <h1>Twoje dane i zgody</h1>
+  <p class="sub">
+    {% if typ == 'wynajem' %}
+      Zamówienie: <b>{{ szkic['pakiet']['nazwa'] }}</b> · {{ szkic['data_od'] }} – {{ szkic['data_do'] }} ({{ szkic['dni'] }} {{ 'doba' if szkic['dni'] == 1 else ('doby' if szkic['dni'] < 5 else 'dób') }})
+      {% if szkic['pers'] %}· personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% endif %}
+    {% elif typ == 'personalizacja' %}
+      Personalizacja: {% if szkic['pers'] %}{{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% endif %}{% if szkic['pomysl'] %}{% if szkic['pers'] %} + {% endif %}własny pomysł{% endif %}
+    {% else %}
+      Sklep: {{ szkic['pozycje']|length }} {{ 'produkt' if szkic['pozycje']|length == 1 else ('produkty' if szkic['pozycje']|length < 5 else 'produktów') }}{% if szkic['pers'] %} · + personalizacja{% endif %}
+    {% endif %}
+  </p>
 
   {% if bledy %}
   <div class="bledy-box">
@@ -25,7 +44,7 @@
   </div>
   {% endif %}
 
-  <form method="post" action="{{ url_for('z_wynajem_dane', w=szkic['_klucz']) }}" class="forma">
+  <form method="post" action="{{ url_for('zamowienia_dane', w=szkic['_klucz']) }}" class="forma">
     <input type="hidden" name="w" value="{{ szkic['_klucz'] }}">
 
     <div class="pole">
@@ -66,22 +85,17 @@
 
     <div class="opcje">
       <label style="margin-bottom:8px">Forma dostawy</label>
+      {% for val, (etykieta, opis_w) in warianty.items() %}
       <div class="rzad">
-        <input type="radio" id="dowoz" name="dostawa" value="dowoz" {% if dostawa == 'dowoz' %}checked{% endif %}>
+        <input type="radio" id="dostawa-{{ val }}" name="dostawa" value="{{ val }}" {% if dostawa == val %}checked{% endif %}>
         <div>
-          <div class="etyk"><label for="dowoz" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Dowóz i montaż przez Studio</label></div>
-          <div class="opis">Przywozimy dekoracje na miejsce imprezy, montujemy i odbieramy po wydarzeniu.</div>
+          <div class="etyk"><label for="dostawa-{{ val }}" style="display:inline;text-transform:none;letter-spacing:0;margin:0">{{ etykieta }}</label></div>
+          <div class="opis">{{ opis_w }}</div>
         </div>
       </div>
-      <div class="rzad">
-        <input type="radio" id="odbior" name="dostawa" value="odbior" {% if dostawa == 'odbior' %}checked{% endif %}>
-        <div>
-          <div class="etyk"><label for="odbior" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Odbiór osobisty w pracowni</label></div>
-          <div class="opis">Odbierasz i zwracasz dekoracje osobiście — szczegóły prześlemy w odpowiedzi.</div>
-        </div>
-      </div>
-      <div id="pole-adres" {% if dostawa != 'dowoz' %}hidden{% endif %} style="margin-top:10px">
-        <label for="adres">Adres imprezy (miejscowość, ulica, kod) *</label>
+      {% endfor %}
+      <div id="pole-adres" {% if dostawa not in ('dowoz', 'wysylka') %}hidden{% endif %} style="margin-top:10px">
+        <label for="adres">{{ 'Adres imprezy' if typ == 'wynajem' else 'Adres dostawy' }} (miejscowość, ulica, kod) *</label>
         <input type="text" id="adres" name="adres" value="{{ adres }}" placeholder="np. Poznań, ul. Kwiatowa 12, 60-001">
       </div>
     </div>
@@ -101,14 +115,20 @@
       </div>
       <div class="rzad">
         <input type="checkbox" id="zgoda_procedura" name="zgoda_procedura" {% if zgody.get('procedura') %}checked{% endif %}>
-        <div><div class="etyk"><label for="zgoda_procedura" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Zapoznałem się z procedurą najmu</label></div>
-        <div class="opis">Procedura: zapytanie → odpowiedź Studia → wpłata kaucji (7 dni) → rezerwacja wiążąca. Dokumenty (procedura, regulamin) dołączymy w e-mailu z potwierdzeniem — do zapoznania i podpisu przy odbiorze.</div></div>
+        <div><div class="etyk"><label for="zgoda_procedura" style="display:inline;text-transform:none;letter-spacing:0;margin:0">{{ 'Zapoznałem się z procedurą najmu' if typ == 'wynajem' else 'Akceptuję regulamin zamówień' }}</label></div>
+        <div class="opis">
+          {% if typ == 'wynajem' %}
+            Procedura: zapytanie → odpowiedź Studia → wpłata kaucji (7 dni) → rezerwacja wiążąca. Dokumenty (procedura, regulamin) dołączymy w e-mailu z potwierdzeniem — do zapoznania i podpisu przy odbiorze.
+          {% else %}
+            Zamówienie zobowiązuje do zapłaty: {{ 'personalizacja płatna w całości z góry (produkty wykonywane na zamówienie).' if typ == 'personalizacja' else 'produkty płatne z góry w całości.' }} Dane do przelewu wyślemy w e-mailu z potwierdzeniem.
+          {% endif %}
+        </div></div>
       </div>
-      {% if szkic['pers'] %}
+      {% if typ == 'personalizacja' or szkic['pers'] %}
       <div class="rzad">
         <input type="checkbox" id="zgoda_pers" name="zgoda_pers" {% if zgody.get('pers') %}checked{% endif %}>
         <div><div class="etyk"><label for="zgoda_pers" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Oświadczenie o produktach personalizowanych</label></div>
-        <div class="opis">Rozumiem, że produkty spersonalizowane są wykonywane na zamówienie: <b>płatne z góry i nie podlegają zwrotowi</b> — po imprezie zostają u mnie.</div></div>
+        <div class="opis">Rozumiem, że produkty spersonalizowane są wykonywane na zamówienie: <b>płatne z góry i nie podlegają zwrotowi</b>.</div></div>
       </div>
       {% endif %}
       <div class="rzad">
@@ -118,18 +138,7 @@
       </div>
     </div>
 
-    <div class="kwoty">
-      <h3>Podsumowanie kosztów (szacunkowe)</h3>
-      <div class="linia"><span>Najem: {{ kwoty['stawka_txt'] }} × {{ kwoty['dni'] }} {{ 'doba' if kwoty['dni'] == 1 else ('doby' if kwoty['dni'] < 5 else 'dób') }}</span><b>{{ '%.0f'|format(kwoty['najem']) }} zł</b></div>
-      <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
-      <div class="linia"><span>Personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% if kwoty['pers_rabat'] %} (rabat −5%){% endif %}</span><b>{{ '%.0f'|format(kwoty['pers_netto']) }} zł</b></div>
-      {% if kwoty['rabat_kod'] %}
-      <div class="linia"><span>Rabat z kodu {{ kwoty['kod'] }}</span><b>−{{ kwoty['rabat_kod'] }} zł</b></div>
-      {% endif %}
-      <div class="razem"><span>RAZEM</span><span>{{ '%.0f'|format(kwoty['razem_po']) }} zł</span></div>
-      <p class="uw"><b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
-      Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł. Kwoty potwierdzimy w odpowiedzi na zamówienie.</p>
-    </div>
+    {% include '_kwoty_box.html' %}
 
     <div class="przyciski" style="justify-content:flex-end">
       <button class="btn" type="submit">Przejdź do podsumowania →</button>
@@ -146,15 +155,16 @@
 
 <script>
 (function(){
-  var dowoz = document.getElementById('dowoz');
-  var odbior = document.getElementById('odbior');
+  var radios = document.querySelectorAll('input[name=dostawa]');
   var adres = document.getElementById('pole-adres');
+  var adresInput = document.getElementById('adres');
   function akt(){
-    adres.hidden = !dowoz.checked;
-    document.getElementById('adres').required = dowoz.checked;
+    var val = (document.querySelector('input[name=dostawa]:checked') || {}).value;
+    var wymagaAdresu = val === 'dowoz' || val === 'wysylka';
+    adres.hidden = !wymagaAdresu;
+    adresInput.required = wymagaAdresu;
   }
-  dowoz.addEventListener('change', akt);
-  odbior.addEventListener('change', akt);
+  radios.forEach(function(r){ r.addEventListener('change', akt); });
   akt();
 
   var nowa = document.getElementById('tryb-nowa');

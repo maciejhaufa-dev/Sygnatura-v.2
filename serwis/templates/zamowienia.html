@@ -34,17 +34,16 @@
       <div class="hub-body">
         <p>Pragniesz obdarować kogoś wyjątkowym prezentem, którego nigdy nie zapomni, a może szukasz miejsca, które zrealizuje Twoją wizję? Jeśli tak, to dobrze trafiłeś — w Sygnaturze specjalizujemy się w personalizowanych prezentach i dekoracjach, gdzie każdy detal pozwala poczuć się wyjątkowo i jest niepowtarzalny. Nie jesteśmy fabryką, tylko rodzinną manufakturą tworzącą unikaty — dzięki temu nasze wyroby są wyjątkowe.</p>
       </div>
-      <a class="btn" href="{{ url_for('personalizacja', next=url_for('zamowienia')) }}">Zamów personalizację</a>
+      <a class="btn" href="{{ url_for('z_pers_samodzielna') }}">Zamów personalizację</a>
     </div>
     <div class="hub-col">
       <div class="hub-head">Sklep</div>
       <div class="hub-body">
         <p>Wiele z naszych prac zdobi prywatne domy i lokale eventowe. Wybierz coś dla siebie i stwórz niepowtarzalny klimat dla swojego wnętrza.</p>
       </div>
-      <a class="btn" href="/sklep.html">Katalog produktów</a>
+      <a class="btn" href="{{ url_for('z_sklep_katalog') }}">Katalog produktów</a>
     </div>
   </div>
-  <p class="sub center" style="margin:26px auto 40px">Personalizacja i sklep prowadzą teraz do katalogu — pełne ścieżki zamówień (krok po kroku, tak jak przy wynajmie) uruchomimy w kolejnym etapie.</p>
 </div>
 
 <footer class="stopka">

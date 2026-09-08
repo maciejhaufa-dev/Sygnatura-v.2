@@ -13,7 +13,9 @@
 {% include '_nav.html' %}
 
 <div class="wrap">
-  {% set etap = 5 %}{% include '_progress.html' %}
+  {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] if typ == 'wynajem' else (['Personalizacja','Dane','Podsumowanie'] if typ == 'personalizacja' else ['Katalog','Personalizacja','Dane','Podsumowanie']) %}
+  {% set etap = etapy|length + 1 %}
+  {% include '_progress.html' %}
 
   <div class="z-dzieki">
     <h1>Dziękujemy za zamówienie!</h1>
@@ -22,14 +24,18 @@
     <div class="syg">{{ rez['sygnatura'] }}</div>
     <div class="z-pod-sec" style="text-align:left">
       <p>
-        <b>{{ rez['pakiet_nazwa'] }}</b><br>
-        Termin najmu: {{ rez['data_od'] }} – {{ rez['data_do'] }} (impreza: {{ rez['data'] }}, {{ rez['dni'] }} {{ 'doba' if rez['dni'] == 1 else ('doby' if rez['dni'] < 5 else 'dób') }})<br>
-        RAZEM (z kaucją): <b>{{ '%.0f'|format(kwoty.get('razem_po', 0)) }} zł</b>
+        <b>{{ rez['pakiet_nazwa'] }}</b>
+        {% if typ == 'wynajem' %}<br>Termin najmu: {{ rez['data_od'] }} – {{ rez['data_do'] }} (impreza: {{ rez['data'] }}, {{ rez['dni'] }} {{ 'doba' if rez['dni'] == 1 else ('doby' if rez['dni'] < 5 else 'dób') }}){% endif %}
+        <br>RAZEM{% if typ == 'wynajem' %} (z kaucją){% endif %}: <b>{{ '%.0f'|format(kwoty.get('razem_po', 0)) }} zł</b>
       </p>
     </div>
     <ul class="z-ul" style="text-align:left">
-      <li>Na Twój adres e-mail (<b>{{ rez['email'] }}</b>) wysłaliśmy potwierdzenie z podsumowaniem, procedurą, dokumentami i <b>danymi do przelewu</b>.</li>
+      <li>Na Twój adres e-mail (<b>{{ rez['email'] }}</b>) wysłaliśmy potwierdzenie z podsumowaniem, dokumentami i <b>danymi do przelewu</b>.</li>
+      {% if typ == 'wynajem' %}
       <li>Termin widnieje w kalendarzu jako „wysłano zapytanie" — rezerwacja staje się wiążąca po wpłacie <b>kaucji w 7 dni</b>. Zapłacone = zarezerwowane.</li>
+      {% else %}
+      <li>Zamówienie zrealizujemy po zaksięgowaniu wpłaty (produkty personalizowane wykonujemy na zamówienie — płatne z góry).</li>
+      {% endif %}
       <li>Odpowiemy w ciągu <b>1 dnia roboczego</b>.</li>
     </ul>
     {% else %}

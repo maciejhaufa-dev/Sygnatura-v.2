@@ -13,7 +13,7 @@
 {% include '_nav.html' %}
 
 <div class="wrap">
-  {% set etap = 2 %}{% include '_progress.html' %}
+  {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] %}{% set etap = 2 %}{% include '_progress.html' %}
   <a class="powrot" href="{{ url_for('z_wynajem_termin', data=data, data_od=data_od, data_do=data_do) }}">← zmień termin</a>
   <h1>Krok 2 · Wybierz pakiet</h1>
   <p class="sub">Termin: <b>{{ data_od }} – {{ data_do }}</b> (impreza: {{ data }}, {{ dni }} {{ 'doba' if dni == 1 else ('doby' if dni < 5 else 'dób') }}). Poniżej pakiety <b>dostępne w tym terminie</b>.</p>

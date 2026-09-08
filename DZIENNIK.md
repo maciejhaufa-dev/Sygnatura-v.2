@@ -16,6 +16,8 @@
 | **Formularz kontaktowy** — naprawiony 500 przy autoresponderze (core.py toleruje braki pól) | `serwis/app.py`, `core.py` | **DZIAŁA** (sesja 15) |
 | **Plan minimum = wizytówka/portfolio** — landing, realizacje, kontakt | `serwis/` (trasy `/`, `/realizacje/`, `/kontakt/`) | **DZIAŁA** (sesja 14); sklep/rejestr dołożymy później |
 | **Kreator ZAMÓWIENIA (wynajem)** — hub 3 kafle + 5 kroków z progres barem: Termin → Pakiet → Personalizacja (pomiń) → Dane/zgody/dostawa/kod → Podsumowanie → „Zamawiam z obowiązkiem zapłaty" | `serwis/templates/z_*.html`, `_progress.html`, trasy `/zamowienia/*` | **DZIAŁA** (sesja 16) |
+| **3 sekcje zamówień A/B/C** — wspólne bloki 3/4/5/6: A wynajem 1→2→3→4→5→6 · B personalizacja 3→4→5→6 · C sklep 7→3→4→5→6 | trasy `/zamowienia/personalizacja/`, `/zamowienia/sklep/`, wspólne `/zamowienia/dane/`, `/podsumowanie/`, `/zamow/`, `/dziekuje/`; `z_dane.html`, `z_podsumowanie.html`, `_kwoty_box.html` | **DZIAŁA** (sesja 17) |
+| **Sklep** — tabela `sklep_produkty` (4 produkty startowe, ceny robocze), CRUD w panelu (Sklep), katalog z ilościami w kreatorze C | `admin_sklep.html`, trasy `/admin/sklep*` | **DZIAŁA** |
 | **Menu główne** — Start / Realizacje / Zamówienia / Kontakt | `_nav.html`, `v4/`, `docs/` | **DZIAŁA** |
 | **Strona statyczna v4** (hero, splash, podstrony) — kopia jako GitHub Pages | `v4/` → `docs/` | gotowa (Pages włącza użytkownik — bot ma 403) |
 | **Szopka 3D** — projekt warstwowy, cięcia, LED | `pracownia/szopka/`, `uploads/Szopka 3D.svg` | konwersja warstw SVG→PNG zrobiona; wizualizacje v2/v3 przestarzałe |

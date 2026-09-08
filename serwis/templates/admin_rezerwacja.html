@@ -9,8 +9,8 @@
   <div class="t-scroll"><table class="tabela">
     <tr><th>Sygnatura</th><td>{{ r['sygnatura'] }}</td></tr>
     <tr><th>Utworzono</th><td>{{ r['utworzono'] }}</td></tr>
-    <tr><th>Najem od–do</th><td><b>{{ r['data_od'] or r['data'] }} – {{ r['data_do'] or r['data'] }}</b> ({{ r['dni'] }} dn.)</td></tr>
-    <tr><th>Data imprezy</th><td>{{ r['data'] }}</td></tr>
+    {% if r['data'] %}<tr><th>Najem od–do</th><td><b>{{ r['data_od'] or r['data'] }} – {{ r['data_do'] or r['data'] }}</b> ({{ r['dni'] }} dn.)</td></tr>
+    <tr><th>Data imprezy</th><td>{{ r['data'] }}</td></tr>{% endif %}
     <tr><th>Pakiet</th><td>{{ r['pakiet_nazwa'] }}</td></tr>
     <tr><th>Temat</th><td>{{ r['temat'] }}</td></tr>
     <tr><th>Imię i nazwisko</th><td>{{ r['imie'] or '—' }}</td></tr>

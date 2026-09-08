@@ -1,0 +1,33 @@
+{# _kwoty_box.html — wspólny box podsumowania kosztów (blok 4 i 5).
+   Wymaga: kwoty (dict z kwoty_zamowienia), typ (opcjonalnie), szkic (opcjonalnie). #}
+{% set typ_k = kwoty.get('typ') or typ %}
+<div class="kwoty">
+  <h3>Podsumowanie kosztów{% if not kwoty.get('rabat_kod') %} (szacunkowe){% endif %}</h3>
+  {% if typ_k == 'wynajem' %}
+  <div class="linia"><span>Najem: {{ kwoty['stawka_txt'] }} × {{ kwoty['dni'] }} {{ 'doba' if kwoty['dni'] == 1 else ('doby' if kwoty['dni'] < 5 else 'dób') }}</span><b>{{ '%.0f'|format(kwoty['najem']) }} zł</b></div>
+  <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
+  {% elif typ_k == 'sklep' %}
+  <div class="linia"><span>Produkty ze sklepu ({{ szkic['pozycje']|length }} poz.)</span><b>{{ '%.0f'|format(kwoty['pozycje_suma']) }} zł</b></div>
+  {% endif %}
+  {% if kwoty['pers_netto'] %}
+  <div class="linia"><span>Personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% if kwoty['pers_rabat'] %} (rabat −5%){% endif %}</span><b>{{ '%.0f'|format(kwoty['pers_netto']) }} zł</b></div>
+  {% endif %}
+  {% if kwoty['rabat_kod'] %}
+  <div class="linia"><span>Rabat z kodu {{ kwoty['kod'] }}</span><b>−{{ kwoty['rabat_kod'] }} zł</b></div>
+  {% endif %}
+  <div class="razem"><span>RAZEM</span><span>{{ '%.0f'|format(kwoty['razem_po']) }} zł</span></div>
+  <p class="uw">
+    {% if typ_k == 'wynajem' %}
+      <b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
+      Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł.
+    {% elif typ_k == 'personalizacja' %}
+      Produkty personalizowane są wykonywane na zamówienie: <b>płatne z góry w całości i bezzwrotne</b>.
+      {% if szkic.get('dostawa') == 'wysylka' %}Koszt wysyłki potwierdzimy w odpowiedzi na zamówienie.{% endif %}
+    {% else %}
+      Produkty ze sklepu płatne z góry w całości (dane do przelewu w e-mailu z potwierdzeniem).
+      {% if szkic.get('dostawa') == 'wysylka' %}Koszt wysyłki potwierdzimy w odpowiedzi na zamówienie.{% endif %}
+      {% if szkic.get('pers') %}Dołączona personalizacja: płatna z góry, bezzwrotna.{% endif %}
+    {% endif %}
+    {% if not kwoty.get('rabat_kod') %}Kwoty potwierdzimy w odpowiedzi na zamówienie.{% endif %}
+  </p>
+</div>

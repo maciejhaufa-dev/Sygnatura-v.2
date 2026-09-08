@@ -58,6 +58,15 @@ CREATE TABLE IF NOT EXISTS personalizacje (
   dostepny  INTEGER DEFAULT 1,      -- 1 = widoczna w katalogu personalizacji
   kolejnosc INTEGER DEFAULT 0
 );
+-- Produkty SKLEPU (kupno na własność — szopki, szyldy, litery do domu)
+CREATE TABLE IF NOT EXISTS sklep_produkty (
+  id        INTEGER PRIMARY KEY AUTOINCREMENT,
+  nazwa     TEXT NOT NULL,
+  opis      TEXT DEFAULT '',
+  cena      REAL DEFAULT 0,         -- cena brutto za sztukę (pełna przedpłata)
+  dostepny  INTEGER DEFAULT 1,      -- 1 = widoczny w katalogu sklepu
+  kolejnosc INTEGER DEFAULT 0
+);
 -- Zgłoszenia / rezerwacje klientów
 CREATE TABLE IF NOT EXISTS rezerwacje (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -229,6 +238,14 @@ PERSONALIZACJE = [
     ('Grawer okolicznościowy', 'Tabliczka z dedykacją — jubileusz, rocznica, pożegnanie', 89),
     ('Panel z cytatem', 'Sentencja, imiona i data — do powieszenia na ścianie', 149),
     ('Ramka rzeźbiona na zdjęcie', 'Data i okazja grawerowane na ramce', 169),
+]
+
+# Produkty SKLEPU startowe (ceny ROBOCZE — użytkownik poprawi w panelu: Sklep)
+SKLEP = [
+    ('Szopka bożonarodzeniowa (warstwowa)', 'Ręcznie cięta szopka warstwowa 20×20 cm, podświetlenie LED 2700 K na baterie. Unikat z naszej pracowni.', 249),
+    ('Szyld powitalny „Witajcie"', 'Drewniany szyld 60×40 cm — do zawieszenia na drzwi, ganek lub ścianę.', 189),
+    ('Litery podświetlane LOVE', 'Zestaw liter 25 cm z podświetleniem LED 2700 K — do salonu, na kominek, na półkę.', 249),
+    ('Ramka z sentencją', 'Drewniana ramka z grawerem wybranej sentencji — wymiar do ustalenia.', 89),
 ]
 
 # Realizacje startowe (portfolio). Zdjęcia kopiowane z ../uploads przy inicjalizacji bazy.
@@ -458,6 +475,13 @@ def inicjuj(sciezka=None):
     if db.execute('SELECT COUNT(*) FROM personalizacje').fetchone()[0] == 0:
         for i, (nazwa, opis, cena) in enumerate(PERSONALIZACJE):
             db.execute('INSERT INTO personalizacje (nazwa, opis, cena, kolejnosc) VALUES (?,?,?,?)',
+                       (nazwa, opis, cena, i))
+        db.commit()
+
+    # sklep (produkty na własność) — seed przy pustej tabeli
+    if db.execute('SELECT COUNT(*) FROM sklep_produkty').fetchone()[0] == 0:
+        for i, (nazwa, opis, cena) in enumerate(SKLEP):
+            db.execute('INSERT INTO sklep_produkty (nazwa, opis, cena, kolejnosc) VALUES (?,?,?,?)',
                        (nazwa, opis, cena, i))
         db.commit()
 

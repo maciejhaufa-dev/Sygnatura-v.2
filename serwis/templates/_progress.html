@@ -1,16 +1,16 @@
 {# _progress.html — złoty pasek postępu z kamieniami milowymi (kreator zamówienia).
    Przed dołączeniem ustaw:
-     {% set etap = 2 %}          (1=Termin 2=Pakiet 3=Personalizacja 4=Dane 5=Podsumowanie)
-   Opcjonalnie (pokazuje „pominięto" na kroku personalizacji):
-     {% set pers_pom = True %}
+     {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] %}
+     {% set etap = 2 %}          (numer bieżącego kroku, 1..N; N+1 = wszystkie ukończone)
+   Opcjonalnie:
+     {% set pominiety = 3 %}     (numer kroku oznaczonego „pominięto")
 #}
-<div class="prog" aria-label="Postęp zamówienia: krok {{ etap }} z 5">
-  {% set ETAPY = ['Termin', 'Pakiet', 'Personalizacja', 'Dane', 'Podsumowanie'] %}
-  {% for e in ETAPY %}
+<div class="prog" aria-label="Postęp zamówienia: krok {{ etap }} z {{ etapy|length }}">
+  {% for e in etapy %}
     {% set i = loop.index %}
     <div class="prg-it {% if i < etap %}zrob{% elif i == etap %}akt{% endif %}">
       <span class="prg-kolo">{% if i < etap %}✓{% else %}{{ i }}{% endif %}</span>
-      <span class="prg-lab">{{ e }}{% if i == 3 and pers_pom and i < etap %} · pominięto{% endif %}</span>
+      <span class="prg-lab">{{ e }}{% if pominiety == i and i < etap %} · pominięto{% endif %}</span>
     </div>
     {% if not loop.last %}<span class="prg-linia {% if i < etap %}zrob{% endif %}" aria-hidden="true"></span>{% endif %}
   {% endfor %}
