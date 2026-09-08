@@ -487,3 +487,9 @@ textarea.pole-blad, input.pole-blad{border-color:#8c2f2f !important;background:#
 .modal-karta p{font-size:16.5px;line-height:1.6;color:rgba(51,38,28,.9)}
 .modal-przyciski{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
 .modal-przyciski .btn{margin-top:0}
+
+/* --- dymek „w koszyku" pod produktem --- */
+.koszyk-dymek{display:inline-block;margin-top:8px;background:var(--zloty-soft);border:1px solid var(--zloty);
+  color:var(--brunatny);padding:3px 12px;font-size:13px;font-weight:600;width:max-content}
+.koszyk-dymek b{color:var(--butelkowa)}
+.koszyk-bar.pelny .koszyk-info b{color:var(--zloty-soft)}

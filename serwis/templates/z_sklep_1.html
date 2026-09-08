@@ -7,7 +7,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css?v=6">
+<link rel="stylesheet" href="/static/style.css?v=7">
 </head>
 <body>
 {% include '_nav.html' %}
@@ -49,10 +49,12 @@
           <div class="sklep-cena">{{ '%.0f'|format(pr.cena) }} zł <span>/ szt.</span></div>
           <div class="licznik">
             <button type="button" class="licz-btn" data-akcja="mniej" aria-label="Zmniejsz ilość: {{ pr.nazwa }}">−</button>
-            <input type="number" id="ile_{{ pr.id }}" name="ile_{{ pr.id }}" min="0" max="99" value="{{ ilosci.get(pr.id, 0) }}" aria-label="Ilość sztuk: {{ pr.nazwa }}">
+            <input type="number" class="licz-q" min="0" max="99" value="0" aria-label="Ilość do dodania: {{ pr.nazwa }}">
             <button type="button" class="licz-btn" data-akcja="wiecej" aria-label="Zwiększ ilość: {{ pr.nazwa }}">+</button>
           </div>
-          <button type="button" class="btn dodaj-btn" data-akcja="dodaj">Dodaj do zamówienia</button>
+          <button type="button" class="btn dodaj-btn">Dodaj do koszyka</button>
+          <input type="hidden" name="ile_{{ pr.id }}" value="{{ ilosci.get(pr.id, 0) }}">
+          <div class="koszyk-dymek" hidden><b>0</b> w koszyku</div>
         </div>
       </div>
       {% endfor %}
@@ -82,17 +84,21 @@
   var lista = document.getElementById('js-bledy-list');
   var bar = document.getElementById('koszyk-bar');
   var opis = document.getElementById('koszyk-opis');
-  var dalej = document.getElementById('koszyk-dalej');
 
-  function przelicz(){
+  /* Koszyk = ukryte pola ile_<id>. Widoczny licznik (q) to tylko „ilość do dodania"
+     — przycisk NIE zmienia licznika, tylko przenosi q do koszyka i zeruje q. */
+  function liczKoszyk(){
     var szt = 0, kwota = 0;
     document.querySelectorAll('.sklep-karta').forEach(function(k){
-      var inp = k.querySelector('input[type=number]');
-      var ile = parseInt(inp.value, 10) || 0;
+      var h = k.querySelector('input[type=hidden]');
+      var ile = parseInt(h.value, 10) || 0;
       if (ile > 0) {
         szt += ile;
         kwota += ile * parseFloat(k.dataset.cena || 0);
       }
+      var dymek = k.querySelector('.koszyk-dymek');
+      dymek.querySelector('b').textContent = ile;
+      dymek.hidden = ile === 0;
     });
     if (szt > 0) {
       opis.textContent = szt + ' szt. · ' + kwota + ' zł (płatne z góry)';
@@ -105,40 +111,41 @@
   }
 
   document.querySelectorAll('.sklep-karta').forEach(function(k){
-    var inp = k.querySelector('input[type=number]');
+    var q = k.querySelector('.licz-q');
+    var h = k.querySelector('input[type=hidden]');
     k.querySelectorAll('.licz-btn').forEach(function(b){
       b.addEventListener('click', function(){
-        var ile = parseInt(inp.value, 10) || 0;
-        if (b.dataset.akcja === 'mniej') ile = Math.max(0, ile - 1);
-        else ile = Math.min(99, ile + 1);
-        inp.value = ile;
-        przelicz();
+        var v = parseInt(q.value, 10) || 0;
+        if (b.dataset.akcja === 'mniej') v = Math.max(0, v - 1);
+        else v = Math.min(99, v + 1);
+        q.value = v;
       });
     });
     k.querySelector('.dodaj-btn').addEventListener('click', function(){
-      var ile = parseInt(inp.value, 10) || 0;
-      inp.value = Math.min(99, ile + 1);
-      przelicz();
+      var v = parseInt(q.value, 10) || 0;
+      var m = parseInt(h.value, 10) || 0;
+      h.value = Math.min(99, m + v);
+      q.value = 0;
+      liczKoszyk();
     });
-    inp.addEventListener('input', przelicz);
   });
 
   form.addEventListener('submit', function(ev){
-    var szt = przelicz();
+    var szt = liczKoszyk();
     lista.innerHTML = '';
     if (szt === 0) {
       var li = document.createElement('li');
-      li.textContent = 'Koszyk jest pusty — dodaj co najmniej jeden produkt (przycisk „Dodaj do zamówienia").';
+      li.textContent = 'Koszyk jest pusty — ustaw ilość i kliknij „Dodaj do koszyka".';
       lista.appendChild(li);
       boxBledy.hidden = false;
-      boxBledy.scrollIntoView({behavior:'smooth', block:'center'});
+      boxBledy.scrollIntoView({behavior: 'smooth', block: 'center'});
       ev.preventDefault();
       return;
     }
     boxBledy.hidden = true;
   });
 
-  przelicz();
+  liczKoszyk();
 })();
 </script>
 </body>

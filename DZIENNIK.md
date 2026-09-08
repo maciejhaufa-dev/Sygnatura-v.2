@@ -260,3 +260,10 @@ Do decyzji / dalej:
 - Kopia Pages (docs/index.html) do zsynchronizowania z nowym layoutem (statyczna wersja slajdów, ścieżki assets bez Flaska) — na końcu prac nad landingiem.
 - Można iterować treści slajdów, zdjęcia (slajd 4 używa assets/hero.jpg), kolory/kadry — user ocenia w podglądzie.
 - UWAGA: user napisał e-mail „kontakt@studiowygnatura.pl" — uznano literówkę, na stronie jest kontakt@studiosygnatura.pl (jak w całym serwisie). Potwierdzić.
+
+---
+
+## Sesja 21 — poprawki: landing na „wersji na komputer" + koszyk sklepu
+
+1) Landing „fatalny na telefonie w trybie wersja na komputer": przyczyną był breakpoint `max-width:980px`, który rozwalał układ kwaterowy dokładnie na szerokości ~980 px zgłaszanej przez telefony w tym trybie. Poprawka: układ kwaterowy zostaje do 760 px — dodany zakres średni `@media (max-width:1100px) and (min-width:761px)` (ciaśniejsza lewa kolumna 200–230 px, mniejsze logo/menu, karty w slajdach 2 kolumny z 3. kartą na całość, ukryta top-note), a pełne zwinięcie „jeden pod drugim" dopiero <760 px (widok mobilny). Lekcja: testować też szerokości 761–1100 px („desktop mode" telefonu = ~980 px).
+2) Sklep — przycisk „Dodaj do koszyka" inkrementował licznik. Rozdzielono: widoczny licznik (`.licz-q`, bez name — nie wysyła się) = ilość DO DODANIA; ukryte pole `ile_<id>` = stan koszyka; przycisk przenosi q do koszyka i zeruje licznik (NIE wpływa na licznik w żaden inny sposób). Pod produktem dymek „N w koszyku" (ukryty przy 0, aktualizowany na żywo; przy powrocie w= pokazuje stan z bazy). Pasek koszyka liczy z pól ukrytych. Server-side bez zmian (czyta ile_<id>). Testy: POST ile_1=2&ile_4=1 → redirect do personalizacji; powrót w= → hidden 2/1 + rachunek 587 zł; szkic testowy posprzątany. style.css v=7 (z_sklep_1.html).

@@ -502,3 +502,7 @@ Nowa forma strony głównej (zastępuje splash+hero+litery z v4):
 - ⚠️ **build.py NIE regeneruje już strony głównej** — index.html jest utrzymywany ręcznie (v5). Uruchomienie build.py nadpisałoby starym layoutem (ostrzeżenie dodane na górze skryptu).
 - Koszyk/panel klienta = na razie ikony-linki (koszyk → /zamowienia/sklep/, panel → /zamowienia/); pełne konta klientów wymagałyby bazy użytkowników — do decyzji.
 - Kopię Pages (docs/index.html) zsynchronizować na końcu (wymaga statycznych ścieżek assets i wygenerowania slajdów bez Jinja).
+
+## 2026-09-08 (popr. 2) — breakpointy landing + koszyk sklepu
+- Układ kwaterowy utrzymany do 760 px (poprzednio <980 px zwijał się na telefonach w „wersji na komputer" ~980 px). Nowe zakresy: 761–1100 px = kwatery ciaśniejsze; <760 px = kolumna mobilna.
+- Sklep: licznik = ilość do dodania, przycisk „Dodaj do koszyka" przenosi do koszyka (hidden ile_<id>) i zeruje licznik; dymek „N w koszyku" pod produktem. Więcej w DZIENNIK.md sesja 21.
