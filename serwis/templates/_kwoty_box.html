@@ -2,12 +2,15 @@
    Wymaga: kwoty (dict z kwoty_zamowienia), typ (opcjonalnie), szkic (opcjonalnie). #}
 {% set typ_k = kwoty.get('typ') or typ %}
 <div class="kwoty">
-  <h3>Podsumowanie kosztów{% if not kwoty.get('rabat_kod') %} (szacunkowe){% endif %}</h3>
   {% if typ_k == 'wynajem' %}
+  <h3>Koszty wynajmu</h3>
   <div class="linia"><span>Najem: {{ kwoty['stawka_txt'] }} × {{ kwoty['dni'] }} {{ 'doba' if kwoty['dni'] == 1 else ('doby' if kwoty['dni'] < 5 else 'dób') }}</span><b>{{ '%.0f'|format(kwoty['najem']) }} zł</b></div>
-  <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
-  {% elif typ_k == 'sklep' %}
+  <div class="linia linia-mala"><span>w tym kaucja zwrotna (najem)</span><b>300 zł</b></div>
+  {% else %}
+  <h3>Podsumowanie kosztów</h3>
+  {% if typ_k == 'sklep' %}
   <div class="linia"><span>Produkty ze sklepu ({{ szkic['pozycje']|length }} poz.)</span><b>{{ '%.0f'|format(kwoty['pozycje_suma']) }} zł</b></div>
+  {% endif %}
   {% endif %}
   {% if kwoty['pers_netto'] %}
   <div class="linia"><span>Personalizacja: {{ szkic['pers']|length }} {{ 'produkt' if szkic['pers']|length == 1 else ('produkty' if szkic['pers']|length < 5 else 'produktów') }}{% if kwoty['pers_rabat'] %} (rabat −5%){% endif %}</span><b>{{ '%.0f'|format(kwoty['pers_netto']) }} zł</b></div>
@@ -15,18 +18,24 @@
   {% if kwoty['rabat_kod'] %}
   <div class="linia"><span>Rabat z kodu {{ kwoty['kod'] }}</span><b>−{{ kwoty['rabat_kod'] }} zł</b></div>
   {% endif %}
-  <div class="razem"><span>RAZEM</span><span>{{ '%.0f'|format(kwoty['razem_po']) }} zł</span></div>
+  <div class="razem-bez"><span>{{ 'PODSUMOWANIE (bez kaucji)' if typ_k == 'wynajem' else 'RAZEM DO ZAPŁATY' }}</span><b>{{ '%.0f'|format(kwoty['razem_po'] - kwoty['kaucja']) }} zł</b></div>
+  {% if typ_k == 'wynajem' %}
+  <div class="kaucja-linia">+ kaucja zwrotna 300 zł — wraca w całości po oddaniu kompletu bez uszkodzeń (przy odbiorze: {{ '%.0f'|format(kwoty['razem_po']) }} zł)</div>
+  {% endif %}
   <p class="uw">
     {% if typ_k == 'wynajem' %}
       <b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
-      Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł.
+      Personalizacja płatna z góry i bezzwrotna.
     {% elif typ_k == 'personalizacja' %}
-      Produkty personalizowane są wykonywane na zamówienie: <b>płatne z góry w całości i bezzwrotne</b>.
+      Produkty personalizowane są wykonywane na zamówienie: <b>płatne z góry w całości i bezzwrotne</b>. Wymagają zamówienia <b>min. 2 tygodnie przed terminem</b> realizacji.
       {% if szkic.get('dostawa') == 'wysylka' %}Koszt wysyłki potwierdzimy w odpowiedzi na zamówienie.{% endif %}
     {% else %}
       Produkty ze sklepu płatne z góry w całości (dane do przelewu w e-mailu z potwierdzeniem).
       {% if szkic.get('dostawa') == 'wysylka' %}Koszt wysyłki potwierdzimy w odpowiedzi na zamówienie.{% endif %}
-      {% if szkic.get('pers') %}Dołączona personalizacja: płatna z góry, bezzwrotna.{% endif %}
+      {% if szkic.get('pers') %}Dołączona personalizacja: płatna z góry, bezzwrotna, wymaga min. 2 tygodni.{% endif %}
+    {% endif %}
+    {% if szkic.get('pomysl') %}
+      <span class="pomysl-uw">Twój pomysł własny zostanie <b>wyceniony osobno</b> — ofertę wyślemy e-mailem pod tą samą sygnaturą sprawy w ciągu <b>2 dni roboczych</b>. Kwoty powyżej nie obejmują tej części.</span>
     {% endif %}
     {% if not kwoty.get('rabat_kod') %}Kwoty potwierdzimy w odpowiedzi na zamówienie.{% endif %}
   </p>

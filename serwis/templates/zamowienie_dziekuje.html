@@ -25,9 +25,18 @@
     <div class="z-pod-sec" style="text-align:left">
       <p>
         <b>{{ rez['pakiet_nazwa'] }}</b>
-        {% if typ == 'wynajem' %}<br>Termin najmu: {{ rez['data_od'] }} – {{ rez['data_do'] }} (impreza: {{ rez['data'] }}, {{ rez['dni'] }} {{ 'doba' if rez['dni'] == 1 else ('doby' if rez['dni'] < 5 else 'dób') }}){% endif %}
-        <br>RAZEM{% if typ == 'wynajem' %} (z kaucją){% endif %}: <b>{{ '%.0f'|format(kwoty.get('razem_po', 0)) }} zł</b>
+        {% if typ == 'wynajem' %}<br>Termin najmu: {{ rez['data_od'] }} – {{ rez['data_do'] }} (impreza: {{ rez['data'] }}, {{ rez['dni'] }} {{ 'doba' if rez['dni'] == 1 else ('doby' if rez['dni'] < 5 else 'dób') }})
+        <br>Podsumowanie (bez kaucji): <b>{{ '%.0f'|format((kwoty.get('razem_po', 0) or 0) - (kwoty.get('kaucja', 0) or 0)) }} zł</b>
+        <br><span class="mala">w tym kaucja zwrotna 300 zł (przy odbiorze: {{ '%.0f'|format(kwoty.get('razem_po', 0)) }} zł)</span>
+        {% else %}
+        <br>RAZEM: <b>{{ '%.0f'|format(kwoty.get('razem_po', 0)) }} zł</b>
+        {% endif %}
       </p>
+      {% if pomysl %}
+      <div class="pomysl-box" style="text-align:left">
+        <b>Twój pomysł własny</b> zostanie wyceniony osobno — ofertę wyślemy e-mailem pod tą samą sygnaturą sprawy w ciągu <b>2 dni roboczych</b>. Kwoty powyżej go nie obejmują.
+      </div>
+      {% endif %}
     </div>
     <ul class="z-ul" style="text-align:left">
       <li>Na Twój adres e-mail (<b>{{ rez['email'] }}</b>) wysłaliśmy potwierdzenie z podsumowaniem, dokumentami i <b>danymi do przelewu</b>.</li>

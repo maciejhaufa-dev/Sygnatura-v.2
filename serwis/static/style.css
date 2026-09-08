@@ -376,3 +376,29 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-co
 .z-ile{display:flex;align-items:center;gap:6px;margin-top:5px}
 .z-ile label{font-size:13px;color:var(--brunatny);text-transform:none;letter-spacing:0;margin:0}
 .z-ile input{width:62px;padding:7px;font-size:16px;border:1px solid rgba(107,69,48,.4);background:var(--krem)}
+
+/* --- kwoty: wyodrębniona kaucja i duża kwota końcowa --- */
+.linia-mala{font-size:12.5px;color:rgba(51,38,28,.6)}
+.linia-mala b{font-size:12.5px;color:rgba(51,38,28,.65)}
+.razem-bez{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  border-top:2px solid rgba(196,165,130,.45);margin-top:10px;padding-top:12px}
+.razem-bez span{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--butelkowa);font-weight:700}
+.razem-bez b{font-size:26px;color:var(--butelkowa)}
+.kaucja-linia{font-size:12.5px;color:rgba(51,38,28,.55);margin-top:6px}
+.z-pod-sec.kwoty .razem-bez span{color:var(--zloty)}
+.z-pod-sec.kwoty .razem-bez b{color:var(--zloty)}
+.z-pod-sec.kwoty .linia-mala{color:rgba(251,247,240,.75)}
+.z-pod-sec.kwoty .linia-mala b{color:rgba(251,247,240,.75)}
+.z-pod-sec.kwoty .kaucja-linia{color:rgba(251,247,240,.75)}
+
+/* --- pomysł własny --- */
+.pomysl-box{border:1px solid var(--zloty);background:#FFF8E1;padding:10px 14px;margin-top:10px;font-size:15px;line-height:1.55}
+.pomysl-uw{color:#7a5a10}
+.z-pod-sec.kwoty .pomysl-uw{color:var(--zloty)}
+
+/* --- regulamin / jak pracujemy --- */
+.regulamin h2{font-size:20px;color:var(--butelkowa);margin:22px 0 6px}
+.regulamin p{margin:6px 0;font-size:16px;line-height:1.65}
+
+/* --- pole z błędem walidacji (kreator) --- */
+textarea.pole-blad, input.pole-blad{border-color:#8c2f2f !important;background:#FFF4F0 !important}

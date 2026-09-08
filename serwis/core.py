@@ -251,7 +251,13 @@ def kwoty_txt(rez):
             linie.append('  w tym rabat na personalizację −5%%: −%d zł' % kw['pers_rabat'])
     if kw.get('rabat_kod'):
         linie.append('Rabat z kodu %s: −%d zł' % (kw.get('kod', ''), kw['rabat_kod']))
-    linie.append('RAZEM: %.0f zł' % (kw.get('razem_po', kw.get('razem', 0))))
+    razem_po = kw.get('razem_po', kw.get('razem', 0))
+    kaucja = kw.get('kaucja', 0)
+    if kaucja:
+        linie.append('PODSUMOWANIE (bez kaucji): %.0f zł' % (razem_po - kaucja))
+        linie.append('RAZEM przy odbiorze: %.0f zł (w tym kaucja zwrotna %.0f zł)' % (razem_po, kaucja))
+    else:
+        linie.append('RAZEM: %.0f zł' % razem_po)
     return '\n'.join(linie) + '\n'
 
 

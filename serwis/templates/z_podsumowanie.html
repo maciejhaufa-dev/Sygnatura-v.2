@@ -60,12 +60,15 @@
           <li><b>{{ pr['nazwa'] }}</b> — {{ '%.0f'|format(pr['cena']) }} zł{% if pr['opis'] %}<br><span class="mala">Opis: {{ pr['opis'] }}</span>{% endif %}</li>
           {% endfor %}
         </ul>
-        <p class="mala">Produkty spersonalizowane: płatne z góry, bezzwrotne{% if typ == 'wynajem' %} — po imprezie zostają u Ciebie{% endif %}.</p>
+        <p class="mala">Produkty spersonalizowane: płatne z góry, bezzwrotne{% if typ == 'wynajem' %} — po imprezie zostają u Ciebie{% endif %}. <b>Wymagają zamówienia min. 2 tygodnie przed terminem.</b></p>
       {% else %}
         <p class="mala">{% if typ == 'wynajem' or typ == 'sklep' %}Bez personalizacji (krok pominięty).{% else %}—{% endif %}</p>
       {% endif %}
       {% if szkic['pomysl'] %}
-      <p><b>Twój pomysł (spoza katalogu):</b><br>{{ szkic['pomysl'] }}</p>
+      <div class="pomysl-box">
+        <b>Twój pomysł (spoza katalogu):</b><br>{{ szkic['pomysl'] }}<br>
+        <span class="pomysl-uw">Ta część zamówienia zostanie <b>wyceniona osobno</b> — ofertę wyślemy e-mailem pod tą samą sygnaturą sprawy w ciągu <b>2 dni roboczych</b>. Kwoty w podsumowaniu jej nie obejmują.</span>
+      </div>
       {% endif %}
     </div>
 

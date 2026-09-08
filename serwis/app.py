@@ -256,6 +256,18 @@ def kontakt_form():
     return render_template('kontakt.html', bledy=bledy, dane=dane, ok=ok)
 
 
+@app.route('/regulamin/')
+def regulamin():
+    """Regulamin serwisu (podstrona) — treść edytowalna w szablonie."""
+    return render_template('regulamin.html')
+
+
+@app.route('/jak-pracujemy/')
+def jak_pracujemy():
+    """Jak pracujemy (podstrona) — treść edytowalna w szablonie."""
+    return render_template('jak_pracujemy.html')
+
+
 # ---------------------------------------------------------------- strona wynajmu
 def stan_dnia(db, pakiet_id, data):
     """(klasa_css, tytul, czy_zablokowany) dla jednego dnia.
@@ -490,7 +502,8 @@ def finalizuj_zamowienie(db, zam):
     dodatkowe = json.dumps({'typ': typ, 'pomysl': pomysl, 'zgody': zam.get('zgody') or {}},
                            ensure_ascii=False)
     if pomysl:
-        tresc = (tresc + '\n\nPOMYSŁ WŁASNY (personalizacja spoza katalogu):\n' + pomysl).strip()
+        tresc = (tresc + '\n\nPOMYSŁ WŁASNY (personalizacja spoza katalogu):\n' + pomysl +
+                 '\n\nUWAGA: pomysł własny zostanie wyceniony OSOBNO — ofertę wyślemy e-mailem '                 'pod tą samą sygnaturą w ciągu 2 dni roboczych. Kwoty w podsumowaniu nie obejmują tej części.').strip()
     teraz = core.teraz()
     db.execute(
         'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, personalizacje, '
@@ -1185,13 +1198,19 @@ def zamowienia_dziekuje():
     rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (syg,)).fetchone() if syg else None
     kwoty = {}
     typ = 'wynajem'
+    pomysl = ''
     if rez:
         try:
             kwoty = json.loads(rez['kwoty'] or '{}')
         except Exception:
             kwoty = {}
         typ = kwoty.get('typ') or 'wynajem'
-    return render_template('zamowienie_dziekuje.html', rez=rez, kwoty=kwoty, sygnatura=syg, typ=typ)
+        try:
+            pomysl = (json.loads(rez['dodatkowe'] or '{}') or {}).get('pomysl') or ''
+        except Exception:
+            pomysl = ''
+    return render_template('zamowienie_dziekuje.html', rez=rez, kwoty=kwoty, sygnatura=syg,
+                           typ=typ, pomysl=pomysl)
 
 
 # ---------------------------------------------------------------- pliki (dokumenty)

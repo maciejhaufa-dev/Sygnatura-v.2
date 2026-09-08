@@ -115,12 +115,14 @@
       </div>
       <div class="rzad">
         <input type="checkbox" id="zgoda_procedura" name="zgoda_procedura" {% if zgody.get('procedura') %}checked{% endif %}>
-        <div><div class="etyk"><label for="zgoda_procedura" style="display:inline;text-transform:none;letter-spacing:0;margin:0">{{ 'Zapoznałem się z procedurą najmu' if typ == 'wynajem' else 'Akceptuję regulamin zamówień' }}</label></div>
+        <div><div class="etyk"><label for="zgoda_procedura" style="display:inline;text-transform:none;letter-spacing:0;margin:0">{{ 'Zapoznałem się z procedurą najmu i akceptuję regulamin' if typ == 'wynajem' else 'Akceptuję regulamin zamówień' }}</label></div>
         <div class="opis">
           {% if typ == 'wynajem' %}
             Procedura: zapytanie → odpowiedź Studia → wpłata kaucji (7 dni) → rezerwacja wiążąca. Dokumenty (procedura, regulamin) dołączymy w e-mailu z potwierdzeniem — do zapoznania i podpisu przy odbiorze.
+            <br><a href="/jak-pracujemy/" target="_blank" rel="noopener">Jak pracujemy →</a> &nbsp;·&nbsp; <a href="/regulamin/" target="_blank" rel="noopener">Regulamin serwisu →</a>
           {% else %}
             Zamówienie zobowiązuje do zapłaty: {{ 'personalizacja płatna w całości z góry (produkty wykonywane na zamówienie).' if typ == 'personalizacja' else 'produkty płatne z góry w całości.' }} Dane do przelewu wyślemy w e-mailu z potwierdzeniem.
+            <br><a href="/jak-pracujemy/" target="_blank" rel="noopener">Jak pracujemy →</a> &nbsp;·&nbsp; <a href="/regulamin/" target="_blank" rel="noopener">Regulamin serwisu →</a>
           {% endif %}
         </div></div>
       </div>

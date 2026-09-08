@@ -16,7 +16,7 @@
   {% set etapy = ['Katalog','Personalizacja','Dane','Podsumowanie'] %}{% set etap = 2 %}{% include '_progress.html' %}
   <a class="powrot" href="{{ url_for('z_sklep_katalog', w=szkic['_klucz']) }}">← wróć do katalogu</a>
   <h1>Dodaj personalizację</h1>
-  <p class="sub">Do zakupów możesz dodać personalizację — np. grawer na ramce, imiona na szopce, dedykację. Produkty spersonalizowane są <b>płatne z góry i bezzwrotne</b>; rabat −5% od 3 produktów.</p>
+  <p class="sub">Do zakupów możesz dodać personalizację — np. grawer na ramce, imiona na szopce, dedykację. Produkty spersonalizowane są <b>płatne z góry i bezzwrotne</b>; rabat −5% od 3 produktów. <b>Wymagają zamówienia min. 2 tygodnie przed planowanym terminem realizacji.</b></p>
 
   {% if bledy %}
   <div class="bledy-box">
@@ -26,6 +26,7 @@
 
   <form method="post" action="{{ url_for('z_sklep_pers', w=szkic['_klucz']) }}" id="f-pers">
     <input type="hidden" name="w" value="{{ szkic['_klucz'] }}">
+    <div class="bledy-box" id="js-bledy" hidden><ul id="js-bledy-list"></ul></div>
 
     <div class="z-skip">
       <span>Nie potrzebujesz personalizacji?</span>
@@ -71,12 +72,59 @@
 
 <script>
 (function(){
+  var form = document.getElementById('f-pers');
+  var boxBledy = document.getElementById('js-bledy');
+  var lista = document.getElementById('js-bledy-list');
+  var wymaganyPomysl = {{ 'true' if typ_sklep is defined and False else 'false' }};
+
   document.querySelectorAll('.z-pers-it input[type=checkbox]').forEach(function(cb){
     cb.addEventListener('change', function(){
-      var box = cb.closest('.pers-it').querySelector('.z-pers-opis');
+      var it = cb.closest('.pers-it');
+      var box = it.querySelector('.z-pers-opis');
+      var ta = box.querySelector('textarea');
       box.hidden = !cb.checked;
-      if (cb.checked) box.querySelector('textarea').focus();
+      ta.required = cb.checked;
+      ta.classList.remove('pole-blad');
+      if (cb.checked) ta.focus();
     });
+  });
+
+  // przycisk „Pomiń ten krok" nie wymaga walidacji (działa też w Safari)
+  form.querySelectorAll('button[name=akcja]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      form.dataset.pomijam = btn.value === 'pomijam' ? '1' : '';
+    });
+  });
+
+  form.addEventListener('submit', function(ev){
+    if (form.dataset.pomijam === '1') return;
+    var bledy = [];
+    document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').forEach(function(cb){
+      var ta = cb.closest('.pers-it').querySelector('.z-pers-opis textarea');
+      if (!ta.value || ta.value.trim().length < 3){
+        bledy.push({ta: ta, nazwa: cb.closest('.pers-it').querySelector('b').textContent.trim()});
+      }
+    });
+    var pomysl = document.getElementById('pomysl');
+    if (wymaganyPomysl){
+      var ileZaznaczonych = document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').length;
+      if (!ileZaznaczonych && (!pomysl || pomysl.value.trim().length < 10)){
+        bledy.push({ta: pomysl, nazwa: 'opisz swój pomysł (min. 10 znaków) albo zaznacz produkt'});
+      }
+    }
+    if (bledy.length){
+      ev.preventDefault();
+      lista.innerHTML = '';
+      bledy.forEach(function(b){
+        var li = document.createElement('li');
+        li.textContent = 'Uzupełnij pole „' + b.nazwa + '\" — co i jak ma być spersonalizowane.';
+        lista.appendChild(li);
+      });
+      boxBledy.hidden = false;
+      boxBledy.scrollIntoView({behavior: 'smooth', block: 'center'});
+      bledy[0].ta.focus();
+      bledy.forEach(function(b){ b.ta.classList.add('pole-blad'); });
+    }
   });
 })();
 </script>
