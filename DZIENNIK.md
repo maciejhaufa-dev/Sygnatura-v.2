@@ -310,3 +310,16 @@ Utworzono `ARCHITEKTURA.md` (repo root) — pełna mapa techniczna:
 Fakty z pomiarów (do archiwum): serwis kod+templates+static ≈ 0,7 MB, baza 96 KB, uploads 7 MB, v4/assets 0,8 MB; venv na PA ~50–100 MB (po odchudzeniu repo zostaje ~350 MB wolnego).
 
 NASTĘPNY KROK (wg użytkownika): decyzje z checklisty → dopiero potem wracamy do wizualizacji/funkcji. User chce „fundament solidny, trwały, gotowy do testów i do pracy".
+
+---
+
+## Sesja 24 — ARCHITEKTURA v2: JEDEN SERWER (decyzja użytkownika) + pakiet deploy/
+
+Użytkownik: domena kupiona, poczta w OVH (Zimbra/OVH Mail) działa i jest przetestowana. Minimalizujemy wydatki. Wszystko ma stać na JEDNEJ maszynie (Oracle) pod domeną — nie chce „15 serwisów" (zdjęcia tu, baza tam, app gdzie indziej + github). Priorytet: STABILNOŚĆ + minimalna obsługa (stroną zarządza głównie żona; on nie będzie jej pilnował codziennie). Budżet awaryjny na serwer: do ~100–200 zł/rok. Wspominał rozważanie WordPress/WooCommerce i Odoo — porównanie w dokumencie.
+
+Wykonane:
+- `ARCHITEKTURA.md` przepisana na v2 „JEDEN SERWER": 1 maszyna = aplikacja + SQLite + zdjęcia lokalnie (Oracle 200 GB dysku) + backup. OVH = domena (tylko A+CNAME; MX/SPF/DKIM poczty NIETKNIĘTE) + wysyłka SMTP OVH (smtp.mail.ovh.net:587, From: kontakt@domena). GitHub = „szafa z kodem" + aktualizacje (niewidoczny dla żony). Drive/Sheets = OPCJONALNE, nie krytyczne. Sekcja „obsługa codzienna żony" (4 czynności w panelu), ryzyka+mitygacje, porównanie opcji (Oracle 0 zł / VPS EU ~150–220 zł/rok / WP+Woo — wymaga odbudowy wszystkiego + aktualizacje wtyczek / Odoo — free tylko .odoo.com, własna domena 1. rok gratis, nasza logika i tak nie działa), etapy (0 PA=poligon ✅, 1 Oracle+skrypt+DNS, 2 stabilizacja, Plan B VPS), checklist decyzji.
+- NOWY PAKIET `deploy/` (składnia sprawdzona): `instalacja.sh` (Ubuntu 22/24: pakiety, użytkownik sygnatura, sparse-clone repo [serwis+v4+deploy], venv, systemd, nginx z aliasami statyk, ufw, cron backup, skrypt aktualizacji), `sygnatura.service` (gunicorn, auto-restart), `nginx-sygnatura.conf`, `backup.sh` + `backup_mail.py` (sqlite .backup → gzip → 30 dni + załącznik na skrzynkę przez SMTP z ustawień), `aktualizuj.sh` (backup→git pull→restart), `README.md` (krok po kroku: Oracle VM + Security List 22/80/443 + Reserved IP, DNS OVH, certbot, SMTP w panelu; migracja <1h).
+- Fakty (search): Odoo One App Free = hosting Odoo, własna domena gratis tylko 1. rok, dalej płatne; e-commerce = płatne plany (~$16.90+/user/msc). VPS EU: Hetzner CX22 €3.79/msc (~200 zł/rok), OVH VPS Starter ~€3.50/msc. Budżet 50–100 zł/rok = realnie tylko ultra-tanie VPS USA (ryzyko) → rekomendacja: Oracle start, VPS jako Plan B.
+
+NASTĘPNY KROK: decyzje z checklisty (konto Oracle i karta do weryfikacji? / dane SMTP OVH do ustawień? / arkusz teraz czy w etapie 2? / potwierdzenie zdjęć lokalnie?) → wdrożenie etapu 1.
