@@ -2,7 +2,7 @@
 {% block tytul %}Sklep — Studio Sygnatura{% endblock %}
 {% block tresc %}
 <h1>Sklep (produkty na własność)</h1>
-<p class="mala">Produkty widoczne w kreatorze: Zamówienia → Sklep. Płatne z góry w całości. Widoczne tylko te z zaznaczonym „Dostępny". Ceny startowe są <b>robocze</b> — ustaw realne. Zdjęcia wgraj do katalogu <code>serwis/static/media/sklep/</code> i podaj tu samą nazwę pliku (np. <code>szopka.jpg</code>).</p>
+<p class="mala">Produkty widoczne w kreatorze: Zamówienia → Sklep. Płatne z góry w całości. Widoczne tylko te z zaznaczonym „Dostępny". Ceny startowe są <b>robocze</b> — ustaw realne. W polu „Obraz" podaj <b>samą nazwę pliku</b> z katalogu <code>serwis/static/media/sklep/</code> (np. <code>szopka.jpg</code>) <b>albo pełny link zewnętrzny</b> (https://…, np. z Dysku Google — zdjęcie nie obciąża wtedy serwera ani miejsca na dysku).</p>
 <style>
 .wiersz{display:grid;grid-template-columns:40px 1.2fr 1.4fr 90px 150px 70px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(107,69,48,.15)}
 .wiersz input,.wiersz textarea{padding:7px;font-family:inherit;font-size:16px;border:1px solid rgba(107,69,48,.35);background:var(--krem);width:100%}
@@ -21,7 +21,7 @@
   <textarea name="opis">{{ p['opis'] }}</textarea>
   <input type="number" name="cena" step="0.01" value="{{ p['cena'] }}">
   <span style="display:flex;gap:6px;align-items:center">
-    {% if p['obraz'] %}<img class="podglad" src="/static/media/sklep/{{ p['obraz'] }}" alt="">{% endif %}
+    {% if p['obraz'] %}<img class="podglad" src="{{ p['obraz']|obrazek('sklep') }}" alt="">{% endif %}
     <input type="text" name="obraz" value="{{ p['obraz'] }}" placeholder="np. szopka.jpg">
   </span>
   <label><input type="checkbox" name="dostepny" {% if p['dostepny'] %}checked{% endif %}> tak</label>

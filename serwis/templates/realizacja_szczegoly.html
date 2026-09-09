@@ -49,7 +49,7 @@ h1{font-size:clamp(30px,5vw,44px);font-weight:600;margin:6px 0 16px;line-height:
   <a class="powrot" href="/realizacje/">← Wszystkie realizacje</a>
   <div class="foto">
     {% if r['zdjecie'] %}
-    <img src="/media/{{ r['zdjecie'] }}" alt="{{ r['tytul'] }}">
+    <img src="{{ r['zdjecie']|obrazek('realizacja') }}" alt="{{ r['tytul'] }}">
     {% else %}
     <span class="init">{{ r['tytul'][:1] }}</span>
     {% endif %}

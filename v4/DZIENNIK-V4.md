@@ -506,3 +506,7 @@ Nowa forma strony głównej (zastępuje splash+hero+litery z v4):
 ## 2026-09-08 (popr. 2) — breakpointy landing + koszyk sklepu
 - Układ kwaterowy utrzymany do 760 px (poprzednio <980 px zwijał się na telefonach w „wersji na komputer" ~980 px). Nowe zakresy: 761–1100 px = kwatery ciaśniejsze; <760 px = kolumna mobilna.
 - Sklep: licznik = ilość do dodania, przycisk „Dodaj do koszyka" przenosi do koszyka (hidden ile_<id>) i zeruje licznik; dymek „N w koszyku" pod produktem. Więcej w DZIENNIK.md sesja 21.
+
+## 2026-09-09 — system lekki: linki zewnętrzne do zdjęć + kompresja assets
+- Obrazy w całym serwisie (sklep, realizacje, slider landingu, wyszukiwarka) akceptują pełne URL-e (Dysk Google) — filtr `obrazek` w app.py; lokalne nazwy działają jak dotąd.
+- v4/assets: hero 52 kB, forest 176 kB, hero-alt 177 kB (skompresowane). Więcej: DZIENNIK.md sesja 22.

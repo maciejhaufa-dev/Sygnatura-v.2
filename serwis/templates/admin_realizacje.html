@@ -3,7 +3,7 @@
 {% block tresc %}
 <h1>Realizacje (portfolio)</h1>
 <p class="mala">Widoczne na stronie: <a href="{{ url_for('realizacje') }}">/realizacje/</a> (tylko te z zaznaczonym „Widoczna").
-Zdjęcia wgrywasz z komputera (JPG/PNG/WEBP, maks. 8 MB).</p>
+Zdjęcie możesz <b>wgrać z komputera</b> (JPG/PNG/WEBP, maks. 8 MB) <b>albo podać link zewnętrzny</b> (np. z Dysku Google — wtedy zdjęcie nie zajmuje miejsca na serwerze). Link ma pierwszeństwo przed plikiem.</p>
 
 <style>
 .karta-r{background:#fff;border:1px solid rgba(107,69,48,.3);padding:12px;margin:12px 0;display:flex;gap:14px;flex-wrap:wrap}
@@ -19,7 +19,7 @@ Zdjęcia wgrywasz z komputera (JPG/PNG/WEBP, maks. 8 MB).</p>
 {% for r in rows %}
 <form class="karta-r" method="post" action="{{ url_for('realizacje_edytuj', rid=r['id']) }}" enctype="multipart/form-data">
   {% if r['zdjecie'] %}
-  <img src="{{ url_for('media', nazwa=r['zdjecie']) }}" alt="{{ r['tytul'] }}">
+  <img src="{{ r['zdjecie']|obrazek('realizacja') }}" alt="{{ r['tytul'] }}">
   {% else %}
   <img src="" alt="brak zdjęcia" style="visibility:hidden">
   {% endif %}
@@ -29,6 +29,7 @@ Zdjęcia wgrywasz z komputera (JPG/PNG/WEBP, maks. 8 MB).</p>
     <textarea name="opis" placeholder="Opis">{{ r['opis'] }}</textarea>
     <label>Kolejność <input type="number" name="kolejnosc" value="{{ r['kolejnosc'] }}" style="width:70px"></label>
     <label><input type="checkbox" name="widoczna" {% if r['widoczna'] %}checked{% endif %}> Widoczna</label>
+    <input type="text" name="zdjecie_url" placeholder="Link do zdjęcia (https://…) — zamiast pliku" {% if r['zdjecie'] and r['zdjecie'].startswith('http') %}value="{{ r['zdjecie'] }}"{% endif %}>
     <div><input type="file" name="zdjecie" accept=".jpg,.jpeg,.png,.webp"></div>
   </div>
   <div class="guzy">
@@ -44,7 +45,8 @@ Zdjęcia wgrywasz z komputera (JPG/PNG/WEBP, maks. 8 MB).</p>
     <label>Tytuł *</label><input type="text" name="tytul" required>
     <label>Kategoria</label><input type="text" name="kategoria" placeholder="np. dekoracje, szyldy i tablice">
     <label>Opis (widoczny na stronie)</label><textarea name="opis"></textarea>
-    <label>Zdjęcie (JPG/PNG/WEBP, maks. 8 MB)</label><input type="file" name="zdjecie" accept=".jpg,.jpeg,.png,.webp">
+    <label>Link do zdjęcia (https://…, np. z Dysku Google) — zamiast pliku</label><input type="text" name="zdjecie_url" placeholder="https://drive.google.com/thumbnail?id=…&amp;sz=w1200">
+    <label>albo zdjęcie z komputera (JPG/PNG/WEBP, maks. 8 MB)</label><input type="file" name="zdjecie" accept=".jpg,.jpeg,.png,.webp">
     <label>Kolejność (mniejsza = wyżej)</label><input type="number" name="kolejnosc" value="0">
     <div class="rzad" style="margin-top:12px"><label><input type="checkbox" name="widoczna" checked> Widoczna na stronie</label></div>
     <p><button class="btn" type="submit">Dodaj realizację</button></p>

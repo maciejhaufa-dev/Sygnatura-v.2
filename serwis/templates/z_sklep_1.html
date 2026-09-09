@@ -38,7 +38,7 @@
       <div class="sklep-karta" data-id="{{ pr.id }}" data-cena="{{ pr.cena }}">
         <div class="sklep-foto">
           {% if pr.obraz %}
-          <img src="/static/media/sklep/{{ pr.obraz }}" alt="{{ pr.nazwa }}" loading="lazy">
+          <img src="{{ pr.obraz|obrazek('sklep') }}" alt="{{ pr.nazwa }}" loading="lazy">
           {% else %}
           <span class="sklep-init">{{ pr.nazwa[:1] }}</span>
           {% endif %}

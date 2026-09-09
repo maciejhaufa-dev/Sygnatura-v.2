@@ -272,7 +272,7 @@ a{text-decoration:none;color:inherit}
             <div class="sl-karty">
               {% if nowosci %}{% for r in nowosci[:3] %}
               <a class="sl-karta" href="/zamowienia/sklep/">
-                {% if r['obraz'] %}<img src="/static/media/sklep/{{ r['obraz'] }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
+                {% if r['obraz'] %}<img src="{{ r['obraz']|obrazek('sklep') }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
                 <span><span class="nazwa">{{ r['nazwa'] }}</span><br><span class="cena">{{ '%.0f'|format(r['cena']) }} zł / szt.</span></span>
               </a>
               {% endfor %}{% else %}
@@ -296,7 +296,7 @@ a{text-decoration:none;color:inherit}
             <div class="sl-karty">
               {% if top %}{% for r in top[:3] %}
               <a class="sl-karta" href="/zamowienia/sklep/">
-                {% if r['obraz'] %}<img src="/static/media/sklep/{{ r['obraz'] }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
+                {% if r['obraz'] %}<img src="{{ r['obraz']|obrazek('sklep') }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
                 <span><span class="nazwa">{{ r['nazwa'] }}</span><br><span class="cena">{{ '%.0f'|format(r['cena']) }} zł / szt.</span></span>
               </a>
               {% endfor %}{% else %}

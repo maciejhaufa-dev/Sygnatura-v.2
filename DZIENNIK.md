@@ -267,3 +267,26 @@ Do decyzji / dalej:
 
 1) Landing „fatalny na telefonie w trybie wersja na komputer": przyczyną był breakpoint `max-width:980px`, który rozwalał układ kwaterowy dokładnie na szerokości ~980 px zgłaszanej przez telefony w tym trybie. Poprawka: układ kwaterowy zostaje do 760 px — dodany zakres średni `@media (max-width:1100px) and (min-width:761px)` (ciaśniejsza lewa kolumna 200–230 px, mniejsze logo/menu, karty w slajdach 2 kolumny z 3. kartą na całość, ukryta top-note), a pełne zwinięcie „jeden pod drugim" dopiero <760 px (widok mobilny). Lekcja: testować też szerokości 761–1100 px („desktop mode" telefonu = ~980 px).
 2) Sklep — przycisk „Dodaj do koszyka" inkrementował licznik. Rozdzielono: widoczny licznik (`.licz-q`, bez name — nie wysyła się) = ilość DO DODANIA; ukryte pole `ile_<id>` = stan koszyka; przycisk przenosi q do koszyka i zeruje licznik (NIE wpływa na licznik w żaden inny sposób). Pod produktem dymek „N w koszyku" (ukryty przy 0, aktualizowany na żywo; przy powrocie w= pokazuje stan z bazy). Pasek koszyka liczy z pól ukrytych. Server-side bez zmian (czyta ile_<id>). Testy: POST ile_1=2&ile_4=1 → redirect do personalizacji; powrót w= → hidden 2/1 + rachunek 587 zł; szkic testowy posprzątany. style.css v=7 (z_sklep_1.html).
+
+---
+
+## Sesja 22 — SYSTEM LEKKI: zdjęcia z zewnętrznych linków (Dysk Google) + odchudzenie
+
+Decyzja użytkownika: system ma być LEKKI na PythonAnywhere (free: 512 MB, 100 CPU-s/dzień). Zdjęcia linkowane z zewnątrz (Dysk Google), żeby nie obciążać serwera.
+
+Wykonane:
+- `app.py`: helper `url_obrazu(obraz, typ)` + filtr Jinja `obrazek` — pełny URL (https://…, np. drive.google.com/thumbnail?id=…&sz=w1200) przechodzi BEZ ZMIAN, lokalna nazwa pliku dostaje ścieżkę (`/static/media/sklep/…` lub `/media/…`). Filtr globalny — działa też w `v4/index.html` (render_template_string).
+- Wszystkie widoki obrazów przechodzą na filtr: `realizacje.html`, `realizacja_szczegoly.html`, `z_sklep_1.html` (karta produktu), `admin_sklep.html` (miniaturka), `v4/index.html` (karty w slajdach Nowości/Bestsellery), `szukaj` (wyniki — przez helper w Pythonie).
+- `admin_realizacje`: nowe pole „Link do zdjęcia (https://…)" w edycji i dodawaniu; link ma PIERWSZEŃSTWO przed plikiem; walidacja startswith http(s). `admin_sklep`: podpowiedź o linkach zewnętrznych.
+- Odchudzenie `v4/assets`: hero.jpg 248→52 kB, forest 356→176 kB, hero-alt 248→177 kB (Pillow, max 1600 px) — całość assets 1,2 MB→0,8 MB. Sklepowe jpg ~70–80 kB szt. (OK).
+- Testy: tymczasowe linki TEST123/TESTREAL w bazie → poprawnie renderowane w sklepie/landing/realizacjach/szczegółach/wyszukiwarce; lokalne nazwy dalej działają; formularze admin z polem URL; po testach baza przywrócona.
+- Sandbox zresetował się W TRAKCIE tury — zmiany uratowane procedurą /tmp (zapis 7 plików → reset → przywrócenie).
+
+USTALENIA TECHNICZNE (ważne dla przyszłych sesji):
+- **Obrazy zewnętrzne ładuje PRZEGLĄDARKA klienta, nie serwer** — whitelist PA (outbound) NIE DOTYCZY obrazków w <img>. PA nie zużywa ani CPU, ani transferu, ani dysku.
+- Wzór linku z Dysku Google (po udostępnieniu „każdy, kto ma link"): `https://drive.google.com/thumbnail?id=FILE_ID&sz=w1200` (w1200 = szerokość; stabilny dla <img>). Alternatywa: `https://lh3.googleusercontent.com/d/FILE_ID=w1200`.
+- Instrukcja dla użytkownika (klikanie na PA) — w ROZMOWIE, nie w plikach md:
+  1) odchudzenie repo na PA (sparse-checkout: tylko serwis/ + v4/ — zamiast ~200 MB zostaje ~5 MB; pracownia/uploads/.git-history zostają tylko na GitHubie),
+  2) mapowania statyczne w zakładce Web (URL → katalog): /static/ → serwis/static, /assets/ → v4/assets, /media/ → serwis/data/uploads — wtedy PA serwuje statyki BEZ Pythona (0 CPU; trasy Flaska zostają jako fallback),
+  3) baza: SQLite lokalnie (lekkie), Dysk Google = zdjęcia + dokumenty (linki), arkusz webhook.gs = raporty.
+- Skala: 1000 klientów ≈ 1–2 MB w SQLite; konta klientów (opcjonalne, gość = klient_id NULL) nie obciążą dysku — do wdrożenia gdy user zdecyduje.

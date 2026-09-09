@@ -56,6 +56,26 @@ if not os.path.exists(SECRET):
         f.write(os.urandom(24).hex())
 app.secret_key = open(SECRET).read()
 
+
+def url_obrazu(obraz, typ='sklep'):
+    """Adres zdjęcia: pełny URL (https://…, np. z Dysku Google) zostaje BEZ ZMIAN,
+    lokalna nazwa pliku dostaje ścieżkę serwisu. Dzięki temu zdjęcia można trzymać
+    na zewnątrz (Dysk Google itp.) i nie obciążają one serwera ani miejsca na dysku."""
+    obraz = (obraz or '').strip()
+    if not obraz:
+        return ''
+    if obraz.startswith(('http://', 'https://', '//')):
+        return obraz
+    if typ == 'realizacja':
+        return '/media/' + obraz
+    return '/static/media/sklep/' + obraz
+
+
+@app.template_filter('obrazek')
+def filtr_obrazek(obraz, typ='sklep'):
+    """W szablonach: {{ nazwa|obrazek('sklep') }} / {{ nazwa|obrazek('realizacja') }}."""
+    return url_obrazu(obraz, typ)
+
 # baza tworzy się automatycznie (też przy starcie przez WSGI/gunicorn — nie tylko `python app.py`)
 baza_mod.inicjuj()
 
@@ -188,7 +208,7 @@ def szukaj():
         for r in db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
             wyniki.append({'typ': 'sklep', 'grupa': 'Sklep', 'tytul': r['nazwa'], 'opis': r['opis'],
                            'meta': '%.0f zł / szt.' % (r['cena'] or 0), 'url': url_for('z_sklep_katalog'),
-                           'obraz': ('/static/media/sklep/' + r['obraz']) if r['obraz'] else ''})
+                           'obraz': url_obrazu(r['obraz'], 'sklep')})
         for r in db.execute('SELECT * FROM personalizacje WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
             wyniki.append({'typ': 'personalizacja', 'grupa': 'Personalizacja', 'tytul': r['nazwa'], 'opis': r['opis'],
                            'meta': '%.0f zł' % (r['cena'] or 0), 'url': url_for('z_pers_samodzielna'), 'obraz': ''})
@@ -198,7 +218,7 @@ def szukaj():
         for r in db.execute('SELECT * FROM realizacje WHERE widoczna=1 AND (tytul LIKE ? OR opis LIKE ?) ORDER BY id DESC LIMIT 12', (like, like)).fetchall():
             wyniki.append({'typ': 'realizacja', 'grupa': 'Realizacje', 'tytul': r['tytul'], 'opis': r['opis'],
                            'meta': r['kategoria'] or '', 'url': url_for('realizacja_szczegoly', rid=r['id']),
-                           'obraz': ('/media/' + r['zdjecie']) if r['zdjecie'] else ''})
+                           'obraz': url_obrazu(r['zdjecie'], 'realizacja')})
     return render_template('szukaj.html', q=q, wyniki=wyniki)
 
 
@@ -1693,7 +1713,13 @@ def admin_realizacje():
 @admin_required
 def realizacje_dodaj():
     db = get_db()
-    zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
+    # zdjęcie: link zewnętrzny (Dysk Google itp.) ma pierwszeństwo przed plikiem
+    zdj = (request.form.get('zdjecie_url') or '').strip()
+    if zdj and not zdj.startswith(('http://', 'https://')):
+        zdj = ''
+    blad = ''
+    if not zdj:
+        zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
     db.execute('INSERT INTO realizacje (tytul, kategoria, opis, zdjecie, kolejnosc, widoczna, utworzono) VALUES (?,?,?,?,?,?,?)',
                (request.form.get('tytul', '').strip(), request.form.get('kategoria', '').strip(),
                 request.form.get('opis', '').strip(), zdj, int(request.form.get('kolejnosc') or 0),
@@ -1710,9 +1736,17 @@ def realizacje_edytuj(rid):
     row = db.execute('SELECT * FROM realizacje WHERE id=?', (rid,)).fetchone()
     if not row:
         abort(404)
-    zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
-    if not zdj:
-        zdj = row['zdjecie']
+    # link zewnętrzny ma pierwszeństwo; bez linku — wgrany plik; bez pliku — zostaje stare
+    zdj = (request.form.get('zdjecie_url') or '').strip()
+    if zdj and not zdj.startswith(('http://', 'https://')):
+        zdj = ''
+    blad = ''
+    if zdj:
+        blad = ''
+    else:
+        zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
+        if not zdj:
+            zdj = row['zdjecie']
     db.execute('UPDATE realizacje SET tytul=?, kategoria=?, opis=?, zdjecie=?, kolejnosc=?, widoczna=? WHERE id=?',
                (request.form.get('tytul', '').strip(), request.form.get('kategoria', '').strip(),
                 request.form.get('opis', '').strip(), zdj, int(request.form.get('kolejnosc') or 0),
