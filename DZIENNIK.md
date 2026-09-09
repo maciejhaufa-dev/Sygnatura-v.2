@@ -290,3 +290,23 @@ USTALENIA TECHNICZNE (ważne dla przyszłych sesji):
   2) mapowania statyczne w zakładce Web (URL → katalog): /static/ → serwis/static, /assets/ → v4/assets, /media/ → serwis/data/uploads — wtedy PA serwuje statyki BEZ Pythona (0 CPU; trasy Flaska zostają jako fallback),
   3) baza: SQLite lokalnie (lekkie), Dysk Google = zdjęcia + dokumenty (linki), arkusz webhook.gs = raporty.
 - Skala: 1000 klientów ≈ 1–2 MB w SQLite; konta klientów (opcjonalne, gość = klient_id NULL) nie obciążą dysku — do wdrożenia gdy user zdecyduje.
+
+---
+
+## Sesja 23 — MAPA ARCHITEKTURY (fundament techniczny, decyzja użytkownika)
+
+Użytkownik: najpierw FUNDAMENT techniczny, dopiero potem wizualizacje/funkcje. Potrzebna kompletna mapa: gdzie aplikacja, gdzie baza zdjęć, gdzie baza użytkowników/kooperantów/zamówień, jak węzły wymieniają dane, kopie zapasowe, spięcie z domeną OVH i pocztą w domenie.
+
+Utworzono `ARCHITEKTURA.md` (repo root) — pełna mapa techniczna:
+- 8 węzłów: PA FREE (etap 1) / Oracle Always Free (etap 2) / GitHub / Google Drive (media) / Sheets+Apps Script (raporty) / Gmail SMTP (etap 1) / OVH domena+poczta / lokalny sandbox.
+- Przepływ danych (diagram): przeglądarka↔PA (HTTPS), PA↔SQLite (lokalnie), przeglądarka→Drive (obrazki, omija serwer), PA→Gmail SMTP, Sheets przez Apps Script PULL (free PA nie „pchnie" przez whitelistę), git pull = deploy, Oracle: domena A→IP, SMTP OVH, cron backup→Drive.
+- Gdzie co zapisane: WSZYSTKIE dane operacyjne w jednym SQLite (rezerwacje, klienci* z gościem=NULL, partnerzy* z indywidualną sygnaturą, wiadomości, katalog, mail_outbox, ustawienia/sekrety, szablony, szkice); media+PDF na Drive (linki w bazie); raporty w Sheets (lustro, nie baza).
+- Backup: etap 1 = automat przy starcie aplikacji (mail z .db przez Gmail SMTP, bo na nowych kontach PA NIE MA zadań planowanych) + przycisk w panelu + ręcznie; etap 2 = cron 03:00 → .backup → gzip → Drive (30 dni + snapshoty miesięczne); odtworzenie <1 h (clone + pip + wgrać db).
+- Domena OVH: etap 1 redirect na PA (free PA nie obsługuje własnych domen) + MX Plan od razu (poczta w domenie, ~1–2 €/msc), aplikacja wysyła z Gmaila z Reply-To domeny; etap 2: tabela DNS (A→IP Oracle, MX→OVH, SPF, DKIM, DMARC), Let's Encrypt, SMTP OVH z From: kontakt@studiosygnatura.pl.
+- Etapy: 1 (PA FREE) → 1.5 (opcjonalnie PA Hacker ~5 $/msc dla domeny) → 2 (Oracle) → 3 (awaryjnie OVH VPS).
+- Limity/ryzyka + mitygacje (512 MB, 100 CPU-s, whitelist, wygasanie app co miesiąc, idle reclaim Oracle, publiczne repo → sekrety tylko w bazie).
+- Checklist decyzji: MX Plan teraz czy później / czy PA Hacker / Sheets w etapie 1 czy 2 / SQLite vs Autonomous w etapie 2 / nazwy folderów Google.
+
+Fakty z pomiarów (do archiwum): serwis kod+templates+static ≈ 0,7 MB, baza 96 KB, uploads 7 MB, v4/assets 0,8 MB; venv na PA ~50–100 MB (po odchudzeniu repo zostaje ~350 MB wolnego).
+
+NASTĘPNY KROK (wg użytkownika): decyzje z checklisty → dopiero potem wracamy do wizualizacji/funkcji. User chce „fundament solidny, trwały, gotowy do testów i do pracy".
