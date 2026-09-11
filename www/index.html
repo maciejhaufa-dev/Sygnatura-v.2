@@ -46,7 +46,8 @@ a{text-decoration:none;color:inherit}
 .brand-kwadrat img{width:82px;height:82px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
 @keyframes kwadrat{0%,100%{box-shadow:0 16px 40px rgba(0,0,0,.35)}50%{box-shadow:0 16px 52px rgba(196,165,130,.38)}}
 .brand-nazwa{font-size:30px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
-.brand-nazwa em{font-style:normal;color:var(--krem)}
+.brand-nazwa .syg{color:var(--krem)}
+.brand-nazwa .natura{color:var(--zloty)}
 .brand-tag{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.55)}
 
 .menu-vert{display:flex;flex-direction:column;gap:2px;margin-top:26px}
@@ -259,7 +260,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   <aside class="side">
     <div class="brand-blok">
       <div class="brand-kwadrat"><img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura — litera S z gałązką w okręgu"></div>
-      <div class="brand-nazwa">syg<em>NATURA</em></div>
+      <div class="brand-nazwa"><span class="syg">Syg</span><span class="natura">natura</span></div>
       <div class="brand-tag">drewno · światło · detal</div>
     </div>
 
@@ -376,7 +377,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a></span>
-    <span>© Sygnatura 2026 · wersja 28.5</span>
+    <span>© Sygnatura 2026 · wersja 28.6</span>
   </footer>
 </div>
 
@@ -398,9 +399,15 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 </script>
 
 <script>
-/* splash — oryginalne zachowanie: 3,8 s, potem płynnie znika (bez klikania) */
+/* splash — TYLKO przy pierwszym wejściu na stronę (raz na sesję przeglądarki).
+   Odświeżenie strony ani powrót z podstrony nie pokazują go ponownie. */
 (function(){
   var splash=document.getElementById('splash');
+  if (sessionStorage.getItem('syg-splash')){
+    if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);
+    return;
+  }
+  sessionStorage.setItem('syg-splash','1');
   var show=3800;
   document.documentElement.style.overflow='hidden';
   setTimeout(function(){
@@ -411,10 +418,10 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 })();
 </script>
 
-<script src="data/katalog.js"></script>
-<script src="assets/koszyk.js"></script>
-<script src="assets/config.js"></script>
-<script src="assets/main.js"></script>
+<script src="data/katalog.js?v=286"></script>
+<script src="assets/koszyk.js?v=286"></script>
+<script src="assets/config.js?v=286"></script>
+<script src="assets/main.js?v=286"></script>
 <script>
 (function(){
   /* ===== slider: autoplay w pętli, strzałki, kropki ===== */

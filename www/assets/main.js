@@ -48,7 +48,7 @@
       '<aside class="side">' +
       '<div class="brand-blok">' +
       '<div class="brand-kwadrat"><img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura"></div>' +
-      '<div class="brand-nazwa">syg<em>NATURA</em></div>' +
+      '<div class="brand-nazwa"><span class="syg">Syg</span><span class="natura">natura</span></div>' +
       '<div class="brand-tag">drewno · światło · detal</div>' +
       '</div>' +
       '<nav class="menu-vert" aria-label="Menu główne">' + pozycje + '</nav>' +
@@ -82,7 +82,7 @@
   function stopka() {
     return '<span><a href="regulamin.html">Regulamin</a><span class="sep">·</span>' +
       '<a href="jak-pracujemy.html">Jak pracujemy</a></span>' +
-      '<span>© Sygnatura 2026 · wersja 28.5</span>';
+      '<span>© Sygnatura 2026 · wersja 28.6</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
