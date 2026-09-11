@@ -19,7 +19,7 @@ button{font-family:inherit}
 
 /* ============ SEGMENT B: czarny pasek kontakt + social; wyszukiwarka + KOSZYK/PANEL ============ */
 .head-kontakt{background:var(--czern);color:rgba(251,247,240,.94);font-size:15.5px;letter-spacing:.04em;
-  padding:12px clamp(16px,2.5vw,32px);display:flex;justify-content:space-between;align-items:center;
+  padding:12px clamp(12px,1.5vw,20px);display:flex;justify-content:space-between;align-items:center;
   gap:14px;flex-wrap:wrap}
 .head-kontakt a{display:inline-flex;align-items:center;gap:8px;transition:color .2s}
 .head-kontakt a:hover{color:var(--zloty)}
@@ -76,7 +76,7 @@ button{font-family:inherit}
 .menu-vert a.on::after{width:34px}
 
 /* --- górny blok po prawej: wyszukiwarka (ładne tło) + ikony; pod spodem TYTUŁ STRONY --- */
-.head{padding:18px clamp(18px,3vw,40px) 4px;background:var(--krem);
+.head{padding:18px clamp(12px,1.5vw,20px) 4px;background:var(--krem);
   display:flex;flex-direction:column;gap:2px}
 .head-gora{display:flex;align-items:stretch;gap:12px;padding:16px 18px;
   background:linear-gradient(135deg,var(--krem-2) 0%,#EFE6D8 55%,var(--krem-2) 100%);
@@ -126,6 +126,7 @@ h1{font-size:clamp(30px,4.6vw,46px);font-weight:600;margin:6px 0 10px;line-heigh
 .btn.ghost{background:transparent;color:var(--butelkowa);border-color:rgba(107,69,48,.4)}
 .btn.niebez{background:transparent;color:#8a2f1d;border-color:rgba(138,47,29,.4)}
 .btn.niebez:hover{background:#8a2f1d;border-color:#8a2f1d;color:var(--krem)}
+.btn.aktywne{background:var(--brunatny);border-color:var(--brunatny);color:var(--krem)}
 .btn:disabled{opacity:.55;cursor:wait}
 
 /* ============ HUB (3 kafle) ============ */
@@ -357,3 +358,47 @@ html.dotyk .brand-kwadrat{width:200px;aspect-ratio:1/1}
 html.dotyk .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
 html.dotyk .menu-vert a{padding:10px 13px;font-size:15px}
 html.dotyk .menu-vert a::after{display:none}
+
+/* ============ BLOKI KOSZYKA I DOSTAWY ============ */
+.koszyk-blok{background:#fff;border:1px solid rgba(107,69,48,.35);margin-top:18px}
+.koszyk-blok>h2{background:var(--krem-2);border-bottom:1px solid rgba(107,69,48,.3);padding:12px 16px;
+  font-size:18.5px;color:var(--butelkowa);display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;flex-wrap:wrap}
+.koszyk-blok .padd{padding:14px 16px}
+.koszyk-tabela{width:100%;border-collapse:collapse;font-size:15.5px;background:#fff}
+.koszyk-tabela th{background:var(--butelkowa);color:var(--zloty);text-align:left;padding:10px 12px;
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.koszyk-tabela td{padding:12px;border-bottom:1px dashed rgba(107,69,48,.25);vertical-align:middle}
+.koszyk-tabela .num{text-align:right;white-space:nowrap}
+.koszyk-tabela .usun{border:none;background:none;color:#8a2f1d;font-size:18px;cursor:pointer;padding:6px 8px;line-height:1}
+.koszyk-tabela .usun:hover{color:#5c1f13}
+.koszyk-tabela .r-pod{display:block;font-size:13.5px;color:rgba(51,38,28,.7);margin-top:2px}
+.koszyk-tabela .r-minus{color:#8a2f1d}
+.koszyk-tabela .koszyk-razem td{background:var(--butelkowa);color:var(--krem);font-size:16px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase}
+.koszyk-tabela .koszyk-razem td:last-child{color:var(--zloty);font-size:24px}
+
+.dostawa-opcja{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(107,69,48,.3);
+  padding:12px 14px;margin:10px 0;background:var(--krem);cursor:pointer;transition:border-color .2s,background .2s}
+.dostawa-opcja:hover{border-color:var(--butelkowa)}
+.dostawa-opcja input[type=radio]{margin-top:5px;width:18px;height:18px;flex:none;accent-color:var(--butelkowa)}
+.dostawa-opcja .d-et{display:block;font-weight:700;font-size:16px}
+.dostawa-opcja .d-op{display:block;font-size:14px;color:rgba(51,38,28,.75);margin-top:2px;line-height:1.5}
+.dostawa-opcja .d-cena{margin-left:auto;color:var(--brunatny);font-weight:700;font-size:15.5px;white-space:nowrap;flex:none}
+.dostawa-opcja.zablokowana{opacity:.45;cursor:not-allowed}
+.dostawa-opcja.zablokowana:hover{border-color:rgba(107,69,48,.3)}
+
+.pers-wiersz{border:1px solid rgba(107,69,48,.25);padding:10px 14px;margin:10px 0;background:var(--krem)}
+
+/* ============ MODAL (pomysł własny) ============ */
+.modal-tlo{position:fixed;inset:0;background:rgba(14,14,12,.62);z-index:120;display:grid;
+  place-items:center;padding:20px}
+.modal-box{background:var(--krem);border:2px solid var(--brunatny);max-width:560px;width:100%;
+  padding:26px 28px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.modal-box h3{font-size:22px;color:var(--butelkowa);margin-bottom:6px}
+
+/* ============ WSTĄŻKA NAD STOPKĄ (pozioma, jak pionowa między kolumnami) ============ */
+.listwa-poziom{height:10px;background:
+  repeating-linear-gradient(180deg, rgba(139,90,43,.30) 0 2px, rgba(107,69,48,.12) 2px 4px),
+  linear-gradient(90deg,#7A5338 0%,#C4A582 22%,#6B4530 50%,#C4A582 78%,#7A5338 100%);
+  box-shadow: inset 0 0 0 1px rgba(196,165,130,.35)}

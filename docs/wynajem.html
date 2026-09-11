@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wynajem dekoracji — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=292">
+</head>
+<body data-strona="Zamówienia">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Krok 1 z 3</span>
+  <a class="powrot" href="zamowienia.html">← wróć do wyboru ścieżki</a>
+  <h1>Wynajem dekoracji — termin i pakiet</h1>
+  <p class="sub">Wybierz datę wydarzenia i pakiet dekoracji. Montujemy dekoracje dzień przed imprezą,
+  a doby najmu liczymy od protokołu zdawczo-odbiorczego. Przy wynajmie pobieramy kaucję zwrotną
+  <b>300 zł</b> — wraca w całości po zwrocie kompletu.</p>
+
+  <div id="progres"></div>
+  <div class="bledy-box" id="bledy" style="display:none">
+    <b>Zanim przejdziemy dalej, uzupełnij:</b>
+    <ul id="bledy-lista"></ul>
+  </div>
+
+  <div class="forma">
+    <h2>1. Termin wydarzenia</h2>
+    <div class="pole" style="max-width:320px">
+      <label for="termin">Data wydarzenia *</label>
+      <input type="date" id="termin" name="termin" min="">
+    </div>
+    <div class="pole" style="max-width:320px">
+      <label for="czas">Godzina rozpoczęcia (opcjonalnie)</label>
+      <input type="time" id="czas" name="czas">
+    </div>
+    <p class="mala">Dekoracje montujemy dzień przed imprezą. Dostępność potwierdzimy w odpowiedzi na zamówienie
+    (w 1–2 dni robocze, pod sygnaturą sprawy).</p>
+
+    <h2 style="margin-top:22px">2. Rodzaj wydarzenia</h2>
+    <div class="pole" style="max-width:320px">
+      <label for="typ-ev">Rodzaj wydarzenia *</label>
+      <select id="typ-ev">
+        <option value="weselny">Wesele</option>
+        <option value="komunijny">Komunia / chrzest</option>
+        <option value="firmowy">Event firmowy</option>
+        <option value="jubileuszowy">Jubileusz / urodziny</option>
+      </select>
+    </div>
+
+    <h2 style="margin-top:22px">3. Wybierz pakiet</h2>
+    <div id="pakiety"></div>
+  </div>
+
+  <div class="przyciski" style="justify-content:flex-end">
+    <button class="btn" type="button" id="dalej">Przejdź do danych →</button>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=292"></script>
+<script src="assets/koszyk.js?v=292"></script>
+<script src="assets/api.js?v=292"></script>
+<script src="data/katalog.js?v=292"></script>
+<script src="assets/main.js?v=292"></script>
+<script>
+(function(){
+  window.PROGRES.wstaw(document.getElementById('progres'), ['Termin i pakiet','Dane','Podsumowanie'], 1);
+
+  /* min = jutro (montaż dzień przed) */
+  var jutro = new Date(Date.now() + 86400000);
+  var minISO = jutro.toISOString().slice(0, 10);
+  document.getElementById('termin').setAttribute('min', minISO);
+
+  /* wypełnienie zapisanymi danymi */
+  var k = KOSZYK.pobierz();
+  if (k.termin){
+    document.getElementById('termin').value = k.termin.data || '';
+    document.getElementById('czas').value = k.termin.czas || '';
+  }
+
+  var pakiety = SYG.WYNAJEM_PAKIETY || [];
+  var typEv = document.getElementById('typ-ev');
+  if (k.pakiet && k.pakiet.ev) typEv.value = k.pakiet.ev;
+
+  function renderPakiety(){
+    var ev = typEv.value;
+    var lista = pakiety.filter(function(p){ return p.ev === ev; });
+    var html = '';
+    lista.forEach(function(p){
+      var zazn = (k.pakiet && k.pakiet.id === p.id);
+      html += '<label class="dostawa-opcja pakiet-opcja" style="cursor:pointer">' +
+        '<input type="radio" name="pakiet" value="' + p.id + '"' + (zazn ? ' checked' : '') + '>' +
+        '<span style="flex:1;min-width:0">' +
+        '<span class="d-et">' + p.nazwa + '</span>' +
+        '<span class="d-op">' + p.opis + '</span>' +
+        '<span class="d-op" style="display:block;margin-top:6px;color:rgba(51,38,28,.8)">' + p.pozycje + '</span>' +
+        '</span>' +
+        '<span class="d-cena">' + p.cenaTxt + '</span>' +
+      '</label>';
+    });
+    document.getElementById('pakiety').innerHTML = html;
+  }
+  typEv.addEventListener('change', renderPakiety);
+  renderPakiety();
+
+  document.getElementById('dalej').addEventListener('click', function(){
+    var bledy = [];
+    var termin = document.getElementById('termin').value;
+    var czas = document.getElementById('czas').value;
+    var wybrany = document.querySelector('input[name=pakiet]:checked');
+    if (!termin) bledy.push('datę wydarzenia');
+    if (!wybrany) bledy.push('pakiet dekoracji');
+    if (bledy.length){
+      var lista = document.getElementById('bledy-lista');
+      lista.innerHTML = bledy.map(function(b){ return '<li>' + b + '</li>'; }).join('');
+      document.getElementById('bledy').style.display = 'block';
+      document.getElementById('bledy').scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    document.getElementById('bledy').style.display = 'none';
+    var p = pakiety.find(function(x){ return x.id === wybrany.value; });
+    k.typ = 'wynajem';
+    k.pakiet = { id: p.id, ev: p.ev, nazwa: p.nazwa, opis: p.opis, cena: p.cena, cenaTxt: p.cenaTxt, pozycje: p.pozycje };
+    k.termin = { data: termin, czas: czas };
+    KOSZYK.zapisz(k);
+    window.location.href = 'dane.html';
+  });
+})();
+</script>
+</body>
+</html>

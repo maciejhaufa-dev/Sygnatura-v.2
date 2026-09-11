@@ -37,7 +37,7 @@ a{text-decoration:none;color:inherit}
 /* ============ SEGMENT B (góra po prawej): czarny pasek kontakt + social,
    pod spodem wyszukiwarka (lewo) + KOSZYK / PANEL UŻYTKOWNIKA (prawo) ============ */
 .head-kontakt{background:var(--czern);color:rgba(251,247,240,.94);font-size:15.5px;letter-spacing:.04em;
-  padding:12px clamp(16px,2.5vw,32px);display:flex;justify-content:space-between;align-items:center;
+  padding:12px clamp(12px,1.5vw,20px);display:flex;justify-content:space-between;align-items:center;
   gap:14px;flex-wrap:wrap}
 .head-kontakt a{display:inline-flex;align-items:center;gap:8px;transition:color .2s}
 .head-kontakt a:hover{color:var(--zloty)}
@@ -88,7 +88,7 @@ a{text-decoration:none;color:inherit}
 
 /* --- nagłówek głównej kolumny: wyszukiwarka + koszyk/panel, pod spodem TYTUŁ STRONY --- */
 .head{flex:none;display:flex;flex-direction:column;gap:2px;
-  padding:18px clamp(18px,3vw,40px) 4px;background:var(--krem)}
+  padding:18px clamp(12px,1.5vw,20px) 4px;background:var(--krem)}
 .head-gora{display:flex;align-items:stretch;gap:12px;padding:16px 18px;
   background:linear-gradient(135deg,var(--krem-2) 0%,#EFE6D8 55%,var(--krem-2) 100%);
   border:1px solid rgba(107,69,48,.28);box-shadow:0 6px 20px rgba(107,69,48,.10)}
@@ -139,7 +139,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 @keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
 
 /* --- okno główne: slider --- */
-.main{padding:8px clamp(12px,1.5vw,20px) 0}
+.main{padding:8px 0 0}
 .slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
   background:var(--butelkowa);aspect-ratio:16/8.6;max-height:600px}
 .sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
@@ -181,7 +181,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .sl-dots button.akt{width:30px;background:var(--zloty)}
 
 /* --- jak działamy + CTA --- */
-.cta{flex:none;padding:26px clamp(16px,2.5vw,32px) 40px}
+.cta{flex:none;padding:26px clamp(12px,1.5vw,20px) 40px}
 .jak{padding:32px 34px;background:#fff;border:1px solid rgba(107,69,48,.25)}
 .jak h2{font-size:24px;color:var(--butelkowa);margin-bottom:4px}
 .jak .pod{font-size:15.5px;color:rgba(51,38,28,.7);margin-bottom:18px}
@@ -197,6 +197,12 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .cta-btn .btn:hover{background:var(--zloty);color:var(--butelkowa)}
 .cta-btn .btn.outline{background:transparent;color:var(--butelkowa)}
 .cta-btn .btn.outline:hover{background:var(--brunatny);border-color:var(--brunatny);color:var(--krem)}
+
+/* --- wstążka nad stopką (pozioma, jak pionowa między kolumnami) --- */
+.listwa-poziom{height:10px;background:
+  repeating-linear-gradient(180deg, rgba(139,90,43,.30) 0 2px, rgba(107,69,48,.12) 2px 4px),
+  linear-gradient(90deg,#7A5338 0%,#C4A582 22%,#6B4530 50%,#C4A582 78%,#7A5338 100%);
+  box-shadow: inset 0 0 0 1px rgba(196,165,130,.35)}
 
 /* --- stopka --- */
 .foot{flex:none;background:var(--butelkowa);color:var(--krem);display:flex;align-items:center;
@@ -398,9 +404,11 @@ html.dotyk .social{margin-top:14px}
   </div>
 </div>
 
+  <div class="listwa-poziom" aria-hidden="true"></div>
+
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a></span>
-    <span>© Sygnatura 2026 · wersja 28.11</span>
+    <span>© Sygnatura 2026 · wersja 28.12</span>
   </footer>
 </div>
 
@@ -444,10 +452,10 @@ html.dotyk .social{margin-top:14px}
 })();
 </script>
 
-<script src="data/katalog.js?v=291"></script>
-<script src="assets/koszyk.js?v=291"></script>
-<script src="assets/config.js?v=291"></script>
-<script src="assets/main.js?v=291"></script>
+<script src="data/katalog.js?v=292"></script>
+<script src="assets/koszyk.js?v=292"></script>
+<script src="assets/config.js?v=292"></script>
+<script src="assets/main.js?v=292"></script>
 <script>
 (function(){
   /* ===== slider: autoplay w pętli, strzałki, kropki ===== */
@@ -476,7 +484,7 @@ html.dotyk .social{margin-top:14px}
   function nastepny(){idz(i+1);}
   function restart(){
     if(timer)clearInterval(timer);
-    timer=setInterval(nastepny,5000);
+    timer=setInterval(nastepny,4500);
   }
   slider.querySelector('.sl-nav.prev').addEventListener('click',function(){idz(i-1);restart();});
   slider.querySelector('.sl-nav.next').addEventListener('click',function(){nastepny();restart();});

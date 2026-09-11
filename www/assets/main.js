@@ -99,7 +99,7 @@
   function stopka() {
     return '<span><a href="regulamin.html">Regulamin</a><span class="sep">·</span>' +
       '<a href="jak-pracujemy.html">Jak pracujemy</a></span>' +
-      '<span>© Sygnatura 2026 · wersja 28.11</span>';
+      '<span>© Sygnatura 2026 · wersja 28.12</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -134,6 +134,10 @@
     /* treść trafia do prawego boxa (segment D) */
     shell.querySelector('.prawa').appendChild(tresc);
     if (stopkaEl) stopkaEl.remove();
+    const listwaNode = document.createElement('div');
+    listwaNode.className = 'listwa-poziom';
+    listwaNode.setAttribute('aria-hidden', 'true');
+    shell.appendChild(listwaNode);
     const stopkaNode = document.createElement('footer');
     stopkaNode.className = 'stopka';
     stopkaNode.innerHTML = stopka();
