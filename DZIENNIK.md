@@ -446,4 +446,38 @@ a08171d + 2cd3db1 + 9a5ea4a):
 
 Testy: składnia JS OK, Pages build OK (gh api), podgląd live przez fetch_page: splash renderuje się
 (sygnet + 9 liter), koszyk.html działa, tytuł strony pod wyszukiwarką, brak podwójnego menu.
-NASTĘPNY KROK: oględziny właściciela (telefon + komputer); potem ścieżki A/B, panel, wdrożenie engine.
+
+## Sesja 28 — korekta 2 po oględzinach (commit 114fd1e, wersja 28.4)
+
+Uwagi właściciela: (1) strona za bardzo rozciągnięta — kolumna z treścią ma się dopasowywać do
+zawartości podstrony, a zawartość boxa treści ma być WYJUSTOWANA DO GÓRY (nie do środka);
+(2) elementy lewej kolumny (menu, sociale) zawsze u góry; (3) długość przewijania strony dopasowuje
+się automatycznie do treści; (4) gdy treści jest więcej, góra i lewe menu zostają NIERUCHOME,
+a treść przewija się WEWNĄTRZ swojego boxa po prawej na dole; (5) kliknięcie ikony konta ma otwierać
+PANEL LOGOWANIA (konto.html), nie sklep; musi być baza klientów — najpierw panel logowania,
+resztę robimy później.
+
+WYKONANE:
+- Nowy szkielet układu (style.css + index.html): zamiast siatki z min-height:100vh — kolumna flex
+  z max-height:100vh i overflow:hidden. Krótka treść = krótka strona (żadnej pustej przestrzeni);
+  długa treść = strona dokładnie na wysokość ekranu, a treść przewija się wewnątrz boxa
+  (main.wrap / .main z overflow-y:auto + cienki scrollbar). Góra (topbar + head z wyszukiwarką
+  i tytułem) oraz lewa kolumna zostają nieruchome. Struktura: topbar / .srodek[ aside.side |
+  .prawa[ .head | main ] ] / .stopka.
+- Lewa kolumna: menu i sociale ZAWSZE U GÓRY (usunięte flex:1 z menu i height:100vh z .side);
+  .side-stopka przypięta do dołu kolumny (margin-top:auto). Na telefonach (<760 px) powrót do
+  normalnego przewijania strony, kolumny jedna pod drugą; 761–1100 px węższa lewa kolumna (230 px).
+- IKONA KONTA (w prawym górnym rogu, obok koszyka) prowadzi teraz do NOWEJ podstrony
+  www/konto.html — PANEL LOGOWANIA: e-mail + hasło + „Zaloguj się", informacja że konto zakłada się
+  przy pierwszym zamówieniu, ręczne odzyskanie hasła przez kontakt@studiosygnatura.pl. Walidacja
+  pól; po kliknięciu komunikat, że weryfikacja kont nastąpi z BAZĄ KLIENTÓW (Google Apps Script +
+  arkusz) — kolejny etap (ustalenie: „najpierw panel logowania, resztę zrobimy później").
+- Baner trybu demo: body.ma-banner pomniejsza max-height układu o wysokość banera, żeby stopka
+  nie uciekała poza ekran.
+- Znacznik wersji w stopkach: „wersja 28.4".
+
+Testy: wszystkie podstrony 200 na podglądzie lokalnym, HTML zbilansowany, node --check OK,
+Pages build OK (gh api: built | 114fd1e), fetch_page potwierdza live: konto.html działa
+(formularz logowania), ikony prowadzą do koszyk.html i konto.html.
+NASTĘPNY KROK: oględziny właściciela (telefon + komputer); potem BAZA KLIENTÓW
+(rejestracja/logowanie przez Apps Script + arkusz), ścieżki A/B, panel admina.
