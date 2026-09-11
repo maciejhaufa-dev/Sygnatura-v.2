@@ -806,5 +806,63 @@ fetch_page live: blog.html (3 kafle-odnośniki + filtr + badge), blog-wpis.html?
 blok projektu z DODAJ DO KOSZYKA / ZAMÓW JUŻ DZIŚ!, treść z listą), admin.html (6 zakładek:
 Zamówienia/Wiadomości/Blog/Produkty/Podstrony/Ustawienia + edytor z paskiem B I U H2 H3 listy
 cytat link obraz film), personalizacja.html?produkt=Szopka (blok zgody marketingowej).
+## Sesja 28 — korekta 12: WYNAJEM W 5 KROKACH + kafelki personalizacji (commit da721d1, wersja 28.14)
+
+Uwagi właściciela (3 screeny): (1) wynajem miał być w 5 KROKACH, a nie „wszystko w jednym
+miejscu": K1 TERMIN — widok KALENDARZA (macierz dni, widok miesiąca, przewijanie przód/tył)
+z danymi o wolnych terminach NA ŻYWO — jak na screenie z wersji PythonAnywhere; BEZ godziny
+(„kto kazał wstawiać godzinę!?"); K2 wybór PAKIETU — dopiero tu; niedostępne pakiety
+wyszarzone z zielonym (butelkowym) napisem „NIEDOSTĘPNY" przez środek + adnotacja nad pakietami
+„KTÓRYŚ PAKIET JEST NIEDOSTĘPNY? ZMIEŃ TERMIN ABY SPRAWDZIĆ JEGO DOSTĘPNOŚĆ"; K3
+PERSONALIZACJA — opcjonalna, do pominięcia; K4 formularz danych („już to mieliśmy ładnie
+ubrane, ale coś rozwaliłeś — napraw!"); K5 podsumowanie + przycisk zamów. (2) Personalizacja:
+KLIENT KUPUJE OCZAMI — kafelki 3 w rzędzie (zdjęcie/podpis/cena + checkbox), po zaznaczeniu
+pole treści personalizacji (maks. 200 znaków); nic nie wybrano → komunikat „wybierz produkt do
+personalizacji"; poniżej 10 znaków w polu → nie można przejść dalej. (3) Usunąć zapis zgód
+(checkboxy) — adnotacja, że składając zamówienie klient akceptuje regulamin i wyraża zgodę na
+kontakt. (4) Podsumowanie: ZMIEŃ DANE jako duży butelkowy przycisk; usunąć „Krok 3 z 3"
+(cyfry nie pasują stylem; jest progress bar); pod podsumowaniem dobrze widoczne „ADNOTACJE DO
+ZAMÓWIENIA" (bold) + kursywą treści — wybrzmieć min. 2 tyg. na personalizacje + opcja EXPRESS
+płatna z góry po wcześniejszym kontakcie; kolor wyraźny (pomarańczowy); sekcja danych jak
+„Etykieta pocztowa" (imię i nazwisko, adres, telefon, paczkomat jeśli wybrano) — większa
+czcionka, bo się zlewa.
+
+WYKONANE:
+- WYNAJEM = 5 kroków na jednej stronie (wynajem.html, sekcje #krok-1..5 + progress bar
+  5 etapów): K1 TERMIN — kalendarz-macierz miesiąca (pon–nie, przewijanie ‹ ›, min. bieżący
+  miesiąc, maks. +12 mies.), dni wolne/wybrane/zajęte (przekreślone) + legenda + podsumowanie
+  wyboru; zajętości NA ŻYWO: akcja demo `terminy-zajete` (hash deterministyczny ~20% dni +
+  terminy z zamówień demo nieodrzuconych). K2 PAKIET — karty pakietów dla wybranego rodzaju
+  wydarzenia; dostępność per pakiet+termin (akcja `pakiet-dostepny`; konflikt z zamówieniami
+  demo); niedostępne: wyszarzone + grayscale + zielony napis NIEDOSTĘPNY przez środek +
+  stała adnotacja nad pakietami; zmiana terminu sprawdza zapisany pakiet (jeśli znika —
+  komunikat i wyczyszczenie wyboru). K3 PERSONALIZACJA opcjonalna — kafelki pers.js, „dalej"
+  przechodzi też bez wyboru. K4 DANE — imię/nazwisko, e-mail, telefon, sygnatura (bez zgód;
+  adnotacja o regulaminie i zgodzie na kontakt pod formularzem). K5 PODSUMOWANIE — rachunek
+  (pakiet z terminem, personalizacje, rabat, kaucja, razem), dane klienta, ADNOTACJE DO
+  ZAMÓWIENIA (pomarańczowy blok, bold nagłówek, kursywa; min. 2 tyg. + EXPRESS płatny z góry
+  po kontakcie; regulamin+zgoda) + duży ZMIEŃ DANE i ZAMÓW → `zamowienie` z pakiet/termin/
+  zgoda → dziekuje. Godzina USUNIĘTA z terminu.
+- PERSONALIZACJA (personalizacja.html + wspólne assets/pers.js): kafelki 3 w rzędzie (2 na
+  tabletach, 1 na telefonie) — zdjęcie, nazwa, opis, cena, checkbox; po zaznaczeniu pole
+  treści max 200 znaków z licznikiem; walidacja: brak wyboru → „Wybierz produkt do
+  personalizacji", opis < 10 znaków → komunikat; zdjęcia produktów pers-*.jpg wygenerowane.
+- KOSZYK/DANE: dane.html bez checkboxów zgód (adnotacja o regulaminie+zgodzie), guard
+  wynajmu (wynajem ma własny krok 4), powrót dynamiczny (personalizacja→personalizacja.html).
+- PODSUMOWANIE (sklep/personalizacja): bez „Krok 3 z 3"; duże przyciski ZMIEŃ DANE
+  (butelkowy) + ZAMÓW Z OBOWIĄZKIEM ZAPŁATY; blok ADNOTACJE DO ZAMÓWIENIA (pomarańczowy
+  #C96F1A/#FDF3E4); dane klienta jako etykieta pocztowa (wiersze: Imię i nazwisko / E-mail /
+  Telefon / Adres / Paczkomat / Dostawa / Sygnatura, 17 px).
+- Wersja 28.14, zasoby ?v=294 (21 stron); CSS: .krok/.krok-nr, .kalendarz-*,
+  .pakiet-karta(.niedostepny/.pk-niedostepny), #pers-kafelki/.pers-kafel, .adnotacje,
+  .btn.duzy, .etykieta-wiersz.
+
+Testy: HTML zbilansowany (21 stron), node --check OK, test API Node: terminy-zajete
+(wrzesień 2026: 5 dni zajętych), pakiet-dostepny (2/12 niedostępne w 2026-09-01; po
+zamówieniu demo pakiet i termin blokują się — konflikt), podgląd lokalny 5×200, sync docs,
+Pages built | da721d1, fetch_page live: wynajem.html (kalendarz WRZESIEŃ 2026 + 5 kroków +
+adnotacja NIEDOSTĘPNY + ADNOTACJE DO ZAMÓWIENIA + ZMIEŃ DANE/ZAMÓW),
+personalizacja.html (kafelki ze zdjęciami + pola 0/200).
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
-strona-*, produkt-nowy dostają lustra serwerowe; zamówienia, maile, hasła/reset, logowania).
+strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
+maile, hasła/reset, logowania).
