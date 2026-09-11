@@ -139,7 +139,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 @keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
 
 /* --- okno główne: slider --- */
-.main{width:100%;padding:8px 0 0}
+.main{width:100%;padding:8px clamp(12px,1.5vw,20px) 0}
 .slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
   background:var(--butelkowa);width:100%;max-width:none;margin:0 auto;aspect-ratio:16/8.6;max-height:600px}
 .sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
@@ -411,14 +411,14 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.15</span>
+    <span>© Sygnatura 2026 · wersja 28.16</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=295"></script>
-<script src="assets/koszyk.js?v=295"></script>
-<script src="assets/config.js?v=295"></script>
-<script src="assets/main.js?v=295"></script>
+<script src="data/katalog.js?v=296"></script>
+<script src="assets/koszyk.js?v=296"></script>
+<script src="assets/config.js?v=296"></script>
+<script src="assets/main.js?v=296"></script>
 <script>
 /* mini-karty w slajdach — dane z katalogu (data/katalog.js) */
 (function(){

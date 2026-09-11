@@ -11,7 +11,8 @@
   const KL = { katalog: 'syg-demo-katalog', wiadomosci: 'syg-demo-wiadomosci',
                zamowienia: 'syg-demo-zamowienia', licznik: 'syg-demo-licznik',
                produkty: 'syg-admin-produkty', dostawa: 'syg-admin-dostawa',
-               blog: 'syg-demo-blog', strony: 'syg-demo-strony', dodane: 'syg-demo-dodane' };
+               blog: 'syg-demo-blog', strony: 'syg-demo-strony', dodane: 'syg-demo-dodane',
+               zapytaniaWynajem: 'syg-demo-wynajem-zapytania' };
   function czytaj(klucz) {
     try { return JSON.parse(localStorage.getItem(klucz) || 'null'); } catch (e) { return null; }
   }
@@ -58,7 +59,8 @@
   SYG.demoDb = {
     czytaj: czytaj, zapisz: zapisz,
     wiadomosci: function () { return czytaj(KL.wiadomosci) || []; },
-    zamowienia: function () { return czytaj(KL.zamowienia) || []; }
+    zamowienia: function () { return czytaj(KL.zamowienia) || []; },
+    wynajemZapytania: function () { return czytaj(KL.zapytaniaWynajem) || []; }
   };
 
   /* ---------- BLOG: wpisy (realizacje) ---------- */
@@ -128,6 +130,23 @@
         zapisz(KL.wiadomosci, lista);
         return { ok: true, id: lista[0].id };
       }
+
+      case 'wynajem-zapytanie': {
+        /* zapytanie o termin wynajmu — jak wiadomość z formularza kontaktowego.
+           Termin NIE jest blokowany: rezerwację potwierdzamy po wpłacie. */
+        const klientW = d.klient || {};
+        if (!klientW.imie || !klientW.email) return { ok: false, blad: 'Brak imienia lub e-maila.' };
+        if (!d.pakiet || !(d.termin && d.termin.data)) return { ok: false, blad: 'Wybierz termin i pakiet.' };
+        const listaW = czytaj(KL.zapytaniaWynajem) || [];
+        listaW.unshift({ id: listaW.length + 1, data: teraz(), klient: klientW, pakiet: d.pakiet,
+          termin: d.termin, pers: d.pers || [], ev: d.ev || '', kwoty: d.kwoty || {},
+          status: 'zapytanie' });
+        zapisz(KL.zapytaniaWynajem, listaW);
+        return { ok: true, id: listaW[0].id };
+      }
+
+      case 'wynajem-zapytania-lista':
+        return { ok: true, zapytania: czytaj(KL.zapytaniaWynajem) || [] };
 
       case 'zamowienie': {
         const klient = d.klient || {};
@@ -261,12 +280,7 @@
           const iso = cz[0] + '-' + String(cz[1]).padStart(2, '0') + '-' + String(dz).padStart(2, '0');
           if (hashDemo(iso) % 5 === 0) zajete.push(iso);
         }
-        (czytaj(KL.zamowienia) || []).forEach(function (z) {
-          if (z.typ === 'wynajem' && z.termin && z.termin.data && z.status !== 'odrzucono' &&
-              z.termin.data.slice(0, 7) === mies && zajete.indexOf(z.termin.data) < 0) {
-            zajete.push(z.termin.data);
-          }
-        });
+        /* zapytania o wynajem NIE blokują dni — rezerwacja potwierdzana jest po wpłacie */
         return { ok: true, miesiac: mies, zajete: zajete };
       }
 

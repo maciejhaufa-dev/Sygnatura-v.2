@@ -1,21 +1,59 @@
 /* ============================================================
    Studio Sygnatura — KOSZYK (koszyk.js)
-   Zamówienie w trakcie składania trzyma się w localStorage,
-   więc przetrwa przeładowanie strony i powrót na telefonie.
-   Struktura: { typ, pozycje:[{id,ile,nazwa,cena}], pers:[{id,opis}], pakiet, pomysl, dane, dostawa }
-   Dodatkowo: GLOBALNY pasek koszyka — gdy coś jest w koszyku,
-   na dole strony (na każdej podstronie) pojawia się przypięty
-   pasek: liczba sztuk, suma i przycisk „Przejdź do koszyka →".
+   DWA osobne, niezależne magazyny w localStorage:
+
+   1) KOSZYK (syg-koszyk-v1) — TYLKO sklep: produkty z katalogu,
+      personalizacje, pomysł własny, dane i dostawa.
+   2) WYNAJEM (syg-wynajem-v1) — TYLKO wynajem dekoracji: wybrany
+      termin, pakiet, personalizacje i dane. Termin NIE trafia do
+      koszyka — po podsumowaniu idzie jako zapytanie o rezerwację
+      (rezerwacja potwierdzana jest po wpłacie).
+
+   Dodatkowo: GLOBALNY pasek koszyka — gdy coś jest w koszyku
+   SKLEPOWYM, na dole strony pojawia się przypięty pasek:
+   liczba sztuk, suma i przycisk „Przejdź do koszyka →".
    ============================================================ */
 window.KOSZYK = (function () {
   const KLUCZ = 'syg-koszyk-v1';
+  const W_KLUCZ = 'syg-wynajem-v1';
 
+  /* migracja ze starej wersji: wynajem i sklep trzymane w jednym
+     obiekcie — rozdzielamy, żeby koszyk nigdy nie pokazywał terminu */
+  (function migruj() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(KLUCZ) || 'null');
+      if (raw && typeof raw === 'object' && (raw.typ === 'wynajem' || raw.pakiet || raw.termin)) {
+        if (!localStorage.getItem(W_KLUCZ)) {
+          localStorage.setItem(W_KLUCZ, JSON.stringify({
+            pakiet: raw.pakiet || null,
+            termin: raw.termin || null,
+            pers: raw.typ === 'wynajem' ? (raw.pers || []) : [],
+            ev: (raw.pakiet && raw.pakiet.ev) || '',
+            dane: raw.typ === 'wynajem' ? (raw.dane || null) : null
+          }));
+        }
+        localStorage.setItem(KLUCZ, JSON.stringify({
+          pozycje: raw.pozycje || [],
+          pers: raw.typ === 'wynajem' ? [] : (raw.pers || []),
+          pomysl: raw.typ === 'wynajem' ? '' : (raw.pomysl || ''),
+          dane: raw.typ === 'wynajem' ? null : (raw.dane || null),
+          dostawa: raw.typ === 'wynajem' ? null : (raw.dostawa || null)
+        }));
+      }
+    } catch (e) { /* uszkodzony zapis — zostawiamy */ }
+  })();
+
+  function czysty() {
+    return { pozycje: [], pers: [], pomysl: '', dane: null, dostawa: null };
+  }
+
+  /* ================= KOSZYK SKLEPOWY ================= */
   function pobierz() {
     try {
       const k = JSON.parse(localStorage.getItem(KLUCZ) || 'null');
-      if (k && typeof k === 'object') return k;
+      if (k && typeof k === 'object' && Array.isArray(k.pozycje)) return k;
     } catch (e) { /* uszkodzony zapis — zaczynamy od nowa */ }
-    return { typ: 'sklep', pozycje: [], pers: [], pakiet: null, pomysl: '', dane: null, dostawa: null };
+    return czysty();
   }
   function zapisz(k) { localStorage.setItem(KLUCZ, JSON.stringify(k)); }
   function wyczysc() { localStorage.removeItem(KLUCZ); }
@@ -28,8 +66,6 @@ window.KOSZYK = (function () {
   /* ---- produkty sklepu ---- */
   function dodajProdukt(id, ile, meta) {
     const k = pobierz();
-    /* zakupy w sklepie = ścieżka sklepowa (porzucamy niezakończony wynajem) */
-    if (k.typ === 'wynajem') { k.typ = 'sklep'; k.pakiet = null; k.termin = null; }
     const pr = znajdzProdukt(id);
     const nazwa = (meta && meta.nazwa) || (pr && pr.nazwa) || ('Produkt #' + id);
     const cena = (meta && Number(meta.cena)) || (pr && Number(pr.cena)) || 0;
@@ -76,7 +112,7 @@ window.KOSZYK = (function () {
     return suma;
   }
 
-  /* ---- licznik na stronie (ikona koszyka) + globalny pasek koszyka ---- */
+  /* ---- licznik przy ikonie koszyka + globalny pasek koszyka ---- */
   function czyStronaKoszyka() {
     return /\/koszyk\.html/.test(window.location.pathname || '');
   }
@@ -91,7 +127,7 @@ window.KOSZYK = (function () {
       el.classList.toggle('widoczna', n > 0);
     });
 
-    /* globalny pasek koszyka (na wszystkich stronach poza samym koszykiem) */
+    /* globalny pasek koszyka (wszystkie strony poza samym koszykiem) */
     const stary = document.getElementById('koszyk-bar-global');
     if (n === 0 || czyStronaKoszyka()) {
       if (stary) stary.remove();
@@ -118,4 +154,31 @@ window.KOSZYK = (function () {
 
   return { pobierz, zapisz, wyczysc, dodajProdukt, ustawIle, ileProduktu,
            liczbaSztuk, sumaZl, odswiez };
+})();
+
+/* ============================================================
+   WYNAJEM — osobny magazyn (termin/pakiet NIE wchodzą do koszyka)
+   ============================================================ */
+window.WYNAJEM = (function () {
+  const W_KLUCZ = 'syg-wynajem-v1';
+
+  function pobierz() {
+    try {
+      const w = JSON.parse(localStorage.getItem(W_KLUCZ) || 'null');
+      if (w && typeof w === 'object') return w;
+    } catch (e) { /* uszkodzony zapis */ }
+    return { pakiet: null, termin: null, pers: [], ev: '', dane: null };
+  }
+  function zapisz(w) { localStorage.setItem(W_KLUCZ, JSON.stringify(w)); }
+  function wyczysc() { localStorage.removeItem(W_KLUCZ); }
+
+  /* suma personalizacji (z rabatem, gdy min. 3 produkty) */
+  function sumaPers() {
+    const pers = pobierz().pers || [];
+    const suma = pers.reduce(function (s, p) { return s + (Number(p.cena) || 0); }, 0);
+    const rabat = pers.length >= SYG.PERS_RABAT_PROG ? Math.round(suma * SYG.PERS_RABAT_PROC / 100) : 0;
+    return { suma: suma, rabat: rabat, razem: Math.max(0, suma - rabat) };
+  }
+
+  return { pobierz, zapisz, wyczysc, sumaPers };
 })();

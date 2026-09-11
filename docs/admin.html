@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=295">
+<link rel="stylesheet" href="assets/style.css?v=296">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -69,6 +69,12 @@
         <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Wiadomości z formularza</h2>
         <table class="tabela" id="tabela-wiadomosci">
           <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Zapytania o termin wynajmu</h2>
+        <p class="mala" style="margin-bottom:8px">Wybrany termin NIE jest blokowany — rezerwację potwierdzamy po wpłacie.</p>
+        <table class="tabela" id="tabela-wynajem-zapytania">
+          <thead><tr><th>Data</th><th>Od</th><th>Wydarzenie</th><th>Pakiet</th><th>Termin</th><th>Personalizacja</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -307,12 +313,12 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=295"></script>
-<script src="assets/koszyk.js?v=295"></script>
-<script src="assets/api.js?v=295"></script>
-<script src="assets/editor.js?v=295"></script>
-<script src="data/katalog.js?v=295"></script>
-<script src="assets/main.js?v=295"></script>
+<script src="assets/config.js?v=296"></script>
+<script src="assets/koszyk.js?v=296"></script>
+<script src="assets/api.js?v=296"></script>
+<script src="assets/editor.js?v=296"></script>
+<script src="data/katalog.js?v=296"></script>
+<script src="assets/main.js?v=296"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -383,14 +389,27 @@
   /* ============ wiadomości ============ */
   function ladujWiadomosci(){
     var wbody = document.querySelector('#tabela-wiadomosci tbody');
+    var zbody = document.querySelector('#tabela-wynajem-zapytania tbody');
     if (SYG.TRYB_DEMO){
       var wiadomosci = SYG.demoDb.wiadomosci();
       wbody.innerHTML = wiadomosci.map(function(w){
         return '<tr><td>' + (w.data || '').slice(0, 10) + '</td><td>' + w.imie + '<br><span class="mala">' + w.email + '</span></td>' +
           '<td>' + w.temat + '</td><td>' + w.tresc + '</td></tr>';
       }).join('') || '<tr><td colspan="4">Brak wiadomości.</td></tr>';
+      var zap = SYG.demoDb.wynajemZapytania();
+      zbody.innerHTML = zap.map(function(z){
+        var persTxt = (z.pers || []).map(function(p){ return p.nazwa + (p.opis ? ': ' + p.opis.slice(0,60) : ''); }).join('; ') || '—';
+        var evMap = { weselny: 'Wesele', komunijny: 'Komunia / chrzest', firmowy: 'Event firmowy', jubileuszowy: 'Jubileusz / urodziny' };
+        return '<tr><td>' + (z.data || '').slice(0, 10) + '</td><td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email +
+          (z.klient.telefon ? ' · ' + z.klient.telefon : '') + '</span></td>' +
+          '<td>' + (evMap[z.ev] || z.ev || '—') + '</td>' +
+          '<td><b>' + (z.pakiet ? z.pakiet.nazwa : '—') + '</b></td>' +
+          '<td>' + (z.termin ? z.termin.data : '—') + '</td>' +
+          '<td>' + persTxt + '</td></tr>';
+      }).join('') || '<tr><td colspan="6">Brak zapytań o termin.</td></tr>';
     } else {
       wbody.innerHTML = '<tr><td colspan="4">Lista wiadomości z arkusza będzie dostępna po wdrożeniu (akcja „wiadomosci-lista").</td></tr>';
+      zbody.innerHTML = '<tr><td colspan="6">Zapytania o wynajem z arkusza będą dostępne po wdrożeniu.</td></tr>';
     }
   }
 
