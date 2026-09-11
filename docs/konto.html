@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konto — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-strona="Konto">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Panel klienta</span>
+  <h1>Logowanie do konta</h1>
+  <p class="sub">Zaloguj się, aby śledzić swoje zamówienia, sygnatury spraw i historię zakupów.
+  Konto zakładasz przy pierwszym zamówieniu — resztę panelu uruchomimy razem z bazą klientów.</p>
+
+  <div class="forma" style="max-width:560px">
+    <form id="forma" novalidate>
+      <div class="pole">
+        <label for="email">Adres e-mail *</label>
+        <input type="email" id="email" name="email" placeholder="adres@poczta.pl">
+      </div>
+      <div class="pole">
+        <label for="haslo">Hasło *</label>
+        <input type="password" id="haslo" name="haslo" placeholder="••••••••">
+      </div>
+      <div class="przyciski">
+        <button class="btn" type="submit">Zaloguj się</button>
+      </div>
+      <p style="font-size:13.5px;color:rgba(51,38,28,.75);margin-top:14px">
+        Nie pamiętasz hasła? Napisz na <a href="mailto:kontakt@studiosygnatura.pl" style="color:var(--brunatny);border-bottom:1px solid var(--zloty)">kontakt@studiosygnatura.pl</a> — odzyskamy dostęp ręcznie.
+      </p>
+    </form>
+  </div>
+
+  <div id="komunikat" style="display:none" class="sukces"></div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/koszyk.js"></script>
+<script src="assets/api.js"></script>
+<script src="data/katalog.js"></script>
+<script src="assets/main.js"></script>
+<script>
+(function(){
+  var forma = document.getElementById('forma');
+  var komunikat = document.getElementById('komunikat');
+  forma.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var email = document.getElementById('email').value.trim();
+    var haslo = document.getElementById('haslo').value;
+    if (!email || !haslo){
+      komunikat.style.display = 'block';
+      komunikat.style.background = '#8a2f1d';
+      komunikat.innerHTML = '<h2>Uzupełnij pola</h2><p>Podaj adres e-mail i hasło, żeby się zalogować.</p>';
+      return;
+    }
+    /* Panel logowania gotowy; weryfikacja kont nastąpi z bazą klientów
+       (Google Apps Script + arkusz) — kolejny etap wdrożenia. */
+    komunikat.style.display = 'block';
+    komunikat.style.background = '';
+    komunikat.innerHTML = '<h2>Panel logowania gotowy</h2>' +
+      '<p>Konta klientów (baza w arkuszu Google) uruchomimy w kolejnym etapie — wtedy logowanie ' +
+      'będzie sprawdzać Twoje dane w bazie. Do tego czasu zamówienia obsługujemy formularzami ' +
+      'z sygnaturą sprawy wysyłaną na e-mail.</p>';
+  });
+})();
+</script>
+</body>
+</html>

@@ -26,19 +26,31 @@ button{font-family:inherit}
 .topbar .top-note{color:rgba(196,165,130,.85);font-style:italic}
 
 /* ============ SIATKA KWATEROWA (wspólna dla podstron) ============ */
-.strona-uklad{display:grid;grid-template-columns:minmax(250px,290px) 1fr;
-  grid-template-areas:"top top" "side head" "side main" "foot foot";
-  max-width:1500px;margin:0 auto;min-height:100vh}
-.topbar{grid-area:top}
-.side{grid-area:side}
-.head{grid-area:head}
-.strona-uklad main.wrap{grid-area:main}
-.stopka{grid-area:foot}
+/* ============================================================
+   SZKIELET APLIKACJI (układ wg ustaleń właściciela):
+   - strona dopasowuje wysokość do treści (krótka treść = krótka strona)
+   - gdy treści jest więcej: góra (topbar+head) i lewa kolumna (menu+social)
+     zostają nieruchome, a treść przewija się WEWNĄTRZ swojego boxa
+   ============================================================ */
+.strona-uklad{display:flex;flex-direction:column;height:auto;max-height:100vh;overflow:hidden;
+  max-width:1500px;margin:0 auto;width:100%}
+.topbar{flex:none}
+.srodek{flex:1 1 auto;min-height:0;display:flex;align-items:stretch}
+.side{flex:none;width:clamp(250px,22vw,290px)}
+.prawa{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;background:var(--krem)}
+.head{flex:none}
+.strona-uklad main.wrap{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.strona-uklad main.wrap::-webkit-scrollbar{width:10px}
+.strona-uklad main.wrap::-webkit-scrollbar-thumb{background:rgba(107,69,48,.35);border-radius:6px}
+.strona-uklad main.wrap::-webkit-scrollbar-track{background:rgba(107,69,48,.08)}
+.stopka{flex:none}
 
-/* --- lewa ćwiartka: logo + menu + social --- */
+/* baner trybu demo zajmuje miejsce nad układem — odliczamy je od wysokości ekranu */
+body.ma-banner .strona-uklad,body.ma-banner .page{max-height:calc(100vh - 40px)}
+
+/* --- lewa kolumna: logo + menu + social — wszystko do góry --- */
 .side{background:linear-gradient(180deg,var(--butelkowa) 0%,#17302A 100%);
-  color:var(--krem);display:flex;flex-direction:column;padding:30px 26px 26px;position:sticky;top:0;
-  height:100vh;min-height:560px}
+  color:var(--krem);display:flex;flex-direction:column;justify-content:flex-start;padding:30px 26px 26px}
 .brand-blok{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .brand-kwadrat{width:128px;height:128px;background:var(--krem);border:1px solid var(--zloty);
   display:grid;place-items:center;box-shadow:0 16px 40px rgba(0,0,0,.35);animation:kwadrat 6s ease-in-out infinite}
@@ -48,7 +60,7 @@ button{font-family:inherit}
 .brand-nazwa em{font-style:normal;color:var(--krem)}
 .brand-tag{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.55)}
 
-.menu-vert{display:flex;flex-direction:column;gap:2px;margin-top:26px;flex:1}
+.menu-vert{display:flex;flex-direction:column;gap:2px;margin-top:26px}
 .menu-vert a{position:relative;color:var(--krem);font-size:15.5px;font-weight:600;letter-spacing:.1em;
   text-transform:uppercase;padding:12px 14px;border:1px solid transparent;transition:all .25s}
 .menu-vert a::after{content:"";position:absolute;left:14px;bottom:6px;width:0;height:1px;
@@ -63,7 +75,7 @@ button{font-family:inherit}
   color:var(--zloty);transition:all .25s}
 .social a:hover{background:var(--zloty);color:var(--butelkowa)}
 .social svg{width:19px;height:19px}
-.side .side-stopka{font-size:11.5px;color:rgba(251,247,240,.45);text-align:center;letter-spacing:.06em;margin-top:14px}
+.side .side-stopka{font-size:11.5px;color:rgba(251,247,240,.45);text-align:center;letter-spacing:.06em;margin-top:auto;padding-top:18px}
 
 /* --- górny blok po prawej: wyszukiwarka (ładne tło) + ikony; pod spodem TYTUŁ STRONY --- */
 .head{padding:18px clamp(18px,3vw,40px) 4px;background:var(--krem);
@@ -168,7 +180,7 @@ body.ma-koszyk{padding-bottom:76px}
 .pole{margin:14px 0}
 .pole label{display:block;font-size:13px;color:var(--brunatny);margin-bottom:5px;
   text-transform:uppercase;letter-spacing:.06em}
-.pole input[type=text],.pole input[type=email],.pole input[type=tel],.pole input[type=number],
+.pole input[type=text],.pole input[type=email],.pole input[type=password],.pole input[type=tel],.pole input[type=number],
 .pole input[type=search],.pole textarea,.pole select{width:100%;padding:11px 13px;
   border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16.5px;color:var(--ink)}
 .pole textarea{min-height:120px;resize:vertical}
@@ -289,8 +301,7 @@ body.ma-koszyk{padding-bottom:76px}
 
 /* ============ RESPONSYWNOŚĆ (kwatery zostają, ciaśniej) ============ */
 @media (max-width:1100px) and (min-width:761px){
-  .strona-uklad{grid-template-columns:minmax(200px,230px) 1fr}
-  .side{padding:20px 16px}
+  .side{width:230px;padding:20px 16px}
   .brand-kwadrat{width:96px;height:96px}
   .brand-kwadrat img{width:62px;height:62px}
   .brand-nazwa{font-size:24px}
@@ -301,14 +312,17 @@ body.ma-koszyk{padding-bottom:76px}
   .head{padding:16px 18px 4px}
 }
 
-/* telefony: wszystko jedno pod drugim */
+/* telefony: normalne przewijanie strony, wszystko jedno pod drugim */
 @media (max-width:760px){
-  .strona-uklad{grid-template-columns:1fr;grid-template-areas:"top" "head" "side" "main" "foot"}
-  .side{position:static;height:auto;min-height:0;padding:20px 16px 22px}
+  .strona-uklad{max-height:none;overflow:visible}
+  .srodek{flex-direction:column}
+  .side{width:auto;padding:20px 16px 22px}
+  .prawa{display:flex;flex-direction:column}
+  .strona-uklad main.wrap{overflow:visible;flex:none}
   .brand-kwadrat{width:96px;height:96px}
   .brand-kwadrat img{width:62px;height:62px}
   .brand-nazwa{font-size:24px}
-  .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px;flex:none}
+  .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
   .menu-vert a{padding:9px 12px;font-size:14px}
   .menu-vert a::after{display:none}
   .social{margin-top:14px}
