@@ -62,7 +62,7 @@ window.KOSZYK = (function () {
   /* ---- licznik na stronie (ikona koszyka, pasek) ---- */
   function odswiez() {
     const n = liczbaSztuk();
-    document.querySelectorAll('.koszyk-kropka').forEach(function (el) {
+    document.querySelectorAll('.kropka').forEach(function (el) {
       el.textContent = n;
       el.classList.toggle('widoczna', n > 0);
     });

@@ -98,9 +98,11 @@
   function odswiezBar(){
     KOSZYK.odswiez();
     var suma = KOSZYK.sumaZl(kat);
+    var n = KOSZYK.liczbaSztuk();
     document.getElementById('koszyk-suma').textContent = SYG.zl(suma);
-    document.getElementById('koszyk-bar').classList.toggle('pelny', KOSZYK.liczbaSztuk() > 0);
-    document.getElementById('dalej').classList.toggle('outline', KOSZYK.liczbaSztuk() === 0);
+    document.getElementById('koszyk-bar').classList.toggle('pelny', n > 0);
+    document.body.classList.toggle('ma-koszyk', n > 0);
+    document.getElementById('dalej').classList.toggle('outline', n === 0);
   }
 
   document.getElementById('dalej').addEventListener('click', function(e){
