@@ -749,5 +749,62 @@ WYKONANE:
 Testy: HTML zbilansowany (18 stron), node --check OK, podgląd lokalny 9×200, sync docs OK,
 Pages build OK (gh api: built | 1126e46), fetch_page live: wynajem.html (kalendarz + 3 pakiety
 weselne + progress), personalizacja.html (katalog 7 pozycji + pomysł własny + progress).
-NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (zamówienia A/B/C,
-maile, hasła/reset, logowania, zapis produktów/cennika) i gabaryty produktów do cennika paczek.
+
+## Sesja 28 — korekta 11: BLOG (wpisy-realizacje) + podstrony z panelu (commit cbb0ec9, wersja 28.13)
+
+Uwagi właściciela: (1) NASZE REALIZACJE to tylko kafelki — w menu admina ma być zakładka BLOG
+z dodawaniem wpisów jak na blogu; kafelki muszą być ODNOŚNIKAMI do strony wpisu (więcej zdjęć,
+zdjęcia z pracowni, opis wykonania/malowania/pracochłonności); (2) edytor tekstu „jak posty na
+forach PHP" żeby żona mogła formatować tekst przy wpisywaniu; (3) wgrywanie zdjęć (max 10),
+miejsce na film (link YT), znacznik przy zdjęciu głównym; (4) przy produkcie: „Podoba Ci się ten
+projekt?" + DODAJ DO KOSZYKA oraz „chcesz otrzymać produkt w wersji spersonalizowanej?" +
+ZAMÓW JUŻ DZIŚ! z przekierowaniem do personalizacji z odniesieniem do produktu; (5) wpis =
+jednocześnie opis produktu w sklepie (checkbox „dodaj do sklepu" → pozycja w zakładce Produkty
+z ceną/gabarytami/technikaliami) — każdy produkt ma historię na bloga/socialmedia/YT;
+(6) w panelu opcja definiowania podstron i dodawania podstron z nowym przyciskiem w MENU;
+(7) PRACOWNIA („o nas") z prostym edytorem — jak sformatowane w panelu, tak wyświetlane
+statycznie; (8) sklep: produkty „bez historii" (np. papierowe winietki); (9) przy produktach
+personalizowanych zgoda zamawiającego na wykorzystanie projektu marketingowo (wpis na blogu,
+social media) — istotny element; (10) złote paseczki 2–3 px: po lewej i prawej strony pionowej
+listwy oraz u góry i u dołu poziomej listwy nad stopką.
+
+WYKONANE:
+- ZAKŁADKA BLOG w panelu (admin.html): lista wpisów (data/tytuł/kategoria/sklep + Podgląd,
+  Edytuj, Usuń) + formularz wpisu: tytuł, kategoria (datalist), data, zajawka, ZDJĘCIA max 10
+  (wgranie plików + podgląd miniatur + radio „główne" + usuwanie), film YouTube, EDYTOR TEKSTU
+  (assets/editor.js: B/I/U, H2/H3, listy, cytat, link, wstawianie obrazu z pliku i ze schowka,
+  wstawianie filmu YT — contenteditable + ukryte pole HTML, dokładnie jak posty na forach),
+  checkbox „dodaj do sklepu" + nazwa/cena/gabaryt + „połącz z produktem" (albo nowy produkt).
+  Zapis: akcja demo `blog-zapisz` (api.js) — syncProdukt(): istniejący produkt aktualizowany
+  (cena, nazwa, gabaryt, storyId) albo tworzony nowy i doczepiany do katalogu (sklep widzi go
+  od razu); wpis ma badge „dostępny w sklepie".
+- REALIZACJE = blog: realizacje.html i blog.html renderują kafle-ODNOŚNIKI (blog.js) z filtrem
+  kategorii; blog-wpis.html to strona wpisu: okładka + miniatury (lightbox ze strzałkami i
+  klawiaturą), film YT, sformatowana treść, blok „Podoba Ci się ten projekt?" z DODAJ DO
+  KOSZYKA (dodaje do koszyka i przenosi) i ZAMÓW JUŻ DZIŚ! → personalizacja.html?produkt=…
+  (prefill pola pomysłu: „Chcę spersonalizowaną wersję produktu: …").
+- PODSTRONY (zakładka w adminie): lista + formularz (slug, tytuł, pokaż w menu, kolejność,
+  edytor treści). MENU (lewe, na wszystkich stronach) buduje się dynamicznie: pozycje stałe +
+  podstrony z panelu (main.js ladujPozycjeMenu); nowe podstrony dostają własny adres
+  podstrona.html?s=slug i przycisk w menu oraz link w stopce. PRACOWNIA edytowalna z panelu
+  (seed treści domyślnej; pracownia.html ładuje zapisaną treść).
+- SKLEP: produkt „bez historii" — przycisk „+ Produkt bez historii" w zakładce Produkty
+  (nazwa, cena, opis, zdjęcie) — akcja demo `produkt-nowy`; produkty z wpisów mają w tabeli
+  link „historia →" (blog-wpis.html?id=…).
+- ZGODA MARKETINGOWA w personalizacji (checkbox + zapis k.zgoda w zamówieniu i wysyłka do
+  panelu; prefill z ?produkt=).
+- ZŁOTE PASECZKI 2 px: listwa pionowa (lewa+prawa krawędź #C9AE85) i listwa nad stopką
+  (góra+dół) — index.html, style.css (podstrony), main.js (szkielet).
+- Wersja 28.13, zasoby ?v=293 (21 stron).
+- Uwaga git: po resecie sandboxa lokalna historia zaczynała od starego 2284074 — naprawa
+  procedurą fetch+reset do FETCH_HEAD + checkout commit -- www docs; push cbb0ec9 czysty.
+
+Testy: HTML zbilansowany (21 stron), node --check OK, test API w Node (blog-lista 3 wpisy,
+blog-pobierz, blog-zapisz nowy → produkt w katalogu ze storyId, aktualizacja szopki cena 269,
+produkt-nowy, strona-zapisz/usun) OK, podgląd lokalny 10×200, sync docs, Pages built | cbb0ec9,
+fetch_page live: blog.html (3 kafle-odnośniki + filtr + badge), blog-wpis.html?id=1 (okładka,
+blok projektu z DODAJ DO KOSZYKA / ZAMÓW JUŻ DZIŚ!, treść z listą), admin.html (6 zakładek:
+Zamówienia/Wiadomości/Blog/Produkty/Podstrony/Ustawienia + edytor z paskiem B I U H2 H3 listy
+cytat link obraz film), personalizacja.html?produkt=Szopka (blok zgody marketingowej).
+NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
+strona-*, produkt-nowy dostają lustra serwerowe; zamówienia, maile, hasła/reset, logowania).
