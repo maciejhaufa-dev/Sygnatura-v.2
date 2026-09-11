@@ -863,6 +863,54 @@ zamówieniu demo pakiet i termin blokują się — konflikt), podgląd lokalny 5
 Pages built | da721d1, fetch_page live: wynajem.html (kalendarz WRZESIEŃ 2026 + 5 kroków +
 adnotacja NIEDOSTĘPNY + ADNOTACJE DO ZAMÓWIENIA + ZMIEŃ DANE/ZAMÓW),
 personalizacja.html (kafelki ze zdjęciami + pola 0/200).
+## Sesja 28 — korekta 13: slider, menu, pasek koszyka, tabela (commity 547d20c + d21039f, wersja 28.15)
+
+Uwagi właściciela: (1) slider na stronie głównej DALEJ „do lewej" — powiększyć na całą
+szerokość albo wyśrodkować; (2) „nie wiem co stało się ze starym progress barem — dodałeś
+zbędne ozdobniki, o co nikt nie prosił — przywróć poprzednią wersję"; (3) menu: DWA przyciski
+PRACOWNIA podświetlone naraz i pod każdym CO INNEGO — naprawić bezwzględnie; (4) cyferka przy
+koszyku za mała/nieczytelna; (5) brak przypiętego paska koszyka na dole (koszyk+suma+przejdź
+do koszyka), który dawniej pojawiał się automatycznie; (6) koszyk: tabela bez pionowych kresek,
+rozjeżdżający się skład, braki nagłówków kolumn, rozciągnięte +/−, X bez podpisu — „TO MA BYĆ
+TABELA: pionowe i poziome pasy 1px przecinające się pod kątem prostym"; (7) „klikam przejdź do
+danych a otwiera się kalendarz wynajmu" (w koszyku).
+
+WYKONANE:
+- SLIDER — przyczyna znaleziona: na stronie głównej data/katalog.js ładował się PO skrypcie
+  mini-kart, więc slajdy Nowości/Bestsellery renderowały się BEZ kart produktów (pusto,
+  „ściśnięte" do lewej). Kolejność skryptów naprawiona (katalog przed mini-kartami — karty
+  wróciły do slajdów). Dodatkowo: .srodek{flex-wrap:nowrap;width:100%},
+  .main{width:100%}, .slider{width:100%;max-width:none;margin:0 auto} + karty-placeholdery
+  „Wkrótce" (gdy mniej niż 3 produkty — slajd zawsze wygląda na wypełniony).
+- PROGRESS BAR: usunięte ozdobniki (kółka z numerami .krok-nr przy nagłówkach kroków
+  wynajmu) — nagłówki wróciły do prostego stylu „1. Termin — …"; pasek postępu bez zmian
+  (był i jest ten sam).
+- MENU: usunięty duplikat PRACOWNIA — podstrony z panelu NIE dublują pozycji z menu stałego
+  (wykluczenie slug „pracownia" w menu, stopce i .foot-podstrony); PRACOWNIA pozostaje
+  edytowalna z panelu, ale ma jeden przycisk (pracownia.html).
+- KROPKA przy koszyku: powiększona (27×27 px, font 15 px) na wszystkich stronach.
+- GLOBALNY PASEK KOSZYKA: koszyk.js tworzy przypięty pasek na dole KAŻDEJ strony, gdy koszyk
+  niepusty: „W koszyku: N szt. produktów (+ M personalizacja)" + SUMA + „Przejdź do koszyka →"
+  (ukrywany tylko na stronie koszyka); pozycje koszyka zapamiętują teraz nazwę i cenę w chwili
+  dodania (sklep + blog z metadanymi), więc suma liczy się na każdej stronie; usunięty
+  statyczny pasek ze sklepu (był zdublowany).
+- TABELA KOSZYKA: prawdziwa krata — brązowe linie 1px pionowe i poziome na wszystkich
+  komórkach (th/td), colgroup z szerokościami kolumn, table-layout:fixed, naprzemienne tło
+  wierszy, NAGŁÓWEK kolumny „Usuń", tytuł na X („Usuń produkt z koszyka"), zwarty licznik
+  +/− (34×36 px, bez rozciągania), zawijanie długich nazw.
+- „PRZEJDŹ DO DANYCH" NIE OTWIERA KALENDARZA: guardy dane.html/podsumowanie.html
+  przekierowują do wynajmu TYLKO przy czystym wynajmie (bez produktów/personalizacji);
+  koszyk przy samym wynajmie pokazuje „Kontynuuj wynajem →" zamiast „Przejdź do danych";
+  dodanie produktu do koszyka porzuca niedokończony wynajem (typ=sklep, pakiet=null) —
+  ścieżki już się nie mieszają.
+- Wersja 28.15, zasoby ?v=295.
+
+Testy: HTML zbilansowany (21 stron), node --check OK, test koszyk.js w Node (dodawanie z
+katalogu i z bloga z metadanymi, suma z rabatem pers, reset typu wynajem→sklep), sync docs,
+Pages built | d21039f, fetch_page live: strona główna (karty produktów w slajdach Nowości/
+Bestsellery WIDOCZNE), koszyk.html (pusty koszyk + opcje dostawy), sklep.html (katalog 4
+produktów). Uwaga: sandbox resetuje lokalną historię git — po resecie: fetch + reset do
+FETCH_HEAD + checkout commita -- www docs + commit + push.
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
