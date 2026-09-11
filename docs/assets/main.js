@@ -82,7 +82,7 @@
   function stopka() {
     return '<span><a href="regulamin.html">Regulamin</a><span class="sep">·</span>' +
       '<a href="jak-pracujemy.html">Jak pracujemy</a></span>' +
-      '<span>© Sygnatura 2026 · wersja 28.4</span>';
+      '<span>© Sygnatura 2026 · wersja 28.5</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
