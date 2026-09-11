@@ -24,7 +24,7 @@
 </script>
 <style>
 :root{
-  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --butelkowa:#0F6B3D; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
   --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C; --czern:#0E0E0C;
   --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
 }
@@ -50,13 +50,15 @@ a{text-decoration:none;color:inherit}
 
 /* --- lewa górna ćwiartka: logo + menu + social (wszystko do góry) --- */
 .side{flex:none;width:clamp(270px,18vw,340px);
-  background:linear-gradient(180deg,var(--butelkowa) 0%,#17302A 100%);
+  background:
+    radial-gradient(130% 85% at 12% -4%, rgba(122,205,158,.30) 0%, rgba(122,205,158,0) 55%),
+    radial-gradient(150% 110% at 90% 8%, rgba(18,96,52,.55) 0%, rgba(18,96,52,0) 60%),
+    linear-gradient(162deg,#11753F 0%,#0C5A31 40%,#073B20 72%,#052A16 100%);
   color:var(--krem);display:flex;flex-direction:column;justify-content:flex-start;padding:30px 26px 26px}
 .brand-blok{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .brand-kwadrat{width:136px;height:136px;background:var(--krem);border:1px solid var(--zloty);
-  display:grid;place-items:center;box-shadow:0 16px 40px rgba(0,0,0,.35);animation:kwadrat 6s ease-in-out infinite}
+  display:grid;place-items:center;box-shadow:0 12px 26px rgba(0,0,0,.28)}
 .brand-kwadrat img{width:88px;height:88px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
-@keyframes kwadrat{0%,100%{box-shadow:0 16px 40px rgba(0,0,0,.35)}50%{box-shadow:0 16px 52px rgba(196,165,130,.38)}}
 .brand-nazwa{font-size:32px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
 .brand-nazwa .syg{color:#EBD9BE}
 .brand-nazwa .natura{color:var(--zloty)}
@@ -90,7 +92,7 @@ h1.strona-tytul{font-size:clamp(28px,3.4vw,42px);margin:2px 14px 0;padding:8px 0
 h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;background:var(--zloty);margin-bottom:8px}
 .szukaj{display:flex;align-items:stretch;flex:1;max-width:520px;margin-left:auto;border:1px solid rgba(107,69,48,.4);
   background:#fff;transition:border-color .25s,box-shadow .25s}
-.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(31,58,50,.12)}
+.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(15,107,61,.15)}
 .szukaj input{flex:1;border:none;background:transparent;padding:12px 15px;font-family:inherit;
   font-size:17px;color:var(--ink);outline:none;min-width:0}
 .szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:50px;cursor:pointer;
@@ -112,8 +114,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
   transition:opacity .8s ease,visibility .8s ease}
 #splash::before{content:"";position:absolute;inset:0;
-  background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
-  radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
+  background:linear-gradient(rgba(15,107,61,.10),rgba(15,107,61,.10)),
+  radial-gradient(115% 100% at 50% 36%,rgba(15,107,61,0) 52%,rgba(4,32,18,.34) 100%)}
 #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
 .splash-card{position:relative;display:flex;flex-direction:column;align-items:center;
   gap:clamp(14px,2.6vw,22px);background:rgba(251,247,240,.97);border:2px solid var(--brunatny);
@@ -144,14 +146,14 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .sl-tag{display:inline-block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);
   border:1px solid rgba(196,165,130,.7);padding:5px 12px;margin-bottom:12px;background:rgba(14,14,12,.35)}
 .sl-tresc h2{font-size:clamp(28px,3.8vw,50px);font-weight:600;line-height:1.08;text-shadow:0 3px 18px rgba(0,0,0,.5)}
-.sl-tresc p{font-size:clamp(16px,1.5vw,18.5px);line-height:1.55;max-width:640px;margin-top:10px;
+.sl-tresc p{font-size:clamp(16px,1.5vw,18.5px);line-height:1.55;margin-top:10px;
   color:rgba(251,247,240,.92)}
 .sl-btn{display:inline-block;margin-top:18px;background:var(--zloty);color:var(--butelkowa);
   font-size:13.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:13px 28px;
   transition:all .25s;border:1.5px solid var(--zloty)}
 .sl-btn:hover{background:transparent;color:var(--zloty)}
 
-.sl-karty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;max-width:760px}
+.sl-karty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;width:100%}
 .sl-karta{display:flex;gap:12px;align-items:center;background:rgba(251,247,240,.95);color:var(--ink);
   padding:10px 12px;transition:transform .25s,box-shadow .25s}
 .sl-karta:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
@@ -345,7 +347,7 @@ html.dotyk .top-note{display:none}
 
         <!-- 3. AKTUALNOŚCI -->
         <div class="sl-slide">
-          <div class="sl-bg" style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"></div>
+          <div class="sl-bg" style="background-image:linear-gradient(135deg,#0F6B3D,#6B4530)"></div>
           <div class="sl-cien"></div>
           <div class="sl-tresc">
             <span class="sl-tag">Aktualności z pracowni</span>
@@ -394,7 +396,7 @@ html.dotyk .top-note{display:none}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a></span>
-    <span>© Sygnatura 2026 · wersja 28.8</span>
+    <span>© Sygnatura 2026 · wersja 28.9</span>
   </footer>
 </div>
 
@@ -438,10 +440,10 @@ html.dotyk .top-note{display:none}
 })();
 </script>
 
-<script src="data/katalog.js?v=288"></script>
-<script src="assets/koszyk.js?v=288"></script>
-<script src="assets/config.js?v=288"></script>
-<script src="assets/main.js?v=288"></script>
+<script src="data/katalog.js?v=289"></script>
+<script src="assets/koszyk.js?v=289"></script>
+<script src="assets/config.js?v=289"></script>
+<script src="assets/main.js?v=289"></script>
 <script>
 (function(){
   /* ===== slider: autoplay w pętli, strzałki, kropki ===== */
