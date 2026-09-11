@@ -14,6 +14,18 @@
 (function () {
   const SYG = window.SYG;
 
+  /* tryb dotykowy (telefon/tablet — także „wersja na komputer"):
+     wymuszamy układ dopasowany do treści z normalnym przewijaniem strony */
+  (function () {
+    let dotyk = false;
+    try {
+      dotyk = (window.matchMedia('(pointer:coarse)').matches || window.matchMedia('(hover:none)').matches);
+    } catch (e) {}
+    if (!dotyk) dotyk = (navigator.maxTouchPoints || 0) > 1;
+    if (!dotyk) dotyk = /(Android|iPhone|iPad|iPod|Mobile)/i.test(navigator.userAgent || '');
+    if (dotyk) document.documentElement.classList.add('dotyk');
+  })();
+
   const MENU = [
     ['index.html', 'Strona główna'],
     ['zamowienia.html', 'Zamówienia'],
@@ -82,7 +94,7 @@
   function stopka() {
     return '<span><a href="regulamin.html">Regulamin</a><span class="sep">·</span>' +
       '<a href="jak-pracujemy.html">Jak pracujemy</a></span>' +
-      '<span>© Sygnatura 2026 · wersja 28.6</span>';
+      '<span>© Sygnatura 2026 · wersja 28.7</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {

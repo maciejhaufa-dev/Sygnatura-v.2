@@ -9,6 +9,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<script>
+/* TRYB DOTYKOWY: telefon/tablet — także z włączoną „wersją na komputer".
+   Wymuszamy wtedy układ dopasowany do treści z normalnym przewijaniem strony. */
+(function(){
+  var dotyk=false;
+  try{
+    dotyk=(window.matchMedia('(pointer:coarse)').matches || window.matchMedia('(hover:none)').matches);
+  }catch(e){}
+  if(!dotyk) dotyk=(navigator.maxTouchPoints||0)>1;
+  if(!dotyk) dotyk=/(Android|iPhone|iPad|iPod|Mobile)/i.test(navigator.userAgent||'');
+  if(dotyk) document.documentElement.classList.add('dotyk');
+})();
+</script>
 <style>
 :root{
   --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
@@ -46,7 +59,7 @@ a{text-decoration:none;color:inherit}
 .brand-kwadrat img{width:82px;height:82px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
 @keyframes kwadrat{0%,100%{box-shadow:0 16px 40px rgba(0,0,0,.35)}50%{box-shadow:0 16px 52px rgba(196,165,130,.38)}}
 .brand-nazwa{font-size:30px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
-.brand-nazwa .syg{color:var(--krem)}
+.brand-nazwa .syg{color:#EBD9BE}
 .brand-nazwa .natura{color:var(--zloty)}
 .brand-tag{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.55)}
 
@@ -231,6 +244,17 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   .sl-nav{width:38px;height:38px;font-size:20px}
   .slider{aspect-ratio:4/3.4}
 }
+/* --- TRYB DOTYKOWY (telefon/tablet, także „wersja na komputer"):
+   strona dopasowuje się do treści, przewija normalnie, bez wewnętrznego boxa --- */
+html.dotyk .page{max-height:none;overflow:visible}
+html.dotyk .srodek{flex-direction:column}
+html.dotyk .side{width:auto}
+html.dotyk .main{overflow:visible;flex:none}
+html.dotyk .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
+html.dotyk .menu-vert a{padding:9px 12px;font-size:14px}
+html.dotyk .menu-vert a::after{display:none}
+html.dotyk .social{margin-top:14px}
+html.dotyk .top-note{display:none}
 </style>
 </head>
 <body data-strona="Strona główna">
@@ -377,7 +401,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a></span>
-    <span>© Sygnatura 2026 · wersja 28.6</span>
+    <span>© Sygnatura 2026 · wersja 28.7</span>
   </footer>
 </div>
 
@@ -399,15 +423,18 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 </script>
 
 <script>
-/* splash — TYLKO przy pierwszym wejściu na stronę (raz na sesję przeglądarki).
-   Odświeżenie strony ani powrót z podstrony nie pokazują go ponownie. */
+/* splash — TYLKO przy pierwszym wejściu na stronę na tym urządzeniu.
+   Kolejne odświeżenia, kliknięcia w „Strona główna" i powroty z podstron
+   NIE pokazują go ponownie (zapis w pamięci urządzenia). */
 (function(){
   var splash=document.getElementById('splash');
-  if (sessionStorage.getItem('syg-splash')){
+  var pokazany=false;
+  try{ pokazany=!!localStorage.getItem('syg-splash'); }catch(e){}
+  if (pokazany){
     if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);
     return;
   }
-  sessionStorage.setItem('syg-splash','1');
+  try{ localStorage.setItem('syg-splash','1'); }catch(e){}
   var show=3800;
   document.documentElement.style.overflow='hidden';
   setTimeout(function(){
@@ -418,10 +445,10 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 })();
 </script>
 
-<script src="data/katalog.js?v=286"></script>
-<script src="assets/koszyk.js?v=286"></script>
-<script src="assets/config.js?v=286"></script>
-<script src="assets/main.js?v=286"></script>
+<script src="data/katalog.js?v=287"></script>
+<script src="assets/koszyk.js?v=287"></script>
+<script src="assets/config.js?v=287"></script>
+<script src="assets/main.js?v=287"></script>
 <script>
 (function(){
   /* ===== slider: autoplay w pętli, strzałki, kropki ===== */

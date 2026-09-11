@@ -57,7 +57,7 @@ body.ma-banner .strona-uklad,body.ma-banner .page{max-height:calc(100vh - 40px)}
 .brand-kwadrat img{width:82px;height:82px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
 @keyframes kwadrat{0%,100%{box-shadow:0 16px 40px rgba(0,0,0,.35)}50%{box-shadow:0 16px 52px rgba(196,165,130,.38)}}
 .brand-nazwa{font-size:30px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
-.brand-nazwa .syg{color:var(--krem)}
+.brand-nazwa .syg{color:#EBD9BE}
 .brand-nazwa .natura{color:var(--zloty)}
 .brand-tag{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.55)}
 
@@ -339,3 +339,17 @@ body.ma-koszyk{padding-bottom:76px}
   .regulamin{padding:18px 16px}
   .progres .krok{min-width:84px;font-size:11px}
 }
+
+/* ============ TRYB DOTYKOWY ============
+   Telefon/tablet — także z włączoną „wersją na komputer": strona dopasowuje się do
+   zawartości (krótka treść = krótka strona, zero pustej przestrzeni) i przewija się
+   normalnie, bez wewnętrznego przewijania boxa. */
+html.dotyk .strona-uklad{max-height:none;overflow:visible}
+html.dotyk .srodek{flex-direction:column}
+html.dotyk .side{width:auto}
+html.dotyk .strona-uklad main.wrap{overflow:visible;flex:none}
+html.dotyk .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
+html.dotyk .menu-vert a{padding:9px 12px;font-size:14px}
+html.dotyk .menu-vert a::after{display:none}
+html.dotyk .social{margin-top:14px}
+html.dotyk .top-note{display:none}
