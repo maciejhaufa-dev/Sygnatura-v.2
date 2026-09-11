@@ -8,19 +8,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=289">
+<link rel="stylesheet" href="assets/style.css?v=290">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
 
 <main class="wrap">
   <h1>Szukaj</h1>
-  <form class="szukaj" action="szukaj.html" method="get" style="display:flex;max-width:560px;border:1px solid rgba(107,69,48,.4);background:#fff">
-    <input type="search" name="q" id="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" style="flex:1;border:none;background:transparent;padding:11px 14px;font-family:inherit;font-size:16px;color:var(--ink);outline:none">
-    <button type="submit" style="border:none;background:var(--butelkowa);color:var(--zloty);width:46px;cursor:pointer">🔍</button>
-  </form>
+  <p class="sub">Wpisz szukane hasło w oknie wyszukiwania u góry strony (obok ikon koszyka i konta) — wyniki pojawią się poniżej.</p>
 
-  <p class="mala" id="info" style="margin-top:10px"></p>
+  <p class="mala" id="info" style="margin-top:12px"></p>
   <div class="katalog" id="wyniki"></div>
   <div class="sukces" id="brak" style="display:none">
     <h2>Nic nie znaleźliśmy</h2>
@@ -32,29 +29,38 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=289"></script>
-<script src="assets/koszyk.js?v=289"></script>
-<script src="assets/api.js?v=289"></script>
-<script src="data/katalog.js?v=289"></script>
-<script src="assets/main.js?v=289"></script>
+<script src="assets/config.js?v=290"></script>
+<script src="assets/koszyk.js?v=290"></script>
+<script src="assets/api.js?v=290"></script>
+<script src="data/katalog.js?v=290"></script>
+<script src="assets/main.js?v=290"></script>
 <script>
 (async function(){
-  var q = (SYG.param('q') || '').trim().toLowerCase();
+  var q = (SYG.param('q') || '').trim();
   var info = document.getElementById('info');
   var wyniki = document.getElementById('wyniki');
   var brak = document.getElementById('brak');
 
   if (q.length < 2){
-    info.textContent = 'Wpisz co najmniej 2 znaki.';
+    info.textContent = 'Wpisz szukane hasło w wyszukiwarce u góry strony (min. 2 znaki).';
     return;
   }
+  var ql = q.toLowerCase();
   var kat = await SYG.katalog();
   var traf = kat.filter(function(p){
-    return p.dostepny && ((p.nazwa + ' ' + p.opis).toLowerCase().indexOf(q) !== -1);
+    return p.dostepny && ((p.nazwa + ' ' + p.opis).toLowerCase().indexOf(ql) !== -1);
   });
 
+  /* komunikat z poprawną odmianą */
+  function komunikat(n){
+    if (n === 0) return 'Nie znaleziono żadnych wyników odpowiadających hasłu: ' + q;
+    if (n === 1) return 'Znaleziono 1 wynik odpowiadający hasłu: ' + q;
+    if (n < 5) return 'Znaleziono ' + n + ' wyniki odpowiadające hasłu: ' + q;
+    return 'Znaleziono ' + n + ' wyników odpowiadających hasłu: ' + q;
+  }
+  info.textContent = komunikat(traf.length);
+
   if (!traf.length){ brak.style.display = 'block'; return; }
-  info.textContent = 'Znaleziono: ' + traf.length;
 
   var html = '';
   traf.forEach(function(p){

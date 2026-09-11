@@ -3,10 +3,10 @@
    Układ kwaterowy — ten sam na każdej podstronie i na landingu:
    czarny topbar | lewa zielona ćwiartka (logo+menu+social) |
    wyszukiwarka + ikony (koszyk/panel) u góry po prawej | treść | stopka.
-   Kolory: royal green #0F6B3D · brąz #6B4530 · złoto #C4A582 · krem #FBF7F0
+   Kolory: butelkowa #1F3A32 · brąz #6B4530 · złoto #C4A582 · krem #FBF7F0
    ============================================================ */
 :root{
-  --butelkowa:#0F6B3D; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
   --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C; --czern:#0E0E0C;
   --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
 }
@@ -43,14 +43,13 @@ button{font-family:inherit}
 
 /* --- lewa kolumna: logo + menu + social — wszystko do góry --- */
 .side{  background:
-    radial-gradient(130% 85% at 12% -4%, rgba(122,205,158,.30) 0%, rgba(122,205,158,0) 55%),
-    radial-gradient(150% 110% at 90% 8%, rgba(18,96,52,.55) 0%, rgba(18,96,52,0) 60%),
-    linear-gradient(162deg,#11753F 0%,#0C5A31 40%,#073B20 72%,#052A16 100%);
+    radial-gradient(120% 75% at 18% -6%, rgba(63,105,85,.34) 0%, rgba(63,105,85,0) 58%),
+    linear-gradient(170deg,#26493C 0%,#1F3A32 46%,#162B24 100%);
   color:var(--krem);display:flex;flex-direction:column;justify-content:flex-start;padding:30px 26px 26px}
 .brand-blok{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
-.brand-kwadrat{width:136px;height:136px;background:var(--krem);border:1px solid var(--zloty);
+.brand-kwadrat{width:100%;aspect-ratio:1/1;background:var(--krem);border:1px solid var(--zloty);
   display:grid;place-items:center;box-shadow:0 12px 26px rgba(0,0,0,.28)}
-.brand-kwadrat img{width:88px;height:88px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
+.brand-kwadrat img{width:64%;height:64%;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
 .brand-nazwa{font-size:32px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
 .brand-nazwa .syg{color:#EBD9BE}
 .brand-nazwa .natura{color:var(--zloty)}
@@ -71,27 +70,26 @@ button{font-family:inherit}
   color:var(--zloty);transition:all .25s}
 .social a:hover{background:var(--zloty);color:var(--butelkowa)}
 .social svg{width:21px;height:21px}
-.side .side-stopka{font-size:12.5px;color:rgba(251,247,240,.45);text-align:center;letter-spacing:.06em;margin-top:auto;padding-top:18px}
 
 /* --- górny blok po prawej: wyszukiwarka (ładne tło) + ikony; pod spodem TYTUŁ STRONY --- */
 .head{padding:18px clamp(18px,3vw,40px) 4px;background:var(--krem);
   display:flex;flex-direction:column;gap:2px}
-.head-gora{display:flex;align-items:stretch;gap:12px;padding:12px 14px;
+.head-gora{display:flex;align-items:stretch;gap:12px;padding:16px 18px;
   background:linear-gradient(135deg,var(--krem-2) 0%,#EFE6D8 55%,var(--krem-2) 100%);
   border:1px solid rgba(107,69,48,.28);box-shadow:0 6px 20px rgba(107,69,48,.10)}
 .szukaj{display:flex;align-items:stretch;flex:1;max-width:560px;margin-left:auto;
   border:1px solid rgba(107,69,48,.4);background:#fff;transition:border-color .25s,box-shadow .25s}
-.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(15,107,61,.15)}
-.szukaj input{flex:1;border:none;background:transparent;padding:12px 15px;font-family:inherit;
-  font-size:17px;color:var(--ink);outline:none;min-width:0}
-.szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:50px;cursor:pointer;
+.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(31,58,50,.14)}
+.szukaj input{flex:1;border:none;background:transparent;padding:14px 18px;font-family:inherit;
+  font-size:18px;color:var(--ink);outline:none;min-width:0}
+.szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:56px;cursor:pointer;
   display:grid;place-items:center;transition:background .25s;font-size:16px}
 .szukaj button:hover{background:var(--brunatny)}
 .head-ikony{display:flex;gap:10px}
-.head-ikony a{position:relative;width:50px;height:50px;border:1px solid rgba(107,69,48,.4);background:#fff;
+.head-ikony a{position:relative;width:56px;height:56px;border:1px solid rgba(107,69,48,.4);background:#fff;
   display:grid;place-items:center;color:var(--brunatny);transition:all .25s}
 .head-ikony a:hover{border-color:var(--butelkowa);color:var(--butelkowa);background:var(--krem-2)}
-.head-ikony svg{width:22px;height:22px}
+.head-ikony svg{width:24px;height:24px}
 .head-ikony .kropka{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;
   background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:11.5px;font-weight:700;
   display:none;place-items:center;padding:0 4px}
@@ -181,7 +179,7 @@ body.ma-koszyk{padding-bottom:76px}
   border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:17px;color:var(--ink)}
 .pole textarea{min-height:120px;resize:vertical}
 .pole input:focus,.pole textarea:focus,.pole select:focus{outline:none;border-color:var(--butelkowa);
-  box-shadow:0 0 0 3px rgba(15,107,61,.15)}
+  box-shadow:0 0 0 3px rgba(31,58,50,.14)}
 .opcje{margin:16px 0}
 .opcje>label:first-child{display:block;font-size:14px;color:var(--brunatny);margin-bottom:8px;
   text-transform:uppercase;letter-spacing:.06em}
@@ -298,8 +296,8 @@ body.ma-koszyk{padding-bottom:76px}
 /* ============ RESPONSYWNOŚĆ (kwatery zostają, ciaśniej) ============ */
 @media (max-width:1100px) and (min-width:761px){
   .side{width:250px;padding:20px 18px}
-  .brand-kwadrat{width:104px;height:104px}
-  .brand-kwadrat img{width:68px;height:68px}
+  .brand-kwadrat{width:100%;aspect-ratio:1/1}
+  .brand-kwadrat img{width:64%;height:64%}
   .brand-nazwa{font-size:24px}
   .brand-tag{font-size:9.5px;letter-spacing:.24em}
   .menu-vert a{font-size:15px;padding:11px 13px}
@@ -314,8 +312,8 @@ body.ma-koszyk{padding-bottom:76px}
   .srodek{flex-direction:column}
   .side{width:auto;padding:20px 16px 22px}
   .prawa{display:flex;flex-direction:column}
-  .brand-kwadrat{width:104px;height:104px}
-  .brand-kwadrat img{width:68px;height:68px}
+  .brand-kwadrat{width:100%;aspect-ratio:1/1}
+  .brand-kwadrat img{width:64%;height:64%}
   .brand-nazwa{font-size:24px}
   .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
   .menu-vert a{padding:10px 13px;font-size:15px}
@@ -341,6 +339,7 @@ body.ma-koszyk{padding-bottom:76px}
 html.dotyk .strona-uklad{padding:10px}
 html.dotyk .srodek{flex-direction:column}
 html.dotyk .side{width:auto}
+html.dotyk .brand-kwadrat{width:200px;aspect-ratio:1/1}
 html.dotyk .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
 html.dotyk .menu-vert a{padding:10px 13px;font-size:15px}
 html.dotyk .menu-vert a::after{display:none}

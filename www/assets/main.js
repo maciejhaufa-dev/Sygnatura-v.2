@@ -69,7 +69,6 @@
       '<a href="#" aria-label="Facebook" title="Facebook — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg></a>' +
       '<a href="#" aria-label="Pinterest" title="Pinterest — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>' +
       '</div>' +
-      '<div class="side-stopka">pracownia: woj. mazowieckie</div>' +
       '</aside>' +
       /* prawa strona: górny blok (wyszukiwarka z tłem + ikony, pod spodem TYTUŁ STRONY) + box treści */
       '<div class="prawa">' +
@@ -94,7 +93,7 @@
   function stopka() {
     return '<span><a href="regulamin.html">Regulamin</a><span class="sep">·</span>' +
       '<a href="jak-pracujemy.html">Jak pracujemy</a></span>' +
-      '<span>© Sygnatura 2026 · wersja 28.9</span>';
+      '<span>© Sygnatura 2026 · wersja 28.10</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {

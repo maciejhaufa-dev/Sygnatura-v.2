@@ -24,7 +24,7 @@
 </script>
 <style>
 :root{
-  --butelkowa:#0F6B3D; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
   --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C; --czern:#0E0E0C;
   --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
 }
@@ -51,14 +51,13 @@ a{text-decoration:none;color:inherit}
 /* --- lewa górna ćwiartka: logo + menu + social (wszystko do góry) --- */
 .side{flex:none;width:clamp(270px,18vw,340px);
   background:
-    radial-gradient(130% 85% at 12% -4%, rgba(122,205,158,.30) 0%, rgba(122,205,158,0) 55%),
-    radial-gradient(150% 110% at 90% 8%, rgba(18,96,52,.55) 0%, rgba(18,96,52,0) 60%),
-    linear-gradient(162deg,#11753F 0%,#0C5A31 40%,#073B20 72%,#052A16 100%);
+    radial-gradient(120% 75% at 18% -6%, rgba(63,105,85,.34) 0%, rgba(63,105,85,0) 58%),
+    linear-gradient(170deg,#26493C 0%,#1F3A32 46%,#162B24 100%);
   color:var(--krem);display:flex;flex-direction:column;justify-content:flex-start;padding:30px 26px 26px}
 .brand-blok{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
-.brand-kwadrat{width:136px;height:136px;background:var(--krem);border:1px solid var(--zloty);
+.brand-kwadrat{width:100%;aspect-ratio:1/1;background:var(--krem);border:1px solid var(--zloty);
   display:grid;place-items:center;box-shadow:0 12px 26px rgba(0,0,0,.28)}
-.brand-kwadrat img{width:88px;height:88px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
+.brand-kwadrat img{width:64%;height:64%;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
 .brand-nazwa{font-size:32px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
 .brand-nazwa .syg{color:#EBD9BE}
 .brand-nazwa .natura{color:var(--zloty)}
@@ -79,31 +78,29 @@ a{text-decoration:none;color:inherit}
   color:var(--zloty);transition:all .25s}
 .social a:hover{background:var(--zloty);color:var(--butelkowa)}
 .social svg{width:21px;height:21px}
-.side .side-stopka{font-size:12.5px;color:rgba(251,247,240,.45);text-align:center;letter-spacing:.06em;
-  margin-top:auto;padding-top:18px}
 
 /* --- nagłówek głównej kolumny: wyszukiwarka + koszyk/panel, pod spodem TYTUŁ STRONY --- */
 .head{flex:none;display:flex;flex-direction:column;gap:2px;
   padding:18px clamp(18px,3vw,40px) 4px;background:var(--krem)}
-.head-gora{display:flex;align-items:stretch;gap:12px;padding:12px 14px;
+.head-gora{display:flex;align-items:stretch;gap:12px;padding:16px 18px;
   background:linear-gradient(135deg,var(--krem-2) 0%,#EFE6D8 55%,var(--krem-2) 100%);
   border:1px solid rgba(107,69,48,.28);box-shadow:0 6px 20px rgba(107,69,48,.10)}
 h1.strona-tytul{font-size:clamp(28px,3.4vw,42px);margin:2px 14px 0;padding:8px 0 4px}
 h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;background:var(--zloty);margin-bottom:8px}
 .szukaj{display:flex;align-items:stretch;flex:1;max-width:520px;margin-left:auto;border:1px solid rgba(107,69,48,.4);
   background:#fff;transition:border-color .25s,box-shadow .25s}
-.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(15,107,61,.15)}
-.szukaj input{flex:1;border:none;background:transparent;padding:12px 15px;font-family:inherit;
-  font-size:17px;color:var(--ink);outline:none;min-width:0}
-.szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:50px;cursor:pointer;
+.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(31,58,50,.14)}
+.szukaj input{flex:1;border:none;background:transparent;padding:14px 18px;font-family:inherit;
+  font-size:18px;color:var(--ink);outline:none;min-width:0}
+.szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:56px;cursor:pointer;
   display:grid;place-items:center;transition:background .25s}
 .szukaj button:hover{background:var(--brunatny)}
 .szukaj svg{width:18px;height:18px}
 .head-ikony{display:flex;gap:10px}
-.head-ikony a{position:relative;width:50px;height:50px;border:1px solid rgba(107,69,48,.4);background:#fff;
+.head-ikony a{position:relative;width:56px;height:56px;border:1px solid rgba(107,69,48,.4);background:#fff;
   display:grid;place-items:center;color:var(--brunatny);transition:all .25s}
 .head-ikony a:hover{border-color:var(--butelkowa);color:var(--butelkowa);background:var(--krem-2)}
-.head-ikony svg{width:22px;height:22px}
+.head-ikony svg{width:24px;height:24px}
 .head-ikony .kropka{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;
   background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:11.5px;font-weight:700;
   display:none;place-items:center;padding:0 4px}
@@ -114,8 +111,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
   transition:opacity .8s ease,visibility .8s ease}
 #splash::before{content:"";position:absolute;inset:0;
-  background:linear-gradient(rgba(15,107,61,.10),rgba(15,107,61,.10)),
-  radial-gradient(115% 100% at 50% 36%,rgba(15,107,61,0) 52%,rgba(4,32,18,.34) 100%)}
+  background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
+  radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
 #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
 .splash-card{position:relative;display:flex;flex-direction:column;align-items:center;
   gap:clamp(14px,2.6vw,22px);background:rgba(251,247,240,.97);border:2px solid var(--brunatny);
@@ -202,8 +199,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 /* ============ RESPONSYWNOŚĆ ============ */
 @media (max-width:1100px) and (min-width:761px){
   .side{width:250px;padding:20px 18px}
-  .brand-kwadrat{width:104px;height:104px}
-  .brand-kwadrat img{width:68px;height:68px}
+  .brand-kwadrat{width:100%;aspect-ratio:1/1}
+  .brand-kwadrat img{width:64%;height:64%}
   .brand-nazwa{font-size:24px}
   .brand-tag{font-size:9.5px;letter-spacing:.24em}
   .menu-vert a{font-size:15px;padding:11px 13px}
@@ -219,8 +216,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   .srodek{flex-direction:column}
   .side{width:auto;padding:22px 18px}
   .prawa{display:flex;flex-direction:column}
-  .brand-kwadrat{width:104px;height:104px}
-  .brand-kwadrat img{width:68px;height:68px}
+  .brand-kwadrat{width:100%;aspect-ratio:1/1}
+  .brand-kwadrat img{width:64%;height:64%}
   .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:18px}
   .menu-vert a{padding:10px 13px;font-size:15px}
   .menu-vert a::after{display:none}
@@ -245,6 +242,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 html.dotyk .page{padding:10px}
 html.dotyk .srodek{flex-direction:column}
 html.dotyk .side{width:auto}
+html.dotyk .brand-kwadrat{width:200px;aspect-ratio:1/1}
 html.dotyk .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
 html.dotyk .menu-vert a{padding:10px 13px;font-size:15px}
 html.dotyk .menu-vert a::after{display:none}
@@ -297,7 +295,6 @@ html.dotyk .top-note{display:none}
       <a href="#" aria-label="Facebook" title="Facebook — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg></a>
       <a href="#" aria-label="Pinterest" title="Pinterest — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>
     </div>
-    <div class="side-stopka">pracownia: woj. mazowieckie</div>
   </aside>
 
   <div class="prawa">
@@ -347,7 +344,7 @@ html.dotyk .top-note{display:none}
 
         <!-- 3. AKTUALNOŚCI -->
         <div class="sl-slide">
-          <div class="sl-bg" style="background-image:linear-gradient(135deg,#0F6B3D,#6B4530)"></div>
+          <div class="sl-bg" style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"></div>
           <div class="sl-cien"></div>
           <div class="sl-tresc">
             <span class="sl-tag">Aktualności z pracowni</span>
@@ -396,7 +393,7 @@ html.dotyk .top-note{display:none}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a></span>
-    <span>© Sygnatura 2026 · wersja 28.9</span>
+    <span>© Sygnatura 2026 · wersja 28.10</span>
   </footer>
 </div>
 
@@ -440,10 +437,10 @@ html.dotyk .top-note{display:none}
 })();
 </script>
 
-<script src="data/katalog.js?v=289"></script>
-<script src="assets/koszyk.js?v=289"></script>
-<script src="assets/config.js?v=289"></script>
-<script src="assets/main.js?v=289"></script>
+<script src="data/katalog.js?v=290"></script>
+<script src="assets/koszyk.js?v=290"></script>
+<script src="assets/config.js?v=290"></script>
+<script src="assets/main.js?v=290"></script>
 <script>
 (function(){
   /* ===== slider: autoplay w pętli, strzałki, kropki ===== */

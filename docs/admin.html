@@ -8,57 +8,81 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=289">
+<link rel="stylesheet" href="assets/style.css?v=290">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
 
 <main class="wrap">
   <span class="tag">Panel administracyjny</span>
-  <h1>Pulpit</h1>
-  <p class="sub" id="tryb-info"></p>
+  <h1>Logowanie do panelu</h1>
 
-  <div class="flash" id="bled" style="display:none"></div>
-
-  <div class="tabela-wrap" id="zamowienia-blok">
-    <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
-    <table class="tabela" id="tabela-zamowien">
-      <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
-      <tbody></tbody>
-    </table>
+  <!-- EKRAN LOGOWANIA: wymuszany po każdym zamknięciu strony (sesja przeglądarki) -->
+  <div id="logowanie" class="forma" style="max-width:480px">
+    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia i wiadomości.</p>
+    <div class="flash" id="logowanie-blad" style="display:none;background:#8a2f1d"></div>
+    <div class="pole">
+      <label for="admin-login">Login *</label>
+      <input type="text" id="admin-login" autocomplete="username">
+    </div>
+    <div class="pole">
+      <label for="admin-haslo">Hasło *</label>
+      <input type="password" id="admin-haslo" autocomplete="current-password">
+    </div>
+    <div class="przyciski">
+      <button class="btn" type="button" id="zaloguj">Zaloguj się</button>
+    </div>
   </div>
 
-  <div class="tabela-wrap" id="wiadomosci-blok">
-    <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Wiadomości z formularza</h2>
-    <table class="tabela" id="tabela-wiadomosci">
-      <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <!-- PANEL: widoczny po zalogowaniu -->
+  <div id="panel" style="display:none">
+    <p class="sub" id="tryb-info"></p>
 
-  <div class="przyciski">
-    <button class="btn outline" type="button" id="odswiez">Odśwież</button>
-    <a class="btn" href="admin.html">Wyczyść filtr</a>
+    <div class="flash" id="bled" style="display:none"></div>
+
+    <div class="tabela-wrap" id="zamowienia-blok">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
+      <table class="tabela" id="tabela-zamowien">
+        <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="tabela-wrap" id="wiadomosci-blok">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Wiadomości z formularza</h2>
+      <table class="tabela" id="tabela-wiadomosci">
+        <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="przyciski">
+      <button class="btn outline" type="button" id="odswiez">Odśwież</button>
+      <a class="btn" href="admin.html">Wyczyść filtr</a>
+      <button class="btn niebez" type="button" id="wyloguj">Wyloguj</button>
+    </div>
   </div>
 </main>
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=289"></script>
-<script src="assets/koszyk.js?v=289"></script>
-<script src="assets/api.js?v=289"></script>
-<script src="data/katalog.js?v=289"></script>
-<script src="assets/main.js?v=289"></script>
+<script src="assets/config.js?v=290"></script>
+<script src="assets/koszyk.js?v=290"></script>
+<script src="assets/api.js?v=290"></script>
+<script src="data/katalog.js?v=290"></script>
+<script src="assets/main.js?v=290"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
   var info = document.getElementById('tryb-info');
   var bled = document.getElementById('bled');
+  var logowanie = document.getElementById('logowanie');
+  var panel = document.getElementById('panel');
+  var logowanieBlad = document.getElementById('logowanie-blad');
 
   if (SYG.TRYB_DEMO){
     info.innerHTML = 'TRYB DEMO: widzisz dane zapisane w tej przeglądarce (z testów formularzy). ' +
-      'Po wdrożeniu Google Apps Script ten sam panel czyta zamówienia z arkusza — z kluczem w adresie: ' +
-      '<code>admin.html?klucz=TWOJ_KLUCZ</code>';
+      'Po wdrożeniu Google Apps Script ten sam panel czyta zamówienia z arkusza — logowanie sprawdza baza administratorów.';
   } else {
     info.textContent = 'Połączono z arkuszem Google.';
   }
@@ -113,8 +137,59 @@
     }
   }
 
+  /* --- logowanie wymuszane po każdym zamknięciu strony (sesja) --- */
+  function pokazPanel(){
+    logowanie.style.display = 'none';
+    panel.style.display = 'block';
+    laduj();
+  }
+
+  var zalogowany = false;
+  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
+  if (zalogowany){
+    pokazPanel();
+  } else {
+    logowanie.style.display = 'block';
+  }
+
+  document.getElementById('zaloguj').addEventListener('click', async function(){
+    var l = document.getElementById('admin-login').value.trim();
+    var h = document.getElementById('admin-haslo').value;
+    if (!l || !h){
+      logowanieBlad.textContent = 'Podaj login i hasło.';
+      logowanieBlad.style.display = 'block';
+      return;
+    }
+    if (SYG.TRYB_DEMO){
+      /* tryb demo: dane do logowania w config.js (SYG.ADMIN_DEMO_LOGIN / HASLO);
+         po wdrożeniu API sprawdza je Google Apps Script (baza administratorów) */
+      if (l === SYG.ADMIN_DEMO_LOGIN && h === SYG.ADMIN_DEMO_HASLO){
+        try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
+        logowanieBlad.style.display = 'none';
+        pokazPanel();
+      } else {
+        logowanieBlad.textContent = 'Nieprawidłowy login lub hasło.';
+        logowanieBlad.style.display = 'block';
+      }
+    } else {
+      var odp = await SYG.wezwij('admin-login', { login: l, haslo: h, klucz: klucz });
+      if (odp.ok){
+        try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
+        logowanieBlad.style.display = 'none';
+        pokazPanel();
+      } else {
+        logowanieBlad.textContent = odp.blad || 'Nieprawidłowy login lub hasło.';
+        logowanieBlad.style.display = 'block';
+      }
+    }
+  });
+
+  document.getElementById('wyloguj').addEventListener('click', function(){
+    try { sessionStorage.removeItem('syg-admin'); } catch(e){}
+    window.location.reload();
+  });
+
   document.getElementById('odswiez').addEventListener('click', laduj);
-  laduj();
 })();
 </script>
 </body>
