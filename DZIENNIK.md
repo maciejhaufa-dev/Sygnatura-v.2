@@ -384,3 +384,30 @@ DO ZROBIENIA (kolejne sesje): ścieżka A wynajem (kalendarz→pakiet→pers, ka
 personalizacja + popup „własny projekt" (bez produktu → kontakt?temat=projekt&opis=…), panel: edycja
 katalogu/wiadomości, konta klientów i partnerów (PART-XXX), raporty kwartalne, podmiana docs/ (Pages),
 wdrożenie (hosting + Apps Script + domena).
+
+---
+
+## Sesja 27 — POTWIERDZENIE ARCHITEKTURY BEZ SERWERA + publikacja na GitHub Pages
+
+Właściciel pyta: (1) czy dobrze rozumie, że serwer nie jest potrzebny — statyka na GitHubie, JS woła bazę w Google; (2) jak rozwiązane są maile (formularz kontaktowy/zgłoszenia); (3) chce PODGLĄD ŻYWY na GitHub Pages (nowa wersja), żeby podesłać link żonie do klikania.
+
+ODPOWIEDZI (potwierdzone):
+1. TAK — serwer nie jest potrzebny. GitHub Pages = statyka; JS na stronie woła Apps Script (JavaScript
+   u Google); arkusz Google = baza (Zamówienia/Wiadomosci/Katalog/Ustawienia); maile wysyła Gmail
+   (MailApp) z Reply-To: kontakt@studiosygnatura.pl. Zero VPS, zero Pythona, zero utrzymania serwera.
+2. Maile: formularz/ zamówienie → fetch do silnika → zapis do arkusza + MailApp wysyła maile
+   (do Studia + do klienta). Na obecnym Pages działa TRYB DEMO (banner) — maile ruszą po wdrożeniu
+   silnika (engine/README.md, 8 kroków, robi właściciel) i wklejeniu URL do www/assets/config.js.
+3. PUBLIKACJA: GitHub Pages jest włączony i buduje się z GAŁĘZI arena/01a056f0-sygnatura-v-2, folder
+   /docs (sprawdzono API: source.branch=arena/…, path=/docs, status=built). Wykonano: docs/ podmienione
+   na nową wersję www/ (rm starej wersji: galeria/warsztat/wynajem/404 → nowe 14 stron + assets/data),
+   dodano docs/.nojekyll i 404.html przekierowujący na stronę główną. Commit 3d43974 → Pages zbudował
+   się sam (status built). Weryfikacja przez fetch: https://maciejhaufa-dev.github.io/Sygnatura-v.2/
+   serwuje NOWĄ wersję (slider, baner demo, menu, sklep). Od teraz: każdy push na arena-branch =
+   automatyczna publikacja — żona zawsze widzi najnowsze.
+4. Uwaga: sandbox nie łączy się z github.io (ograniczenie sieci sandboxa — curl 000), ale API Pages
+   (status built) + fetch zewnętrzny potwierdzają publikację. Link dla żony:
+   https://maciejhaufa-dev.github.io/Sygnatura-v.2/ (panel demo: /admin.html).
+5. Docelowo: podpięcie własnej domeny studiosygnatura.pl do Pages (Ustawienia → Pages → Custom domain
+   + rekord CNAME w OVH) — robi właściciel (bot 403 na ustawieniach Pages); NIE jest to potrzebne
+   do testów żony.
