@@ -156,7 +156,8 @@
     if (gK) {
       gK.addEventListener('click', function () {
         const id = Number(gK.getAttribute('data-koszyk'));
-        KOSZYK.dodajProdukt(id, 1);
+        const pr = w.produkt || {};
+        KOSZYK.dodajProdukt(id, 1, { nazwa: pr.nazwa || w.tytul, cena: pr.cena });
         KOSZYK.odswiez();
         gK.textContent = 'DODANO ✓ — przejdź do koszyka';
         setTimeout(function () { window.location.href = 'koszyk.html'; }, 700);

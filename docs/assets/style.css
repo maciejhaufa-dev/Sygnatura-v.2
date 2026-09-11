@@ -96,9 +96,9 @@ button{font-family:inherit}
 .head-przycisk:hover{border-color:var(--butelkowa);background:var(--krem-2);color:var(--butelkowa)}
 .head-przycisk svg{width:22px;height:22px;color:var(--brunatny)}
 .head-przycisk:hover svg{color:var(--butelkowa)}
-.head-przycisk .kropka{position:absolute;top:-7px;right:-7px;min-width:20px;height:20px;border-radius:10px;
-  background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:11.5px;font-weight:700;
-  display:none;place-items:center;padding:0 4px}
+.head-przycisk .kropka{position:absolute;top:-9px;right:-9px;min-width:27px;height:27px;border-radius:14px;
+  background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:15px;font-weight:700;
+  display:none;place-items:center;padding:0 6px}
 .head-przycisk .kropka.widoczna{display:grid}
 
 /* tytuł strony — pod wyszukiwarką, w górnym bloku */
@@ -365,17 +365,25 @@ html.dotyk .menu-vert a::after{display:none}
   font-size:18.5px;color:var(--butelkowa);display:flex;justify-content:space-between;align-items:baseline;
   gap:10px;flex-wrap:wrap}
 .koszyk-blok .padd{padding:14px 16px}
-.koszyk-tabela{width:100%;border-collapse:collapse;font-size:15.5px;background:#fff}
-.koszyk-tabela th{background:var(--butelkowa);color:var(--zloty);text-align:left;padding:10px 12px;
-  font-size:12px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-.koszyk-tabela td{padding:12px;border-bottom:1px dashed rgba(107,69,48,.25);vertical-align:middle}
+.koszyk-tabela{width:100%;border-collapse:collapse;font-size:15.5px;background:#fff;
+  table-layout:fixed}
+.koszyk-tabela th{border:1px solid rgba(107,69,48,.55);background:var(--butelkowa);color:var(--zloty);
+  text-align:left;padding:10px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.koszyk-tabela th:last-child,.koszyk-tabela td:last-child{text-align:center}
+.koszyk-tabela td{border:1px solid rgba(107,69,48,.4);padding:12px;vertical-align:middle;
+  word-wrap:break-word;overflow-wrap:break-word}
+.koszyk-tabela tr:nth-child(even) td{background:rgba(243,237,226,.55)}
 .koszyk-tabela .num{text-align:right;white-space:nowrap}
-.koszyk-tabela .usun{border:none;background:none;color:#8a2f1d;font-size:18px;cursor:pointer;padding:6px 8px;line-height:1}
+.koszyk-tabela .usun{border:none;background:none;color:#8a2f1d;font-size:18px;cursor:pointer;
+  padding:6px 8px;line-height:1}
 .koszyk-tabela .usun:hover{color:#5c1f13}
+.koszyk-tabela .licznik{display:inline-flex;border:1px solid rgba(107,69,48,.45);background:#fff}
+.koszyk-tabela .licznik button{width:34px;height:36px}
+.koszyk-tabela .licznik .val{min-width:32px;font-size:16px}
 .koszyk-tabela .r-pod{display:block;font-size:13.5px;color:rgba(51,38,28,.7);margin-top:2px}
 .koszyk-tabela .r-minus{color:#8a2f1d}
-.koszyk-tabela .koszyk-razem td{background:var(--butelkowa);color:var(--krem);font-size:16px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase}
+.koszyk-tabela .koszyk-razem td{background:var(--butelkowa);border-color:rgba(107,69,48,.55);
+  color:var(--krem);font-size:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 .koszyk-tabela .koszyk-razem td:last-child{color:var(--zloty);font-size:24px}
 
 .dostawa-opcja{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(107,69,48,.3);
@@ -484,9 +492,7 @@ html.dotyk .menu-vert a::after{display:none}
 
 /* ============ KROKI (wynajem 5 kroków) ============ */
 .krok{border:1px solid rgba(107,69,48,.3);background:#fff;padding:20px 22px;margin-top:16px}
-.krok-tytul{color:var(--butelkowa);font-size:22px;margin:0 0 10px;display:flex;align-items:center;gap:12px}
-.krok-nr{flex:none;width:42px;height:42px;border-radius:22px;background:var(--butelkowa);color:var(--zloty);
-  display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
+.krok-tytul{color:var(--butelkowa);font-size:22px;margin:0 0 10px}
 .link-przycisk{background:none;border:none;color:var(--butelkowa);border-bottom:1px solid var(--zloty);
   cursor:pointer;font-size:14.5px;padding:0}
 .link-przycisk:hover{color:var(--brunatny)}

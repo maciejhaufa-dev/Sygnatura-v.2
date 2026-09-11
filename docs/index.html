@@ -51,7 +51,7 @@ a{text-decoration:none;color:inherit}
 
 /* ============ SIATKA KWATEROWA ============ */
 .page{display:flex;flex-direction:column;width:100%;padding:clamp(8px,1.5vw,20px);background:var(--krem)}
-.srodek{display:flex;align-items:stretch}
+.srodek{display:flex;align-items:stretch;flex-wrap:nowrap;width:100%}
 /* brązowo-złota wstążka oddzielająca kolumny A+C od B+D (max 10px) */
 .listwa{flex:none;width:10px;background:
   repeating-linear-gradient(90deg, rgba(139,90,43,.30) 0 2px, rgba(107,69,48,.12) 2px 4px),
@@ -110,9 +110,9 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .head-przycisk:hover{border-color:var(--butelkowa);background:var(--krem-2);color:var(--butelkowa)}
 .head-przycisk svg{width:22px;height:22px;color:var(--brunatny)}
 .head-przycisk:hover svg{color:var(--butelkowa)}
-.head-przycisk .kropka{position:absolute;top:-7px;right:-7px;min-width:20px;height:20px;border-radius:10px;
-  background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:11.5px;font-weight:700;
-  display:none;place-items:center;padding:0 4px}
+.head-przycisk .kropka{position:absolute;top:-9px;right:-9px;min-width:27px;height:27px;border-radius:14px;
+  background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:15px;font-weight:700;
+  display:none;place-items:center;padding:0 6px}
 .head-przycisk .kropka.widoczna{display:grid}
 
 /* ============ SPLASH SCREEN (zgodnie z księgą znaku — oryginał) ============ */
@@ -139,9 +139,9 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 @keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
 
 /* --- okno główne: slider --- */
-.main{padding:8px 0 0}
+.main{width:100%;padding:8px 0 0}
 .slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
-  background:var(--butelkowa);aspect-ratio:16/8.6;max-height:600px}
+  background:var(--butelkowa);width:100%;max-width:none;margin:0 auto;aspect-ratio:16/8.6;max-height:600px}
 .sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
 .sl-slide{flex:0 0 100%;position:relative;display:flex;align-items:flex-end;overflow:hidden}
 .sl-bg{position:absolute;inset:0;background-size:cover;background-position:center}
@@ -159,7 +159,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   transition:all .25s;border:1.5px solid var(--zloty)}
 .sl-btn:hover{background:transparent;color:var(--zloty)}
 
-.sl-karty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;width:100%}
+.sl-karty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;width:100%;align-content:start}
 .sl-karta{display:flex;gap:12px;align-items:center;background:rgba(251,247,240,.95);color:var(--ink);
   padding:10px 12px;transition:transform .25s,box-shadow .25s}
 .sl-karta:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
@@ -168,6 +168,9 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .sl-karta .cena{font-size:14px;color:var(--brunatny);font-weight:700;margin-top:2px}
 .sl-karta .pusty{width:60px;height:60px;flex:none;background:linear-gradient(135deg,var(--krem-2),var(--zloty-soft));
   display:grid;place-items:center;font-size:24px;color:var(--brunatny)}
+.sl-karta-pusta{border:1px dashed rgba(196,165,130,.6);background:rgba(251,247,240,.18);color:var(--krem)}
+.sl-karta-pusta .nazwa{color:var(--krem)}
+.sl-karta-pusta .cena{color:rgba(196,165,130,.9)}
 
 .sl-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:52px;height:52px;
   border-radius:50%;border:1px solid rgba(196,165,130,.8);background:rgba(14,14,12,.45);color:var(--zloty);
@@ -408,7 +411,7 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.14</span>
+    <span>© Sygnatura 2026 · wersja 28.15</span>
   </footer>
 </div>
 
@@ -421,10 +424,23 @@ html.dotyk .social{margin-top:14px}
     return '<a class="sl-karta" href="sklep.html">' + img +
       '<span><span class="nazwa">' + pr.nazwa + '</span><br><span class="cena">' + pr.cena + ' zł / szt.</span></span></a>';
   }
+  function wypelnij(id, lista){
+    var el = document.getElementById(id);
+    if (!el) return;
+    var html = lista.map(karta).join('');
+    for (var i = lista.length; i < 3; i++){
+      html += '<span class="sl-karta sl-karta-pusta"><span><span class="nazwa">Wkrótce</span><br>' +
+        '<span class="cena">nowe prace w drodze</span></span></span>';
+    }
+    el.innerHTML = html;
+  }
   var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
   if (kat.length){
-    document.getElementById('sl-nowosci').innerHTML = kat.slice(0,3).map(karta).join('');
-    document.getElementById('sl-top').innerHTML = kat.slice().reverse().slice(0,3).map(karta).join('');
+    wypelnij('sl-nowosci', kat.slice(0,3));
+    wypelnij('sl-top', kat.slice().reverse().slice(0,3));
+  } else {
+    wypelnij('sl-nowosci', []);
+    wypelnij('sl-top', []);
   }
 })();
 </script>
@@ -452,10 +468,10 @@ html.dotyk .social{margin-top:14px}
 })();
 </script>
 
-<script src="data/katalog.js?v=294"></script>
-<script src="assets/koszyk.js?v=294"></script>
-<script src="assets/config.js?v=294"></script>
-<script src="assets/main.js?v=294"></script>
+<script src="data/katalog.js?v=295"></script>
+<script src="assets/koszyk.js?v=295"></script>
+<script src="assets/config.js?v=295"></script>
+<script src="assets/main.js?v=295"></script>
 <script>
 (function(){
   /* ===== slider: autoplay w pętli, strzałki, kropki ===== */

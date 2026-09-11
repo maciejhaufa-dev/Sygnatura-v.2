@@ -34,22 +34,29 @@
     ['kontakt.html', 'Kontakt']
   ];
 
-  /* menu = pozycje stałe + podstrony zarządzane z panelu admina (zakładka „Podstrony") */
+  /* menu = pozycje stałe + podstrony zarządzane z panelu admina (zakładka „Podstrony").
+     Podstrony „pracownia" NIE doklejamy — ma już własny przycisk w menu stałym (pracownia.html). */
   let POZYCJE_MENU = MENU.slice();
   let STRONY_MENU = [];
+  function widocznePodstrony(){
+    return STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; })
+      .sort(function (a, b) { return (a.kol || 10) - (b.kol || 10); });
+  }
   async function ladujPozycjeMenu(){
     try {
       const odp = await SYG.wezwij('strony-lista', {});
-      const strony = (odp.ok && odp.strony) || [];
-      STRONY_MENU = strony;
+      STRONY_MENU = (odp.ok && odp.strony) || [];
       POZYCJE_MENU = MENU.concat(
-        strony.filter(function (s) { return s.menu; })
-          .sort(function (a, b) { return (a.kol || 10) - (b.kol || 10); })
-          .map(function (s) { return ['podstrona.html?s=' + encodeURIComponent(s.slug), s.tytul]; })
+        widocznePodstrony().map(function (s) { return ['podstrona.html?s=' + encodeURIComponent(s.slug), s.tytul]; })
       );
     } catch (e) { /* brak danych — zostaje menu stałe */ }
     document.querySelectorAll('.menu-vert').forEach(function (nav) {
       nav.innerHTML = pozycjeHtml(document.body.getAttribute('data-strona') || '');
+    });
+    document.querySelectorAll('.foot-podstrony').forEach(function (el) {
+      el.innerHTML = widocznePodstrony().map(function (s2) {
+        return '<span class="sep">·</span><a href="podstrona.html?s=' + encodeURIComponent(s2.slug) + '">' + s2.tytul + '</a>';
+      }).join('');
     });
   }
   function pozycjeHtml(aktywna){
@@ -118,11 +125,11 @@
 
   function stopka() {
     const czesci = ['<a href="regulamin.html">Regulamin</a>', '<a href="jak-pracujemy.html">Jak pracujemy</a>'];
-    STRONY_MENU.filter(function (s) { return s.menu; }).forEach(function (s) {
+    STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; }).forEach(function (s) {
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.14</span>';
+      '<span>© Sygnatura 2026 · wersja 28.15</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=294">
+<link rel="stylesheet" href="assets/style.css?v=295">
 </head>
 <body data-strona="Zamówienia">
 <div id="naglowek"></div>
@@ -49,18 +49,18 @@
   </div>
 
   <div class="przyciski" id="guzy" style="justify-content:flex-end;display:none">
-    <a class="btn" href="dane.html">Przejdź do danych →</a>
-    <a class="btn outline" href="sklep.html">← Wróć do katalogu</a>
+    <a class="btn" href="dane.html" id="guz-dalej">Przejdź do danych →</a>
+    <a class="btn outline" href="sklep.html" id="guz-wstecz">← Wróć do katalogu</a>
   </div>
 </main>
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=294"></script>
-<script src="assets/koszyk.js?v=294"></script>
-<script src="assets/api.js?v=294"></script>
-<script src="data/katalog.js?v=294"></script>
-<script src="assets/main.js?v=294"></script>
+<script src="assets/config.js?v=295"></script>
+<script src="assets/koszyk.js?v=295"></script>
+<script src="assets/api.js?v=295"></script>
+<script src="data/katalog.js?v=295"></script>
+<script src="assets/main.js?v=295"></script>
 <script>
 (function(){
   var k = KOSZYK.pobierz();
@@ -80,8 +80,9 @@
   function renderuj(){
     guzy.style.display = 'flex';
     var lp = 0;
-    var html = '<div class="tabela-wrap"><table class="koszyk-tabela"><thead><tr>' +
-      '<th>Lp.</th><th>Produkt</th><th>Cena jedn.</th><th>Ilość</th><th>Wartość</th><th></th></tr></thead><tbody>';
+    var html = '<div class="tabela-wrap"><table class="koszyk-tabela">' +
+      '<colgroup><col style="width:48px"><col><col style="width:110px"><col style="width:132px"><col style="width:110px"><col style="width:76px"></colgroup>' +
+      '<thead><tr><th>Lp.</th><th>Produkt</th><th>Cena jedn.</th><th>Ilość</th><th>Wartość</th><th>Usuń</th></tr></thead><tbody>';
     razem = 0;
     k.pozycje.forEach(function(x){
       lp++;
@@ -98,7 +99,7 @@
         '<span class="val">' + x.ile + '</span>' +
         '<button type="button" class="plus" aria-label="więcej">+</button></span></td>' +
         '<td class="num"><b>' + SYG.zl(c * x.ile) + '</b></td>' +
-        '<td><button type="button" class="usun" aria-label="usuń">✕</button></td></tr>';
+        '<td><button type="button" class="usun" aria-label="usuń" title="Usuń produkt z koszyka">✕</button></td></tr>';
     });
     k.pers.forEach(function(p){
       lp++;
@@ -241,11 +242,17 @@
       '<p style="margin-top:16px"><a class="btn" href="sklep.html">Przejdź do katalogu</a></p></div>';
     guzy.style.display = 'none';
   } else if (!k.pozycje.length && !k.pers.length && k.typ === 'wynajem'){
-    /* sam wynajem — bez opcji dostawy (dekoracje dowozimy sami) */
+    /* sam wynajem — kontynuacja ścieżki 5 kroków, bez opcji dostawy */
     kontener.innerHTML = '<div class="sukces"><h2>Wynajem: ' + (k.pakiet ? k.pakiet.nazwa : '') + '</h2>' +
-      '<p>Termin: ' + (k.termin ? k.termin.data + (k.termin.czas ? ' godz. ' + k.termin.czas : '') : '—') + '</p>' +
+      '<p>Termin: ' + (k.termin ? k.termin.data : '—') + '</p>' +
       '<p class="mala" style="margin-top:8px">Dekoracje montujemy dzień przed imprezą — opcja dostawy nie jest potrzebna.</p></div>';
     guzy.style.display = 'flex';
+    var gd = document.getElementById('guz-dalej');
+    var gw = document.getElementById('guz-wstecz');
+    gd.setAttribute('href', 'wynajem.html');
+    gd.textContent = 'Kontynuuj wynajem →';
+    gw.setAttribute('href', 'wynajem.html');
+    gw.textContent = '← Wróć do wynajmu';
   } else {
     renderuj();
     blokDostawa.style.display = 'block';
