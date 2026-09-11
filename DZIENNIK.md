@@ -479,5 +479,32 @@ WYKONANE:
 Testy: wszystkie podstrony 200 na podglądzie lokalnym, HTML zbilansowany, node --check OK,
 Pages build OK (gh api: built | 114fd1e), fetch_page potwierdza live: konto.html działa
 (formularz logowania), ikony prowadzą do koszyk.html i konto.html.
-NASTĘPNY KROK: oględziny właściciela (telefon + komputer); potem BAZA KLIENTÓW
-(rejestracja/logowanie przez Apps Script + arkusz), ścieżki A/B, panel admina.
+
+## Sesja 28 — korekta 4 po oględzinach (commit 08a7651, wersja 28.6)
+
+Uwagi właściciela: (1) splash pojawia się przy KAŻDYM kliknięciu/odświeżeniu strony głównej —
+ma być TYLKO przy pierwszym wejściu; (2) podstrony nie dopasowują się do zawartości (u właściciela
+widać stare wersje plików); (3) panel klienta dalej otwiera zamówienia; (4) napis logo przy sygnecie
+nie zgadza się z ustaleniami/księgą znaku — ma być JEDNOLITY napis „Sygnatura": „Syg" delikatnie
+jaśniej (zauważalnie), „natura" w kolorze złotym.
+
+WYKONANE:
+- SPLASH: tylko przy pierwszym wejściu — sessionStorage 'syg-splash': pokazuje się raz na sesję
+  przeglądarki (odświeżenie strony i powrót z podstron NIE powtarzają go; nowa wizyta = pokazuje
+  się znowu). Nadal 3,8 s, płynnie znika, bez klikania.
+- WYMUSZONE ODŚWIEŻANIE ZASOBÓW: wszystkie podstrony ładują style.css / main.js / koszyk.js /
+  api.js / config.js / data/katalog.js z parametrem ?v=286. Od teraz każdy deploy z nową wersją
+  automatycznie wymusza w przeglądarce świeże pliki — koniec z oglądaniem starych kopii z cache
+  (to dlatego podstrony „były bez zmian" i ikona konta „prowadziła do zamówień").
+- NAPIS LOGO (przy sygnecie, lewa kolumna — strona główna i wszystkie podstrony): jednolity
+  „Sygnatura" (ta sama czcionka/wielkość/waga): „Syg" w kolorze kremowym (jaśniejszy), „natura"
+  w złotym (var(--zloty)). Usunięty stary zapis „sygNATURA" (małe/duże litery).
+- Ikona konta (prawy górny róg) → konto.html (panel logowania) — potwierdzone na live; panel
+  logowania gotowy, BAZA KLIENTÓW do zrobienia później (Apps Script + arkusz).
+- Znacznik wersji w stopkach: „wersja 28.6".
+
+Testy: HTML zbilansowany (wszystkie 17 stron), node --check OK, podgląd lokalny 17×200 + zasoby
+?v=286 OK, Pages build OK (gh api: built | 08a7651), fetch_page: konto.html live (formularz
+logowania), ikona konta „Konto — logowanie".
+NASTĘPNY KROK: oględziny właściciela; potem BAZA KLIENTÓW (rejestracja/logowanie przez
+Apps Script + arkusz), ścieżki A/B, panel admina.
