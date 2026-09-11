@@ -652,5 +652,50 @@ Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 7×200, s
 Pages build OK (gh api: built | 00aa646), fetch_page live: szukaj.html?q=Szopka pokazuje
 „Znaleziono 1 wynik odpowiadający hasłu: Szopka" (bez drugiej wyszukiwarki), admin.html zaczyna
 się od ekranu logowania.
-NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + uruchomienie skryptów (Apps Script):
-zamówienia, maile, panel, logowanie admina (admin-login), widget paczkomatu.
+
+## Sesja 28 — korekta 9: układ 4 segmentów A/B/C/D (commity 2e70c54 + 349f2a8, wersja 28.11)
+
+Uwagi właściciela (screenshoty): (1) podział okna na 4 segmenty — A: LOGO tylko logo i nazwa
+SYGNATURA; B: u góry czarny pasek kontakt (tel+mail większe/czytelniejsze, do lewej; w tej samej
+linii do prawej „Znajdź nas na:" + miniatury Pinterest, YouTube, Instagram, Facebook), pod spodem
+wyszukiwarka do lewej + po prawej przycisk KOSZYK (podpisany) i PANEL UŻYTKOWNIKA z miniaturką;
+C: menu jak było (przyciski jeden pod drugim z animacjami), usunąć wszystko pod przyciskami;
+D: main z treściami — slider NIE rozciągnięty do szerokości okna (margines max 20px z obu stron
+boxa), reszta wyjustowana do góry i do szerokości strony; stopka bez zmian. (2) Odzyskiwanie
+hasła MUSI być automatyczne (niedopuszczalny tekst „napisz do nas"), dodać podgląd hasła (oko).
+(3) Panel admina nie ma zakładek do zmiany rzeczy na stronie (jak wcześniej). (4) Kolory OK,
+ale brakuje akcentu odcinającego sekcje — pionowy brązowo-złoty pasek oddzielający A+C od B+D,
+max 10px, jak drewniana rameczka inkrustowana złotem — zaproponować.
+
+WYKONANE:
+- UKŁAD A/B/C/D (index.html + main.js + style.css): lewa kolumna = A (logo+SYGNATURA) + C (menu,
+  nic pod przyciskami — sociale usunięte stamtąd). Prawa kolumna = B (head): czarny pasek
+  .head-kontakt (tel+mail 15.5px do lewej | „Znajdź nas na:" + 4 mini ikony social do prawej),
+  pod nim .head-gora: wyszukiwarka do lewej (pełna dostępna szerokość) + dwa podpisane przyciski:
+  KOSZYK (z licznikiem .kropka) i PANEL UŻYTKOWNIKA (ikona osoby) — wys. 56px, do prawej.
+  Tytuł strony pod spodem (bez zmian). D = main z paddingiem clamp(12px,1.5vw,20px) — slider
+  i treść z marginesem max 20px z obu stron. Stopka bez zmian.
+- LISTWA (propozycja właściciela): pionowy pasek 10px między kolumnami — drewniana rameczka
+  inkrustowana złotem: poziome słoje (repeating-linear-gradient brązu) + pionowy gradient
+   #7A5338→#C4A582→#6B4530→#C4A582→#7A5338 + złota obwódka (inset 1px). Na mobile/dotyku ukryta.
+- KONTO (konto.html): przycisk „oko" podglądu hasła (logowanie i nowe hasło); link
+  „Nie pamiętasz hasła?" otwiera formularz odzyskiwania: e-mail → SYG.wezwij('haslo-reset')
+  (tryb demo: symulacja komunikatu; automat wyśle link po wdrożeniu silnika + Gmaila).
+  Wejście z linku konto.html?reset=TOKEN otwiera „Ustaw nowe hasło" (walidacja min. 8 znaków,
+  powtórzenie) → SYG.wezwij('haslo-ustaw'). Logowanie → 'konto-login' (sesja klienta syg-konto).
+- ADMIN: ZAKŁADKI (jak wcześniej): Zamówienia | Wiadomości | Produkty | Ustawienia.
+  Produkty: tabela całego katalogu — edycja ceny + przełącznik „widoczny" + Zapisz
+  (demo: localStorage 'syg-admin-produkty', nadpisania nanoszone NA ŻYWO na katalog — od razu
+  widać w sklepie; po wdrożeniu: akcja 'produkty-zapisz'). Ustawienia: cennik dostawy
+  (paczkomat/kurier S/M/L) z zapisem (demo: 'syg-admin-dostawa' + SYG.ustawieniaDostawa() —
+  formularz zamówienia używa nowych stawek od razu; po wdrożeniu: 'ustawienia-dostawa-zapisz').
+- api.js: nowe akcje demo 'produkty-zapisz' i 'ustawienia-dostawa-zapisz', SYG.ustawieniaDostawa(),
+  nanoszenie nadpisań produktów na SYG_KATALOG. dane.html używa SYG.ustawieniaDostawa().
+- Wersja 28.11, zasoby ?v=291.
+
+Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 7×200, sync docs OK,
+Pages build OK (gh api: built | 349f2a8), fetch_page live: konto.html ma oko + automat
+odzyskiwania, admin.html ma 4 zakładki, pasek kontakt + „Znajdź nas na:" i podpisane
+KOSZYK / PANEL UŻYTKOWNIKA.
+NASTĘPNY KROK: akceptacja układu; potem BAZA GOOGLE SHEETS + skrypty Apps Script (zamówienia,
+maile, hasła/reset, logowanie admina i klienta, zapis produktów/cennika).
