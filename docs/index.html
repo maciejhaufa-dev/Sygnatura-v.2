@@ -64,10 +64,15 @@ a{text-decoration:none;color:inherit}
 .social svg{width:19px;height:19px}
 .side .side-stopka{font-size:11.5px;color:rgba(251,247,240,.45);text-align:center;letter-spacing:.06em}
 
-/* --- nagłówek głównej kolumny: wyszukiwarka + koszyk/panel --- */
-.head{grid-area:head;display:flex;align-items:center;gap:16px;
-  padding:20px clamp(18px,3vw,40px) 6px;background:var(--krem)}
-.szukaj{display:flex;align-items:stretch;flex:1;max-width:520px;border:1px solid rgba(107,69,48,.4);
+/* --- nagłówek głównej kolumny: wyszukiwarka + koszyk/panel, pod spodem TYTUŁ STRONY --- */
+.head{grid-area:head;display:flex;flex-direction:column;gap:2px;
+  padding:18px clamp(18px,3vw,40px) 4px;background:var(--krem)}
+.head-gora{display:flex;align-items:stretch;gap:12px;padding:12px 14px;
+  background:linear-gradient(135deg,var(--krem-2) 0%,#EFE6D8 55%,var(--krem-2) 100%);
+  border:1px solid rgba(107,69,48,.28);box-shadow:0 6px 20px rgba(107,69,48,.10)}
+h1.strona-tytul{font-size:clamp(26px,3.2vw,38px);margin:2px 14px 0;padding:8px 0 4px}
+h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;background:var(--zloty);margin-bottom:8px}
+.szukaj{display:flex;align-items:stretch;flex:1;max-width:520px;margin-left:auto;border:1px solid rgba(107,69,48,.4);
   background:#fff;transition:border-color .25s,box-shadow .25s}
 .szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(31,58,50,.12)}
 .szukaj input{flex:1;border:none;background:transparent;padding:11px 14px;font-family:inherit;
@@ -76,7 +81,7 @@ a{text-decoration:none;color:inherit}
   display:grid;place-items:center;transition:background .25s}
 .szukaj button:hover{background:var(--brunatny)}
 .szukaj svg{width:18px;height:18px}
-.head-ikony{display:flex;gap:10px;margin-left:auto}
+.head-ikony{display:flex;gap:10px}
 .head-ikony a{position:relative;width:46px;height:46px;border:1px solid rgba(107,69,48,.4);background:#fff;
   display:grid;place-items:center;color:var(--brunatny);transition:all .25s}
 .head-ikony a:hover{border-color:var(--butelkowa);color:var(--butelkowa);background:var(--krem-2)}
@@ -203,12 +208,13 @@ a{text-decoration:none;color:inherit}
   .social{margin-top:14px}
   .slider{aspect-ratio:16/10;max-height:none}
   .head{padding:14px 18px 4px}
+  .head-gora{flex-wrap:wrap;padding:10px 12px}
   .kroki{grid-template-columns:1fr}
   .topbar .wrap{justify-content:center;text-align:center}
   .top-note{display:none}
-  .head{flex-wrap:wrap}
-  .szukaj{order:3;max-width:none;flex-basis:100%}
-  .head-ikony{margin-left:0}
+  .szukaj{order:3;max-width:none;flex-basis:100%;margin-left:0}
+  .head-ikony{order:1;margin-left:auto}
+  h1.strona-tytul{margin:2px 12px 0}
   .sl-karty{grid-template-columns:1fr}
   .sl-karta:nth-child(3){grid-column:auto}
   .sl-karta img{width:46px;height:46px}
@@ -265,6 +271,7 @@ a{text-decoration:none;color:inherit}
   </aside>
 
   <div class="head">
+    <div class="head-gora">
     <form class="szukaj" action="szukaj.html" method="get" role="search">
       <input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">
       <button type="submit" aria-label="Szukaj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
@@ -273,6 +280,8 @@ a{text-decoration:none;color:inherit}
       <a href="koszyk.html" title="Koszyk" aria-label="Koszyk"><span class="kropka"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></a>
       <a href="zamowienia.html" title="Twoje zamówienia" aria-label="Panel klienta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg></a>
     </div>
+    </div>
+    <h1 class="strona-tytul">Studio Sygnatura</h1>
   </div>
 
   <main class="main">
