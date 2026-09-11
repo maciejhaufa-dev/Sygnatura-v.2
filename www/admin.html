@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-strona="">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Panel administracyjny</span>
+  <h1>Pulpit</h1>
+  <p class="sub" id="tryb-info"></p>
+
+  <div class="flash" id="bled" style="display:none"></div>
+
+  <div class="tabela-wrap" id="zamowienia-blok">
+    <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
+    <table class="tabela" id="tabela-zamowien">
+      <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="tabela-wrap" id="wiadomosci-blok">
+    <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Wiadomości z formularza</h2>
+    <table class="tabela" id="tabela-wiadomosci">
+      <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="przyciski">
+    <button class="btn outline" type="button" id="odswiez">Odśwież</button>
+    <a class="btn" href="admin.html">Wyczyść filtr</a>
+  </div>
+</main>
+
+<div id="stopka"></div>
+<footer class="stopka"></footer>
+
+<script src="assets/config.js"></script>
+<script src="assets/koszyk.js"></script>
+<script src="assets/api.js"></script>
+<script src="data/katalog.js"></script>
+<script src="assets/main.js"></script>
+<script>
+(function(){
+  var klucz = SYG.param('klucz');
+  var info = document.getElementById('tryb-info');
+  var bled = document.getElementById('bled');
+
+  if (SYG.TRYB_DEMO){
+    info.innerHTML = 'TRYB DEMO: widzisz dane zapisane w tej przeglądarce (z testów formularzy). ' +
+      'Po wdrożeniu Google Apps Script ten sam panel czyta zamówienia z arkusza — z kluczem w adresie: ' +
+      '<code>admin.html?klucz=TWOJ_KLUCZ</code>';
+  } else {
+    info.textContent = 'Połączono z arkuszem Google.';
+  }
+
+  var STAN_NAZWA = {
+    zapytanie: 'zapytanie',
+    platnosc_w_toku: 'płatność w toku',
+    zarezerwowany: 'zarezerwowany',
+    odrzucono: 'odrzucono'
+  };
+
+  async function laduj(){
+    var odp = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
+    if (!odp.ok){
+      bled.textContent = odp.blad || 'Brak dostępu (zły klucz?).';
+      bled.style.display = 'block';
+      return;
+    }
+    bled.style.display = 'none';
+    var lista = odp.zamowienia || [];
+    var tbody = document.querySelector('#tabela-zamowien tbody');
+    tbody.innerHTML = lista.map(function(z){
+      var pozycje = (z.pozycje || []).map(function(p){ return p.nazwa + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
+      var razem = (z.kwoty && z.kwoty.razem) ? SYG.zl(z.kwoty.razem) : '—';
+      var opcje = Object.keys(STAN_NAZWA).map(function(s){
+        return '<option value="' + s + '"' + (z.status === s ? ' selected' : '') + '>' + STAN_NAZWA[s] + '</option>';
+      }).join('');
+      return '<tr><td><b>' + z.sygnatura + '</b></td>' +
+        '<td>' + (z.data || '').slice(0, 10) + '</td>' +
+        '<td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email + '</span></td>' +
+        '<td>' + pozycje + '</td>' +
+        '<td>' + razem + '</td>' +
+        '<td><select data-syg="' + z.sygnatura + '">' + opcje + '</select></td></tr>';
+    }).join('') || '<tr><td colspan="6">Brak zamówień.</td></tr>';
+
+    tbody.querySelectorAll('select').forEach(function(sel){
+      sel.addEventListener('change', async function(){
+        var odp2 = await SYG.wezwij('zamowienie-status', { klucz: klucz, sygnatura: sel.getAttribute('data-syg'), status: sel.value });
+        if (!odp2.ok) alert(odp2.blad || 'Nie zapisano.');
+      });
+    });
+
+    var wiadomosci = SYG.TRYB_DEMO ? SYG.demoDb.wiadomosci() : [];
+    var wbody = document.querySelector('#tabela-wiadomosci tbody');
+    if (SYG.TRYB_DEMO){
+      wbody.innerHTML = wiadomosci.map(function(w){
+        return '<tr><td>' + (w.data || '').slice(0, 10) + '</td><td>' + w.imie + '<br><span class="mala">' + w.email + '</span></td>' +
+          '<td>' + w.temat + '</td><td>' + w.tresc + '</td></tr>';
+      }).join('') || '<tr><td colspan="4">Brak wiadomości.</td></tr>';
+    } else {
+      wbody.innerHTML = '<tr><td colspan="4">Lista wiadomości z arkusza będzie dostępna po wdrożeniu (akcja „wiadomosci-lista" — w kolejnej wersji silnika).</td></tr>';
+    }
+  }
+
+  document.getElementById('odswiez').addEventListener('click', laduj);
+  laduj();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sklep — Studio Sygnatura</title>
+<meta name="description" content="Sklep Studio Sygnatura: szopki, szyldy, podświetlane litery i ramki z sentencją — z drewna i światła.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-strona="Zamówienia">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Krok 1 z 3</span>
+  <h1>Sklep — katalog produktów</h1>
+  <p class="lead">Wybierz produkty, ustaw ilości i przejdź dalej. Kolejne kroki: Twoje dane → podsumowanie z rachunkiem → wysyłka zamówienia. Produkty sklepu są płatne z góry w całości — dane do przelewu otrzymasz w e-mailu z potwierdzeniem.</p>
+
+  <div id="progres"></div>
+  <div class="katalog" id="katalog"></div>
+  <p class="mala" id="komunikat" style="margin-top:16px;display:none"></p>
+
+  <div class="przyciski" style="justify-content:flex-end">
+    <a class="btn" href="dane.html" id="dalej">Przejdź do danych →</a>
+  </div>
+</main>
+
+<!-- pasek koszyka -->
+<div class="koszyk-bar" id="koszyk-bar">
+  <span class="koszyk-ile">W koszyku: 0 szt.</span>
+  <span class="suma" id="koszyk-suma">0 zł</span>
+  <a class="btn" href="dane.html">Podsumowanie →</a>
+</div>
+
+<div id="stopka"></div>
+<footer class="stopka"></footer>
+
+<script src="assets/config.js"></script>
+<script src="assets/koszyk.js"></script>
+<script src="assets/api.js"></script>
+<script src="data/katalog.js"></script>
+<script src="assets/main.js"></script>
+<script>
+(function(){
+  var kat = window.SYG_KATALOG.filter(function(p){ return p.dostepny; });
+  var kontener = document.getElementById('katalog');
+  var komunikat = document.getElementById('komunikat');
+
+  window.PROGRES.wstaw(document.getElementById('progres'), ['Katalog','Dane','Podsumowanie'], 1);
+
+  function foto(pr){
+    return (pr.obraz && /^https?:/.test(pr.obraz)) ? pr.obraz : 'assets/media/sklep/' + (pr.obraz || 'szopka.jpg');
+  }
+  function renderuj(){
+    var html = '';
+    kat.forEach(function(pr){
+      var wKoszyku = KOSZYK.ileProduktu(pr.id);
+      html += '<article class="karta" data-id="' + pr.id + '">' +
+        '<span class="dymek' + (wKoszyku ? ' widoczny' : '') + '">' + wKoszyku + ' w koszyku</span>' +
+        '<img class="foto" src="' + foto(pr) + '" alt="' + pr.nazwa + '" loading="lazy">' +
+        '<h2 class="nazwa">' + pr.nazwa + '</h2>' +
+        '<p class="opis">' + pr.opis + '</p>' +
+        '<p class="cena">' + SYG.zl(pr.cena) + ' / szt.</p>' +
+        '<div class="wybierz">' +
+          '<div class="licznik">' +
+            '<button type="button" class="minus" aria-label="mniej">−</button>' +
+            '<span class="val">0</span>' +
+            '<button type="button" class="plus" aria-label="więcej">+</button>' +
+          '</div>' +
+          '<button type="button" class="btn-dodaj">Dodaj do koszyka</button>' +
+        '</div>' +
+      '</article>';
+    });
+    kontener.innerHTML = html;
+    kontener.querySelectorAll('.karta').forEach(function(karta){
+      var id = Number(karta.getAttribute('data-id'));
+      var val = karta.querySelector('.val');
+      var dymek = karta.querySelector('.dymek');
+      var ile = 0;
+      function nastaw(v){ ile = Math.max(0, v); val.textContent = ile; }
+      karta.querySelector('.minus').addEventListener('click', function(){ nastaw(ile-1); });
+      karta.querySelector('.plus').addEventListener('click', function(){ nastaw(ile+1); });
+      karta.querySelector('.btn-dodaj').addEventListener('click', function(){
+        if (ile === 0){ komunikat.textContent = 'Ustaw ilość licznikiem, zanim dodasz do koszyka.'; komunikat.style.display='block'; return; }
+        KOSZYK.dodajProdukt(id, ile);
+        nastaw(0);
+        var w = KOSZYK.ileProduktu(id);
+        dymek.textContent = w + ' w koszyku';
+        dymek.classList.add('widoczny');
+        komunikat.style.display='none';
+        odswiezBar();
+      });
+    });
+  }
+
+  function odswiezBar(){
+    KOSZYK.odswiez();
+    var suma = KOSZYK.sumaZl(kat);
+    document.getElementById('koszyk-suma').textContent = SYG.zl(suma);
+    document.getElementById('koszyk-bar').classList.toggle('pelny', KOSZYK.liczbaSztuk() > 0);
+    document.getElementById('dalej').classList.toggle('outline', KOSZYK.liczbaSztuk() === 0);
+  }
+
+  document.getElementById('dalej').addEventListener('click', function(e){
+    if (KOSZYK.liczbaSztuk() === 0){
+      e.preventDefault();
+      komunikat.textContent = 'Koszyk jest pusty — dodaj przynajmniej jeden produkt, żeby przejść dalej.';
+      komunikat.style.display = 'block';
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  });
+
+  renderuj();
+  odswiezBar();
+})();
+</script>
+</body>
+</html>

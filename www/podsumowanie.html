@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podsumowanie zamówienia — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-strona="Zamówienia">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Krok 3 z 3</span>
+  <a class="powrot" href="dane.html">← popraw dane</a>
+  <h1>Podsumowanie zamówienia</h1>
+  <p class="sub">Sprawdź wszystko raz jeszcze. Poniżej znajdziesz pełne zestawienie (rachunek) — pozycja po pozycji. Po wysłaniu dostaniesz e-mail z sygnaturą sprawy, dokumentami i danymi do przelewu.</p>
+
+  <div id="progres"></div>
+  <div class="flash" id="blad" style="display:none"></div>
+
+  <div id="rachunek"></div>
+
+  <div class="forma">
+    <h2>Dane i dostawa</h2>
+    <p id="dane-klienta" style="font-size:15.5px;line-height:1.7"></p>
+
+    <div class="pole">
+      <label for="tresc">Wiadomość dla nas (opcjonalnie)</label>
+      <textarea id="tresc" rows="4" placeholder="Kilka słów od Ciebie — instrukcje, liczba gości, pytania…"></textarea>
+    </div>
+    <p class="mala">Wysyłając zamówienie zobowiązujesz się do zapłaty zgodnie z podsumowaniem (przelew — dane otrzymasz w e-mailu z potwierdzeniem). Kliknięcie poniżej = akceptacja powyższego podsumowania.</p>
+    <div class="przyciski" style="justify-content:flex-end">
+      <button class="btn" type="button" id="zamow">Zamawiam z obowiązkiem zapłaty</button>
+    </div>
+  </div>
+</main>
+
+<div id="stopka"></div>
+<footer class="stopka"></footer>
+
+<script src="assets/config.js"></script>
+<script src="assets/koszyk.js"></script>
+<script src="assets/api.js"></script>
+<script src="data/katalog.js"></script>
+<script src="assets/main.js"></script>
+<script>
+(function(){
+  var k = KOSZYK.pobierz();
+  var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
+
+  if (!k.pozycje.length && !k.pers.length){ window.location.replace('sklep.html'); return; }
+  if (!k.dane){ window.location.replace('dane.html'); return; }
+
+  window.PROGRES.wstaw(document.getElementById('progres'), ['Katalog','Dane','Podsumowanie'], 3);
+
+  /* ---- kwoty ---- */
+  var razem = 0;
+  var persRabat = 0;
+  var persSuma = k.pers.reduce(function(s,p){ return s + (Number(p.cena)||0); }, 0);
+  if (k.pers.length >= SYG.PERS_RABAT_PROG){
+    persRabat = Math.round(persSuma * SYG.PERS_RABAT_PROC / 100);
+  }
+  var kaucja = (k.typ === 'wynajem' && k.pakiet) ? Number(SYG.KAUCJA) : 0;
+  k.pozycje.forEach(function(x){
+    var pr = kat.find(function(p){ return Number(p.id) === Number(x.id); });
+    if (pr) razem += (Number(pr.cena)||0) * x.ile;
+  });
+  razem += persSuma - persRabat;
+
+  /* ---- rachunek (port _kwoty_box) ---- */
+  function nazwaProduktu(id){ var p = kat.find(function(x){ return Number(x.id) === Number(id); }); return p ? p.nazwa : 'Produkt #' + id; }
+  function cenaProduktu(id){ var p = kat.find(function(x){ return Number(x.id) === Number(id); }); return p ? Number(p.cena)||0 : 0; }
+
+  var lp = 0, wiersze = '';
+  k.pozycje.forEach(function(x){
+    lp++;
+    var c = cenaProduktu(x.id);
+    wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+      '<span class="r-poz"><b>' + nazwaProduktu(x.id) + '</b>' +
+      '<span class="r-mob">' + x.ile + ' szt. × ' + SYG.zl(c) + '</span></span>' +
+      '<span class="r-ile">' + x.ile + ' szt.</span>' +
+      '<span class="r-cena">' + SYG.zl(c) + '</span>' +
+      '<span class="r-wart">' + SYG.zl(c * x.ile) + '</span></div>';
+  });
+  k.pers.forEach(function(p){
+    lp++;
+    wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+      '<span class="r-poz"><b>' + p.nazwa + '</b> <span class="r-tag">personalizacja</span>' +
+      (p.opis ? '<span class="r-pod">Opis: ' + p.opis + '</span>' : '') +
+      '<span class="r-mob">1 szt. × ' + SYG.zl(p.cena) + '</span></span>' +
+      '<span class="r-ile">1 szt.</span>' +
+      '<span class="r-cena">' + SYG.zl(p.cena) + '</span>' +
+      '<span class="r-wart">' + SYG.zl(p.cena) + '</span></div>';
+  });
+  if (!lp && k.pomysl){
+    lp++;
+    wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+      '<span class="r-poz"><b>Pomysł własny (spoza katalogu)</b>' +
+      '<span class="r-pod">' + k.pomysl.slice(0,120) + (k.pomysl.length > 120 ? '…' : '') + '</span></span>' +
+      '<span class="r-ile">1</span><span class="r-cena">wycena osobno</span><span class="r-wart">—</span></div>';
+  }
+  if (persRabat){
+    lp++;
+    wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+      '<span class="r-poz"><b>Rabat na personalizację</b><span class="r-pod">−5% przy min. 3 produktach personalizowanych</span></span>' +
+      '<span class="r-ile">—</span><span class="r-cena">—</span>' +
+      '<span class="r-wart r-minus">−' + SYG.zl(persRabat) + '</span></div>';
+  }
+  if (!lp){
+    wiersze = '<div class="rach-wiersz"><span class="r-poz" style="grid-column:1/-1">Brak pozycji — wróć do wcześniejszego kroku i wybierz produkty.</span></div>';
+  }
+  var razemBezKaucji = razem;
+  var razemZk = razem + kaucja;
+  var html = '<div class="rachunek">' +
+    '<div class="rach-naglowek">Rachunek zamówienia <span class="mala">kwoty szacunkowe — potwierdzimy w odpowiedzi</span></div>' +
+    '<div class="rach-wiersz rach-glowka"><span class="r-lp">Lp.</span><span class="r-poz">Pozycja</span><span class="r-ile">Ilość</span><span class="r-cena">Cena jedn.</span><span class="r-wart">Wartość</span></div>' +
+    wiersze +
+    (lp ? '<div class="rach-razem"><span>' + (kaucja ? 'PODSUMOWANIE (bez kaucji)' : 'RAZEM DO ZAPŁATY') + '</span><b>' + SYG.zl(razemBezKaucji) + '</b></div>' : '') +
+    (kaucja ? '<div class="rach-kaucja"><span class="mala">w tym kaucja zwrotna ' + SYG.zl(kaucja) + '</span> → <b>razem przy odbiorze: ' + SYG.zl(razemZk) + '</b> (kaucja wraca w całości po zwrocie kompletu)</div>' : '') +
+    '<p class="uw"><b>Produkty ze sklepu płatne z góry w całości</b> (dane do przelewu w e-mailu z potwierdzeniem).' +
+    (k.pers.length ? ' Dołączona personalizacja: płatna z góry, bezzwrotna, wymaga min. 2 tygodni.' : '') +
+    (k.pomysl ? '<span class="pomysl-uw">Twój pomysł własny zostanie <b>wyceniony osobno</b> — ofertę wyślemy e-mailem pod tą samą sygnaturą sprawy w ciągu <b>2 dni roboczych</b>. Kwoty powyżej nie obejmują tej części.</span>' : '') +
+    '</p></div>';
+  document.getElementById('rachunek').innerHTML = html;
+
+  /* ---- dane klienta ---- */
+  var d = k.dane;
+  var dostawaLabel = d.dostawa === 'wysylka' ? 'Wysyłka kurierem' : 'Odbiór osobisty w pracowni';
+  document.getElementById('dane-klienta').innerHTML =
+    '<b>' + d.imie + '</b> · ' + d.email + (d.telefon ? ' · tel. ' + d.telefon : '') + '<br>' +
+    'Sygnatura: ' + (d.sygnatura ? d.sygnatura : 'nadamy nową') + '<br>' +
+    'Dostawa: <b>' + dostawaLabel + '</b>' + (d.adres ? '<br>Adres: ' + d.adres : '');
+
+  /* ---- wysyłka zamówienia ---- */
+  document.getElementById('zamow').addEventListener('click', async function(){
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Wysyłanie…';
+    var odp = await SYG.wezwij('zamowienie', {
+      typ: k.typ,
+      klient: d,
+      pozycje: k.pozycje.map(function(x){
+        return { id: x.id, nazwa: nazwaProduktu(x.id), cena: cenaProduktu(x.id), ile: x.ile };
+      }),
+      pers: k.pers,
+      pomysl: k.pomysl,
+      kwoty: { razem: razem, pers_rabat: persRabat, kaucja: kaucja },
+      wiadomosc: document.getElementById('tresc').value.trim()
+    });
+    if (odp.ok){
+      window.location.href = 'dziekuje.html?sygnatura=' + encodeURIComponent(odp.sygnatura);
+    } else {
+      var blad = document.getElementById('blad');
+      blad.textContent = (odp.blad || 'Nie udało się wysłać zamówienia. Spróbuj ponownie.');
+      blad.style.display = 'block';
+      blad.scrollIntoView({behavior:'smooth'});
+      btn.disabled = false;
+      btn.textContent = 'Zamawiam z obowiązkiem zapłaty';
+    }
+  });
+})();
+</script>
+</body>
+</html>

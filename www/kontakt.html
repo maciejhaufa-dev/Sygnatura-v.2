@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontakt — Studio Sygnatura</title>
+<meta name="description" content="Napisz do Studio Sygnatura — odpowiadamy w ciągu 2 dni roboczych.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-strona="Kontakt">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Jesteśmy do dyspozycji</span>
+  <h1>Napisz do nas</h1>
+  <p class="lead">Odpowiadamy w ciągu 2 dni roboczych — zwykle szybciej. W pilnych sprawach dopisz „pilne" w wiadomości.</p>
+
+  <div class="sukces" id="sukces" style="display:none">
+    <h2>Dziękujemy za wiadomość!</h2>
+    <p id="sukces-tresc"></p>
+  </div>
+
+  <div id="formularz-blok">
+    <div class="forma">
+      <h2>Formularz kontaktowy</h2>
+      <div class="bledy-box" id="bledy" style="display:none">
+        <b>Zanim wyślemy, uzupełnij:</b>
+        <ul id="bledy-lista"></ul>
+      </div>
+
+      <form id="forma">
+        <div class="pole">
+          <label for="temat">Temat *</label>
+          <select id="temat" name="temat">
+            <option value="projekt">Zapytanie o projekt spersonalizowany</option>
+            <option value="wynajem">Wynajem dekoracji</option>
+            <option value="sklep">Sklep i zamówienia</option>
+            <option value="wspolpraca">Współpraca (dla firm)</option>
+            <option value="inne">Inne</option>
+          </select>
+        </div>
+        <div class="pole">
+          <label for="opis">Opis pomysłu / treść zapytania *</label>
+          <textarea id="opis" name="opis" placeholder="Opisz, o co chodzi — im więcej szczegółów, tym szybciej odpowiemy konkretnie."></textarea>
+        </div>
+        <div class="pole">
+          <label for="imie">Imię i nazwisko *</label>
+          <input type="text" id="imie" name="imie">
+        </div>
+        <div class="pole">
+          <label for="email">Adres e-mail *</label>
+          <input type="email" id="email" name="email" placeholder="adres@poczta.pl">
+        </div>
+        <div class="pole">
+          <label for="telefon">Telefon (opcjonalnie)</label>
+          <input type="tel" id="telefon" name="telefon">
+        </div>
+        <div class="rzad">
+          <input type="checkbox" id="zgoda" name="zgoda">
+          <div>
+            <div class="etyk"><label for="zgoda" style="font-size:inherit;font-weight:inherit">Zgoda na kontakt *</label></div>
+            <div class="opis">Wyrażam zgodę na kontakt ze strony Studio Sygnatura w sprawie mojego zapytania (podstawa: PKE art. 398).</div>
+          </div>
+        </div>
+        <!-- pułapka na boty -->
+        <div class="anty-spam" aria-hidden="true">
+          <label>Zostaw puste</label><input type="text" name="strona_www" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="przyciski" style="justify-content:flex-end">
+          <button class="btn" type="submit" id="wyslij">Wyślij wiadomość</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="forma" style="margin-top:18px">
+      <h2>Studio Sygnatura</h2>
+      <p style="font-size:15.5px;line-height:1.7">
+        <b>E-mail:</b> <a href="mailto:kontakt@studiosygnatura.pl" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">kontakt@studiosygnatura.pl</a><br>
+        <b>Telefon:</b> 510 767 076<br>
+        Pracownia: Polska, woj. mazowieckie (szczegóły prześlemy w odpowiedzi).<br>
+        Zapytania o wynajem i personalizację możesz też złożyć przez <a href="zamowienia.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">kreator zamówień</a>.
+      </p>
+    </div>
+  </div>
+</main>
+
+<div id="stopka"></div>
+<footer class="stopka"></footer>
+
+<script src="assets/config.js"></script>
+<script src="assets/koszyk.js"></script>
+<script src="assets/api.js"></script>
+<script src="assets/main.js"></script>
+<script>
+(function(){
+  /* temat i opis z adresu (np. z popupu „własny projekt": kontakt.html?temat=projekt&opis=…) */
+  var temat = SYG.param('temat');
+  var opis = SYG.param('opis');
+  if (temat) document.getElementById('temat').value = temat;
+  if (opis) document.getElementById('opis').value = opis;
+
+  document.getElementById('forma').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var bledy = [];
+    var d = {
+      temat: document.getElementById('temat').value,
+      tresc: document.getElementById('opis').value.trim(),
+      imie: document.getElementById('imie').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      telefon: document.getElementById('telefon').value.trim(),
+      zgoda: document.getElementById('zgoda').checked,
+      bot: document.querySelector('input[name=strona_www]').value
+    };
+    if (!d.imie) bledy.push('imię i nazwisko');
+    if (!d.email) bledy.push('adres e-mail');
+    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) bledy.push('poprawny adres e-mail');
+    if (!d.tresc) bledy.push('treść zapytania');
+    if (!d.zgoda) bledy.push('zgodę na kontakt');
+    if (d.bot) return; /* bot wpadł w pułapkę — udajemy sukces */
+
+    if (bledy.length){
+      document.getElementById('bledy-lista').innerHTML = bledy.map(function(b){ return '<li>' + b + '</li>'; }).join('');
+      document.getElementById('bledy').style.display = 'block';
+      return;
+    }
+    document.getElementById('bledy').style.display = 'none';
+
+    var btn = document.getElementById('wyslij');
+    btn.disabled = true; btn.textContent = 'Wysyłanie…';
+    var odp = await SYG.wezwij('wiadomosc', d);
+    if (odp.ok){
+      document.getElementById('formularz-blok').style.display = 'none';
+      document.getElementById('sukces-tresc').innerHTML =
+        'Trafiła do naszej skrzynki. Odpowiemy na adres <b>' + d.email + '</b> najpóźniej w ciągu 2 dni roboczych.' +
+        (SYG.TRYB_DEMO ? '<br><span class="mala">(tryb demo — wiadomość zapisała się tylko w tej przeglądarce)</span>' : '');
+      document.getElementById('sukces').style.display = 'block';
+    } else {
+      btn.disabled = false; btn.textContent = 'Wyślij wiadomość';
+      alert(odp.blad || 'Nie udało się wysłać. Spróbuj ponownie.');
+    }
+  });
+})();
+</script>
+</body>
+</html>

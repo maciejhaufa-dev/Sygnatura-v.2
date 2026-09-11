@@ -336,3 +336,51 @@ NASTĘPNY KROK: decyzje z checklisty (konto Oracle i karta do weryfikacji? / dan
 - Jeżeli seohost potwierdzi warunki: wdrożenie = wgrać serwis + `passenger_wsgi.py` (adaptacja deploy pod Passenger zamiast systemd/nginx) — przygotować po decyzji.
 
 NASTĘPNY KROK: użytkownik wysyła pytania do supportu seohost (treść w rozmowie) albo decyduje MyDevil/Oracle.
+
+---
+
+## Sesja 26 — PIVOT TECHNOLOGICZNY: przebudowa na HTML + CSS + JS (decyzja właściciela)
+
+Właściciel (ton stanowczy): „To ty wymyśliłeś Pythona, nie ja. Mówiłem cały czas o HTML+CSS+JS."
+→ PRZEBUDOWUJEMY cały serwis na HTML + CSS + JavaScript. Zero Flaska, zero Pythona.
+- Silnik (zapisy, maile, sygnatury, panel) = Google Apps Script (JavaScript) + arkusz Google jako baza
+  (to wraca do pierwotnego pomysłu właściciela „arkusz = jedna baza").
+- Hosting: ma być obsługiwany przez kogoś innego („nie będę codziennie pilnował serwera"),
+  strona administrowana głównie przez żonę, właściciel pomaga przy utrzymaniu. SeoHost SH2 (37 zł/rok)
+  = kandydat #1; kryteria do supportu ustalam SAM (nie właściciel) — w ARCHITEKTURA.md §4.
+- DZIENNIK.md = backup rozmowy (wymóg właściciela) — aktualizowany i wypychany co sesję.
+
+WYKONANE W TEJ SESJI:
+1. NOWY PROJEKT `www/` (czyste HTML+CSS+JS, bez frameworków, bez builda):
+   - index.html — landing kwaterowy przeniesiony 1:1 z v4 (slider, autoplay, swipe; karty slajdów
+     renderowane z data/katalog.js; wyszukiwarka → szukaj.html),
+   - zamowienia.html — hub 3 kafli (teksty 1:1 ze starego szablonu); wynajem i personalizacja tymczasowo
+     przez formularz z tematem (ścieżki A/B do przeniesienia w kolejnych sesjach),
+   - sklep.html — krok 1: katalog, licznik −/+, „Dodaj do koszyka", dymek „N w koszyku", sticky pasek
+     koszyka z sumą, blokada pustego koszyka (jak w sesji 21, ale w czystym JS),
+   - dane.html — krok 2: dane + sygnatura (nowa/istniejąca) + dostawa + zgody (PKE art. 398 + regulamin
+     z linkami) + KOMUNIKAT O NIEUZUPEŁNIONYCH POLACH przed przejściem dalej (wymóg sesji 17),
+   - podsumowanie.html — krok 3: rachunek (port _kwoty_box: pozycje, personalizacje, rabat 5% od 3 pers.,
+     „pomysł własny = wycena osobno", „PODSUMOWANIE (bez kaucji)" + kaucja mniejszym drukiem — gotowe pod
+     wynajem) + „Zamawiam z obowiązkiem zapłaty" → API → dziekuje.html z sygnaturą,
+   - kontakt.html — tematy + auto-wypełnienie ?temat=&opis= (popup pomysłu) + honeypot antybot + zgoda,
+   - szukaj.html — wyszukiwanie katalogu po nazwie/opisie (min. 2 znaki), fallback → formularz,
+   - admin.html — panel: zamówienia + zmiana statusów (demo: localStorage; produkcja: klucz w URL),
+   - regulamin/jak-pracujemy/pracownia/wspolpraca/realizacje — treści przeniesione ze starych szablonów,
+   - assets/: style.css (wspólny motyw), main.js (szkielet: topbar/menu/stopka/banner demo/progres),
+     koszyk.js (localStorage), api.js (demo ↔ Apps Script — te same akcje), config.js (SYG.API),
+   - data/katalog.js — 4 produkty (szopka 249, szyld 189, LOVE 249, ramka 89; zdjęcia skopiowane).
+2. SILNIK `engine/` (Google Apps Script = JavaScript): Konfig.gs (ID arkusza, TOKEN, maile, instaluj()),
+   Kod.gs (API: katalog/wiadomosc/zamowienie publiczne; zamowienia-lista/status z kluczem; sygnatury
+   z LockService; maile MailApp z Reply-To domeny), Uruchom.gs (nocny backup JSON na Dysk + retencja
+   30 dni + alarm), README.md (wdrożenie krok po kroku — robi właściciel, bot nie ma dostępu do Google).
+3. tools/serwuj.mjs — podgląd lokalny w czystym JS (Node, port 8001) — bez Pythona nawet do podglądu.
+4. README.md (root) — nowy projekt, struktura, testy, wdrożenie, roadmapa. ARCHITEKTURA.md v3 —
+   węzły (hosting statyczny + Google silnik + OVH domena/poczta + GitHub), kryteria seohost, ryzyka.
+5. Sprzątanie: usunięte testowe uploads (7 MB) z serwis/data/uploads; serwis/ (Flask) ZOSTAJE na razie
+   jako referencja do przepisywania logiki (całość w historii gita) — do usunięcia po pełnym przeniesieniu.
+
+DO ZROBIENIA (kolejne sesje): ścieżka A wynajem (kalendarz→pakiet→pers, kaucja w rachunku), ścieżka B
+personalizacja + popup „własny projekt" (bez produktu → kontakt?temat=projekt&opis=…), panel: edycja
+katalogu/wiadomości, konta klientów i partnerów (PART-XXX), raporty kwartalne, podmiana docs/ (Pages),
+wdrożenie (hosting + Apps Script + domena).
