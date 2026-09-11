@@ -697,5 +697,57 @@ Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 7×200, s
 Pages build OK (gh api: built | 349f2a8), fetch_page live: konto.html ma oko + automat
 odzyskiwania, admin.html ma 4 zakładki, pasek kontakt + „Znajdź nas na:" i podpisane
 KOSZYK / PANEL UŻYTKOWNIKA.
-NASTĘPNY KROK: akceptacja układu; potem BAZA GOOGLE SHEETS + skrypty Apps Script (zamówienia,
-maile, hasła/reset, logowanie admina i klienta, zapis produktów/cennika).
+
+## Sesja 28 — korekta 10: ścieżki A/B + koszyk-tabela + slider (commit 1126e46, wersja 28.12)
+
+Uwagi właściciela (5 screenshotów): (1) slider na stronie głównej dalej nie rozciągnięty do
+szerokości okna D i nie przewija się sam — „strona musi żyć"; (2) ZAMÓWIENIA: „Zarezerwuj termin"
+przekierowuje do formularza kontaktowego — ma być kalendarz z wyborem pakietów + progress bar
+1-2-3 jak ustalono; (3) PERSONALIZACJA tak samo — katalog produktów + progress bar (jak było
+w wersji PythonAnywhere); (4) KOSZYK: ma być ładna, przejrzysta TABELA z nagłówkami kolumn
+(bez nachodzących napisów i okien +/−); opcje dostawy w blokach (ramka + nagłówek), checkboxy
+z ceną; kategoryzacja produktów wg wielkości → automatyczny dobór rozmiaru paczki (nie można
+kupić 10 szopek i wybrać paczkę S); testowo: S = 1–3 prod., M = 4–6, L = 7–10, powyżej 10 =
+tylko kurier; pole paczkomatu + opcja „Znajdź na mapie" (link/nowe okno do wyszukiwarki InPost);
+komunikaty przy blokowaniu małych paczek; (5) pionowy pasek OK — taki sam dodać nad footerem
+na całą szerokość; (6) symbol przy logowaniu (drugi obok oka = 🙈) mylący — zostawić samo oko;
+(7) slider dalej nie powiększony do szerokości okna D.
+
+WYKONANE:
+- SLIDER: .main bez bocznych paddingów (slider rozciąga się na CAŁĄ szerokość okna D; margines
+  tylko zewnętrzny .page = max 20px — wcześniej był podwójny: page+main, razem ~40px).
+  Autoplay przyspieszony do 4,5 s (pauza na hover, strzałki, kropki, swipe — było, działa).
+  Spójne paddingi .head/.cta/.head-kontakt: clamp(12px,1.5vw,20px).
+- WYNAJEM (nowa strona www/wynajem.html, ścieżka A): krok 1/3 — kalendarz (input date, min.
+  jutro — montaż dzień przed) + godzina + rodzaj wydarzenia (select) + PAKIETY (12 pakietów
+  ESENCJA/MID/FULL z poprzedniej wersji serwisu: komunijny/weselny/firmowy/jubileuszowy —
+  karty radio z nazwą, opisem, składem i ceną „od X zł / doba") + progress bar (Termin i pakiet →
+  Dane → Podsumowanie) + walidacja + kaucja 300 zł. Zapis do koszyka: k.typ='wynajem',
+  k.pakiet, k.termin → dane.html → podsumowanie (wiersz pakietu z terminem w rachunku,
+  kaucja w podsumowaniu) → dziekuje. Kafle w zamowienia.html linkują do wynajem.html.
+- PERSONALIZACJA (nowa www/personalizacja.html, ścieżka B): krok 1/3 — katalog produktów
+  personalizowanych (7 pozycji z poprzedniej wersji), checkbox + obowiązkowy opis „co ma być
+  wygrawerowane", adnotacja min. 2 tygodnie, rabat 5% od 3 pers., progress bar (Personalizacja →
+  Dane → Podsumowanie). POMYSŁ WŁASNY (sesja 18): bez wybranego produktu nie przejdzie dalej —
+  modal z cytowanym opisem i przyciskami „Chcę wysłać zapytanie" (→ kontakt.html?temat=
+  Zapytanie o projekt spersonalizowany&opis=…) oraz „Anuluj". Pers[] dopisywane do koszyka.
+- KOSZYK (przebudowa): blok „Koszyk" — czytelna tabela z NAGŁÓWKAMI (Lp. | Produkt ze
+  zdjęciem | Cena jedn. | Ilość −/+ | Wartość | usuń), personalizacje, rabat, pomysł, dostawa
+  i wiersz RAZEM; blok „Opcje dostawy" — opcje w ramkach (Odbiór osobisty 0 zł / Paczkomat
+  InPost / Kurier) z ceną, AUTOMATYCZNY dobór rozmiaru paczki wg liczby produktów
+  (S ≤3, M ≤6, L ≤10; >10 → paczkomat zablokowany + komunikat „tylko kurier"), zapisany wybór
+  korygowany przy zmianie ilości; pole paczkomatu + przycisk „Znajdź paczkomat na mapie →"
+  (link inpost.pl/znajdz-paczkomat, nowe okno); adres przy kurierze; dostawa wliczona w RAZEM
+  i zapisana w k.dostawa. Dane dostawy PRZENIESIONE z dane.html do koszyka (dane.html = tylko
+  dane osobowe + zgody); podsumowanie czyta k.dostawa; wynajem pomija blok dostawy.
+- WSTĄŻKA NAD STOPKĄ: pozioma 10px (te same słoje + gradient brąz→złoto + złota obwódka) na
+  całej szerokości — na stronie głównej i wszystkich podstronach (main.js).
+- OKO przy haśle: usunięty 🙈 — teraz zawsze 👁, stan „widoczne" = podświetlenie przycisku
+  (.btn.aktywne); oko dodane też do hasła w panelu admina.
+- Wersja 28.12, zasoby ?v=292 (18 stron).
+
+Testy: HTML zbilansowany (18 stron), node --check OK, podgląd lokalny 9×200, sync docs OK,
+Pages build OK (gh api: built | 1126e46), fetch_page live: wynajem.html (kalendarz + 3 pakiety
+weselne + progress), personalizacja.html (katalog 7 pozycji + pomysł własny + progress).
+NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (zamówienia A/B/C,
+maile, hasła/reset, logowania, zapis produktów/cennika) i gabaryty produktów do cennika paczek.
