@@ -418,26 +418,30 @@ ODPOWIEDZI (potwierdzone):
 
 Uwagi właściciela po testach żony: (1) brak splash screen przy pierwszym uruchomieniu, (2) na telefonie
 strona się rozjeżdża, (3) menu niespójne — koszyk był osobną zakładką, ma być IKONKĄ w prawym górnym rogu,
-(4) pusty koszyk = pusty widok, (5) ogółem szata graficzna „się nie spina" — układ ma być spójny, jednolity,
-responsywny na telefonie i komputerze, przystosowany do każdego urządzenia. „Popraw zanim wyślę żonie".
+(4) pusty koszyk = pusty widok, (5) ogółem szata graficzna „się nie spina". „Popraw zanim wyślę żonie".
 
-WYKONANE:
-- www/assets/style.css przepisany: WSZYSTKIE podstrony dostały TEN SAM układ kwaterowy co landing
-  (.strona-uklad: czarny topbar / lewa zielona ćwiartka z logo+menu pionowym+social / wiersz
-  wyszukiwarka+ikony / treść / stopka). Breakpointy jak na landingu: 761–1100 px ciaśniejsza ćwiartka,
-  <760 px kolumna (menu jako pigułki, wyszukiwarka na całą szerokość). Usunięte stare paski
-  .site-head/.site-menu.
-- www/assets/main.js: buduje wspólny szkielet kwaterowy dla podstron (topbar+side+head), przenosi
-  treść i stopkę do siatki, usuwa stary #naglowek. MENU BEZ pozycji „Koszyk" — koszyk to IKONKA
-  w prawym górnym rogu (obok ikony panelu), identyczna jak na stronie głównej; klik = sklep.html
-  (katalog = strona koszyka, więc pusty koszyk nigdy nie prowadzi do martwego widoku).
-- Kropka na ikonie koszyka: widoczna TYLKO gdy coś jest w koszyku (koszyk.js odswiez() przełącza
-  .kropka.widoczna; na landingu też).
-- SPLASH SCREEN na starcie (index.html): pełnoekranowa plansza (gradient butelkowa→czerń, pulsujący
-  kwadrat z sygnetem, sygNATURA, „drewno·światło·detal"), pokazuje się raz na sesję (sessionStorage),
-  gaśnie po ~2 s, klik pomija.
-- sklep.html: body.ma-koszyk (odstęp pod dolnym paskiem koszyka, żeby nie zasłaniał stopki).
+Dwa pierwsze warianty poprawki zostały ODRZUCONE. Finalna wersja (zaakceptowany kierunek, commity
+a08171d + 2cd3db1):
+
+- SPLASH DOKŁADNIE jak we wcześniejszej wersji (księga znaku): zdjęcie forest.jpg w tle (center/cover
+  + delikatny gradient przyciemniający), kremowy PROSTOKĄT z brązową ramką 2px, sygnet SVG i 9 liter
+  PNG (assets/letters/l0–l8.png) spadających po kolei (delay 1,25–2,29 s). Pokazuje się przy KAŻDYM
+  wejściu na stronę główną, 3,8 s, potem płynnie znika (bez klikania, bez sessionStorage).
+- Naprawa podwójnego menu na stronie głównej: main.js buduje wspólny szkielet WYŁĄCZNIE na podstronach
+  (main.wrap); index.html zachowuje swój własny układ kwaterowy — nic się nie dubluje ani nie rozjeżdża.
+- UKŁAD WG OPISU WŁAŚCICIELA (obowiązuje na podstronach i na stronie głównej): czarny pasek u góry
+  (tel + mail) → pod spodem logo po lewej, WYSZUKIWARKA z ładnym tłem (kremowy gradient w ramce)
+  po prawej → NAZWA/TYTUŁ STRONY POD WYSZUKIWARKĄ (górna część, na wysokości logo) → menu pionowe
+  po lewej + SOCIALE pod menu → treść podstrony w osobnym bloku → stopka. Breakpointy 761–1100 px
+  i <760 px (kolumna).
+- Koszyk WYŁĄCZNIE jako ikona w prawym górnym rogu (kropka z licznikiem tylko gdy niepusty); klik
+  otwiera PODSTRONĘ koszyk.html (podgląd koszyka: pozycje z miniaturami, ilości −/+, usuń, pozycje
+  personalizowane, rabat, RAZEM, „Przejdź do danych" / „Wróć do katalogu"; pusty koszyk = komunikat
+  + przycisk do katalogu). Ścieżka: sklep → koszyk → dane → podsumowanie → dziękujemy.
+- style.css: wspólna szata (topbar, side z logo/menu/social, head z wyszukiwarką i ikonami, h1 pod
+  wyszukiwarką), komponenty formularzy/rachunku/tabeli admina/progresu.
 - docs/ zsynchronizowane z www/ (Pages publikuje się sam z brancha arena/…, folder /docs).
 
-Testy: składnia JS OK, podgląd lokalny 200. Do weryfikacji wizualnej przez właściciela (telefon + komputer).
-NASTĘPNY KROK: uwagi po oględzinach; potem ścieżki A/B, panel, wdrożenie.
+Testy: składnia JS OK, Pages build OK (gh api), podgląd live przez fetch_page: splash renderuje się
+(sygnet + 9 liter), koszyk.html działa, tytuł strony pod wyszukiwarką, brak podwójnego menu.
+NASTĘPNY KROK: oględziny właściciela (telefon + komputer); potem ścieżki A/B, panel, wdrożenie engine.
