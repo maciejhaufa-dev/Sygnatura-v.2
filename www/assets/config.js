@@ -23,7 +23,7 @@ window.SYG = {
   // Po wdrożeniu Google Apps Script logowanie sprawdza baza administratorów (arkusz),
   // a te dwa pola przestają działać — możesz je wtedy usunąć.
   ADMIN_DEMO_LOGIN: 'admin',
-  ADMIN_DEMO_HASLO: 'sygnatura-demo-2026',
+  ADMIN_DEMO_HASLO: 'test',
 
   // cennik dostawy (zł) — stawki startowe; zaktualizuj wg aktualnych cenników
   // InPost/kuriera. Rozmiary paczek: S (np. ramki, litery), M (np. szopka, szyld), L (duże zamówienia).

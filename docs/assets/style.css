@@ -98,8 +98,8 @@ button{font-family:inherit}
 .head-przycisk:hover svg{color:var(--butelkowa)}
 .head-przycisk .kropka{position:absolute;top:-9px;right:-9px;min-width:27px;height:27px;border-radius:14px;
   background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:15px;font-weight:700;
-  display:none;place-items:center;padding:0 6px}
-.head-przycisk .kropka.widoczna{display:grid}
+  display:none;line-height:23px;text-align:center;padding:0 6px}
+.head-przycisk .kropka.widoczna{display:inline-block}
 
 /* tytuł strony — pod wyszukiwarką, w górnym bloku */
 h1.strona-tytul{font-size:clamp(28px,3.4vw,42px);margin:2px 14px 0;padding:8px 0 4px}
@@ -212,14 +212,19 @@ body.ma-koszyk{padding-bottom:76px}
 .demo-banner b{color:var(--zloty)}
 
 /* ============ PASEK POSTĘPU ============ */
-.progres{display:flex;margin:18px 0 8px;flex-wrap:wrap;background:var(--krem-2);
-  border:1px solid rgba(107,69,48,.35)}
-.progres .krok{flex:1;min-width:110px;text-align:center;padding:10px 12px;
-  font-size:13.5px;font-weight:700;letter-spacing:.06em;color:rgba(51,38,28,.55);text-transform:uppercase;
-  border-right:1px solid rgba(107,69,48,.35)}
-.progres .krok:last-child{border-right:none}
+.progres{display:flex;gap:0;margin:18px 0 8px;flex-wrap:wrap}
+.progres .krok{flex:1;min-width:110px;position:relative;text-align:center;padding-top:22px;
+  font-size:14px;font-weight:600;letter-spacing:.05em;color:rgba(51,38,28,.55);text-transform:uppercase}
+.progres .krok::before{content:"";position:absolute;top:7px;left:50%;transform:translateX(-50%);
+  width:14px;height:14px;border-radius:50%;background:var(--krem-2);border:2px solid rgba(107,69,48,.35)}
+.progres .krok::after{content:"";position:absolute;top:13px;left:calc(50% + 9px);right:calc(-50% + 9px);
+  height:2px;background:rgba(107,69,48,.22)}
+.progres .krok:last-child::after{display:none}
 .progres .krok.zrob{color:var(--butelkowa)}
-.progres .krok.akt{background:var(--butelkowa);color:var(--zloty)}
+.progres .krok.zrob::before{background:var(--zloty);border-color:var(--zloty)}
+.progres .krok.zrob::after{background:var(--zloty)}
+.progres .krok.akt{color:var(--brunatny)}
+.progres .krok.akt::before{background:var(--zloty);border-color:var(--brunatny)}
 
 /* ============ RACHUNEK ============ */
 .rachunek{background:#fff;border:1px solid rgba(107,69,48,.35);margin-top:16px}
