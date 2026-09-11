@@ -3,234 +3,118 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <title>Sklep — Studio Sygnatura</title>
-<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<meta name="description" content="Sklep Studio Sygnatura: szopki, szyldy, podświetlane litery i ramki z sentencją — z drewna i światła.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
-  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C;
-  --serif:"Cormorant Garamond","Playfair Display",Georgia,"Palatino Linotype","Book Antiqua",Palatino,serif;
-  --script:"Great Vibes","Alex Brush","Brush Script MT",cursive;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
-  display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
-img{display:block;max-width:100%}
-a{text-decoration:none;color:inherit}
-button{font-family:inherit}
-
-/* ================= SPLASH ================= */
-#splash{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
-  background:var(--butelkowa) url('assets/forest.jpg') center/cover no-repeat;
-  transition:opacity .8s ease,visibility .8s ease}
-#splash::before{content:"";position:absolute;inset:0;
-  background:linear-gradient(rgba(31,58,50,.10),rgba(31,58,50,.10)),
-  radial-gradient(115% 100% at 50% 36%,rgba(31,58,50,0) 52%,rgba(31,58,50,.30) 100%)}
-#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.splash-card{position:relative;display:flex;flex-direction:column;align-items:center;
-  gap:clamp(14px,2.6vw,22px);background:rgba(251,247,240,.97);border:2px solid var(--brunatny);
-  border-radius:0;padding:clamp(28px,5vw,46px) clamp(34px,8vw,64px);
-  box-shadow:0 42px 90px rgba(15,26,21,.45);
-  --sygW:clamp(84px,20vw,126px);
-  animation:card-soft 1.1s cubic-bezier(.22,.61,.36,1) .3s both}
-.splash-sygnet{width:var(--sygW);height:auto;animation:rise-soft 1.2s cubic-bezier(.22,.61,.36,1) .75s both}
-.splash-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847)}
-
-/* litery logotypu */
-.lbox,.fall{display:inline-block;flex:none}
-.wl{height:1em;width:auto;display:block}
-.fall{opacity:0;animation:softfall .9s cubic-bezier(.22,.61,.36,1) forwards}
-
-@keyframes card-soft{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
-@keyframes rise-soft{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes softfall{0%{opacity:.3;transform:translateY(-.8em)}100%{opacity:1;transform:none}}
-
-/* ================= NAGŁÓWEK ================= */
-/* nagłówek NAD zdjęciem hero (menu przykrywa górę zdjęcia — zdjęcie nie jest ucinane pod spodem) */
-.site-head{position:absolute;top:0;left:0;right:0;z-index:40}
-.topbar{display:flex;justify-content:flex-end;align-items:center;gap:4px;
-  padding:8px clamp(14px,3.5vw,44px);background:rgba(251,247,240,.95);
-  border-bottom:1px solid rgba(107,69,48,.16)}
-.iconbtn{width:40px;height:40px;display:grid;place-items:center;color:var(--brunatny);
-  border-radius:0;background:none;border:0;cursor:pointer}
-.iconbtn:hover{background:var(--krem-2)}
-.iconbtn svg{width:21px;height:21px}
-.burger{display:none}
-.menu{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2px;
-  background:var(--butelkowa);padding:10px clamp(10px,3vw,40px);box-shadow:0 14px 30px rgba(15,26,21,.28)}
-.menu a{color:var(--zloty);font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;
-  padding:9px 13px;transition:background .2s}
-.menu a:hover{background:rgba(196,165,130,.14)}
-.menu a.on{background:rgba(196,165,130,.2)}
-
-/* ================= HERO ================= */
-/* TŁO NA HERO użytkownika — pełna szerokość, bez cięcia boków (100% auto);
-   logo DUŻE po lewej na wysokości napisu „Cześć", panel u dołu PO PRAWEJ (rozciągnięty, 4 przyciski obok siebie) */
-.hero{flex:1;position:relative;display:flex;flex-direction:column;min-height:100svh;
-  background-color:#CECBB6;background-image:url('assets/hero.jpg');
-  background-size:100% auto;background-position:center 22%;background-repeat:no-repeat}
-.brand{position:absolute;top:clamp(96px,15%,170px);left:clamp(24px,4vw,72px);z-index:2;
-  display:flex;flex-direction:column;align-items:flex-start;gap:clamp(12px,1.6vw,18px);
-  --sygW:clamp(110px,13vw,176px)}
-.brand-sygnet{width:var(--sygW);height:auto;filter:drop-shadow(0 10px 24px rgba(30,20,10,.28));
-  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 3.9s forwards}
-.brand-txt{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
-.brand-word{display:flex;align-items:flex-start;font-size:calc(var(--sygW)/5.0847);
-  filter:drop-shadow(0 6px 14px rgba(30,20,10,.30))}
-.brand-podpis{font-size:clamp(11px,1.2vw,14px);letter-spacing:.34em;text-transform:uppercase;color:var(--brunatny);
-  white-space:nowrap;text-shadow:0 1px 0 rgba(251,247,240,.65);
-  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.05s forwards}
-.panel{position:absolute;bottom:clamp(14px,2.6vh,30px);right:clamp(24px,4vw,72px);z-index:3;
-  width:min(1140px,calc(100% - clamp(48px,8vw,144px)));
-  background:#FFFDF8;border:2px solid var(--brunatny);border-radius:0;
-  padding:clamp(20px,2.6vw,36px);box-shadow:0 34px 70px rgba(20,15,8,.42);
-  opacity:0;animation:panel-up .85s cubic-bezier(.22,.61,.36,1) 3.7s forwards}
-@keyframes panel-up{from{opacity:.4;transform:translateY(14%)}to{opacity:1;transform:none}}
-.slow-row{display:flex;align-items:baseline;gap:clamp(10px,1.4vw,16px);flex-wrap:wrap}
-.slowo{font-family:var(--serif);color:var(--zloty);font-weight:600;
-  font-size:clamp(26px,3.2vw,42px);line-height:1.1;letter-spacing:.05em;
-  text-shadow:0 1px 0 rgba(107,69,48,.25),0 6px 16px rgba(20,15,8,.18);
-  opacity:0;animation:wipe .8s cubic-bezier(.22,.61,.36,1) forwards}
-.slowo.s1{animation-delay:4.3s}.slowo.s2{animation-delay:4.6s}.slowo.s3{animation-delay:4.9s}
-.slow-dash{color:var(--brunatny);font-size:clamp(18px,2.2vw,26px);font-weight:600;
-  opacity:0;animation:rise-soft .6s cubic-bezier(.22,.61,.36,1) forwards}
-.slow-dash.d1{animation-delay:4.5s}.slow-dash.d2{animation-delay:4.8s}
-.hero-text{font-size:clamp(14.5px,1.4vw,16.5px);line-height:1.65;color:rgba(51,38,28,.96);
-  margin-top:clamp(10px,1.4vw,14px);
-  opacity:0;animation:rise-soft 1s cubic-bezier(.22,.61,.36,1) 5.2s forwards}
-.btn-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:clamp(14px,2vw,20px)}
-.btn-row .btn{opacity:0;animation:rise-soft .9s cubic-bezier(.22,.61,.36,1) forwards}
-.btn-row .btn:nth-child(1){animation-delay:5.5s}.btn-row .btn:nth-child(2){animation-delay:5.62s}
-.btn-row .btn:nth-child(3){animation-delay:5.74s}.btn-row .btn:nth-child(4){animation-delay:5.86s}
-@keyframes wipe{0%{clip-path:inset(0 100% 0 0);opacity:0}100%{clip-path:inset(0 -1% 0 0);opacity:1}}
-.btn{width:100%;text-align:center;padding:13px 10px;border-radius:0;font-size:12px;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;transition:all .25s}
-.btn-solid{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa)}
-.btn-solid:hover{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
-.btn-outline{background:transparent;color:var(--brunatny);border:1.5px solid var(--brunatny)}
-.btn-outline:hover{background:var(--brunatny);color:var(--krem)}
-
-/* ================= STOPKA ================= */
-.site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
-  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px)}
-.foot-social{display:flex;align-items:center;gap:14px}
-.foot-label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--zloty-soft)}
-.soc-icons{display:flex;gap:8px}
-.soc-icons a{width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(196,165,130,.45);
-  border-radius:50%;color:var(--zloty);transition:all .25s}
-.soc-icons a:hover{background:var(--zloty);color:var(--butelkowa)}
-.soc-icons svg{width:16px;height:16px}
-.foot-mid{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
-.copy{font-size:13px;letter-spacing:.04em}
-.regbtn{border:1px solid rgba(196,165,130,.6);color:var(--zloty);font-size:10.5px;letter-spacing:.14em;
-  text-transform:uppercase;padding:5px 13px;border-radius:0;transition:all .25s}
-.regbtn:hover{background:var(--zloty);color:var(--butelkowa)}
-.foot-right{display:flex;align-items:center;gap:10px;font-size:13.5px}
-.foot-right a:hover{color:var(--zloty)}
-.foot-sep{opacity:.4}
-
-/* ================= RESPONSYWNOŚĆ ================= */
-@media (max-width:1023px){
-  /* telefon/tablet: pas zdjęcia pełnej szerokości POD nagłówkiem — „Cześć" w całości;
-     logo na pasie po lewej (na wysokości napisu), panel rozciągnięty na dole */
-  .hero{background-position:0 112px}
-  .brand{top:120px;left:14px;flex-direction:row;align-items:flex-start;gap:12px;--sygW:clamp(46px,13vw,64px)}
-  .brand-txt{gap:6px}
-  .brand-podpis{font-size:10px;letter-spacing:.26em}
-  .panel{left:14px;right:14px;width:auto;padding:18px 16px}
-  .slowo{font-size:clamp(24px,6.4vw,32px)}
-  .btn-row{grid-template-columns:1fr 1fr}
-}
-@media (max-width:860px){
-  .menu{display:none;flex-direction:column;align-items:stretch;text-align:center;padding:6px 14px 14px}
-  .menu.open{display:flex}
-  .menu a{padding:11px 12px}
-  .burger{display:grid}
-}
-/* niskie ekrany desktopowe: ciaśniejszy panel + kadr zdjęcia tak, żeby „Cześć" mieściło się nad panelem */
-@media (min-width:1024px) and (max-height:860px){
-  .hero{background-position:center 28%}
-  .brand{top:clamp(84px,12%,120px);--sygW:clamp(96px,11vw,150px)}
-  .panel{padding:14px 22px}
-  .slowo{font-size:clamp(24px,3vw,34px)}
-  .hero-text{font-size:13.5px;line-height:1.5}
-  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
-  .btn-row{gap:10px;margin-top:12px}
-  .slow-row{gap:10px}
-}
-/* bardzo szerokie monitory: kadr zdjęcia niżej (więcej góry), ciaśniejszy panel */
-@media (min-width:1024px) and (min-aspect-ratio:21/10){
-  .hero{background-position:center 18%}
-  .panel{padding:14px 22px}
-  .slowo{font-size:clamp(24px,3vw,34px)}
-  .hero-text{font-size:13.5px;line-height:1.5}
-  .btn{padding:10px 8px;font-size:11px;letter-spacing:.1em}
-}
-@media (max-width:520px){
-  .btn{font-size:10.5px;letter-spacing:.1em;padding:12px 8px}
-  .btn-row{grid-template-columns:1fr}
-  .site-foot{flex-direction:column;gap:14px;padding:18px 16px}
-  .foot-social{flex-direction:column;gap:10px}
-  .splash-card{padding:26px 30px}
-  .brand{top:118px}
-}
-
-/* ================= PODSTRONY (stuby) ================= */
-body.stub{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
-.stub-head{background:var(--butelkowa);padding:16px clamp(16px,4vw,44px);display:flex;align-items:center}
-.stub-brand{display:flex;align-items:center;gap:14px;color:var(--zloty)}
-.stub-brand img{width:52px;height:52px}
-.stub-brand span{font-weight:700;font-size:15px;letter-spacing:.2em;text-transform:uppercase}
-.stub-main{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 18px;background:var(--krem)}
-.stub-card{max-width:560px;width:100%;text-align:center;background:#fff;
-  border:1.5px solid rgba(107,69,48,.5);border-radius:0;padding:clamp(30px,6vw,52px);
-  display:flex;flex-direction:column;align-items:center;gap:14px;
-  box-shadow:0 24px 50px rgba(38,29,20,.16)}
-.stub-card h1{font-size:clamp(24px,5vw,34px);font-weight:600;color:var(--ink)}
-.stub-tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
-.stub-card p{color:rgba(51,38,28,.85);line-height:1.7;font-size:15.5px}
-.stub-card .btn{margin-top:8px}
-.back{color:var(--brunatny);font-size:13.5px;letter-spacing:.08em;border-bottom:1px solid transparent}
-.back:hover{border-color:var(--brunatny)}
-
-/* ================= PICKER HERO ================= */
-.picker-head{background:var(--butelkowa);color:var(--krem);padding:22px clamp(16px,4vw,44px)}
-.picker-head h1{font-size:22px;font-weight:600}
-.picker-head p{margin-top:6px;font-size:13.5px;color:var(--zloty-soft);max-width:760px}
-.picker-view{height:46vh;min-height:300px;position:relative;overflow:hidden;
-  background:url('assets/hero.jpg') center 40%/cover no-repeat}
-.picker-view .pv-label{position:absolute;left:14px;bottom:12px;background:rgba(31,58,50,.88);color:var(--zloty);
-  padding:8px 14px;font-size:12.5px;letter-spacing:.06em}
-.picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;
-  padding:26px clamp(16px,4vw,44px) 60px}
-.picker-item{border:2px solid transparent;cursor:pointer;padding:6px;background:#fff;
-  border-radius:0;transition:border-color .2s}
-.picker-item img{width:100%;height:110px;object-fit:cover}
-.picker-item b{display:block;margin-top:6px;font-size:13px}
-.picker-item span{display:block;font-size:10.5px;color:#8A7B69;word-break:break-all}
-.picker-item.sel{border-color:var(--brunatny)}
-</style>
+<link rel="stylesheet" href="assets/style.css">
 </head>
-<body class="stub">
-<header class="stub-head">
-  <a href="index.html" class="stub-brand">
-    <img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura">
-    <span>Studio Sygnatura</span>
-  </a>
-</header>
-<main class="stub-main">
-  <div class="stub-card">
-    <h1>Sklep i realizacje</h1>
-    <p class="stub-tag">Wkrótce</p>
-    <p>Szykujemy naszą ofertę i galerię realizacji. Zajrzyj tu niebawem — będzie na co popatrzeć.</p>
-    <a class="btn btn-outline" href="index.html">Zobacz stronę główną</a>
-    <a class="back" href="index.html">← Wróć na stronę główną</a>
+<body data-strona="Zamówienia">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Krok 1 z 3</span>
+  <h1>Sklep — katalog produktów</h1>
+  <p class="lead">Wybierz produkty, ustaw ilości i przejdź dalej. Kolejne kroki: Twoje dane → podsumowanie z rachunkiem → wysyłka zamówienia. Produkty sklepu są płatne z góry w całości — dane do przelewu otrzymasz w e-mailu z potwierdzeniem.</p>
+
+  <div id="progres"></div>
+  <div class="katalog" id="katalog"></div>
+  <p class="mala" id="komunikat" style="margin-top:16px;display:none"></p>
+
+  <div class="przyciski" style="justify-content:flex-end">
+    <a class="btn" href="dane.html" id="dalej">Przejdź do danych →</a>
   </div>
 </main>
+
+<!-- pasek koszyka -->
+<div class="koszyk-bar" id="koszyk-bar">
+  <span class="koszyk-ile">W koszyku: 0 szt.</span>
+  <span class="suma" id="koszyk-suma">0 zł</span>
+  <a class="btn" href="dane.html">Podsumowanie →</a>
+</div>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/koszyk.js"></script>
+<script src="assets/api.js"></script>
+<script src="data/katalog.js"></script>
+<script src="assets/main.js"></script>
+<script>
+(function(){
+  var kat = window.SYG_KATALOG.filter(function(p){ return p.dostepny; });
+  var kontener = document.getElementById('katalog');
+  var komunikat = document.getElementById('komunikat');
+
+  window.PROGRES.wstaw(document.getElementById('progres'), ['Katalog','Dane','Podsumowanie'], 1);
+
+  function foto(pr){
+    return (pr.obraz && /^https?:/.test(pr.obraz)) ? pr.obraz : 'assets/media/sklep/' + (pr.obraz || 'szopka.jpg');
+  }
+  function renderuj(){
+    var html = '';
+    kat.forEach(function(pr){
+      var wKoszyku = KOSZYK.ileProduktu(pr.id);
+      html += '<article class="karta" data-id="' + pr.id + '">' +
+        '<span class="dymek' + (wKoszyku ? ' widoczny' : '') + '">' + wKoszyku + ' w koszyku</span>' +
+        '<img class="foto" src="' + foto(pr) + '" alt="' + pr.nazwa + '" loading="lazy">' +
+        '<h2 class="nazwa">' + pr.nazwa + '</h2>' +
+        '<p class="opis">' + pr.opis + '</p>' +
+        '<p class="cena">' + SYG.zl(pr.cena) + ' / szt.</p>' +
+        '<div class="wybierz">' +
+          '<div class="licznik">' +
+            '<button type="button" class="minus" aria-label="mniej">−</button>' +
+            '<span class="val">0</span>' +
+            '<button type="button" class="plus" aria-label="więcej">+</button>' +
+          '</div>' +
+          '<button type="button" class="btn-dodaj">Dodaj do koszyka</button>' +
+        '</div>' +
+      '</article>';
+    });
+    kontener.innerHTML = html;
+    kontener.querySelectorAll('.karta').forEach(function(karta){
+      var id = Number(karta.getAttribute('data-id'));
+      var val = karta.querySelector('.val');
+      var dymek = karta.querySelector('.dymek');
+      var ile = 0;
+      function nastaw(v){ ile = Math.max(0, v); val.textContent = ile; }
+      karta.querySelector('.minus').addEventListener('click', function(){ nastaw(ile-1); });
+      karta.querySelector('.plus').addEventListener('click', function(){ nastaw(ile+1); });
+      karta.querySelector('.btn-dodaj').addEventListener('click', function(){
+        if (ile === 0){ komunikat.textContent = 'Ustaw ilość licznikiem, zanim dodasz do koszyka.'; komunikat.style.display='block'; return; }
+        KOSZYK.dodajProdukt(id, ile);
+        nastaw(0);
+        var w = KOSZYK.ileProduktu(id);
+        dymek.textContent = w + ' w koszyku';
+        dymek.classList.add('widoczny');
+        komunikat.style.display='none';
+        odswiezBar();
+      });
+    });
+  }
+
+  function odswiezBar(){
+    KOSZYK.odswiez();
+    var suma = KOSZYK.sumaZl(kat);
+    document.getElementById('koszyk-suma').textContent = SYG.zl(suma);
+    document.getElementById('koszyk-bar').classList.toggle('pelny', KOSZYK.liczbaSztuk() > 0);
+    document.getElementById('dalej').classList.toggle('outline', KOSZYK.liczbaSztuk() === 0);
+  }
+
+  document.getElementById('dalej').addEventListener('click', function(e){
+    if (KOSZYK.liczbaSztuk() === 0){
+      e.preventDefault();
+      komunikat.textContent = 'Koszyk jest pusty — dodaj przynajmniej jeden produkt, żeby przejść dalej.';
+      komunikat.style.display = 'block';
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  });
+
+  renderuj();
+  odswiezBar();
+})();
+</script>
 </body>
 </html>
