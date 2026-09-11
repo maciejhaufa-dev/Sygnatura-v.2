@@ -911,6 +911,45 @@ Pages built | d21039f, fetch_page live: strona główna (karty produktów w slaj
 Bestsellery WIDOCZNE), koszyk.html (pusty koszyk + opcje dostawy), sklep.html (katalog 4
 produktów). Uwaga: sandbox resetuje lokalną historię git — po resecie: fetch + reset do
 FETCH_HEAD + checkout commita -- www docs + commit + push.
+## Sesja 28 — korekta 14: wynajem poza koszykiem, prosty progress bar, slider w szerokości boxów (commit 8d3368a, wersja 28.16)
+
+Uwagi właściciela: (1) slider ma być szerokością DOPASOWANY do boxów ponad (szukaj) i pod
+(„Jak działamy") — tam dookoła jest odstęp kilkudziesięciu px; (2) koszyk: dalej „babole"
+w krokach (kółka paska postępu) i napis „Krok x z y"; (3) NIEDOPUSZCZALNE: nie ma opcji
+odznaczenia/usunięcia z koszyka wybranego terminu — termin NIE ma trafiać do koszyka, tylko
+iść jako ZAPYTANIE z kontaktu; rezerwacja terminu potwierdzana jest PO WPŁACIE (jak było
+wcześniej).
+
+WYKONANE:
+- SLIDER: .main ma teraz ten sam odstęp poziomy co boxy (head i .cta): padding
+  8px clamp(12px,1.5vw,20px) 0 — slider jest szerokością „Jak działamy" i wyszukiwarki.
+- PROGRESS BAR: usunięte kółka (::before/::after) — prosty pasek: etykiety kroków
+  w równej kratce na kremowym tle, aktywny krok butelkowy ze złotym tekstem.
+  Usunięte napisy „Krok 1 z 3"/„Krok 2 z 3" z koszyka, katalogu i danych.
+- WYNAJEM ODDZIELONY OD KOSZYKA: dwa osobne magazyny localStorage — KOSZYK (syg-koszyk-v1)
+  TYLKO sklep (produkty, personalizacje, pomysł, dane, dostawa) i WYNAJEM (syg-wynajem-v1)
+  TYLKO wynajem (termin, pakiet, personalizacje, dane). Koszyk NIGDY nie pokazuje terminu.
+  Stary zapis mieszany jest migrowany automatycznie przy starcie (koszyk.js).
+- ODZNACZENIE TERMINU: drugie kliknięcie wybranego dnia w kalendarzu odznacza go
+  (komunikat „Odznaczono termin — możesz wybrać inny dzień."); opis kroku 1 wyjaśnia to.
+- ZAPYTANIE O REZERWACJĘ: krok 5 wynajmu wysyła akcję api „wynajem-zapytanie" (termin +
+  pakiet + personalizacje + dane idą jak zapytanie z formularza kontaktowego), przycisk
+  „WYŚLIJ ZAPYTANIE O TERMIN →", adnotacja: rezerwacja potwierdzana PO WPŁACIE (odpowiedź
+  1–2 dni robocze z potwierdzeniem dostępności i danymi do przelewu). dziekuje.html ma
+  wariant dla zapytania. Zapytania NIE blokują dni w kalendarzu (blokuje je dopiero
+  potwierdzona rezerwacja po wpłacie — w demo widać je w admin → Wiadomości jako
+  „Zapytania o termin wynajmu").
+- API demo: akcje wynajem-zapytanie / wynajem-zapytania-lista, demoDb.wynajemZapytania;
+  terminy-zajete bez blokowania z zapytań. koszyk.html/podsumowanie.html oczyszczone
+  z gałęzi wynajmu i kaucji (podsumowanie = czysty sklep).
+- Wersja 28.16, zasoby ?v=296.
+
+Testy: HTML zbilansowany, node --check OK; Node: migracja starego zapisu (wynajem→osobny
+magazyn, koszyk czysty), dodanie produktu nie miesza wynajmu, odznaczenie terminu,
+wynajem-zapytanie (walidacja + zapis), kalendarz wolny po zapytaniu; sync docs,
+Pages built | 8d3368a; fetch_page live: koszyk.html bez „Krok 1 z 3" i bez wynajmu,
+wynajem.html z odznaczaniem, „Podsumowaniem zapytania o termin", adnotacją o wpłacie
+i przyciskiem „WYŚLIJ ZAPYTANIE O TERMIN →".
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
