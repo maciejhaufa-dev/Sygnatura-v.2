@@ -8,41 +8,58 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=293">
+<link rel="stylesheet" href="assets/style.css?v=294">
 </head>
 <body data-strona="Zamówienia">
 <div id="naglowek"></div>
 
 <main class="wrap">
-  <span class="tag">Krok 1 z 3</span>
-  <a class="powrot" href="zamowienia.html">← wróć do wyboru ścieżki</a>
-  <h1>Wynajem dekoracji — termin i pakiet</h1>
-  <p class="sub">Wybierz datę wydarzenia i pakiet dekoracji. Montujemy dekoracje dzień przed imprezą,
-  a doby najmu liczymy od protokołu zdawczo-odbiorczego. Przy wynajmie pobieramy kaucję zwrotną
-  <b>300 zł</b> — wraca w całości po zwrocie kompletu.</p>
+  <h1>Wynajem dekoracji</h1>
+  <p class="sub">Zarezerwuj dekoracje w 5 krokach. Montujemy je dzień przed imprezą,
+  a doby najmu liczymy od protokołu zdawczo-odbiorczego. Przy wynajmie pobieramy kaucję
+  zwrotną <b>300 zł</b> — wraca w całości po zwrocie kompletu.</p>
 
   <div id="progres"></div>
-  <div class="bledy-box" id="bledy" style="display:none">
-    <b>Zanim przejdziemy dalej, uzupełnij:</b>
-    <ul id="bledy-lista"></ul>
-  </div>
+  <div class="flash" id="komunikat" style="display:none"></div>
 
-  <div class="forma">
-    <h2>1. Termin wydarzenia</h2>
-    <div class="pole" style="max-width:320px">
-      <label for="termin">Data wydarzenia *</label>
-      <input type="date" id="termin" name="termin" min="">
+  <!-- ============ KROK 1: TERMIN (kalendarz) ============ -->
+  <section id="krok-1" class="krok">
+    <h2 class="krok-tytul"><span class="krok-nr">1</span> Termin — sprawdź dostępność w kalendarzu</h2>
+    <p class="mala">Kalendarz pokazuje <b>na żywo</b>, które dni są wolne, a które zajęte.
+    Kliknij wolny dzień, aby go wybrać. Zajęte dni są przekreślone.</p>
+    <div class="kalendarz-wrap">
+      <div class="kalendarz">
+        <div class="kal-gora">
+          <button type="button" class="kal-nav" id="kal-prev" aria-label="Poprzedni miesiąc">‹</button>
+          <div class="kal-tytul" id="kal-tytul"></div>
+          <button type="button" class="kal-nav" id="kal-next" aria-label="Następny miesiąc">›</button>
+        </div>
+        <div class="kal-dni-tyg">
+          <span>pon</span><span>wt</span><span>śr</span><span>czw</span><span>pt</span><span>sob</span><span>nie</span>
+        </div>
+        <div class="kal-siatka" id="kal-siatka"></div>
+        <div class="kal-legenda">
+          <span><i class="leg leg-wolny"></i> wolny</span>
+          <span><i class="leg leg-wybrany"></i> wybrany</span>
+          <span><i class="leg leg-zajety"></i> zajęty</span>
+        </div>
+        <p class="mala" id="kal-wybrano" style="margin-top:10px;font-size:15.5px"></p>
+      </div>
     </div>
-    <div class="pole" style="max-width:320px">
-      <label for="czas">Godzina rozpoczęcia (opcjonalnie)</label>
-      <input type="time" id="czas" name="czas">
+    <div class="przyciski">
+      <button class="btn" type="button" id="k1-dalej">Dalej: wybierz pakiet →</button>
     </div>
-    <p class="mala">Dekoracje montujemy dzień przed imprezą. Dostępność potwierdzimy w odpowiedzi na zamówienie
-    (w 1–2 dni robocze, pod sygnaturą sprawy).</p>
+  </section>
 
-    <h2 style="margin-top:22px">2. Rodzaj wydarzenia</h2>
+  <!-- ============ KROK 2: PAKIET ============ -->
+  <section id="krok-2" class="krok" style="display:none">
+    <h2 class="krok-tytul"><span class="krok-nr">2</span> Wybierz pakiet</h2>
+    <p class="mala" style="font-size:15.5px">
+      Termin: <b id="k2-termin"></b> <button type="button" class="link-przycisk" id="k2-zmien-termin">zmień termin</button>
+    </p>
+    <p class="niedostepny-adnotacja">KTÓRYŚ PAKIET JEST NIEDOSTĘPNY? ZMIEŃ TERMIN, ABY SPRAWDZIĆ JEGO DOSTĘPNOŚĆ.</p>
     <div class="pole" style="max-width:320px">
-      <label for="typ-ev">Rodzaj wydarzenia *</label>
+      <label for="typ-ev">Rodzaj wydarzenia</label>
       <select id="typ-ev">
         <option value="weselny">Wesele</option>
         <option value="komunijny">Komunia / chrzest</option>
@@ -50,85 +67,394 @@
         <option value="jubileuszowy">Jubileusz / urodziny</option>
       </select>
     </div>
+    <div class="pakiety" id="pakiety"></div>
+    <div class="przyciski">
+      <button class="btn outline" type="button" id="k2-wstecz">← Wróć do terminu</button>
+      <button class="btn" type="button" id="k2-dalej">Dalej: personalizacja (opcjonalnie) →</button>
+    </div>
+  </section>
 
-    <h2 style="margin-top:22px">3. Wybierz pakiet</h2>
-    <div id="pakiety"></div>
-  </div>
+  <!-- ============ KROK 3: PERSONALIZACJA (opcjonalna) ============ -->
+  <section id="krok-3" class="krok" style="display:none">
+    <h2 class="krok-tytul"><span class="krok-nr">3</span> Personalizacja (opcjonalna)</h2>
+    <p class="sub">Chcesz coś dodać do pakietu? Wybierz produkty personalizowane i wpisz, co ma
+    się na nich znaleźć. Personalizację przyjmujemy z <b>min. 2-tygodniowym wyprzedzeniem</b>.
+    Możesz też pominąć ten krok.</p>
+    <div id="pers-kafelki"></div>
+    <div class="przyciski">
+      <button class="btn outline" type="button" id="k3-wstecz">← Wróć do pakietu</button>
+      <button class="btn" type="button" id="k3-dalej">Dalej: Twoje dane →</button>
+    </div>
+  </section>
 
-  <div class="przyciski" style="justify-content:flex-end">
-    <button class="btn" type="button" id="dalej">Przejdź do danych →</button>
-  </div>
+  <!-- ============ KROK 4: DANE ============ -->
+  <section id="krok-4" class="krok" style="display:none">
+    <h2 class="krok-tytul"><span class="krok-nr">4</span> Twoje dane</h2>
+    <form id="forma-dane" class="forma" style="margin-top:8px">
+      <div class="pole">
+        <label for="imie">Imię i nazwisko *</label>
+        <input type="text" id="imie" name="imie" required>
+      </div>
+      <div class="pole">
+        <label for="email">Adres e-mail *</label>
+        <input type="email" id="email" name="email" placeholder="adres@poczta.pl" required>
+        <p class="mala">Na ten adres wyślemy potwierdzenie, sygnaturę sprawy i dokumenty.</p>
+      </div>
+      <div class="pole">
+        <label for="telefon">Telefon (opcjonalnie)</label>
+        <input type="tel" id="telefon" name="telefon" placeholder="opcjonalnie">
+      </div>
+      <div class="opcje">
+        <label>Sygnatura sprawy</label>
+        <div class="rzad">
+          <input type="radio" id="tryb-nowa" name="tryb_sygnatury" value="nowa" checked>
+          <div>
+            <div class="etyk"><label for="tryb-nowa" style="font-size:inherit;font-weight:inherit">Nadaj nową sygnaturę</label></div>
+            <div class="opis">System automatycznie nada numer sprawy (np. SYG-2026-001) i wyśle go w e-mailu.</div>
+          </div>
+        </div>
+        <div class="rzad">
+          <input type="radio" id="tryb-istniejaca" name="tryb_sygnatury" value="istniejaca">
+          <div>
+            <div class="etyk"><label for="tryb-istniejaca" style="font-size:inherit;font-weight:inherit">Mam sygnaturę sprawy</label></div>
+            <div class="opis">Jeśli już z nami rozmawiałeś — dopiszemy do niej to zamówienie.</div>
+            <div class="pole" id="pole-syg" style="display:none">
+              <label for="sygnatura">Twoja sygnatura sprawy</label>
+              <input type="text" id="sygnatura" name="sygnatura" placeholder="np. SYG-2026-001">
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="mala" style="border:1px dashed rgba(107,69,48,.5);padding:10px 14px;background:var(--krem-2)">
+        Składając zamówienie akceptujesz <a href="regulamin.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">regulamin serwisu</a>
+        i wyrażasz zgodę na kontakt ze strony Studio Sygnatura w sprawie zamówienia.
+      </p>
+      <div class="przyciski" style="justify-content:space-between">
+        <button class="btn outline" type="button" id="k4-wstecz">← Wróć do personalizacji</button>
+        <button class="btn" type="submit">Przejdź do podsumowania →</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ KROK 5: PODSUMOWANIE ============ -->
+  <section id="krok-5" class="krok" style="display:none">
+    <h2 class="krok-tytul"><span class="krok-nr">5</span> Podsumowanie zamówienia</h2>
+    <div id="rachunek-wynajem"></div>
+
+    <div class="forma" style="margin-top:6px">
+      <h2>Dane zamówienia</h2>
+      <p id="dane-klienta" style="font-size:17px;line-height:1.8"></p>
+      <div class="adnotacje">
+        <h3>ADNOTACJE DO ZAMÓWIENIA</h3>
+        <p><i>Zamówienia spersonalizowane przyjmowane są do realizacji z minimum <b>2 tygodni wyprzedzeniem</b>.
+        Realizacja — jeśli moce przerobowe pozwolą — może być szybsza. Opcja „EXPRESS" (realizacja
+        z dnia na dzień) jest płatna z góry i dostępna wyłącznie po wcześniejszym kontakcie.</i></p>
+        <p><i>Dekoracje montujemy dzień przed imprezą; doby najmu liczymy od protokołu
+        zdawczo-odbiorczego. Przy wynajmie pobieramy kaucję zwrotną 300 zł — wraca w całości po zwrocie kompletu.</i></p>
+        <p><i>Składając zamówienie akceptujesz regulamin serwisu i wyrażasz zgodę na kontakt
+        ze strony Studio Sygnatura w sprawie zamówienia.</i></p>
+      </div>
+      <div class="przyciski" style="justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <a class="btn outline" href="#" id="k5-zmien-dane">ZMIEŃ DANE</a>
+        <button class="btn duzy" type="button" id="zamow">ZAMÓW →</button>
+      </div>
+    </div>
+  </section>
 </main>
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=293"></script>
-<script src="assets/koszyk.js?v=293"></script>
-<script src="assets/api.js?v=293"></script>
-<script src="data/katalog.js?v=293"></script>
-<script src="assets/main.js?v=293"></script>
+<script src="assets/config.js?v=294"></script>
+<script src="assets/koszyk.js?v=294"></script>
+<script src="assets/api.js?v=294"></script>
+<script src="assets/pers.js?v=294"></script>
+<script src="data/katalog.js?v=294"></script>
+<script src="assets/main.js?v=294"></script>
 <script>
 (function(){
-  window.PROGRES.wstaw(document.getElementById('progres'), ['Termin i pakiet','Dane','Podsumowanie'], 1);
-
-  /* min = jutro (montaż dzień przed) */
-  var jutro = new Date(Date.now() + 86400000);
-  var minISO = jutro.toISOString().slice(0, 10);
-  document.getElementById('termin').setAttribute('min', minISO);
-
-  /* wypełnienie zapisanymi danymi */
   var k = KOSZYK.pobierz();
-  if (k.termin){
-    document.getElementById('termin').value = k.termin.data || '';
-    document.getElementById('czas').value = k.termin.czas || '';
+  var pakiety = SYG.WYNAJEM_PAKIETY || [];
+  var etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'];
+  window.PROGRES.wstaw(document.getElementById('progres'), etapy, 1);
+
+  var komunikat = document.getElementById('komunikat');
+  function mow(txt, zle){
+    komunikat.style.display = 'block';
+    komunikat.textContent = txt;
+    komunikat.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    komunikat.scrollIntoView({ behavior:'smooth', block:'center' });
+    setTimeout(function(){ komunikat.style.display = 'none'; }, 5000);
+  }
+  function pokaz(id, nr){
+    document.querySelectorAll('.krok').forEach(function(x){ x.style.display = 'none'; });
+    document.getElementById(id).style.display = 'block';
+    window.PROGRES.wstaw(document.getElementById('progres'), etapy, nr);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  var pakiety = SYG.WYNAJEM_PAKIETY || [];
+  /* ================= KROK 1: KALENDARZ ================= */
+  var dzis = new Date();
+  var widok = { r: dzis.getFullYear(), m: dzis.getMonth() };
+  var zajeteSet = {};
+  var wybranyDzien = (k.termin && k.termin.data) || '';
+  var MIESIACE = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
+
+  function isoDnia(r, m, d){ return r + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); }
+  function isoDzis(){ return isoDnia(dzis.getFullYear(), dzis.getMonth(), dzis.getDate()); }
+
+  async function ladujZajete(){
+    zajeteSet = {};
+    var miesiac = widok.r + '-' + String(widok.m + 1).padStart(2, '0');
+    var odp = await SYG.wezwij('terminy-zajete', { miesiac: miesiac });
+    if (odp.ok) (odp.zajete || []).forEach(function(z){ zajeteSet[z] = true; });
+    rysujKalendarz();
+  }
+  function rysujKalendarz(){
+    var rok = widok.r, m = widok.m;
+    document.getElementById('kal-tytul').textContent = MIESIACE[m].toUpperCase() + ' ' + rok;
+    var pierwszy = (new Date(rok, m, 1).getDay() + 6) % 7; /* pon=0 */
+    var dniWMies = new Date(rok, m + 1, 0).getDate();
+    var html = '';
+    for (var i = 0; i < pierwszy; i++) html += '<span class="kal-puste"></span>';
+    for (var d = 1; d <= dniWMies; d++){
+      var iso = isoDnia(rok, m, d);
+      var klasa = 'kal-dzien';
+      if (iso < isoDzis()) klasa += ' przeszly';
+      else if (zajeteSet[iso]) klasa += ' zajety';
+      else if (iso === wybranyDzien) klasa += ' wybrany';
+      html += '<button type="button" class="' + klasa + '" data-iso="' + iso + '">' + d + '</button>';
+    }
+    document.getElementById('kal-siatka').innerHTML = html;
+    document.querySelectorAll('#kal-siatka .kal-dzien').forEach(function(b){
+      b.addEventListener('click', function(){
+        var iso = b.getAttribute('data-iso');
+        if (iso < isoDzis() || zajeteSet[iso]) return;
+        wybranyDzien = iso;
+        k.termin = { data: iso };
+        KOSZYK.zapisz(k);
+        rysujKalendarz();
+        pokazWybrany();
+        /* dostępność pakietów może zależeć od terminu — czyść wybór, gdy pakiet znika */
+        if (k.pakiet) sprawdzWybranyPakiet();
+      });
+    });
+    pokazWybrany();
+  }
+  function pokazWybrany(){
+    var el = document.getElementById('kal-wybrano');
+    el.innerHTML = wybranyDzien
+      ? 'Wybrano: <b>' + new Date(wybranyDzien + 'T12:00:00').toLocaleDateString('pl-PL', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + '</b>'
+      : 'Nie wybrano jeszcze terminu.';
+  }
+  document.getElementById('kal-prev').addEventListener('click', function(){
+    var min = { r: dzis.getFullYear(), m: dzis.getMonth() };
+    if (widok.r * 12 + widok.m <= min.r * 12 + min.m) return;
+    widok.m--; if (widok.m < 0){ widok.m = 11; widok.r--; }
+    ladujZajete();
+  });
+  document.getElementById('kal-next').addEventListener('click', function(){
+    widok.m++; if (widok.m > 11){ widok.m = 0; widok.r++; }
+    if (widok.r * 12 + widok.m > dzis.getFullYear() * 12 + dzis.getMonth() + 12) { widok.m--; if (widok.m < 0){ widok.m = 11; widok.r--; } return; }
+    ladujZajete();
+  });
+  document.getElementById('k1-dalej').addEventListener('click', function(){
+    if (!wybranyDzien){ mow('Wybierz najpierw wolny termin w kalendarzu.', true); return; }
+    pokaz('krok-2', 2);
+    ladujPakiety();
+  });
+  ladujZajete();
+
+  /* ================= KROK 2: PAKIETY ================= */
   var typEv = document.getElementById('typ-ev');
   if (k.pakiet && k.pakiet.ev) typEv.value = k.pakiet.ev;
+  typEv.addEventListener('change', ladujPakiety);
+  document.getElementById('k2-termin').textContent = wybranyDzien
+    ? new Date(wybranyDzien + 'T12:00:00').toLocaleDateString('pl-PL', { day:'numeric', month:'long', year:'numeric' }) : '—';
+  document.getElementById('k2-zmien-termin').addEventListener('click', function(){ pokaz('krok-1', 1); });
+  document.getElementById('k2-wstecz').addEventListener('click', function(){ pokaz('krok-1', 1); });
 
-  function renderPakiety(){
+  function wybranyPakietId(){
+    var r = document.querySelector('input[name=pakiet]:checked');
+    return r ? r.value : (k.pakiet ? k.pakiet.id : '');
+  }
+  async function ladujPakiety(){
+    document.getElementById('k2-termin').textContent = new Date(wybranyDzien + 'T12:00:00')
+      .toLocaleDateString('pl-PL', { day:'numeric', month:'long', year:'numeric' });
     var ev = typEv.value;
     var lista = pakiety.filter(function(p){ return p.ev === ev; });
+    var zazn = wybranyPakietId();
     var html = '';
-    lista.forEach(function(p){
-      var zazn = (k.pakiet && k.pakiet.id === p.id);
-      html += '<label class="dostawa-opcja pakiet-opcja" style="cursor:pointer">' +
-        '<input type="radio" name="pakiet" value="' + p.id + '"' + (zazn ? ' checked' : '') + '>' +
-        '<span style="flex:1;min-width:0">' +
-        '<span class="d-et">' + p.nazwa + '</span>' +
-        '<span class="d-op">' + p.opis + '</span>' +
-        '<span class="d-op" style="display:block;margin-top:6px;color:rgba(51,38,28,.8)">' + p.pozycje + '</span>' +
-        '</span>' +
-        '<span class="d-cena">' + p.cenaTxt + '</span>' +
+    for (var i = 0; i < lista.length; i++){
+      var p = lista[i];
+      var odp = await SYG.wezwij('pakiet-dostepny', { id: p.id, data: wybranyDzien });
+      var dost = odp.ok ? odp.dostepny : true;
+      if (!dost && zazn === p.id) zazn = '';
+      html += '<label class="pakiet-karta' + (dost ? '' : ' niedostepny') + (zazn === p.id ? ' wybrany' : '') + '">' +
+        '<input type="radio" name="pakiet" value="' + p.id + '"' + (zazn === p.id ? ' checked' : '') + (dost ? '' : ' disabled') + '>' +
+        '<span class="pk-nazwa">' + p.nazwa + '</span>' +
+        '<span class="pk-opis">' + p.opis + '</span>' +
+        '<span class="pk-pozycje">' + p.pozycje + '</span>' +
+        '<span class="pk-cena">' + p.cenaTxt + '</span>' +
+        (!dost ? '<span class="pk-niedostepny">NIEDOSTĘPNY</span>' : '') +
       '</label>';
-    });
-    document.getElementById('pakiety').innerHTML = html;
-  }
-  typEv.addEventListener('change', renderPakiety);
-  renderPakiety();
-
-  document.getElementById('dalej').addEventListener('click', function(){
-    var bledy = [];
-    var termin = document.getElementById('termin').value;
-    var czas = document.getElementById('czas').value;
-    var wybrany = document.querySelector('input[name=pakiet]:checked');
-    if (!termin) bledy.push('datę wydarzenia');
-    if (!wybrany) bledy.push('pakiet dekoracji');
-    if (bledy.length){
-      var lista = document.getElementById('bledy-lista');
-      lista.innerHTML = bledy.map(function(b){ return '<li>' + b + '</li>'; }).join('');
-      document.getElementById('bledy').style.display = 'block';
-      document.getElementById('bledy').scrollIntoView({behavior:'smooth', block:'center'});
-      return;
     }
-    document.getElementById('bledy').style.display = 'none';
-    var p = pakiety.find(function(x){ return x.id === wybrany.value; });
+    document.getElementById('pakiety').innerHTML = html;
+    document.querySelectorAll('input[name=pakiet]').forEach(function(r){
+      r.addEventListener('change', function(){ zazn = r.value; });
+    });
+  }
+  function sprawdzWybranyPakiet(){
+    /* po zmianie terminu: jeśli zapisany pakiet jest niedostępny — usuwamy wybór */
+    if (!k.pakiet || !wybranyDzien) return;
+    var nazwaP = k.pakiet.nazwa;
+    SYG.wezwij('pakiet-dostepny', { id: k.pakiet.id, data: wybranyDzien }).then(function(odp){
+      if (odp.ok && !odp.dostepny){
+        k.pakiet = null;
+        KOSZYK.zapisz(k);
+        mow('Pakiet „' + nazwaP + '" na nowy termin jest NIEDOSTĘPNY — wybierz inny pakiet.', true);
+      }
+    });
+  }
+  document.getElementById('k2-dalej').addEventListener('click', function(){
+    var r = document.querySelector('input[name=pakiet]:checked');
+    if (!r){ mow('Wybierz pakiet, aby przejść dalej.', true); return; }
+    var p = pakiety.find(function(x){ return x.id === r.value; });
     k.typ = 'wynajem';
     k.pakiet = { id: p.id, ev: p.ev, nazwa: p.nazwa, opis: p.opis, cena: p.cena, cenaTxt: p.cenaTxt, pozycje: p.pozycje };
-    k.termin = { data: termin, czas: czas };
     KOSZYK.zapisz(k);
-    window.location.href = 'dane.html';
+    pokaz('krok-3', 3);
+  });
+
+  /* ================= KROK 3: PERSONALIZACJA ================= */
+  var persWybor = {};
+  (k.pers || []).forEach(function(p){ if (p.id) persWybor[p.id] = p.opis || ''; });
+  SYG.personalizacje.renderuj(document.getElementById('pers-kafelki'), persWybor);
+  document.getElementById('k3-wstecz').addEventListener('click', function(){ pokaz('krok-2', 2); });
+  document.getElementById('k3-dalej').addEventListener('click', function(){
+    var zbior = SYG.personalizacje.zbierz(document.getElementById('pers-kafelki'));
+    if (zbior.bledy.length){ mow(zbior.bledy[0], true); return; }
+    /* zapisujemy tylko wybrane; wyczyszczone też */
+    k.pers = zbior.pers;
+    KOSZYK.zapisz(k);
+    pokaz('krok-4', 4);
+  });
+
+  /* ================= KROK 4: DANE ================= */
+  var d = k.dane || {};
+  document.getElementById('imie').value = d.imie || '';
+  document.getElementById('email').value = d.email || '';
+  document.getElementById('telefon').value = d.telefon || '';
+  if (d.sygnatura){
+    document.getElementById('tryb-istniejaca').checked = true;
+    document.getElementById('pole-syg').style.display = 'block';
+    document.getElementById('sygnatura').value = d.sygnatura;
+  }
+  var sygRadia = document.getElementsByName('tryb_sygnatury');
+  Array.prototype.forEach.call(sygRadia, function(r){
+    r.addEventListener('change', function(){
+      document.getElementById('pole-syg').style.display = r.value === 'istniejaca' ? 'block' : 'none';
+    });
+  });
+  document.getElementById('k4-wstecz').addEventListener('click', function(){ pokaz('krok-3', 3); });
+  document.getElementById('forma-dane').addEventListener('submit', function(e){
+    e.preventDefault();
+    var imie = document.getElementById('imie').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var sygMode = document.querySelector('input[name=tryb_sygnatury]:checked').value;
+    var sygnatura = document.getElementById('sygnatura').value.trim();
+    var bledy = [];
+    if (!imie) bledy.push('imię i nazwisko');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) bledy.push('poprawny adres e-mail');
+    if (sygMode === 'istniejaca' && !sygnatura) bledy.push('sygnaturę sprawy (albo wybierz „nadaj nową")');
+    if (bledy.length){ mow('Uzupełnij: ' + bledy.join(', ') + '.', true); return; }
+    k.dane = { imie: imie, email: email, telefon: document.getElementById('telefon').value.trim(),
+               sygnatura: sygMode === 'istniejaca' ? sygnatura : '' };
+    KOSZYK.zapisz(k);
+    pokaz('krok-5', 5);
+    rysujRachunek();
+  });
+
+  /* ================= KROK 5: PODSUMOWANIE ================= */
+  function rysujRachunek(){
+    var dk = k.dane || {};
+    document.getElementById('dane-klienta').innerHTML =
+      '<b>' + dk.imie + '</b> · ' + dk.email + (dk.telefon ? ' · tel. ' + dk.telefon : '') + '<br>' +
+      'Sygnatura: ' + (dk.sygnatura ? dk.sygnatura : 'nadamy nową');
+
+    var wiersze = '';
+    var lp = 0, sumaPers = 0, suma = 0;
+    var kaucja = 300;
+    if (k.pakiet){
+      lp++;
+      var terminTxt = wybranyDzien ? new Date(wybranyDzien + 'T12:00:00').toLocaleDateString('pl-PL', { day:'numeric', month:'long', year:'numeric' }) : '—';
+      wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+        '<span class="r-poz"><b>Wynajem: ' + k.pakiet.nazwa + '</b>' +
+        '<span class="r-pod">Termin: ' + terminTxt + ' · doby od protokołu zdawczo-odbiorczego · montaż dzień przed imprezą</span>' +
+        '<span class="r-pod">' + (k.pakiet.pozycje || '') + '</span></span>' +
+        '<span class="r-ile">' + k.pakiet.cenaTxt + '</span>' +
+        '<span class="r-cena">—</span>' +
+        '<span class="r-wart">' + SYG.zl(k.pakiet.cena) + '</span></div>';
+      suma += k.pakiet.cena;
+    }
+    (k.pers || []).forEach(function(p){
+      lp++;
+      sumaPers += Number(p.cena) || 0;
+      wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+        '<span class="r-poz"><b>' + p.nazwa + '</b> <span class="r-tag">personalizacja</span>' +
+        (p.opis ? '<span class="r-pod">' + p.opis + '</span>' : '') + '</span>' +
+        '<span class="r-ile">1 szt.</span>' +
+        '<span class="r-cena">' + SYG.zl(p.cena) + '</span>' +
+        '<span class="r-wart">' + SYG.zl(p.cena) + '</span></div>';
+    });
+    var rabat = 0;
+    if ((k.pers || []).length >= SYG.PERS_RABAT_PROG){
+      rabat = Math.round(sumaPers * SYG.PERS_RABAT_PROC / 100);
+      lp++;
+      wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+        '<span class="r-poz"><b>Rabat na personalizację</b><span class="r-pod">−5% przy min. 3 produktach personalizowanych</span></span>' +
+        '<span class="r-ile">—</span><span class="r-cena">—</span>' +
+        '<span class="r-wart" style="color:#8a2f1d">−' + SYG.zl(rabat) + '</span></div>';
+    }
+    suma = Math.max(0, suma + sumaPers - rabat);
+    lp++;
+    wiersze += '<div class="rach-wiersz"><span class="r-lp">' + lp + '</span>' +
+      '<span class="r-poz"><b>Kaucja zwrotna</b><span class="r-pod">zwracana w całości po zwrocie kompletu</span></span>' +
+      '<span class="r-ile">—</span><span class="r-cena">—</span>' +
+      '<span class="r-wart">' + SYG.zl(kaucja) + '</span></div>';
+    wiersze += '<div class="rach-razem"><span>RAZEM (najem + personalizacja)</span><span>' + SYG.zl(suma) + '</span></div>';
+    wiersze += '<p class="mala" style="margin-top:10px">Ostateczna kwota najmu zależy od liczby dób (stawka „od X zł / doba") — '
+      + 'potwierdzimy ją w e-mailu z ofertą. Kaucja doliczana jest osobno i wraca po zwrocie dekoracji.</p>';
+    document.getElementById('rachunek-wynajem').innerHTML = wiersze;
+  }
+  document.getElementById('k5-zmien-dane').addEventListener('click', function(e){ e.preventDefault(); pokaz('krok-4', 4); });
+
+  document.getElementById('zamow').addEventListener('click', async function(){
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Wysyłanie…';
+    var dk = k.dane || {};
+    var sumaPers = (k.pers || []).reduce(function(s,p){ return s + (Number(p.cena)||0); }, 0);
+    var rabat = (k.pers || []).length >= SYG.PERS_RABAT_PROG ? Math.round(sumaPers * SYG.PERS_RABAT_PROC / 100) : 0;
+    var razem = Math.max(0, (k.pakiet ? k.pakiet.cena : 0) + sumaPers - rabat);
+    var odp = await SYG.wezwij('zamowienie', {
+      typ: 'wynajem',
+      klient: dk,
+      pozycje: [],
+      pers: k.pers || [],
+      pomysl: '',
+      pakiet: k.pakiet,
+      termin: { data: wybranyDzien },
+      zgoda: 1,
+      kwoty: { razem: razem, pers_rabat: rabat, kaucja: 300, dostawa: 0 }
+    });
+    btn.disabled = false;
+    btn.textContent = 'ZAMÓW →';
+    if (odp.ok){
+      KOSZYK.wyczysc();
+      window.location.href = 'dziekuje.html?sygnatura=' + encodeURIComponent(odp.sygnatura);
+    } else {
+      mow(odp.blad || 'Nie udało się wysłać. Spróbuj ponownie.', true);
+    }
   });
 })();
 </script>

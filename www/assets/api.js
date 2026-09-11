@@ -17,6 +17,11 @@
   }
   function zapisz(klucz, wart) { localStorage.setItem(klucz, JSON.stringify(wart)); }
   function teraz() { return new Date().toISOString(); }
+  function hashDemo(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) { h = ((h << 5) + h + str.charCodeAt(i)) >>> 0; }
+    return h;
+  }
 
   /* cennik dostawy: nadpisania z panelu admina albo wartości z config.js */
   SYG.ustawieniaDostawa = function () {
@@ -134,6 +139,8 @@
         const lista = czytaj(KL.zamowienia) || [];
         lista.unshift({ sygnatura: sygnatura, data: teraz(), klient: klient, typ: d.typ || 'sklep',
           pozycje: d.pozycje || [], pers: d.pers || [], kwoty: d.kwoty || {}, pomysl: d.pomysl || '',
+          pakiet: d.pakiet || null, termin: d.termin || null,
+          zgoda: d.zgoda || 0, produkt: d.produkt || '',
           wiadomosc: d.wiadomosc || '', status: 'zapytanie',
           historia: [{ t: teraz(), s: 'zapytanie' }] });
         zapisz(KL.zamowienia, lista);
@@ -241,6 +248,41 @@
       case 'strona-usun': {
         zapisz(KL.strony, strony().filter(function (x) { return x.slug !== d.slug; }));
         return { ok: true };
+      }
+
+      /* ---------- KALENDARZ WYNAJMU (dostępność na żywo) ---------- */
+      case 'terminy-zajete': {
+        const mies = String(d.miesiac || '');
+        const cz = mies.split('-').map(Number);
+        if (!cz[0] || !cz[1]) return { ok: false, blad: 'Zły miesiąc.' };
+        const zajete = [];
+        const dni = new Date(cz[0], cz[1], 0).getDate();
+        for (let dz = 1; dz <= dni; dz++) {
+          const iso = cz[0] + '-' + String(cz[1]).padStart(2, '0') + '-' + String(dz).padStart(2, '0');
+          if (hashDemo(iso) % 5 === 0) zajete.push(iso);
+        }
+        (czytaj(KL.zamowienia) || []).forEach(function (z) {
+          if (z.typ === 'wynajem' && z.termin && z.termin.data && z.status !== 'odrzucono' &&
+              z.termin.data.slice(0, 7) === mies && zajete.indexOf(z.termin.data) < 0) {
+            zajete.push(z.termin.data);
+          }
+        });
+        return { ok: true, miesiac: mies, zajete: zajete };
+      }
+
+      case 'pakiet-dostepny': {
+        const id = String(d.id || '');
+        const data = String(d.data || '');
+        if (!id || !data) return { ok: false, blad: 'Brak pakietu lub terminu.' };
+        let dostepny = hashDemo(id + '|' + data) % 5 !== 0;
+        if (dostepny) {
+          const konflikt = (czytaj(KL.zamowienia) || []).some(function (z) {
+            return z.typ === 'wynajem' && z.pakiet && String(z.pakiet.id) === id &&
+              z.termin && z.termin.data === data && z.status !== 'odrzucono';
+          });
+          if (konflikt) dostepny = false;
+        }
+        return { ok: true, dostepny: dostepny };
       }
 
       default:

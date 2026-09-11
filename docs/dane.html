@@ -8,14 +8,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=293">
+<link rel="stylesheet" href="assets/style.css?v=294">
 </head>
 <body data-strona="Zamówienia">
 <div id="naglowek"></div>
 
 <main class="wrap">
   <span class="tag">Krok 2 z 3</span>
-  <a class="powrot" href="koszyk.html">← wróć do koszyka</a>
+
+  <a class="powrot" href="koszyk.html" id="powrot-link">← wróć</a>
   <h1>Twoje dane i zgody</h1>
   <p class="sub" id="podsumowanie-krotkie"></p>
 
@@ -62,23 +63,10 @@
       </div>
     </div>
 
-    <div class="opcje">
-      <label>Zgody (wymagane)</label>
-      <div class="rzad">
-        <input type="checkbox" id="zgoda_pke" name="zgoda_pke">
-        <div>
-          <div class="etyk"><label for="zgoda_pke" style="font-size:inherit;font-weight:inherit">Zgoda na kontakt</label></div>
-          <div class="opis">Wyrażam zgodę na kontakt ze strony Studio Sygnatura w sprawie zamówienia (podstawa: PKE art. 398). Bez tej zgody nie możemy odpowiedzieć.</div>
-        </div>
-      </div>
-      <div class="rzad">
-        <input type="checkbox" id="zgoda_regulamin" name="zgoda_regulamin">
-        <div>
-          <div class="etyk"><label for="zgoda_regulamin" style="font-size:inherit;font-weight:inherit">Akceptuję <a href="regulamin.html">regulamin zamówień</a></label></div>
-          <div class="opis">W tym zasady płatności, kaucji i zwrotów. Zapoznaj się też z tym, <a href="jak-pracujemy.html">jak pracujemy</a>.</div>
-        </div>
-      </div>
-    </div>
+    <p class="mala" style="border:1px dashed rgba(107,69,48,.5);padding:12px 14px;background:var(--krem-2);margin-top:16px">
+      Składając zamówienie akceptujesz <a href="regulamin.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">regulamin serwisu</a>
+      i wyrażasz zgodę na kontakt ze strony Studio Sygnatura w sprawie zamówienia.
+    </p>
 
     <div class="przyciski" style="justify-content:flex-end">
       <button class="btn" type="submit" id="zapisz">Przejdź do podsumowania →</button>
@@ -88,28 +76,34 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=293"></script>
-<script src="assets/koszyk.js?v=293"></script>
-<script src="assets/api.js?v=293"></script>
-<script src="data/katalog.js?v=293"></script>
-<script src="assets/main.js?v=293"></script>
+<script src="assets/config.js?v=294"></script>
+<script src="assets/koszyk.js?v=294"></script>
+<script src="assets/api.js?v=294"></script>
+<script src="data/katalog.js?v=294"></script>
+<script src="assets/main.js?v=294"></script>
 <script>
 (function(){
   var k = KOSZYK.pobierz();
   var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
 
-  /* bez niczego w koszyku — wracamy do właściwego kroku 1 */
-  if (!k.pozycje.length && !k.pers.length && !(k.typ === 'wynajem' && k.pakiet)){
-    window.location.replace(k.typ === 'wynajem' ? 'wynajem.html' : 'sklep.html');
+  /* wynajem ma własną ścieżkę 5 kroków (dane w kroku 4) */
+  if (k.typ === 'wynajem'){
+    window.location.replace('wynajem.html');
     return;
   }
-  /* wynajem bez pakietu — wracamy do wyboru pakietu */
-  if (k.typ === 'wynajem' && !k.pakiet){
-    window.location.replace('wynajem.html');
+  /* bez niczego w koszyku — wracamy do właściwego kroku 1 */
+  if (!k.pozycje.length && !k.pers.length){
+    window.location.replace('sklep.html');
     return;
   }
 
   window.PROGRES.wstaw(document.getElementById('progres'), ['Katalog','Dane','Podsumowanie'], 2);
+  /* powrót: personalizacja → personalizacja.html, zakupy → koszyk.html */
+  var powrotEl = document.getElementById('powrot-link');
+  if (powrotEl){
+    if (k.pers.length && !k.pozycje.length){ powrotEl.setAttribute('href', 'personalizacja.html'); powrotEl.textContent = '← wróć do personalizacji'; }
+    else { powrotEl.setAttribute('href', 'koszyk.html'); powrotEl.textContent = '← wróć do koszyka'; }
+  }
 
   var nazwy = k.pozycje.map(function(x){
     var pr = kat.find(function(p){ return Number(p.id) === Number(x.id); });
@@ -147,16 +141,10 @@
     var telefon = document.getElementById('telefon').value.trim();
     var sygMode = document.querySelector('input[name=tryb_sygnatury]:checked').value;
     var sygnatura = document.getElementById('sygnatura').value.trim();
-    var pke = document.getElementById('zgoda_pke').checked;
-    var regulamin = document.getElementById('zgoda_regulamin').checked;
-
     if (!imie) bledy.push('imię i nazwisko');
     if (!email) bledy.push('adres e-mail');
     else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) bledy.push('poprawny adres e-mail');
     if (sygMode === 'istniejaca' && !sygnatura) bledy.push('sygnaturę sprawy (albo wybierz „nadaj nową")');
-    if (!pke) bledy.push('zgodę na kontakt');
-    if (!regulamin) bledy.push('akceptację regulaminu');
-
     if (bledy.length){
       var lista = document.getElementById('bledy-lista');
       lista.innerHTML = bledy.map(function(b){ return '<li>' + b + '</li>'; }).join('');

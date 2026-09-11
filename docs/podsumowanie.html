@@ -8,14 +8,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=293">
+<link rel="stylesheet" href="assets/style.css?v=294">
 </head>
 <body data-strona="Zamówienia">
 <div id="naglowek"></div>
 
 <main class="wrap">
-  <span class="tag">Krok 3 z 3</span>
-  <a class="powrot" href="dane.html">← popraw dane</a>
   <h1>Podsumowanie zamówienia</h1>
   <p class="sub">Sprawdź wszystko raz jeszcze. Poniżej znajdziesz pełne zestawienie (rachunek) — pozycja po pozycji. Po wysłaniu dostaniesz e-mail z sygnaturą sprawy, dokumentami i danymi do przelewu.</p>
 
@@ -24,35 +22,45 @@
 
   <div id="rachunek"></div>
 
+  <div class="adnotacje" style="margin:18px 0 0">
+    <h3>ADNOTACJE DO ZAMÓWIENIA</h3>
+    <p><i>Zamówienia spersonalizowane przyjmowane są do realizacji z minimum <b>2 tygodni wyprzedzeniem</b>.
+    Realizacja — jeśli moce przerobowe pozwolą — może być szybsza. Opcja „EXPRESS" (realizacja
+    z dnia na dzień) jest płatna z góry i dostępna wyłącznie po wcześniejszym kontakcie.</i></p>
+    <p><i>Składając zamówienie akceptujesz regulamin serwisu i wyrażasz zgodę na kontakt
+    ze strony Studio Sygnatura w sprawie zamówienia.</i></p>
+  </div>
+
   <div class="forma">
     <h2>Dane i dostawa</h2>
-    <p id="dane-klienta" style="font-size:15.5px;line-height:1.7"></p>
+    <p id="dane-klienta" style="font-size:17px;line-height:1.8"></p>
 
     <div class="pole">
       <label for="tresc">Wiadomość dla nas (opcjonalnie)</label>
       <textarea id="tresc" rows="4" placeholder="Kilka słów od Ciebie — instrukcje, liczba gości, pytania…"></textarea>
     </div>
-    <p class="mala">Wysyłając zamówienie zobowiązujesz się do zapłaty zgodnie z podsumowaniem (przelew — dane otrzymasz w e-mailu z potwierdzeniem). Kliknięcie poniżej = akceptacja powyższego podsumowania.</p>
-    <div class="przyciski" style="justify-content:flex-end">
-      <button class="btn" type="button" id="zamow">Zamawiam z obowiązkiem zapłaty</button>
+    <div class="przyciski" style="justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:18px">
+      <a class="btn duzy" href="dane.html">ZMIEŃ DANE</a>
+      <button class="btn duzy" type="button" id="zamow">ZAMÓW Z OBOWIĄZKIEM ZAPŁATY</button>
     </div>
   </div>
 </main>
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=293"></script>
-<script src="assets/koszyk.js?v=293"></script>
-<script src="assets/api.js?v=293"></script>
-<script src="data/katalog.js?v=293"></script>
-<script src="assets/main.js?v=293"></script>
+<script src="assets/config.js?v=294"></script>
+<script src="assets/koszyk.js?v=294"></script>
+<script src="assets/api.js?v=294"></script>
+<script src="data/katalog.js?v=294"></script>
+<script src="assets/main.js?v=294"></script>
 <script>
 (function(){
   var k = KOSZYK.pobierz();
   var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
 
-  if (!k.pozycje.length && !k.pers.length && !(k.typ === 'wynajem' && k.pakiet)){
-    window.location.replace(k.typ === 'wynajem' ? 'wynajem.html' : 'sklep.html');
+  if (k.typ === 'wynajem'){ window.location.replace('wynajem.html'); return; }
+  if (!k.pozycje.length && !k.pers.length){
+    window.location.replace('sklep.html');
     return;
   }
   if (!k.dane){ window.location.replace('dane.html'); return; }
@@ -165,18 +173,18 @@
 
   /* ---- dane klienta ---- */
   var d = k.dane;
+  function wiersz(etykieta, wartosc){ return wartosc ? '<span class="etykieta-wiersz"><b>' + etykieta + ':</b> ' + wartosc + '</span>' : ''; }
   var klientHtml =
-    '<b>' + d.imie + '</b> · ' + d.email + (d.telefon ? ' · tel. ' + d.telefon : '') + '<br>' +
-    'Sygnatura: ' + (d.sygnatura ? d.sygnatura : 'nadamy nową');
+    wiersz('Imię i nazwisko', d.imie) +
+    wiersz('E-mail', d.email) +
+    wiersz('Telefon', d.telefon) +
+    (k.dostawa && k.dostawa.adres ? wiersz('Adres', k.dostawa.adres) : '') +
+    (k.dostawa && k.dostawa.paczkomat ? wiersz('Paczkomat', k.dostawa.paczkomat) : '') +
+    wiersz('Dostawa', etykietaDostawy + (cenaDostawy ? ' — ' + SYG.zl(cenaDostawy) : ' — 0 zł')) +
+    wiersz('Sygnatura', d.sygnatura || 'nadamy nową');
   if (k.typ === 'wynajem' && k.pakiet){
-    klientHtml += '<br>Wynajem: <b>' + k.pakiet.nazwa + '</b>' +
-      (k.termin ? ' · termin: ' + k.termin.data + (k.termin.czas ? ' godz. ' + k.termin.czas : '') : '');
-  }
-  if (k.pozycje.length || k.pers.length){
-    klientHtml += '<br>Dostawa: <b>' + etykietaDostawy + '</b>' +
-      (cenaDostawy ? ' — ' + SYG.zl(cenaDostawy) : ' — 0 zł') +
-      (k.dostawa && k.dostawa.paczkomat ? '<br>Paczkomat: ' + k.dostawa.paczkomat : '') +
-      (k.dostawa && k.dostawa.adres ? '<br>Adres: ' + k.dostawa.adres : '');
+    klientHtml += wiersz('Wynajem', k.pakiet.nazwa) +
+      wiersz('Termin', k.termin ? k.termin.data : '—');
   }
   document.getElementById('dane-klienta').innerHTML = klientHtml;
 
@@ -206,7 +214,7 @@
       blad.style.display = 'block';
       blad.scrollIntoView({behavior:'smooth'});
       btn.disabled = false;
-      btn.textContent = 'Zamawiam z obowiązkiem zapłaty';
+      btn.textContent = 'ZAMÓW Z OBOWIĄZKIEM ZAPŁATY';
     }
   });
 })();

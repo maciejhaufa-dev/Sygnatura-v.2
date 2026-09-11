@@ -8,31 +8,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=293">
+<link rel="stylesheet" href="assets/style.css?v=294">
 </head>
 <body data-strona="Zamówienia">
 <div id="naglowek"></div>
 
 <main class="wrap">
-  <span class="tag">Krok 1 z 3</span>
-  <a class="powrot" href="zamowienia.html">← wróć do wyboru ścieżki</a>
   <h1>Personalizacja</h1>
-  <p class="sub">Wybierz produkty, które spersonalizujemy dla Ciebie, i opisz, co ma się na nich znaleźć.
+  <p class="sub">Wybierz produkty, które spersonalizujemy dla Ciebie, i wpisz, co ma się na nich znaleźć.
   Personalizację zamów <b>min. 2 tygodnie przed wydarzeniem</b>. Przy zamówieniu od 3 produktów
   personalizowanych naliczamy rabat <b>5%</b>.</p>
 
   <div id="progres"></div>
-  <div class="bledy-box" id="bledy" style="display:none">
-    <b>Zanim przejdziemy dalej:</b>
-    <ul id="bledy-lista"></ul>
-  </div>
+  <div class="flash" id="komunikat" style="display:none"></div>
 
-  <div class="koszyk-blok">
-    <h2>Katalog produktów personalizowanych</h2>
-    <div class="padd" id="katalog-pers"></div>
-  </div>
+  <h2>Katalog produktów personalizowanych</h2>
+  <div id="pers-kafelki"></div>
 
-  <div class="koszyk-blok">
+  <div class="koszyk-blok" style="margin-top:24px">
     <h2>Nie znalazłeś tego, czego szukasz?</h2>
     <div class="padd">
       <p class="mala" style="margin-bottom:10px">Opisz swój pomysł własnymi słowami. Wycenimy go osobno —
@@ -56,7 +49,7 @@
     </div>
   </div>
 
-  <div class="przyciski" style="justify-content:flex-end">
+  <div class="przyciski" style="justify-content:flex-end;margin-top:18px">
     <button class="btn" type="button" id="dalej">Przejdź do danych →</button>
   </div>
 </main>
@@ -78,51 +71,32 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=293"></script>
-<script src="assets/koszyk.js?v=293"></script>
-<script src="assets/api.js?v=293"></script>
-<script src="data/katalog.js?v=293"></script>
-<script src="assets/main.js?v=293"></script>
+<script src="assets/config.js?v=294"></script>
+<script src="assets/koszyk.js?v=294"></script>
+<script src="assets/api.js?v=294"></script>
+<script src="assets/pers.js?v=294"></script>
+<script src="data/katalog.js?v=294"></script>
+<script src="assets/main.js?v=294"></script>
 <script>
 (function(){
   window.PROGRES.wstaw(document.getElementById('progres'), ['Personalizacja','Dane','Podsumowanie'], 1);
 
   var k = KOSZYK.pobierz();
-  var katalog = SYG.PERSONALIZACJE || [];
-  var kontener = document.getElementById('katalog-pers');
+  var komunikat = document.getElementById('komunikat');
+  function mow(txt, zle){
+    komunikat.style.display = 'block';
+    komunikat.textContent = txt;
+    komunikat.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    komunikat.scrollIntoView({ behavior:'smooth', block:'center' });
+    setTimeout(function(){ komunikat.style.display = 'none'; }, 5000);
+  }
 
   /* odtworzenie wcześniejszych wyborów */
   var wybrane = {};
   (k.pers || []).forEach(function(p){ if (p.id) wybrane[p.id] = p.opis || ''; });
+  SYG.personalizacje.renderuj(document.getElementById('pers-kafelki'), wybrane);
 
-  kontener.innerHTML = katalog.map(function(p, i){
-    var id = 'pers-' + i;
-    var opis = wybrane[id] || '';
-    return '<div class="pers-wiersz">' +
-      '<label class="rzad" style="margin:0;align-items:flex-start;cursor:pointer;flex:1;min-width:0">' +
-      '<input type="checkbox" class="pers-cb" data-id="' + id + '"' + (wybrane[id] !== undefined ? ' checked' : '') + ' style="margin-top:5px">' +
-      '<span style="flex:1;min-width:0">' +
-      '<span class="etyk">' + p.nazwa + '</span>' +
-      '<span class="opis">' + p.opis + '</span>' +
-      '</span>' +
-      '<span class="d-cena">' + SYG.zl(p.cena) + '</span>' +
-      '</label>' +
-      '<div class="pole pers-opis" data-id="' + id + '" style="margin:8px 0 4px 34px;display:' + (wybrane[id] !== undefined ? 'block' : 'none') + '">' +
-      '<label for="opis-' + id + '">Co ma być wygrawerowane / napisane? *</label>' +
-      '<input type="text" id="opis-' + id + '" value="' + opis.replace(/"/g, '&quot;') + '" placeholder="np. imiona, data, sentencja…">' +
-      '</div></div>';
-  }).join('') || '<p class="mala">Brak produktów w katalogu personalizacji.</p>';
-
-  /* pokazywanie pola opisu przy zaznaczeniu */
-  kontener.querySelectorAll('.pers-cb').forEach(function(cb){
-    cb.addEventListener('change', function(){
-      var id = cb.getAttribute('data-id');
-      var opis = kontener.querySelector('.pers-opis[data-id="' + id + '"]');
-      opis.style.display = cb.checked ? 'block' : 'none';
-    });
-  });
-
-  /* pomysł własny — odtworzenie; ?produkt= z bloga/karty daje punkt zaczepienia */
+  /* pomysł własny — odtworzenie; ?produkt= z bloga daje punkt zaczepienia */
   var zProduktu = SYG.param('produkt');
   if (k.pomysl) document.getElementById('pomysl').value = k.pomysl;
   else if (zProduktu){
@@ -135,20 +109,11 @@
   document.getElementById('modal-anuluj').addEventListener('click', function(){ modal.style.display = 'none'; });
 
   document.getElementById('dalej').addEventListener('click', function(){
-    var pers = [];
-    var bledy = [];
-    kontener.querySelectorAll('.pers-cb:checked').forEach(function(cb){
-      var id = cb.getAttribute('data-id');
-      var idx = Number(id.split('-')[1]);
-      var p = katalog[idx];
-      var opis = document.getElementById('opis-' + id).value.trim();
-      if (!opis) bledy.push('opis personalizacji dla „' + p.nazwa + '"');
-      pers.push({ id: id, nazwa: p.nazwa, opis: opis, cena: p.cena });
-    });
+    var zbior = SYG.personalizacje.zbierz(document.getElementById('pers-kafelki'));
     var pomysl = document.getElementById('pomysl').value.trim();
 
     /* sesja 18: pomysł własny bez wybranego produktu NIE przechodzi dalej — monit */
-    if (!pers.length && pomysl){
+    if (!zbior.pers.length && pomysl){
       document.getElementById('modal-cytat').textContent = '„' + pomysl + '"';
       document.getElementById('modal-wyslij').setAttribute('href',
         'kontakt.html?temat=' + encodeURIComponent('Zapytanie o projekt spersonalizowany') +
@@ -156,21 +121,15 @@
       modal.style.display = 'grid';
       return;
     }
-    if (!pers.length && !pomysl){
-      bledy.push('wybór co najmniej jednego produktu (albo opisz pomysł własny)');
-    }
-    if (bledy.length){
-      var lista = document.getElementById('bledy-lista');
-      lista.innerHTML = bledy.map(function(b){ return '<li>' + b + '</li>'; }).join('');
-      document.getElementById('bledy').style.display = 'block';
-      document.getElementById('bledy').scrollIntoView({behavior:'smooth', block:'center'});
+    if (!zbior.pers.length && !pomysl){
+      mow('Wybierz produkt do personalizacji (zaznacz kafelek).', true);
       return;
     }
-    document.getElementById('bledy').style.display = 'none';
+    if (zbior.bledy.length){ mow(zbior.bledy[0], true); return; }
 
     /* dopisujemy do koszyka: personalizacje + pomysł (bez czyszczenia sklepu) */
     k.pers = k.pers || [];
-    pers.forEach(function(p){
+    zbior.pers.forEach(function(p){
       var ist = k.pers.findIndex(function(x){ return x.id === p.id; });
       if (ist >= 0) k.pers[ist] = p; else k.pers.push(p);
     });

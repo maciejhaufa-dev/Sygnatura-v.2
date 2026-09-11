@@ -67,13 +67,13 @@ window.SYG = {
 
   // katalog produktów personalizowanych (jednorazówki — płatne z góry, zostają u klienta)
   PERSONALIZACJE: [
-    { nazwa: 'Wkładka do tablicy powitalnej', opis: 'Imiona i data na wymiennej wkładce — grawer', cena: 39 },
-    { nazwa: 'Wkładka do planu stołów', opis: 'Rozpiska stołów z imionami gości', cena: 49 },
-    { nazwa: 'Winietki imienne', opis: 'Komplet 20 szt. z imionami gości', cena: 49 },
-    { nazwa: 'Kafelki z imionami do mozaiki „scrabble"', opis: 'Imiona gości lub pary — komplet', cena: 35 },
-    { nazwa: 'Litery przestrzenne z imionami', opis: 'Para liter z imionami lub nazwiskiem — na pamiątkę', cena: 149 },
-    { nazwa: 'Numery stołów z imionami', opis: 'Numer stolika + imiona gości — komplet 10', cena: 35 },
-    { nazwa: 'Grawer okolicznościowy', opis: 'Tabliczka z dedykacją — jubileusz, rocznica, pożegnanie', cena: 89 }
+    { nazwa: 'Wkładka do tablicy powitalnej', opis: 'Imiona i data na wymiennej wkładce — grawer', cena: 39, foto: 'pers-wkladka-tablica.jpg' },
+    { nazwa: 'Wkładka do planu stołów', opis: 'Rozpiska stołów z imionami gości', cena: 49, foto: 'pers-plan-stolow.jpg' },
+    { nazwa: 'Winietki imienne', opis: 'Komplet 20 szt. z imionami gości', cena: 49, foto: 'pers-winietki.jpg' },
+    { nazwa: 'Kafelki z imionami do mozaiki „scrabble"', opis: 'Imiona gości lub pary — komplet', cena: 35, foto: 'pers-kafelki-scrabble.jpg' },
+    { nazwa: 'Litery przestrzenne z imionami', opis: 'Para liter z imionami lub nazwiskiem — na pamiątkę', cena: 149, foto: 'pers-litery.jpg' },
+    { nazwa: 'Numery stołów z imionami', opis: 'Numer stolika + imiona gości — komplet 10', cena: 35, foto: 'pers-numery-stolow.jpg' },
+    { nazwa: 'Grawer okolicznościowy', opis: 'Tabliczka z dedykacją — jubileusz, rocznica, pożegnanie', cena: 89, foto: 'pers-grawer.jpg' }
   ]
 };
 

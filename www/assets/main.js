@@ -122,7 +122,7 @@
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.13</span>';
+      '<span>© Sygnatura 2026 · wersja 28.14</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {

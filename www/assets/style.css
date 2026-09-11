@@ -481,3 +481,91 @@ html.dotyk .menu-vert a::after{display:none}
 .bf-mini-el label{display:flex;align-items:center;gap:4px;font-size:11.5px;margin-top:4px;cursor:pointer}
 .bf-mini-el .bf-mini-x{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:12px;
   border:1px solid var(--brunatny);background:var(--krem);color:#8a2f1d;cursor:pointer;font-size:12px;line-height:1}
+
+/* ============ KROKI (wynajem 5 kroków) ============ */
+.krok{border:1px solid rgba(107,69,48,.3);background:#fff;padding:20px 22px;margin-top:16px}
+.krok-tytul{color:var(--butelkowa);font-size:22px;margin:0 0 10px;display:flex;align-items:center;gap:12px}
+.krok-nr{flex:none;width:42px;height:42px;border-radius:22px;background:var(--butelkowa);color:var(--zloty);
+  display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
+.link-przycisk{background:none;border:none;color:var(--butelkowa);border-bottom:1px solid var(--zloty);
+  cursor:pointer;font-size:14.5px;padding:0}
+.link-przycisk:hover{color:var(--brunatny)}
+.niedostepny-adnotacja{font-size:15px;font-weight:700;letter-spacing:.06em;color:var(--butelkowa);
+  border:1px dashed var(--butelkowa);background:rgba(31,58,50,.06);padding:10px 14px;margin:10px 0 16px}
+
+/* ============ KALENDARZ ============ */
+.kalendarz-wrap{max-width:560px}
+.kalendarz{border:1px solid rgba(107,69,48,.35);background:var(--krem);padding:14px}
+.kal-gora{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.kal-tytul{font-size:20px;font-weight:700;letter-spacing:.08em;color:var(--butelkowa)}
+.kal-nav{border:1px solid rgba(107,69,48,.35);background:#fff;color:var(--butelkowa);
+  width:42px;height:42px;font-size:24px;cursor:pointer;line-height:1}
+.kal-nav:hover{background:var(--butelkowa);color:var(--zloty)}
+.kal-dni-tyg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.kal-dni-tyg span{text-align:center;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--brunatny);padding:4px 0}
+.kal-siatka{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.kal-puste{aspect-ratio:1}
+.kal-dzien{aspect-ratio:1;border:1px solid rgba(107,69,48,.22);background:#fff;color:var(--butelkowa);
+  font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}
+.kal-dzien:hover:not(.przeszly):not(.zajety){border-color:var(--butelkowa);background:rgba(31,58,50,.08)}
+.kal-dzien.wybrany{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa);font-weight:700}
+.kal-dzien.zajety{background:rgba(138,47,29,.14);border-color:rgba(138,47,29,.35);color:#8a2f1d;
+  text-decoration:line-through;text-decoration-thickness:2px;cursor:not-allowed}
+.kal-dzien.przeszly{background:rgba(51,38,28,.05);color:rgba(51,38,28,.35);cursor:not-allowed}
+.kal-legenda{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13.5px;color:rgba(51,38,28,.8)}
+.kal-legenda span{display:inline-flex;align-items:center;gap:6px}
+.leg{width:14px;height:14px;border:1px solid rgba(107,69,48,.4);display:inline-block}
+.leg-wolny{background:#fff}
+.leg-wybrany{background:var(--butelkowa);border-color:var(--butelkowa)}
+.leg-zajety{background:rgba(138,47,29,.2);border-color:rgba(138,47,29,.4)}
+
+/* ============ KARTY PAKIETÓW ============ */
+.pakiety{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}
+.pakiet-karta{position:relative;display:flex;flex-direction:column;gap:6px;border:1px solid rgba(107,69,48,.35);
+  background:var(--krem);padding:16px 16px 18px;cursor:pointer;overflow:hidden;transition:all .2s}
+.pakiet-karta:hover:not(.niedostepny){border-color:var(--butelkowa)}
+.pakiet-karta.wybrany{border:2px solid var(--butelkowa);background:rgba(31,58,50,.05);padding:15px 15px 17px}
+.pakiet-karta input{position:absolute;left:12px;top:14px;width:18px;height:18px;accent-color:var(--butelkowa)}
+.pakiet-karta .pk-nazwa{margin-left:28px;font-weight:700;font-size:17px;color:var(--butelkowa)}
+.pakiet-karta .pk-opis{font-size:14px;color:rgba(51,38,28,.75)}
+.pakiet-karta .pk-pozycje{font-size:13.5px;color:rgba(51,38,28,.7);line-height:1.5}
+.pakiet-karta .pk-cena{margin-top:auto;font-weight:700;color:var(--brunatny);font-size:15.5px}
+.pakiet-karta.niedostepny{opacity:.5;filter:grayscale(.75);cursor:not-allowed}
+.pakiet-karta.niedostepny:hover{border-color:rgba(107,69,48,.35)}
+.pakiet-karta .pk-niedostepny{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--butelkowa);font-size:19px;font-weight:800;letter-spacing:.14em;
+  transform:rotate(-12deg);text-shadow:0 1px 2px rgba(255,255,255,.6)}
+
+/* ============ KAFELKI PERSONALIZACJI ============ */
+#pers-kafelki{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px}
+@media(max-width:900px){#pers-kafelki{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){#pers-kafelki{grid-template-columns:1fr}}
+.pers-kafel{display:flex;flex-direction:column;border:1px solid rgba(107,69,48,.35);background:#fff;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;overflow:hidden}
+.pers-kafel:hover{border-color:var(--butelkowa);box-shadow:0 8px 22px rgba(31,58,50,.14)}
+.pers-kafel.wybrany{border:2px solid var(--butelkowa)}
+.pers-kafel img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.pers-kafel .pk-tresc{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.pers-kafel .pk-zaznacz{position:absolute}
+.pers-kafel .pers-cb{width:18px;height:18px;accent-color:var(--butelkowa);margin-top:2px}
+.pers-kafel .pk-nazwa{font-weight:700;font-size:16.5px;color:var(--butelkowa);margin-left:28px}
+.pers-kafel .pk-opis{font-size:13.5px;color:rgba(51,38,28,.75);line-height:1.45;margin-left:28px}
+.pers-kafel .pk-cena{font-weight:700;color:var(--brunatny);font-size:15.5px;margin-left:28px}
+.pers-pole{display:none;padding:0 14px 12px}
+.pers-pole textarea{width:100%;min-height:74px;border:1px solid rgba(107,69,48,.35);background:var(--krem);
+  padding:8px 10px;font-size:14.5px;line-height:1.5;font-family:inherit}
+.pers-pole textarea:focus{outline:none;border-color:var(--butelkowa)}
+.pers-licznik{display:block;text-align:right;font-size:12px;color:rgba(51,38,28,.6);margin-top:3px}
+
+/* ============ ADNOTACJE DO ZAMÓWIENIA ============ */
+.adnotacje{border:2px solid #C96F1A;border-left:8px solid #C96F1A;background:#FDF3E4;
+  padding:16px 18px;margin:16px 0}
+.adnotacje h3{color:#A85A10;font-size:16.5px;letter-spacing:.1em;margin:0 0 8px}
+.adnotacje p{color:#6B3F0F;font-size:15.5px;line-height:1.65;margin:6px 0}
+
+/* ============ Etykieta pocztowa (dane w podsumowaniu) ============ */
+#dane-klienta .etykieta-wiersz{display:block;font-size:17px;line-height:1.8}
+#dane-klienta b{color:var(--butelkowa)}
+
+/* ============ Duże przyciski ============ */
+.btn.duzy{padding:16px 34px;font-size:17.5px;letter-spacing:.08em;font-weight:700}
