@@ -538,5 +538,41 @@ WYKONANE:
 Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 200, sync docs OK,
 Pages build OK (gh api: built | ae5b8be), fetch_page live OK; docs zawierają localStorage,
 #EBD9BE i html.dotyk (potwierdzone grepowaniem kopii publikacyjnej).
-NASTĘPNY KROK: oględziny właściciela (telefon — też „wersja na komputer" — i komputer); potem
-BAZA KLIENTÓW (rejestracja/logowanie przez Apps Script + arkusz), ścieżki A/B, panel admina.
+
+## Sesja 28 — korekta 6 po oględzinach na komputerze (commit 84ca751, wersja 28.8)
+
+Uwagi właściciela (przy komputerze): (1) strona wygląda jak podgląd dokumentu w WORD, nie
+pełnowymiarowa strona — bloki mają WYPEŁNIAĆ CAŁĄ SZEROKOŚĆ niezależnie od urządzenia,
+zlikwidować wolne przestrzenie po bokach; ramka dookoła max 20 px (to samo góra i dół);
+(2) NIEDOPUSZCZALNE wewnętrzne przewijane okno — okno dopasowuje się do zawartości strony,
+a przy scrollowaniu w dół boczne menu/logo i górny pasek (koszyk|panel) jadą RAZEM ze scrollem;
+stopka dopiero na samym dole (tam, gdzie kończy się blok treści); (3) czcionki i grafiki
+większe o 1–2 rozmiary (osoby słabiej widzące), zachowując proporcje; menu może być szersze,
+przyciski większe; (4) strona główna: slider 4 okien jak jest, „Jak działamy" ma zostać pod
+sliderem i ładnie wypełniać całą stronę (nie wycentrowane i zmniejszone). Po akceptacji:
+baza Google Sheets + uruchomienie skryptów.
+
+WYKONANE (style.css + index.html):
+- PEŁNA SZEROKOŚĆ: usunięte max-width:1500px + centrowanie (z .page/.strona-uklad i .topbar .wrap).
+  Bloki rozciągają się na całą szerokość okna; ramka zewnętrzna clamp(8px,1.5vw,20px) dookoła
+  (max 20 px, góra/dół tak samo). Wewnętrzne odstępy treści: clamp(16px,2.5vw,32px).
+- KONIEC Z WEWNĘTRZNYM OKNEM: usunięte max-height:100vh, overflow:hidden i overflow-y:auto
+  z kontenerów i z main.wrap/.main (wraz ze scrollbarami). Strona ma naturalną wysokość treści,
+  scrolluje się normalnie w przeglądarce, a boczne menu/logo i górny pasek przewijają się razem
+  z treścią. Stopka na samym dole strony. Usunięta reguła body.ma-banner (była pod stary układ).
+- CZCIONKI +1-2 px (proporcje zachowane): body 17px; topbar 14.5; brand-nazwa 32; menu 16.5
+  (padding 13px 16px); h1 clamp(30,4.6vw,46); tytuł strony clamp(28,3.4vw,42); lead/sub/mala/
+  powrot +1; .btn 14px (padding 13px 30px); kafle hub 21/15.5; karty 18/14.5/17; licznik 40x42;
+  formularze (label 14, input 17, etyk 16.5); rachunek 16 (razem 26); tabela 15.5; stopka 15.5;
+  regulamin 16/20; slider h2 clamp(28,3.8vw,50), p +1, sl-btn 13.5, mini-karty 60px; „Jak
+  działamy": h2 24, pod 15.5, krok b 17.5, p 15, CTA 14px (padding 15px 32px).
+- GRAFIKI większe: sygnet w kwadracie 136px (obraz 88px; w media 104/68), ikony szukaj/koszyk/
+  panel 50px (svg 22), social 44px (svg 21), strzałki slidera 52px.
+- MENU SZERSZE: lewa kolumna clamp(270px,18vw,340px) (media 761–1100: 250px).
+- Wersja 28.8, zasoby ?v=288 (świeże pliki w przeglądarce).
+
+Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 17×200, sync docs OK,
+Pages build OK (gh api: built | 84ca751), fetch_page live OK; docs bez max-height:100vh/
+overflow-y:auto, z padding clamp(8px,1.5vw,20px) i side clamp(270px,18vw,340px).
+NASTĘPNY KROK: akceptacja układu przez właściciela; potem BAZA GOOGLE SHEETS + uruchomienie
+skryptów (Apps Script) i test całego serwisu (zamówienia, maile, panel).
