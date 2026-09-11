@@ -421,7 +421,7 @@ strona się rozjeżdża, (3) menu niespójne — koszyk był osobną zakładką,
 (4) pusty koszyk = pusty widok, (5) ogółem szata graficzna „się nie spina". „Popraw zanim wyślę żonie".
 
 Dwa pierwsze warianty poprawki zostały ODRZUCONE. Finalna wersja (zaakceptowany kierunek, commity
-a08171d + 2cd3db1):
+a08171d + 2cd3db1 + 9a5ea4a):
 
 - SPLASH DOKŁADNIE jak we wcześniejszej wersji (księga znaku): zdjęcie forest.jpg w tle (center/cover
   + delikatny gradient przyciemniający), kremowy PROSTOKĄT z brązową ramką 2px, sygnet SVG i 9 liter
@@ -441,6 +441,8 @@ a08171d + 2cd3db1):
 - style.css: wspólna szata (topbar, side z logo/menu/social, head z wyszukiwarką i ikonami, h1 pod
   wyszukiwarką), komponenty formularzy/rachunku/tabeli admina/progresu.
 - docs/ zsynchronizowane z www/ (Pages publikuje się sam z brancha arena/…, folder /docs).
+- Stopka: „© Sygnatura 2026 · wersja 28.3" — znacznik ułatwia właścicielowi potwierdzenie, że widzi
+  NAJNOWSZĄ wersję (GitHub Pages + przeglądarka trzymają kopie do ~10 min; odświeżanie może pokazywać starą).
 
 Testy: składnia JS OK, Pages build OK (gh api), podgląd live przez fetch_page: splash renderuje się
 (sygnet + 9 liter), koszyk.html działa, tytuł strony pod wyszukiwarką, brak podwójnego menu.
