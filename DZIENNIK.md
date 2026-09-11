@@ -602,5 +602,55 @@ WYKONANE:
 Testy: HTML zbilansowany (16 stron), node --check OK, sync docs OK, Pages build OK
 (gh api: built | 6579d21), fetch_page live OK; docs: #0F6B3D, radial gradient w .side,
 brak animacji kwadrat i max-width w sliderze (potwierdzone grepowaniem).
-NASTĘPNY KROK: akceptacja kolorystyki; potem BAZA GOOGLE SHEETS + uruchomienie skryptów
-(Apps Script) i test całego serwisu (zamówienia, maile, panel).
+
+## Sesja 28 — korekta 8 (commit 00aa646, wersja 28.10)
+
+Uwagi właściciela: (1) wyszukiwanie działa, ale okno jest ZDUBLOWANE — zostaje tylko górne;
+(2) nad wynikami komunikat z poprawną odmianą: „Znaleziono X wyników odpowiadający(ych) hasłu: Y"
+(np. „Znaleziono 1 wynik odpowiadający hasłu: Szopka"); (3) admin.html wchodzi do panelu BEZ
+logowania — logowanie ma być WYMUSZANE co najmniej po każdym zamknięciu strony; panel zostaje
+pod adresem /admin (mniej intuicyjny = bezpieczniejszy niż pod ikoną konta); (4) usunąć
+„pracownia: woj. mazowieckie" (jesteśmy z Poznania; zasięg ogólnopolski, wynajem Poznań i okolice);
+(5) formularz zakupów: brak opcji dostawy — dodać InPost paczkomat/kurier z cenami wg rozmiarów
+paczek (cennik dostawców) + miejsce na wskazanie paczkomatu; (6) Royal Green za jasny — wrócić
+do butelkowej z minimalistycznym (nierozświetlającym) gradientem; UJEDNOLICIĆ menu na wszystkich
+stronach (część miała stary kolor); (7) logo za małe — ma WYPEŁNIAĆ SZEROKOŚĆ menu (kwadrat);
+(8) pasek wyszukiwarki / koszyk / profil klienta — większe.
+
+WYKONANE:
+- SZUKANIE: z szukaj.html usunięte drugie okno wyszukiwania (zostało tylko górne w nagłówku).
+  Nad wynikami komunikat z odmianą: 1 → „Znaleziono 1 wynik odpowiadający hasłu: X",
+  2–4 → „…X wyniki odpowiadające hasłu…", 5+ → „…X wyników odpowiadających hasłu…",
+  0 → „Nie znaleziono żadnych wyników odpowiadających hasłu: X" (hasło w oryginalnej pisowni).
+- ADMIN: logowanie WYMUSZANE — sesja w sessionStorage ('syg-admin'), więc po zamknięciu
+  przeglądarki/karty znów wymagany login+hasło. Tryb demo sprawdza dane z config.js
+  (SYG.ADMIN_DEMO_LOGIN='admin', SYG.ADMIN_DEMO_HASLO — do zmiany w config.js; działa tylko
+  do wdrożenia API). Po wdrożeniu API logowanie sprawdzi akcja 'admin-login' w Google Apps Script
+  (baza administratorów w arkuszu). Przycisk „Wyloguj" czyści sesję. Panel dalej pod /admin
+  (zgodnie z decyzją właściciela — bezpieczniej niż pod ikoną konta).
+- USUNIĘTE „pracownia: woj. mazowieckie" (lewa kolumna, wszystkie strony). Odbiór osobisty
+  opisany jako „Poznań i okolice".
+- DOSTAWA W FORMULARZU (dane.html): Odbiór osobisty (0 zł) / Paczkomat InPost / Kurier.
+  Cennik wg rozmiarów paczek S/M/L w config.js (SYG.DOSTAWA — stawki startowe:
+  paczkomat 15.99/18.99/21.99, kurier 18.99/21.99/24.99; do aktualizacji wg cenników
+  dostawców). Domyślny rozmiar sugerowany wg liczby sztuk (1→S, 2–4→M, 5+→L). Pole na
+  wskazanie paczkomatu (miasto + oznaczenie) i adres kuriera; walidacja wymaga tych pól.
+  Podsumowanie: pozycja „Dostawa" w rachunku (nazwa metody + rozmiar + cena), dostawa wliczona
+  do RAZEM i do kwot wysyłanych do zamówienia; dane klienta pokazują paczkomat/adres.
+  (Docelowo: widget wyboru paczkomatu InPost zamiast pola tekstowego.)
+- KOLORY: powrót butelkowej #1F3A32 (zmienna --butelkowa) + minimalistyczny gradient lewego
+  słupka: jedna subtelna poświata u góry (rgba(63,105,85,.34)) + pionowy gradient
+  #26493C→#1F3A32→#162B24. Identyczny w index.html i style.css — WSZYSTKIE strony mają teraz
+  jednakowe menu (stare różnice wynikały z cache — zasoby z ?v=290 wymuszają świeże pliki).
+- LOGO: .brand-kwadrat wypełnia SZEROKOŚĆ kolumny menu (width:100%; aspect-ratio 1/1 —
+  kwadrat), sygnet 64% boku. Na telefonach/tabletach logo 200px.
+- PASEK HEAD większy: wyszukiwarka (input 18px, padding 14px 18px, przycisk 56px), ikony
+  koszyka/konta 56px (svg 24px), tło head-gora z większym paddingiem (16px 18px).
+- Wersja 28.10, zasoby ?v=290.
+
+Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 7×200, sync docs OK,
+Pages build OK (gh api: built | 00aa646), fetch_page live: szukaj.html?q=Szopka pokazuje
+„Znaleziono 1 wynik odpowiadający hasłu: Szopka" (bez drugiej wyszukiwarki), admin.html zaczyna
+się od ekranu logowania.
+NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + uruchomienie skryptów (Apps Script):
+zamówienia, maile, panel, logowanie admina (admin-login), widget paczkomatu.
