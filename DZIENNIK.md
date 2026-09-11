@@ -574,5 +574,33 @@ WYKONANE (style.css + index.html):
 Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 17×200, sync docs OK,
 Pages build OK (gh api: built | 84ca751), fetch_page live OK; docs bez max-height:100vh/
 overflow-y:auto, z padding clamp(8px,1.5vw,20px) i side clamp(270px,18vw,340px).
-NASTĘPNY KROK: akceptacja układu przez właściciela; potem BAZA GOOGLE SHEETS + uruchomienie
-skryptów (Apps Script) i test całego serwisu (zamówienia, maile, panel).
+
+## Sesja 28 — korekta 7: Royal Green + rozświetlony gradient menu (commit 6579d21, wersja 28.9)
+
+Uwagi właściciela (po akceptacji korekty 6 — „zdecydowanie lepiej"): (1) nie podoba się
+„złota poświata" pod napisem i logo; (2) butelkową zieleń zamienić na akcent ROYAL GREEN
+(referencja: abstrakcyjne zielone tło Canva) — ładne rozświetlenie podkreślające gradient
+jako tło lewego słupka MENU (wyróżnik strony); (3) slider z obrazkami na stronie głównej jest
+wyjustowany do lewej i nie wypełnia całej szerokości treści.
+
+WYKONANE:
+- ROYAL GREEN: zmienna --butelkowa = #0F6B3D (królewska szmaragdowa zieleń) — automatycznie
+  przechodzi na przyciski, przycisk szukajki, stopkę, pasek koszyka, nagłówki tabel, focus-ringi
+  (rgba(15,107,61,.15)), przyciemnienie splashu i tło slajdu „Aktualności" (gradient
+  #0F6B3D→#6B4530).
+- TŁO MENU (lewy słupek): rozświetlony gradient w klimacie referencji Canva —
+  radialna jasna poświata u góry po lewej (rgba(122,205,158,.30)), drugi radial u góry po prawej
+  (rgba(18,96,52,.55)) + pionowy gradient #11753F → #0C5A31 → #073B20 → #052A16. Ta sama
+  definicja w index.html i style.css (spójność podstron).
+- ZŁOTA POŚWIATA: usunięta pulsująca animacja kwadratu logo (@keyframes kwadrat z złotym
+  box-shadowem) — zostaje statyczny, dyskretny cień 0 12px 26px rgba(0,0,0,.28). Napis
+  „Sygnatura" (Syg jasniejsze złoto / natura złoto) bez zmian.
+- SLIDER PEŁNA SZEROKOŚĆ: usunięte max-width:640px z akapitu slajdu i max-width:760px
+  z mini-kart — treść slajdów rozciąga się na całą szerokość okna slajdu (.sl-karty width:100%).
+- Wersja 28.9, zasoby ?v=289.
+
+Testy: HTML zbilansowany (16 stron), node --check OK, sync docs OK, Pages build OK
+(gh api: built | 6579d21), fetch_page live OK; docs: #0F6B3D, radial gradient w .side,
+brak animacji kwadrat i max-width w sliderze (potwierdzone grepowaniem).
+NASTĘPNY KROK: akceptacja kolorystyki; potem BAZA GOOGLE SHEETS + uruchomienie skryptów
+(Apps Script) i test całego serwisu (zamówienia, maile, panel).
