@@ -1,9 +1,15 @@
 /* ============================================================
    Studio Sygnatura — wspólny szkielet podstron (main.js)
-   Buduje JEDNOLITY układ kwaterowy (ten sam co strona główna):
-   czarny topbar → lewa zielona ćwiartka (logo, menu, social) →
-   wyszukiwarka + IKONY (koszyk/panel) w prawym górnym rogu → treść → stopka.
+   Układ wg ustaleń właściciela:
+   [ czarny pasek: tel + mail ]
+   [ logo (lewo) | wyszukiwarka z ładnym tłem + ikony (prawo) ]
+   [ menu (lewo) | TYTUŁ STRONY (pod wyszukiwarką)            ]
+   [ social     |                                             ]
+   [            | TREŚĆ STRONY (osobny blok)                  ]
+   [ stopka ]
    Strona deklaruje się atrybutem data-strona="…" na <body>.
+   UWAGA: strona główna (index.html) ma własny układ i NIE jest
+   dotykana przez ten skrypt (brak main.wrap = pomijamy).
    ============================================================ */
 (function () {
   const SYG = window.SYG;
@@ -30,14 +36,14 @@
       pozycje += '<a href="' + m[0] + '"' + (m[1] === aktywna ? ' class="on"' : '') + '>' + m[1] + '</a>';
     });
     return '' +
-      /* czarny pasek */
+      /* czarny pasek: telefon + mail */
       '<div class="topbar"><div class="wrap">' +
       '<span><a href="tel:+48510767076">☎ ' + SYG.TEL + '</a>' +
       '<span style="opacity:.35;margin:0 10px">|</span>' +
       '<a href="mailto:' + SYG.MAIL + '">✉ ' + SYG.MAIL + '</a></span>' +
       '<span class="top-note">odpowiadamy w 1–2 dni robocze</span>' +
       '</div></div>' +
-      /* lewa ćwiartka */
+      /* lewa kolumna: logo, menu, social */
       '<aside class="side">' +
       '<div class="brand-blok">' +
       '<div class="brand-kwadrat"><img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura"></div>' +
@@ -50,19 +56,22 @@
       '<a href="#" aria-label="Facebook" title="Facebook — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg></a>' +
       '<a href="#" aria-label="Pinterest" title="Pinterest — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>' +
       '</div>' +
-      '<div class="side-stopka">pracownia: woj. mazowieckie</div>' +
       '</aside>' +
-      /* wyszukiwarka + ikony w prawym górnym rogu */
+      /* górny blok po prawej: wyszukiwarka (ładne tło) + ikony; pod spodem TYTUŁ STRONY */
       '<div class="head">' +
+      '<div class="head-gora">' +
       '<form class="szukaj" action="szukaj.html" method="get" role="search">' +
       '<input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">' +
       '<button type="submit" aria-label="Szukaj">' + ikonaSvg(SVG_SZUKAJ) + '</button>' +
       '</form>' +
       '<div class="head-ikony">' +
-      '<a href="sklep.html" title="Koszyk — wybierz produkty ze sklepu" aria-label="Koszyk">' +
+      '<a href="koszyk.html" title="Koszyk" aria-label="Koszyk">' +
       '<span class="kropka"></span>' + ikonaSvg(SVG_KOSZYK) + '</a>' +
       '<a href="zamowienia.html" title="Twoje zamówienia" aria-label="Panel klienta">' + ikonaSvg(SVG_PANEL) + '</a>' +
-      '</div></div>';
+      '</div>' +
+      '</div>' +
+      '<h1 class="strona-tytul" id="strona-tytul"></h1>' +
+      '</div>';
   }
 
   function stopka() {
@@ -74,7 +83,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     const aktywna = document.body.getAttribute('data-strona') || '';
 
-    /* baner trybu demo — zawsze na samej górze */
+    /* baner trybu demo — na samej górze */
     if (SYG.TRYB_DEMO) {
       const b = document.createElement('div');
       b.className = 'demo-banner';
@@ -83,19 +92,28 @@
       document.body.insertBefore(b, document.body.firstChild);
     }
 
-    /* układ kwaterowy: przenosimy treść i stopkę do wspólnej siatki */
+    /* szkielet budujemy TYLKO dla podstron (main.wrap).
+       Strona główna ma własny układ — zostawiamy ją nietkniętą. */
     const tresc = document.querySelector('main.wrap');
+    if (!tresc) { window.KOSZYK.odswiez(); return; }
+
     const stopkaEl = document.getElementById('stopka');
     const stary = document.getElementById('naglowek');
     if (stary) stary.remove();
     const shell = document.createElement('div');
     shell.className = 'strona-uklad';
     shell.innerHTML = szkielet(aktywna);
+
+    /* tytuł strony przenosimy POD wyszukiwarkę (górny blok, na wysokości logo) */
+    const h1 = tresc.querySelector('h1');
+    const tytulEl = shell.querySelector('#strona-tytul');
+    if (h1 && tytulEl) tytulEl.appendChild(h1);
+
+    shell.appendChild(tresc);
+    if (stopkaEl) stopkaEl.remove();
     const stopkaNode = document.createElement('footer');
     stopkaNode.className = 'stopka';
     stopkaNode.innerHTML = stopka();
-    if (tresc) shell.appendChild(tresc);
-    if (stopkaEl) stopkaEl.remove();
     shell.appendChild(stopkaNode);
     document.body.appendChild(shell);
 
