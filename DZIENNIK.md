@@ -506,5 +506,37 @@ WYKONANE:
 Testy: HTML zbilansowany (wszystkie 17 stron), node --check OK, podgląd lokalny 17×200 + zasoby
 ?v=286 OK, Pages build OK (gh api: built | 08a7651), fetch_page: konto.html live (formularz
 logowania), ikona konta „Konto — logowanie".
-NASTĘPNY KROK: oględziny właściciela; potem BAZA KLIENTÓW (rejestracja/logowanie przez
-Apps Script + arkusz), ścieżki A/B, panel admina.
+
+## Sesja 28 — korekta 5 po oględzinach (commit ae5b8be, wersja 28.7)
+
+Uwagi właściciela: (1) splash pokazuje się przy każdym kliknięciu „Strona główna"/odświeżeniu —
+ma być TYLKO przy pierwszym wejściu; (2) napis logo przy sygnecie nadal niezgodny — ma być
+JEDNOLITY „Sygnatura": „Syg" delikatnie jaśniej (zauważalnie), „natura" w kolorze; (3) strona
+nie dopasowuje się do ekranu — „wszystko upchnięte na górze, pod tym dużo pustej przestrzeni";
+właściciel podejrzewa przeglądanie telefonu w trybie „wersja na komputer" — jeśli tak, też trzeba
+to wyeliminować, bo UX leży.
+
+WYKONANE:
+- SPLASH: przełączony z sessionStorage na localStorage (klucz 'syg-splash'): pokazuje się RAZ
+  na danym urządzeniu przy pierwszym wejściu; każde kolejne odświeżenie, kliknięcie w „Strona
+  główna" i powrót z podstrony go NIE pokazuje (sprawdzenie + natychmiastowe usunięcie, gdy
+  już był). Zapis w try/catch (bezpieczny dla trybu prywatnego). Nowe wejście = 3,8 s i płynne
+  zniknięcie; żeby zobaczyć go ponownie: tryb incognito.
+- TRYB DOTYKOWY (eliminacja problemu „wersja na komputer" na telefonie): na starcie każdej
+  strony wykrywamy ekran dotykowy (matchMedia pointer:coarse / hover:none / maxTouchPoints /
+  UA Android-iPhone-iPad-Mobile) i dodajemy klasę html.dotyk. Wtedy: układ przechodzi w kolumnę
+  dopasowaną do treści (strona ma dokładnie taką wysokość jak zawartość — ZERO pustej
+  przestrzeni), przewijanie strony jest zwykłe (bez wewnętrznego boxa), menu jako pigułki.
+  Działa zarówno na telefonie w trybie mobilnym, jak i z włączoną „wersją na komputer"
+  (viewport ~980 px, gdzie media query szerokości nie łapie).
+- NAPIS LOGO: „Syg" w jaśniejszym złotym (#EBD9BE — delikatnie jaśniejszy, zauważalnie),
+  „natura" w złotym (--zloty #C4A582); jednolita czcionka/wielkość/waga. Na stronie głównej
+  i wszystkich podstronach (lewa kolumna przy sygnecie).
+- Wszystkie strony ładują zasoby z ?v=287 (kolejne wymuszenie świeżych plików), stopki:
+  „wersja 28.7".
+
+Testy: HTML zbilansowany (16 stron), node --check OK, podgląd lokalny 200, sync docs OK,
+Pages build OK (gh api: built | ae5b8be), fetch_page live OK; docs zawierają localStorage,
+#EBD9BE i html.dotyk (potwierdzone grepowaniem kopii publikacyjnej).
+NASTĘPNY KROK: oględziny właściciela (telefon — też „wersja na komputer" — i komputer); potem
+BAZA KLIENTÓW (rejestracja/logowanie przez Apps Script + arkusz), ścieżki A/B, panel admina.
