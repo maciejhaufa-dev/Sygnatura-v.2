@@ -950,6 +950,28 @@ wynajem-zapytanie (walidacja + zapis), kalendarz wolny po zapytaniu; sync docs,
 Pages built | 8d3368a; fetch_page live: koszyk.html bez „Krok 1 z 3" i bez wynajmu,
 wynajem.html z odznaczaniem, „Podsumowaniem zapytania o termin", adnotacją o wpłacie
 i przyciskiem „WYŚLIJ ZAPYTANIE O TERMIN →".
+## Sesja 28 — korekta 15: progress bar z kropkami, hasło „test", kropka koszyka (commit baffc7c, wersja 28.17)
+
+Uwagi właściciela: (1) usunąć niewidoczny/nieczytelny tekst w koszyku „Dekoracje montujemy
+dzień przed imprezą — opcja dostawy nie jest potrzebna" — takie zabiegi niedopuszczalne;
+(2) hasło do panelu admina uprościć do „test"; (3) cyferka przy koszyku musi być
+WYCENTROWANA w kółku (była za nisko); (4) progress bar: „znów zmieniłeś wygląd — miały być
+podpisane kropki jak wcześniej, a dałeś kafelki/przyciski zielone — PRZYWRÓĆ TAMTEN UKŁAD".
+
+WYKONANE:
+- Tekst o dekoracjach zniknął z koszyka całkowicie (koszyk nie pokazuje już wynajmu).
+- Hasło admina: ADMIN_DEMO_HASLO = 'test' (config.js) — ekran logowania admin.html czyta
+  je stamtąd; stara wartość usunięta z całego serwisu.
+- Kropka koszyka: cyfra wycentrowana w kółku (line-height = wysokość minus obramowania +
+  text-align:center; display inline-block zamiast grid).
+- PROGRESS BAR: przywrócony układ z podpisanymi kropkami (korekty 9–12): kropki 14px na
+  linii poziomej + etykiety pod spodem, zrobione kroki złote, aktualny brązowy — bez
+  kafelków i zielonego tła.
+- Wersja 28.17, zasoby ?v=297.
+
+Testy: HTML zbilansowany, node --check OK, kontrole grep (stary tekst nieobecny, stare
+hasło nieobecne, kropki ::before w CSS), sync docs, Pages built | baffc7c, fetch_page
+live: koszyk.html czysty (bez tekstu o dekoracjach, bez „Krok x z y").
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
