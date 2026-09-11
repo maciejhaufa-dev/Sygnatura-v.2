@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twój koszyk — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=296">
+</head>
+<body data-strona="Zamówienia">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <h1>Twój koszyk</h1>
+  <p class="sub">Sprawdź produkty i wybierz sposób dostawy. Ilości możesz zmieniać tutaj.</p>
+
+  <div id="progres"></div>
+
+  <!-- BLOK: KOSZYK (tabela + suma) -->
+  <div class="koszyk-blok" id="blok-koszyk">
+    <h2>Koszyk <span class="mala" id="koszyk-info"></span></h2>
+    <div class="padd" id="koszyk-tresc"></div>
+  </div>
+
+  <!-- BLOK: OPCJE DOSTAWY -->
+  <div class="koszyk-blok" id="blok-dostawa" style="display:none">
+    <h2>Opcje dostawy <span class="mala" id="dostawa-info"></span></h2>
+    <div class="padd">
+      <p class="mala" style="margin-bottom:6px">Rozmiar paczki dobieramy automatycznie do liczby produktów:
+      <b>S</b> = 1–3 produkty, <b>M</b> = 4–6, <b>L</b> = 7–10. Powyżej 10 produktów — tylko kurier.</p>
+      <div id="dostawa-opcje"></div>
+      <div class="flash" id="dostawa-uwaga" style="display:none"></div>
+      <div class="pole" id="pole-paczkomat" style="display:none">
+        <label for="paczkomat">Paczkomat (miasto i oznaczenie) *</label>
+        <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap">
+          <input type="text" id="paczkomat" placeholder="np. Poznań, POZ001P" style="flex:1;min-width:220px">
+          <a class="btn outline" href="https://inpost.pl/znajdz-paczkomat" target="_blank" rel="noopener" style="white-space:nowrap">Znajdź paczkomat na mapie →</a>
+        </div>
+      </div>
+      <div class="pole" id="pole-adres" style="display:none">
+        <label for="adres">Adres dostawy (miejscowość, ulica, kod) *</label>
+        <input type="text" id="adres" placeholder="np. Poznań, ul. Kwiatowa 12, 60-001">
+      </div>
+    </div>
+  </div>
+
+  <div class="przyciski" id="guzy" style="justify-content:flex-end;display:none">
+    <a class="btn" href="dane.html" id="guz-dalej">Przejdź do danych →</a>
+    <a class="btn outline" href="sklep.html" id="guz-wstecz">← Wróć do katalogu</a>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=296"></script>
+<script src="assets/koszyk.js?v=296"></script>
+<script src="assets/api.js?v=296"></script>
+<script src="data/katalog.js?v=296"></script>
+<script src="assets/main.js?v=296"></script>
+<script>
+(function(){
+  var k = KOSZYK.pobierz();
+  var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
+  var kontener = document.getElementById('koszyk-tresc');
+  var guzy = document.getElementById('guzy');
+  var blokDostawa = document.getElementById('blok-dostawa');
+  var info = document.getElementById('koszyk-info');
+
+  window.PROGRES.wstaw(document.getElementById('progres'), ['Koszyk','Dane','Podsumowanie'], 1);
+
+  function foto(pr){ return (pr && pr.obraz && /^https?:/.test(pr.obraz)) ? pr.obraz : 'assets/media/sklep/' + ((pr && pr.obraz) || 'szopka.jpg'); }
+  function nazwa(id){ var p = kat.find(function(x){ return Number(x.id) === Number(id); }); return p ? p.nazwa : 'Produkt #' + id; }
+  function cena(id){ var p = kat.find(function(x){ return Number(x.id) === Number(id); }); return p ? (Number(p.cena)||0) : 0; }
+
+  var razem = 0;
+  function renderuj(){
+    guzy.style.display = 'flex';
+    var lp = 0;
+    var html = '<div class="tabela-wrap"><table class="koszyk-tabela">' +
+      '<colgroup><col style="width:48px"><col><col style="width:110px"><col style="width:132px"><col style="width:110px"><col style="width:76px"></colgroup>' +
+      '<thead><tr><th>Lp.</th><th>Produkt</th><th>Cena jedn.</th><th>Ilość</th><th>Wartość</th><th>Usuń</th></tr></thead><tbody>';
+    razem = 0;
+    k.pozycje.forEach(function(x){
+      lp++;
+      var c = cena(x.id);
+      razem += c * x.ile;
+      var pr = kat.find(function(p){ return Number(p.id) === Number(x.id); }) || {};
+      html += '<tr data-id="' + x.id + '">' +
+        '<td>' + lp + '</td>' +
+        '<td><div style="display:flex;align-items:center;gap:12px;min-width:220px">' +
+        '<img src="' + foto(pr) + '" alt="" style="width:52px;height:52px;object-fit:cover;flex:none;border:1px solid rgba(107,69,48,.25)">' +
+        '<b>' + nazwa(x.id) + '</b></div></td>' +
+        '<td class="num">' + SYG.zl(c) + '</td>' +
+        '<td><span class="licznik"><button type="button" class="minus" aria-label="mniej">−</button>' +
+        '<span class="val">' + x.ile + '</span>' +
+        '<button type="button" class="plus" aria-label="więcej">+</button></span></td>' +
+        '<td class="num"><b>' + SYG.zl(c * x.ile) + '</b></td>' +
+        '<td><button type="button" class="usun" aria-label="usuń" title="Usuń produkt z koszyka">✕</button></td></tr>';
+    });
+    k.pers.forEach(function(p){
+      lp++;
+      razem += Number(p.cena) || 0;
+      html += '<tr><td>' + lp + '</td>' +
+        '<td><b>' + p.nazwa + '</b> <span class="r-tag">personalizacja</span>' +
+        (p.opis ? '<span class="r-pod">' + p.opis + '</span>' : '') + '</td>' +
+        '<td class="num">' + SYG.zl(p.cena) + '</td>' +
+        '<td>1 szt.</td>' +
+        '<td class="num"><b>' + SYG.zl(p.cena) + '</b></td>' +
+        '<td></td></tr>';
+    });
+    if (k.pers.length >= SYG.PERS_RABAT_PROG){
+      var sumaPers = k.pers.reduce(function(s,p){ return s + (Number(p.cena)||0); }, 0);
+      var rabat = Math.round(sumaPers * SYG.PERS_RABAT_PROC / 100);
+      razem -= rabat;
+      html += '<tr><td></td><td><b>Rabat na personalizację</b><span class="r-pod">−5% przy min. 3 produktach personalizowanych</span></td>' +
+        '<td>—</td><td>—</td><td class="num r-minus">−' + SYG.zl(rabat) + '</td><td></td></tr>';
+    }
+    if (k.pomysl){
+      html += '<tr><td></td><td><b>Pomysł własny (spoza katalogu)</b><span class="r-pod">' +
+        k.pomysl.slice(0, 120) + (k.pomysl.length > 120 ? '…' : '') + '</span></td>' +
+        '<td>wycena osobno</td><td>—</td><td class="num">—</td><td></td></tr>';
+    }
+    var dostawa = k.dostawa || {};
+    var cenaDostawy = Number(dostawa.cena) || 0;
+    if (dostawa.metoda && cenaDostawy > 0){
+      html += '<tr><td></td><td><b>Dostawa</b><span class="r-pod">' + etykietaDostawy(dostawa) + '</span></td>' +
+        '<td>—</td><td>—</td><td class="num"><b>' + SYG.zl(cenaDostawy) + '</b></td><td></td></tr>';
+      razem += cenaDostawy;
+    }
+    html += '<tr class="koszyk-razem"><td colspan="4">RAZEM</td><td class="num" colspan="2">' + SYG.zl(razem) + '</td></tr>';
+    html += '</tbody></table></div>';
+    html += '<p class="uw" style="margin-top:10px">Produkty ze sklepu i personalizacja płatne z góry w całości — dane do przelewu otrzymasz w e-mailu z potwierdzeniem.</p>';
+    kontener.innerHTML = html;
+    info.textContent = k.pozycje.reduce(function(s,x){return s+x.ile;},0) + ' szt. produktów + ' + k.pers.length + ' personalizacja';
+
+    /* −/+ i usuń */
+    kontener.querySelectorAll('tr[data-id]').forEach(function(w){
+      var id = Number(w.getAttribute('data-id'));
+      w.querySelector('.minus').addEventListener('click', function(){ KOSZYK.ustawIle(id, KOSZYK.ileProduktu(id) - 1); location.reload(); });
+      w.querySelector('.plus').addEventListener('click', function(){ KOSZYK.ustawIle(id, KOSZYK.ileProduktu(id) + 1); location.reload(); });
+      w.querySelector('.usun').addEventListener('click', function(){ KOSZYK.ustawIle(id, 0); location.reload(); });
+    });
+    renderujDostawe();
+  }
+
+  /* ================= DOSTAWA ================= */
+  var sztuk = k.pozycje.reduce(function(s,x){ return s + x.ile; }, 0) + k.pers.length;
+  function rozmiarWg(s){
+    var R = SYG.PACZKA_REGULY || { S: 3, M: 6, L: 10 };
+    if (s <= R.S) return 'S';
+    if (s <= R.M) return 'M';
+    return 'L';
+  }
+  function etykietaDostawy(d){
+    var map = { odbior: 'Odbiór osobisty (Poznań i okolice)', paczkomat: 'Paczkomat InPost', kurier: 'Kurier' };
+    var t = map[d.metoda] || 'Dostawa';
+    if ((d.metoda === 'paczkomat' || d.metoda === 'kurier') && d.rozmiar) t += ' — paczka ' + d.rozmiar;
+    return t;
+  }
+  function renderujDostawe(){
+    var cennik = SYG.ustawieniaDostawa();
+    var R = SYG.PACZKA_REGULY || { S: 3, M: 6, L: 10 };
+    var auto = rozmiarWg(sztuk);
+    var tylkoKurier = sztuk > R.L;
+    var dostawa = k.dostawa || {};
+
+    /* korekta zapisu: za dużo produktów -> paczkomat się blokuje */
+    if (tylkoKurier && dostawa.metoda === 'paczkomat'){ dostawa.metoda = 'kurier'; dostawa.rozmiar = auto; }
+    if ((dostawa.metoda === 'paczkomat' || dostawa.metoda === 'kurier') && dostawa.rozmiar !== auto && !(dostawa.metoda==='kurier' && tylkoKurier)){
+      dostawa.rozmiar = auto;
+    }
+    if (!dostawa.metoda) dostawa.metoda = 'odbior';
+
+    var opcje = [
+      { v: 'odbior', et: 'Odbiór osobisty', op: 'Poznań i okolice — szczegóły umówimy w korespondencji.', cena: 0 },
+      { v: 'paczkomat', et: 'Paczkomat InPost', op: 'Paczka ' + auto + ' (dobrana do ' + sztuk + ' prod.) — dostawa do wybranego paczkomatu.', cena: cennik.paczkomat[auto], blokada: tylkoKurier },
+      { v: 'kurier', et: 'Kurier', op: 'Paczka ' + auto + ' (dobrana do ' + sztuk + ' prod.) — dostawa pod wskazany adres.', cena: cennik.kurier[auto] }
+    ];
+    var html = '';
+    opcje.forEach(function(o){
+      var blok = o.blokada;
+      html += '<label class="dostawa-opcja' + (blok ? ' zablokowana' : '') + '">' +
+        '<input type="radio" name="dostawa" value="' + o.v + '"' + (dostawa.metoda === o.v && !blok ? ' checked' : '') + (blok ? ' disabled' : '') + '>' +
+        '<span style="flex:1;min-width:0"><span class="d-et">' + o.et + '</span>' +
+        '<span class="d-op">' + o.op + (blok ? ' <b>(niedostępna — ponad ' + R.L + ' produktów)</b>' : '') + '</span></span>' +
+        '<span class="d-cena">' + (o.cena ? SYG.zl(o.cena) : '0 zł') + '</span></label>';
+    });
+    document.getElementById('dostawa-opcje').innerHTML = html;
+
+    var uwaga = document.getElementById('dostawa-uwaga');
+    if (tylkoKurier){
+      uwaga.style.display = 'block';
+      uwaga.textContent = 'Masz ponad ' + R.L + ' produktów — dostępna jest tylko dostawa kurierem (paczkomat nie pomieści takiej paczki).';
+    } else {
+      uwaga.style.display = 'none';
+    }
+    pokazPola(dostawa.metoda === 'paczkomat' ? 'paczkomat' : dostawa.metoda);
+    document.getElementById('dostawa-info').textContent = 'dla ' + sztuk + ' prod.: paczka ' + auto;
+
+    document.querySelectorAll('input[name=dostawa]').forEach(function(r){
+      r.addEventListener('change', function(){
+        if (r.disabled) return;
+        dostawa.metoda = r.value;
+        dostawa.rozmiar = auto;
+        dostawa.cena = r.value === 'odbior' ? 0 : cennik[r.value][auto];
+        pokazPola(r.value);
+        k.dostawa = dostawa;
+        KOSZYK.zapisz(k);
+        location.reload();
+      });
+    });
+
+    /* pola adres/paczkomat zapisują się na bieżąco */
+    function bindPole(id, klucz){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.value = dostawa[klucz] || '';
+      el.addEventListener('input', function(){
+        k.dostawa = k.dostawa || {};
+        k.dostawa[klucz] = el.value.trim();
+        KOSZYK.zapisz(k);
+      });
+    }
+    bindPole('paczkomat', 'paczkomat');
+    bindPole('adres', 'adres');
+    k.dostawa = dostawa;
+    KOSZYK.zapisz(k);
+  }
+  function pokazPola(metoda){
+    document.getElementById('pole-paczkomat').style.display = metoda === 'paczkomat' ? 'block' : 'none';
+    document.getElementById('pole-adres').style.display = metoda === 'kurier' ? 'block' : 'none';
+  }
+
+  /* pusty koszyk */
+  if (!k.pozycje.length && !k.pers.length){
+    kontener.innerHTML = '<div class="sukces"><h2>Twój koszyk jest pusty</h2>' +
+      '<p>Nic jeszcze nie wybrałeś. Zajrzyj do katalogu i dodaj produkty licznikiem −/+.</p>' +
+      '<p style="margin-top:16px"><a class="btn" href="sklep.html">Przejdź do katalogu</a></p></div>';
+    guzy.style.display = 'none';
+  } else {
+    renderuj();
+    blokDostawa.style.display = 'block';
+  }
+
+  KOSZYK.odswiez();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+/* ============================================================
+   STUDIO SYGNATURA — wspólny arkusz stylów serwisu
+   Ten plik steruje WYGLĄDEM wszystkich podstron publicznych:
+   /wynajem/, /personalizacja/, /komponuje/, formularz rezerwacji itd.
+   Zmień tutaj kolory/czcionki — zmiana zadziała wszędzie.
+   Kolory firmowe: butelkowa #1F3A32, brąz #6B4530, złoto #C4A582, krem #FBF7F0.
+   ============================================================ */
+:root{
+  --brunatny:#6B4530; --butelkowa:#1F3A32; --zloty:#C4A582;
+  --krem:#FBF7F0; --krem2:#F6EFE1; --ink:#33261C;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--krem);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6}
+a{color:var(--butelkowa)}
+img{max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+/* ============ MENU (nagłówek) ============ */
+.site-head{position:sticky;top:0;z-index:50;background:var(--butelkowa);border-bottom:1px solid rgba(196,165,130,.35)}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px 0}
+.nav .brand{font-size:20px;font-weight:700;color:var(--zloty);letter-spacing:.04em;text-decoration:none;margin-right:8px}
+.nav a{color:var(--krem);text-decoration:none;padding:7px 11px;font-size:16px;border:1px solid transparent}
+.nav a:hover,.nav a.akt{color:var(--zloty);border-color:var(--zloty)}
+
+/* ============ NAGŁÓWKI I TEKSTY ============ */
+h1{color:var(--brunatny);font-size:clamp(26px,4vw,36px);margin:14px 0 6px}
+.sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 10px}
+.powrot{display:inline-block;margin:18px 0 0;font-size:15px}
+.mala{font-size:13.5px;color:rgba(51,38,28,.6)}
+.flash{background:var(--butelkowa);color:var(--zloty);padding:10px 14px;margin:12px 0 0;font-size:15px}
+
+/* ============ PASEK KROKÓW (postęp zamówienia) ============ */
+.kroki-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 0;font-size:14px}
+.krok-it{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(107,69,48,.28);
+  color:rgba(51,38,28,.55);padding:6px 12px 6px 7px}
+.krok-it i{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:var(--krem2);border:1px solid rgba(107,69,48,.4);font-style:normal;font-weight:700;font-size:13px}
+.krok-it a{color:var(--brunatny);text-decoration:none}
+.krok-it.akt{background:var(--butelkowa);border-color:var(--butelkowa);color:var(--zloty);font-weight:700}
+.krok-it.akt i{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
+.krok-it.zrob{background:#fff}
+.krok-it.zrob i{background:var(--brunatny);color:var(--krem);border-color:var(--brunatny)}
+.krok-sep{flex:0 0 16px;height:1px;background:rgba(107,69,48,.35)}
+@media(max-width:560px){
+  .krok-sep{flex-basis:6px}
+  .krok-it{padding:5px 9px 5px 5px;font-size:13px}
+  .krok-it i{width:21px;height:21px;font-size:12px}
+}
+
+/* ============ PASEK WYBRANEJ PERSONALIZACJI ============ */
+.pers-bar{display:flex;align-items:flex-start;gap:12px;background:#FFF8E1;border:1px solid var(--zloty);
+  padding:12px 14px;margin:16px 0 0;font-size:15px;color:rgba(51,38,28,.9)}
+.pers-bar .ik{font-size:20px;line-height:1.2}
+.pers-bar b{color:var(--brunatny)}
+.pers-bar a{font-weight:700;margin-left:6px}
+.pers-bar .edytuj{color:var(--butelkowa)}
+.pers-bar .wyczysc{color:#8c2f2f}
+.pers-bar .tekst{flex:1;line-height:1.5}
+
+/* ============ HERO I SEKCJE (wynajem) ============ */
+.hero{background:var(--butelkowa);color:var(--krem);padding:56px 0 44px;text-align:center}
+.hero h1{font-size:clamp(30px,5vw,44px);margin:0 0 10px;color:var(--zloty)}
+.hero p{max-width:640px;margin:0 auto;color:rgba(251,247,240,.85);font-size:18px}
+.hero .cta{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.sec{padding:44px 0 20px;scroll-margin-top:80px}
+.sec h2{font-size:clamp(24px,3.5vw,34px);color:var(--brunatny);margin:0 0 8px}
+.sec .sub{color:rgba(51,38,28,.75);max-width:760px;margin:0 0 24px;font-size:17px}
+.center{text-align:center}
+.center .sub{margin-left:auto;margin-right:auto}
+.kroki{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-top:20px}
+.krok{background:#fff;border:1px solid rgba(107,69,48,.3);padding:18px 16px}
+.krok .num{display:inline-grid;place-items:center;width:32px;height:32px;background:var(--butelkowa);color:var(--zloty);font-weight:700;margin-bottom:10px}
+.krok b{display:block;margin-bottom:6px;color:var(--brunatny)}
+.krok p{margin:0;font-size:15px;color:rgba(51,38,28,.8)}
+
+/* ============ KARTY WYDARZEŃ (wynajem) ============ */
+.wyd{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:22px}
+.wyd-card{background:#fff;border:2px solid rgba(107,69,48,.45);padding:26px 20px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink)}
+.wyd-card:hover{border-color:var(--brunatny);box-shadow:0 18px 36px rgba(38,29,20,.12)}
+.wyd-card .ik{width:52px;height:52px;border:1px solid rgba(107,69,48,.5);display:grid;place-items:center;color:var(--brunatny);background:var(--krem2);margin-bottom:6px}
+.wyd-card .ik svg{width:30px;height:30px}
+.wyd-card h3{font-size:22px;color:var(--butelkowa);margin:0}
+.wyd-card p{margin:0;font-size:14.5px;color:rgba(51,38,28,.75);flex:1}
+.wyd-card .wiecej{color:var(--brunatny);font-weight:700;font-size:15px}
+.wyd-card.diy{background:var(--butelkowa);border-color:var(--butelkowa)}
+.wyd-card.diy h3,.wyd-card.diy .wiecej{color:var(--zloty)}
+.wyd-card.diy p{color:rgba(251,247,240,.8)}
+.wyd-card.diy .ik{border-color:var(--zloty);color:var(--zloty);background:transparent}
+
+/* ============ KARTY PAKIETÓW (wydarzenie) ============ */
+.pak{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin-top:34px;align-items:stretch}
+.pak-card{position:relative;background:#fff;border:2px solid rgba(107,69,48,.5);padding:26px 20px 20px;display:flex;flex-direction:column;gap:10px}
+.pak-card.top{border-color:var(--brunatny);box-shadow:0 22px 44px rgba(38,29,20,.16)}
+.pak-tag{display:inline-block;align-self:flex-start;background:var(--krem2);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px}
+.pak-name{font-size:23px;font-weight:700;color:var(--butelkowa)}
+.pak-sub{font-size:14px;color:rgba(51,38,28,.7);margin-top:-6px}
+.pak-price{color:var(--brunatny);font-size:26px;font-weight:700}
+.pak-price small{display:block;font-size:11.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6)}
+.pak ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:15px;color:rgba(51,38,28,.9)}
+.pak li::before{content:"✦ ";color:var(--zloty)}
+.pak .btn{margin-top:auto;text-align:center}
+.note{margin-top:26px;font-size:14.5px;color:rgba(51,38,28,.65);background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px 16px}
+.note b{color:var(--brunatny)}
+
+/* ============ STRONA PAKIETU (karta + kalendarz) ============ */
+.glowna{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;margin-top:22px;align-items:start}
+@media(max-width:860px){.glowna{grid-template-columns:1fr}}
+.karta{background:#fff;border:2px solid rgba(107,69,48,.5);padding:26px 22px}
+.karta .tag{display:inline-block;background:var(--krem2);border:1px solid rgba(107,69,48,.45);color:var(--brunatny);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px}
+.karta h1{font-size:28px;color:var(--butelkowa);margin:12px 0 4px}
+.karta .sub{font-size:14.5px;color:rgba(51,38,28,.7);margin:0 0 12px}
+.karta .cena{color:var(--brunatny);font-size:26px;font-weight:700;margin-bottom:12px}
+.karta ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:15px;color:rgba(51,38,28,.9)}
+.karta li::before{content:"✦ ";color:var(--zloty)}
+
+/* ============ KALENDARZ ============ */
+.cal{background:#fff;border:2px solid rgba(107,69,48,.5);padding:14px}
+.cal h2{font-size:20px;color:var(--brunatny);margin:0 0 10px}
+.calhead{display:flex;justify-content:space-between;align-items:center;background:var(--butelkowa);color:var(--zloty);padding:8px 12px}
+.calhead b{font-size:16px;text-transform:capitalize}
+.calnav{display:flex;gap:2px}
+.calnav a{color:var(--zloty);text-decoration:none;font-size:19px;padding:0 8px}
+.calnav a.disabled{opacity:.3;pointer-events:none}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.calgrid i{font-size:10.5px;font-weight:700;text-align:center;color:var(--brunatny);font-style:normal;text-transform:uppercase;padding:2px 0}
+.cal-d{display:block;text-align:center;padding:6px 0;font-size:13.5px;text-decoration:none;background:var(--krem2);border:1px solid rgba(107,69,48,.25);color:var(--ink);cursor:pointer;font-family:inherit}
+a.cal-d:hover{border-color:var(--butelkowa);color:var(--butelkowa);font-weight:700}
+.cal-d.pusty{background:transparent;border-color:transparent;cursor:default}
+.cal-d.przeszly{background:transparent;border-color:transparent;color:rgba(51,38,28,.28);cursor:default}
+.cal-d.st-zapytanie{background:#FFF8E1;outline:2px solid var(--zloty);color:#7a5a10;cursor:pointer}
+.cal-d.st-platnosc,.cal-d.st-zarezerwowany{cursor:default}
+.cal-d.st-platnosc{background:#E8C97A;color:var(--butelkowa);font-weight:700}
+.cal-d.st-zarezerwowany{background:var(--brunatny);color:var(--krem);text-decoration:line-through}
+.callegend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:rgba(51,38,28,.75);margin-top:10px}
+.callegend i{display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(107,69,48,.3);background:var(--krem2)}
+.callegend i.st-zapytanie{background:#FFF8E1;outline:1px solid var(--zloty)}
+.callegend i.st-platnosc{background:#E8C97A}
+.callegend i.st-zarezerwowany{background:var(--brunatny)}
+.hint{margin-top:14px;font-size:14px;color:rgba(51,38,28,.7);background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:12px 14px}
+.hint b{color:var(--brunatny)}
+
+/* ============ KATALOG (wynajem + kompozytor) ============ */
+.kat{margin-top:16px}
+.kat h4{font-size:19px;color:var(--brunatny);margin:22px 0 10px;border-left:4px solid var(--zloty);padding-left:10px}
+.kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.kat-card{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px}
+.kat-card b{display:block;color:var(--butelkowa);font-size:17px}
+.kat-card p{margin:4px 0;font-size:14px;color:rgba(51,38,28,.75)}
+.kat-card .cena{color:var(--brunatny);font-weight:700;font-size:15px}
+
+/* ============ KOMPOZYTOR (katalog + podsumowanie) ============ */
+.komp{display:grid;grid-template-columns:1fr 330px;gap:24px;margin-top:18px;align-items:start}
+@media(max-width:920px){.komp{grid-template-columns:1fr}}
+.reguly{background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px 16px;margin:14px 0 0;font-size:14.5px;color:rgba(51,38,28,.8)}
+.reguly b{color:var(--brunatny)}
+.komp-it{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.3);padding:12px;cursor:pointer}
+.komp-it:hover{border-color:var(--brunatny)}
+.komp-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.komp-it .ik{width:38px;height:38px;flex:none;border:1px solid rgba(107,69,48,.4);background:var(--krem2);display:grid;place-items:center;color:var(--brunatny);font-weight:700;font-size:15px}
+.komp-it b{display:block;font-size:15px;color:var(--ink)}
+.komp-it small{display:block;font-size:12px;color:rgba(51,38,28,.6);margin:2px 0}
+.komp-it .cena{font-size:14px;color:var(--butelkowa);font-weight:700}
+.pod{position:sticky;top:70px;background:var(--butelkowa);color:var(--krem);padding:22px}
+.pod h3{margin:0 0 4px;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--zloty)}
+.pod .n{margin:0;font-size:12.5px;color:rgba(251,247,240,.75)}
+.pod .rabat{font-size:12.5px;color:rgba(251,247,240,.75);margin:12px 0 0;min-height:18px}
+.pod .rabat.on{color:var(--zloty);font-weight:700}
+.pod .suma{font-size:32px;font-weight:700;color:var(--zloty);margin:6px 0 0}
+.pod .suma small{display:block;font-size:11.5px;font-weight:400;color:rgba(251,247,240,.75);letter-spacing:.1em;text-transform:uppercase}
+.pod .wybrane{margin-top:14px;font-size:13px;border-top:1px solid rgba(196,165,130,.35);padding-top:10px}
+.pod .wybrane div{display:flex;justify-content:space-between;gap:8px;padding:3px 0}
+.pod .wybrane span{color:var(--zloty);white-space:nowrap}
+.pod .note{font-size:12px;color:rgba(251,247,240,.7);margin:12px 0 0;line-height:1.55}
+.pod .linia{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:rgba(251,247,240,.9);padding:2px 0}
+.pod .linia b{color:var(--zloty)}
+.pod .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:8px;font-size:18px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.pod .btn{margin-top:16px;width:100%;text-align:center;background:var(--zloty);color:var(--butelkowa)}
+.pod .btn:hover{background:var(--krem);color:var(--butelkowa)}
+.pod .cal{padding:10px;margin:16px 0}
+.pod .calhead{padding:6px 10px}
+.pod .calhead b{font-size:14px}
+.pod .calnav a{font-size:18px;padding:0 8px}
+.pod .calgrid{margin-top:6px}
+.pod .calgrid i{font-size:10px}
+.pod .cal-d{padding:4px 0;font-size:12.5px}
+.pod .callegend{font-size:12.5px;margin-top:8px}
+.pod .callegend i{width:12px;height:12px;margin-right:5px}
+
+/* ============ PERSONALIZACJA ============ */
+.info{background:#fff;border:2px solid var(--brunatny);padding:18px 20px;margin:18px 0;font-size:15.5px}
+.info h2{font-size:20px;color:var(--butelkowa);margin:0 0 10px}
+.info ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.info b{color:var(--brunatny)}
+.pers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:18px 0}
+.pers-it{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px;cursor:pointer}
+.pers-it:hover{border-color:var(--brunatny)}
+.pers-it input{margin-top:4px;width:17px;height:17px;accent-color:var(--butelkowa);flex:none;cursor:pointer}
+.pers-it b{display:block;font-size:15.5px;color:var(--ink)}
+.pers-it small{display:block;font-size:12.5px;color:rgba(51,38,28,.6);margin:2px 0}
+.pers-it .cena{font-size:14px;color:var(--butelkowa);font-weight:700}
+.pers-it .bez{font-size:12px;color:#8c2f2f;font-weight:700}
+.wybor{position:sticky;bottom:0;background:var(--butelkowa);color:var(--krem);padding:14px 0;margin-top:20px}
+.wybor .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.wybor .n{font-size:15px;color:rgba(251,247,240,.85)}
+.wybor .suma{font-size:22px;font-weight:700;color:var(--zloty)}
+.wybor .rabat{font-size:13px;color:var(--zloty);font-weight:700}
+
+/* ============ FORMULARZE ============ */
+.forma{background:#fff;border:2px solid var(--brunatny);padding:24px 22px;margin-top:20px}
+.pole{margin-bottom:16px}
+label{display:block;font-size:14px;color:var(--brunatny);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;padding:11px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:16px;color:var(--ink)}
+textarea{min-height:120px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--zloty);border-color:var(--brunatny)}
+.terminy{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.terminy .rzad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media(max-width:520px){.terminy .rzad{grid-template-columns:1fr}}
+.terminy .info{font-size:13.5px;color:rgba(51,38,28,.7);margin:8px 0 0}
+.terminy .info b{color:var(--brunatny)}
+.dni-sum{font-size:14px;color:var(--butelkowa);font-weight:700;margin-top:8px}
+.opcje{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.opcje .rzad{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.opcje .rzad:last-child{margin-bottom:0}
+.opcje input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--butelkowa);flex:none}
+.opcje .etyk{font-weight:700;color:var(--brunatny)}
+.opcje .opis{font-size:13.5px;color:rgba(51,38,28,.65)}
+#pole-syg{display:none;margin-top:10px}
+.pers-sekcja{background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:14px;margin-bottom:16px}
+.pers-sekcja>label{text-transform:none;letter-spacing:0;font-size:15px;font-weight:700;color:var(--brunatny)}
+.pers-sekcja .pers-it{border:1px solid rgba(107,69,48,.35);background:#fff;padding:10px 12px;margin-top:10px}
+.pers-sekcja .pers-it b{display:block;font-size:15px;color:var(--ink)}
+.pers-sekcja .pers-it .meta{font-size:13px;color:rgba(51,38,28,.65);margin-bottom:6px}
+.pers-sekcja .pers-it .meta .cena{color:var(--butelkowa);font-weight:700}
+.pers-sekcja .pers-it .meta .bez{color:#8c2f2f;font-weight:700}
+.pers-sekcja .pers-it textarea{min-height:58px;margin-top:4px}
+.pers-link{display:inline-block;margin-top:10px;font-size:14px;font-weight:700}
+.kwoty{background:var(--butelkowa);color:var(--krem);padding:18px 20px;margin-bottom:16px}
+.kwoty h3{margin:0 0 10px;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--zloty)}
+.kwoty .linia{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:3px 0;color:rgba(251,247,240,.9)}
+.kwoty .linia b{color:var(--zloty)}
+.kwoty .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:10px;font-size:20px;font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.kwoty .uw{font-size:12.5px;color:rgba(251,247,240,.7);margin-top:10px;line-height:1.55}
+.kwoty-note{background:var(--butelkowa);color:rgba(251,247,240,.85);padding:14px 16px;margin-bottom:16px;font-size:13.5px}
+.kwoty-note b{color:var(--zloty)}
+.przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+
+/* ============ PRZYCISKI ============ */
+.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1px solid var(--butelkowa);padding:12px 30px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--brunatny);border-color:var(--brunatny)}
+.btn-line{background:transparent;color:var(--brunatny);border-color:var(--brunatny)}
+.btn-line:hover{background:var(--krem2);color:var(--brunatny)}
+.btn-ciemny{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa)}
+.btn-ciemny:hover{background:var(--brunatny);border-color:var(--brunatny)}
+.wybor .btn{margin-left:auto}
+@media(max-width:620px){.wybor .btn{width:100%;margin-left:0;text-align:center}}
+
+/* ============ STOPKA ============ */
+.stopka{background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px}
+.stopka .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.stopka a{color:var(--zloty)}
+
+/* ============ TELEFON ============ */
+@media(max-width:620px){
+  .nav a{padding:6px 9px;font-size:15px}
+  .nav .brand{width:100%}
+  .hero{padding:38px 0 30px}
+  .btn{width:100%;text-align:center}
+  .kroki{grid-template-columns:1fr}
+  .wyd{grid-template-columns:1fr}
+  .pak{grid-template-columns:1fr}
+  .cal-d{padding:4px 0;font-size:12.5px}
+}
+@media(max-width:560px){
+  h1{font-size:26px}
+  .karta{padding:18px 16px}
+  .przyciski .btn{flex:1;text-align:center}
+  .przyciski{flex-direction:column-reverse}
+}
+
+/* ============ KREATOR ZAMÓWIEŃ (hub + progres + kroki) ============ */
+/* --- hub: 3 kafle --- */
+.hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:24px;margin-top:34px}
+.hub-col{background:#FFFDF8;border:2px solid rgba(107,69,48,.6);box-shadow:0 22px 46px rgba(38,29,20,.16);
+  display:flex;flex-direction:column}
+.hub-head{background:var(--butelkowa);color:var(--zloty);text-align:center;font-size:21px;font-weight:700;
+  letter-spacing:.03em;padding:15px 12px}
+.hub-body{padding:20px 20px 8px;flex:1}
+.hub-body p{margin:0;font-size:16px;line-height:1.65;color:rgba(51,38,28,.85)}
+.hub-col .btn{margin:16px 20px 22px;text-align:center}
+
+/* --- progres bar (5 kamieni milowych, wypełnia się na złoto) --- */
+.prog{display:flex;align-items:flex-start;margin:16px 0 4px;max-width:900px}
+.prg-it{display:flex;flex-direction:column;align-items:center;gap:5px;flex:none;width:64px;text-align:center}
+.prg-kolo{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  background:var(--krem2);border:2px solid rgba(107,69,48,.4);color:rgba(51,38,28,.55);
+  font-size:13px;font-weight:700}
+.prg-lab{font-size:11.5px;line-height:1.25;color:rgba(51,38,28,.55);text-transform:uppercase;letter-spacing:.04em}
+.prg-linia{flex:1;height:3px;background:var(--krem2);border:1px solid rgba(107,69,48,.25);
+  border-width:1px 0;margin-top:13px;min-width:8px}
+.prg-it.zrob .prg-kolo{background:var(--zloty);border-color:var(--zloty);color:var(--butelkowa)}
+.prg-it.zrob .prg-lab{color:var(--brunatny);font-weight:700}
+.prg-linia.zrob{background:var(--zloty);border-color:var(--zloty)}
+.prg-it.akt .prg-kolo{background:var(--butelkowa);border-color:var(--butelkowa);color:var(--zloty)}
+.prg-it.akt .prg-lab{color:var(--butelkowa);font-weight:700}
+@media(max-width:560px){
+  .prg-it{width:52px}
+  .prg-lab{font-size:9.5px}
+  .prg-kolo{width:26px;height:26px;font-size:12px}
+  .prg-linia{margin-top:11px}
+}
+
+/* --- kroki kreatora --- */
+.z-krok{grid-template-columns:1.15fr 1fr}
+.rzad-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.rzad-2{grid-template-columns:1fr}}
+.cal-d.wybor{font-family:inherit;font-size:14px}
+.cal-d.wybor.akt{background:var(--butelkowa);border-color:var(--butelkowa);color:var(--zloty);font-weight:700}
+.bledy-box{background:#FFF4E0;border:1px solid var(--zloty);padding:12px 16px;margin:12px 0;font-size:15.5px}
+.bledy-box ul{margin:0;padding-left:20px}
+.bledy-box li{margin:4px 0}
+
+/* --- krok 2: pakiety dostępne/niedostępne --- */
+.pak.z-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.pak-card.nd{border-style:dashed;opacity:.92}
+.pak-card.nd .pak-name{color:rgba(51,38,28,.65)}
+.z-nd summary{cursor:pointer;font-size:16.5px;font-weight:700;color:var(--brunatny);
+  border:1px solid rgba(107,69,48,.4);background:#fff;padding:12px 16px}
+.z-nd[open] summary{border-bottom:none}
+.z-nd-list{margin-top:0;border:1px solid rgba(107,69,48,.4);border-top:none;padding:16px;background:rgba(251,247,240,.5)}
+
+/* --- krok 3: personalizacja --- */
+.z-skip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  background:var(--krem2);border:1px solid rgba(107,69,48,.3);padding:12px 14px;margin:14px 0 4px;
+  font-size:15.5px;color:var(--brunatny);font-weight:700}
+.pers.z-3{margin-top:14px}
+.z-pers-it{align-items:flex-start}
+.z-pers-it input{margin-top:5px}
+.z-pers-tresc{flex:1}
+.z-pers-tresc b{font-size:16.5px}
+.z-pers-tresc small{display:block;font-size:13px;color:rgba(51,38,28,.6);margin:3px 0}
+.z-pers-tresc .cena{font-size:14.5px;color:var(--butelkowa);font-weight:700}
+.z-pers-tresc .bez{font-size:12.5px;color:#8c2f2f;font-weight:700}
+.z-pers-opis{margin-top:8px}
+.z-pers-opis label{display:block;font-size:12.5px;color:var(--brunatny);margin-bottom:3px;
+  text-transform:none;letter-spacing:0}
+.z-pers-opis textarea{min-height:52px;width:100%}
+
+/* --- krok 5: podsumowanie --- */
+.z-pod{max-width:760px;margin-top:16px}
+.z-pod-sec{background:#fff;border:1px solid rgba(107,69,48,.35);padding:16px 18px;margin-bottom:14px}
+.z-pod-sec h2{font-size:19px;color:var(--butelkowa);margin:0 0 8px}
+.z-pod-sec h3{margin:0 0 10px;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--zloty)}
+.z-pod-sec p{margin:4px 0;font-size:16px;line-height:1.6}
+.z-ul{margin:6px 0 0;padding-left:20px;font-size:15.5px}
+.z-ul li{margin:4px 0}
+.z-pod-sec.kwoty{background:var(--butelkowa);color:var(--krem);border-color:var(--butelkowa)}
+.z-pod-sec.kwoty .linia{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:3px 0;color:rgba(251,247,240,.9)}
+.z-pod-sec.kwoty .linia b{color:var(--zloty)}
+.z-pod-sec.kwoty .razem{border-top:1px solid rgba(196,165,130,.4);margin-top:8px;padding-top:10px;font-size:20px;
+  font-weight:700;color:var(--zloty);display:flex;justify-content:space-between}
+.z-pod-sec.kwoty .uw{font-size:12.5px;color:rgba(251,247,240,.7);margin-top:10px;line-height:1.55}
+.z-pod-sec.kwoty .mala{color:rgba(251,247,240,.7)}
+
+/* --- podziękowanie --- */
+.z-dzieki{max-width:640px;margin:26px auto 40px;background:#fff;border:2px solid var(--brunatny);
+  padding:34px 28px;text-align:center}
+.z-dzieki h1{color:var(--butelkowa);font-size:30px;margin:0 0 10px}
+.z-dzieki .syg{display:inline-block;background:var(--butelkowa);color:var(--zloty);padding:8px 18px;
+  font-size:20px;letter-spacing:.06em;margin:8px 0 16px}
+.z-dzieki p{font-size:16.5px;line-height:1.6;margin:8px 0}
+.z-dzieki .z-pod-sec{margin-top:14px}
+.z-dzieki .btn{margin-top:14px}
+
+/* --- sklep: ilość sztuk --- */
+.z-ile{display:flex;align-items:center;gap:6px;margin-top:5px}
+.z-ile label{font-size:13px;color:var(--brunatny);text-transform:none;letter-spacing:0;margin:0}
+.z-ile input{width:62px;padding:7px;font-size:16px;border:1px solid rgba(107,69,48,.4);background:var(--krem)}
+
+/* --- kwoty: wyodrębniona kaucja i duża kwota końcowa --- */
+.linia-mala{font-size:12.5px;color:rgba(51,38,28,.6)}
+.linia-mala b{font-size:12.5px;color:rgba(51,38,28,.65)}
+.razem-bez{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  border-top:2px solid rgba(196,165,130,.45);margin-top:10px;padding-top:12px}
+.razem-bez span{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--butelkowa);font-weight:700}
+.razem-bez b{font-size:26px;color:var(--butelkowa)}
+.kaucja-linia{font-size:12.5px;color:rgba(51,38,28,.55);margin-top:6px}
+.z-pod-sec.kwoty .razem-bez span{color:var(--zloty)}
+.z-pod-sec.kwoty .razem-bez b{color:var(--zloty)}
+.z-pod-sec.kwoty .linia-mala{color:rgba(251,247,240,.75)}
+.z-pod-sec.kwoty .linia-mala b{color:rgba(251,247,240,.75)}
+.z-pod-sec.kwoty .kaucja-linia{color:rgba(251,247,240,.75)}
+
+/* --- pomysł własny --- */
+.pomysl-box{border:1px solid var(--zloty);background:#FFF8E1;padding:10px 14px;margin-top:10px;font-size:15px;line-height:1.55}
+.pomysl-uw{color:#7a5a10}
+.z-pod-sec.kwoty .pomysl-uw{color:var(--zloty)}
+
+/* --- regulamin / jak pracujemy --- */
+.regulamin h2{font-size:20px;color:var(--butelkowa);margin:22px 0 6px}
+.regulamin p{margin:6px 0;font-size:16px;line-height:1.65}
+
+/* --- pole z błędem walidacji (kreator) --- */
+textarea.pole-blad, input.pole-blad{border-color:#8c2f2f !important;background:#FFF4F0 !important}
+
+/* ============ SKLEP: karty produktów + koszyk ============ */
+.sklep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-top:16px}
+.sklep-karta{background:#fff;border:1px solid rgba(107,69,48,.28);display:flex;flex-direction:column;
+  box-shadow:0 6px 18px rgba(31,58,50,.07)}
+.sklep-foto{aspect-ratio:4/3;background:linear-gradient(135deg,var(--krem-2),var(--zloty-soft));
+  display:grid;place-items:center;overflow:hidden;border-bottom:1px solid rgba(107,69,48,.15)}
+.sklep-foto img{width:100%;height:100%;object-fit:cover}
+.sklep-init{font-size:64px;font-weight:700;color:var(--brunatny);opacity:.5}
+.sklep-tresc{padding:14px 16px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.sklep-nazwa{font-size:18px;color:var(--ink);line-height:1.25}
+.sklep-opis{font-size:13.5px;color:rgba(51,38,28,.75);line-height:1.5}
+.sklep-cena{font-size:20px;font-weight:700;color:var(--butelkowa);margin-top:2px}
+.sklep-cena span{font-size:12.5px;font-weight:500;color:rgba(51,38,28,.55)}
+.licznik{display:flex;align-items:stretch;border:1px solid rgba(107,69,48,.4);width:max-content;background:var(--krem)}
+.licznik .licz-btn{width:38px;min-height:38px;border:none;background:transparent;font-family:inherit;
+  font-size:20px;font-weight:700;color:var(--brunatny);cursor:pointer;line-height:1}
+.licznik .licz-btn:hover{background:var(--zloty-soft)}
+.licznik input[type=number]{width:52px;border:none;border-left:1px solid rgba(107,69,48,.4);
+  border-right:1px solid rgba(107,69,48,.4);background:#fff;text-align:center;font-family:inherit;
+  font-size:17px;font-weight:700;color:var(--ink);appearance:textfield;-moz-appearance:textfield}
+.licznik input[type=number]::-webkit-outer-spin-button,
+.licznik input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.sklep-tresc .dodaj-btn{margin-top:2px;padding:10px 12px;width:100%}
+.koszyk-bar{position:sticky;bottom:10px;z-index:40;margin-top:22px;display:flex;align-items:center;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;background:rgba(31,58,50,.97);
+  color:var(--krem);border:1px solid var(--zloty);padding:12px 18px;box-shadow:0 10px 30px rgba(31,58,50,.35)}
+.koszyk-bar .koszyk-info b{display:block;color:var(--zloty);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.koszyk-bar .koszyk-info span{font-size:15px;color:rgba(251,247,240,.92)}
+.koszyk-bar .btn{margin-top:0;background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
+.koszyk-bar .btn:hover{background:var(--krem);color:var(--butelkowa)}
+
+/* ============ RACHUNEK (tabela pozycji zamówienia) ============ */
+.rachunek{background:#fff;border:1px solid rgba(107,69,48,.3);margin-bottom:4px}
+.rach-naglowek{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;
+  background:var(--butelkowa);color:var(--zloty);padding:12px 16px;font-size:15px;
+  letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.rach-naglowek .mala{color:rgba(251,247,240,.75);letter-spacing:0;text-transform:none}
+.rach-wiersz{display:grid;grid-template-columns:44px 1fr 110px 110px 110px;gap:10px;align-items:center;
+  padding:10px 16px;border-bottom:1px solid rgba(107,69,48,.14);font-size:15px}
+.rach-wiersz:nth-child(odd){background:var(--krem)}
+.rach-glowka{background:var(--krem-2);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--brunatny);font-weight:700;border-bottom:2px solid rgba(107,69,48,.35)}
+.rach-wiersz .r-lp{color:var(--brunatny);font-weight:700}
+.rach-wiersz .r-poz b{display:block;color:var(--ink)}
+.rach-wiersz .r-tag{display:inline-block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--butelkowa);border:1px solid var(--zloty);padding:1px 6px;margin-top:2px}
+.rach-wiersz .r-pod{display:block;font-size:12.5px;color:rgba(51,38,28,.6);margin-top:2px;line-height:1.45}
+.rach-wiersz .r-mob{display:none}
+.rach-wiersz .r-ile,.rach-wiersz .r-cena{color:rgba(51,38,28,.85)}
+.rach-wiersz .r-wart{text-align:right;font-weight:700;color:var(--butelkowa)}
+.rach-wiersz .r-minus{color:#8c2f2f}
+.rach-razem{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+  background:var(--butelkowa);color:var(--zloty);padding:14px 16px;font-weight:700;font-size:17px;
+  letter-spacing:.1em;text-transform:uppercase}
+.rach-razem b{font-size:24px}
+.rach-kaucja{padding:8px 16px;font-size:13.5px;color:rgba(51,38,28,.75);background:var(--krem-2);
+  border-top:1px solid rgba(107,69,48,.2)}
+.rachunek .uw{padding:10px 16px;font-size:12.5px;color:rgba(51,38,28,.65);line-height:1.6}
+.rachunek .uw b{color:var(--brunatny)}
+.rachunek .pomysl-uw{display:block;margin-top:6px;color:#7a5a10}
+.z-pod-sec.rachunek-sec{padding:0;background:transparent}
+@media(max-width:640px){
+  .rach-wiersz{grid-template-columns:30px 1fr auto;gap:8px;padding:10px 12px}
+  .rach-wiersz .r-ile,.rach-wiersz .r-cena{display:none}
+  .rach-wiersz .r-mob{display:block;font-size:12.5px;color:rgba(51,38,28,.65);margin-top:2px}
+  .rach-glowka .r-ile,.rach-glowka .r-cena{display:none}
+  .rach-razem b{font-size:20px}
+}
+
+/* ============ POPUP: własny projekt bez produktu (krok B) ============ */
+.projekt-cb{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;padding:10px 12px;
+  background:#FFF8E1;border:1px solid var(--zloty);font-size:15px}
+.projekt-cb input{width:18px;height:18px;flex:none;margin-top:2px;accent-color:var(--butelkowa)}
+.projekt-cb label{margin:0;text-transform:none;letter-spacing:0;font-size:15px;line-height:1.5}
+.projekt-cb b{color:var(--brunatny)}
+.modal{position:fixed;inset:0;z-index:200;background:rgba(31,58,50,.55);display:grid;place-items:center;
+  padding:18px}
+.modal[hidden]{display:none}
+.modal-karta{background:var(--krem);border:1.5px solid var(--brunatny);box-shadow:0 30px 70px rgba(31,58,50,.4);
+  max-width:560px;width:100%;padding:clamp(22px,4vw,34px);text-align:center}
+.modal-karta h2{font-size:clamp(20px,3vw,26px);color:var(--butelkowa);margin-bottom:12px;line-height:1.25}
+.modal-karta p{font-size:16.5px;line-height:1.6;color:rgba(51,38,28,.9)}
+.modal-przyciski{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.modal-przyciski .btn{margin-top:0}
+
+/* --- dymek „w koszyku" pod produktem --- */
+.koszyk-dymek{display:inline-block;margin-top:8px;background:var(--zloty-soft);border:1px solid var(--zloty);
+  color:var(--brunatny);padding:3px 12px;font-size:13px;font-weight:600;width:max-content}
+.koszyk-dymek b{color:var(--butelkowa)}
+.koszyk-bar.pelny .koszyk-info b{color:var(--zloty-soft)}

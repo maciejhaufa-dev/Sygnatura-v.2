@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zamówienia — Studio Sygnatura</title>
+<meta name="description" content="Zamów w Studio Sygnatura: wynajem dekoracji na wydarzenia, produkty personalizowane i sklep z dekoracjami.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Zamówienia</h1>
+    <p>Wybierz, czego potrzebujesz. Każdą ścieżkę prowadzimy krok po kroku — z podsumowaniem i jasnymi zasadami na końcu. Bez niespodzianek.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="hub">
+    <div class="hub-col">
+      <div class="hub-head">Wynajem dekoracji</div>
+      <div class="hub-body">
+        <p>Stwórz niepowtarzalny klimat swojego wydarzenia, dodając mu wyjątkowego wymiaru za pomocą naszych dekoracji. Wybierz jeden z dostępnych pakietów, sprawdź dostępność terminów i zarezerwuj. Możesz też dodać do wystroju personalizowane elementy i detale, które sprawią, że będą to niezapomniane chwile dla wszystkich.</p>
+      </div>
+      <a class="btn" href="{{ url_for('z_wynajem_termin') }}">Zarezerwuj termin</a>
+    </div>
+    <div class="hub-col">
+      <div class="hub-head">Personalizacja</div>
+      <div class="hub-body">
+        <p>Pragniesz obdarować kogoś wyjątkowym prezentem, którego nigdy nie zapomni, a może szukasz miejsca, które zrealizuje Twoją wizję? Jeśli tak, to dobrze trafiłeś — w Sygnaturze specjalizujemy się w personalizowanych prezentach i dekoracjach, gdzie każdy detal pozwala poczuć się wyjątkowo i jest niepowtarzalny. Nie jesteśmy fabryką, tylko rodzinną manufakturą tworzącą unikaty — dzięki temu nasze wyroby są wyjątkowe.</p>
+      </div>
+      <a class="btn" href="{{ url_for('z_pers_samodzielna') }}">Zamów personalizację</a>
+    </div>
+    <div class="hub-col">
+      <div class="hub-head">Sklep</div>
+      <div class="hub-body">
+        <p>Wiele z naszych prac zdobi prywatne domy i lokale eventowe. Wybierz coś dla siebie i stwórz niepowtarzalny klimat dla swojego wnętrza.</p>
+      </div>
+      <a class="btn" href="{{ url_for('z_sklep_katalog') }}">Katalog produktów</a>
+    </div>
+  </div>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

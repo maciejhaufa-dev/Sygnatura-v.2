@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szukaj — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=296">
+</head>
+<body data-strona="">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <h1>Szukaj</h1>
+  <p class="sub">Wpisz szukane hasło w oknie wyszukiwania u góry strony (obok ikon koszyka i konta) — wyniki pojawią się poniżej.</p>
+
+  <p class="mala" id="info" style="margin-top:12px"></p>
+  <div class="katalog" id="wyniki"></div>
+  <div class="sukces" id="brak" style="display:none">
+    <h2>Nic nie znaleźliśmy</h2>
+    <p>Nie ma produktu o takiej nazwie lub opisie. Opisz, czego szukasz, w
+    <a href="kontakt.html?temat=projekt" style="color:var(--krem);border-bottom:1px solid var(--zloty)">formularzu kontaktowym</a>
+    — wycenimy Twój pomysł w ciągu 2 dni roboczych.</p>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=296"></script>
+<script src="assets/koszyk.js?v=296"></script>
+<script src="assets/api.js?v=296"></script>
+<script src="data/katalog.js?v=296"></script>
+<script src="assets/main.js?v=296"></script>
+<script>
+(async function(){
+  var q = (SYG.param('q') || '').trim();
+  var info = document.getElementById('info');
+  var wyniki = document.getElementById('wyniki');
+  var brak = document.getElementById('brak');
+
+  if (q.length < 2){
+    info.textContent = 'Wpisz szukane hasło w wyszukiwarce u góry strony (min. 2 znaki).';
+    return;
+  }
+  var ql = q.toLowerCase();
+  var kat = await SYG.katalog();
+  var traf = kat.filter(function(p){
+    return p.dostepny && ((p.nazwa + ' ' + p.opis).toLowerCase().indexOf(ql) !== -1);
+  });
+
+  /* komunikat z poprawną odmianą */
+  function komunikat(n){
+    if (n === 0) return 'Nie znaleziono żadnych wyników odpowiadających hasłu: ' + q;
+    if (n === 1) return 'Znaleziono 1 wynik odpowiadający hasłu: ' + q;
+    if (n < 5) return 'Znaleziono ' + n + ' wyniki odpowiadające hasłu: ' + q;
+    return 'Znaleziono ' + n + ' wyników odpowiadających hasłu: ' + q;
+  }
+  info.textContent = komunikat(traf.length);
+
+  if (!traf.length){ brak.style.display = 'block'; return; }
+
+  var html = '';
+  traf.forEach(function(p){
+    var foto = (p.obraz && /^https?:/.test(p.obraz)) ? p.obraz : 'assets/media/sklep/' + (p.obraz || 'szopka.jpg');
+    html += '<article class="karta"><img class="foto" src="' + foto + '" alt="' + p.nazwa + '">' +
+      '<h2 class="nazwa">' + p.nazwa + '</h2>' +
+      '<p class="opis">' + p.opis + '</p>' +
+      '<p class="cena">' + SYG.zl(p.cena) + ' / szt.</p>' +
+      '<div class="przyciski"><a class="btn" href="sklep.html">Do sklepu →</a></div></article>';
+  });
+  wyniki.innerHTML = html;
+})();
+</script>
+</body>
+</html>

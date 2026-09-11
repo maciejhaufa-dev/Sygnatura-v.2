@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rezerwacja terminu — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% set pers_str = pers_ids|map('string')|join(',') %}
+<div class="wrap">
+  {% set krok = 3 %}
+  {% set krok2_url = url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) %}
+  {% include '_kroki.html' %}
+  <a class="powrot" href="{{ url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) }}#kalendarz">← wróć do kalendarza</a>
+  <h1>Rezerwacja terminu</h1>
+  <p class="podsum">Ostatni krok: wypełnij formularz — po wysłaniu dostaniesz e-mail z podsumowaniem, sygnaturą sprawy i dokumentami do zapoznania.</p>
+
+  {% with wiad = get_flashed_messages() %}
+    {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
+  {% endwith %}
+
+  <div class="karta">
+    <div class="pkg">{{ p.nazwa }}</div>
+    <div class="cena">{{ p.cena }}</div>
+    {% if p.opis %}<div class="mala">{{ p.opis }}</div>{% endif %}
+    <ul style="margin:10px 0 0;padding-left:20px;font-size:15px">
+      {% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}
+    </ul>
+  </div>
+
+  <form method="post" action="{{ url_for('api_rezerwuj') }}">
+    <input type="hidden" name="pakiet_id" value="{{ p.id }}">
+
+    <div class="pole">
+      <label for="temat">Temat zapytania</label>
+      <select id="temat" name="temat">
+        <option value="Rezerwacja terminu" selected>Rezerwacja terminu</option>
+        <option value="Pytanie o pakiet">Pytanie o pakiet</option>
+        <option value="Wynajem indywidualny">Wynajem indywidualny</option>
+        <option value="Inne">Inne</option>
+      </select>
+    </div>
+
+    <div class="terminy">
+      <label for="data">Data imprezy</label>
+      <input type="date" id="data" name="data" value="{{ data }}" required>
+      <div class="rzad">
+        <div>
+          <label for="data_od">Termin od (montaż)</label>
+          <input type="date" id="data_od" name="data_od" value="{{ data_od }}" required>
+        </div>
+        <div>
+          <label for="data_do">Termin do (demontaż)</label>
+          <input type="date" id="data_do" name="data_do" value="{{ data_do }}" required>
+        </div>
+      </div>
+      <p class="info">
+        <b>Domyślnie: dzień przed imprezą (montaż) i dzień po (demontaż) — razem min. 3 doby.</b>
+        Dekoracji nie da się fizycznie zamontować i zdjąć w jeden dzień; najem 1-dniowy tylko w wyjątkowych
+        sytuacjach — opisz to w wiadomości, a rozpatrzymy ręcznie.
+      </p>
+      <div class="dni-sum" id="dni-sum"></div>
+    </div>
+
+    <div class="pers-sekcja">
+      <label>Produkty spersonalizowane <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcjonalnie)</span></label>
+      <input type="hidden" name="pers" value="{{ pers_ids }}">
+      {% if personalizacje %}
+        {% for pr in personalizacje %}
+        <div class="pers-it" data-cena="{{ pr.cena }}">
+          <b>{{ pr.nazwa }}</b>
+          <div class="meta"><span class="cena">{{ '%.0f'|format(pr.cena) }} zł</span> · <span class="bez">płatne z góry, bezzwrotne</span></div>
+          <textarea name="pers_opis_{{ pr.id }}" rows="2" required
+                    placeholder="Opisz, co i jak ma być spersonalizowane (np. imiona, data, treść graweru...)"></textarea>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="mala" style="margin:8px 0 0">Nic nie wybrano. Każdy dodany produkt dostanie tu osobne pole opisu.</p>
+      {% endif %}
+      <a class="pers-link" href="{{ url_for('personalizacja', next=url_for('rezerwuj', pid=p.id, data=data, data_od=data_od, data_do=data_do, pers=pers_str), pers=pers_str) }}">+ Dodaj produkty spersonalizowane</a>
+      <p class="mala" style="margin:8px 0 0">Rabat −5% od 3 produktów · personalizacja płatna z góry, kaucja za wynajem obowiązuje zawsze.</p>
+    </div>
+
+    <div class="opcje">
+      <div class="rzad">
+        <input type="checkbox" id="tryb-nowa" name="tryb_sygnatury" value="nowa" checked>
+        <div>
+          <div class="etyk"><label for="tryb-nowa" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Nadaj nową sygnaturę</label></div>
+          <div class="opis">System automatycznie nada numer sprawy (np. SYG-2026-001) i wyśle go w e-mailu z podsumowaniem.</div>
+        </div>
+      </div>
+      <div class="rzad">
+        <input type="checkbox" id="tryb-istniejaca" name="tryb_sygnatury" value="istniejaca">
+        <div>
+          <div class="etyk"><label for="tryb-istniejaca" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Mam sygnaturę sprawy</label></div>
+          <div class="opis">Jeśli już z nami rozmawiałeś i masz numer sprawy — dopiszemy do niej to zapytanie.</div>
+          <div id="pole-syg">
+            <label for="sygnatura">Twoja sygnatura sprawy</label>
+            <input type="text" id="sygnatura" name="sygnatura" placeholder="np. SYG-2026-001">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pole">
+      <label for="tresc">Twoja wiadomość</label>
+      <textarea id="tresc" name="tresc" placeholder="Opisz okazję, liczbę gości, miejsce imprezy, czego potrzebujesz..."></textarea>
+    </div>
+
+    <div class="pole">
+      <label for="imie">Imię i nazwisko</label>
+      <input type="text" id="imie" name="imie" required>
+    </div>
+
+    <div class="pole">
+      <label for="email">Twój adres e-mail do kontaktu</label>
+      <input type="email" id="email" name="email" placeholder="adres@poczta.pl" required>
+    </div>
+
+    <div class="pole">
+      <label for="telefon">Telefon (opcjonalnie)</label>
+      <input type="tel" id="telefon" name="telefon" placeholder="opcjonalnie">
+    </div>
+
+    <div class="kwoty">
+      <h3>Podsumowanie kwot (szacunkowe)</h3>
+      <div class="linia"><span id="kw-najem-txt">Najem: —</span><b id="kw-najem">—</b></div>
+      <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
+      <div class="linia"><span id="kw-pers-txt">Personalizacja: 0 produktów</span><b id="kw-pers">—</b></div>
+      <div class="razem"><span>RAZEM</span><span id="kw-razem">—</span></div>
+      <p class="uw"><b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
+      Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł. Kwoty potwierdzimy w odpowiedzi na zapytanie.</p>
+    </div>
+
+    <div class="przyciski">
+      <a class="btn btn-line" href="{{ url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) }}#kalendarz">Zmień termin</a>
+      <button class="btn" type="submit">Wyślij zapytanie</button>
+    </div>
+    <p class="mala" style="margin-top:14px">Wysyłając formularz akceptujesz kontakt e-mail w sprawie zapytania (art. 398 PKE). Termin rezerwuje kaucja w terminie 7 dni.</p>
+  </form>
+</div>
+
+<script>
+(function(){
+  /* checkboxy sygnatury wzajemnie się wykluczają */
+  var nowa = document.getElementById('tryb-nowa');
+  var ist  = document.getElementById('tryb-istniejaca');
+  var pole = document.getElementById('pole-syg');
+  function aktualizujSyg(){
+    if (ist.checked) nowa.checked = false;
+    pole.style.display = ist.checked ? 'block' : 'none';
+    document.getElementById('sygnatura').required = ist.checked;
+  }
+  nowa.addEventListener('change', function(){ if (nowa.checked) ist.checked = false; aktualizujSyg(); });
+  ist.addEventListener('change', aktualizujSyg);
+  aktualizujSyg();
+
+  /* zakres najmu: zmiana daty imprezy -> domyślnie dzień przed i dzień po */
+  var dEv = document.getElementById('data');
+  var dOd = document.getElementById('data_od');
+  var dDo = document.getElementById('data_do');
+  var sumaDni = document.getElementById('dni-sum');
+  function przesun(d, k){
+    var x = new Date(d + 'T12:00:00');
+    x.setDate(x.getDate() + k);
+    return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+  }
+  function pokazDni(){
+    if (dOd.value && dDo.value && dOd.value <= dDo.value){
+      var dni = Math.round((new Date(dDo.value) - new Date(dOd.value)) / 86400000) + 1;
+      sumaDni.textContent = 'Łącznie: ' + dni + (dni === 1 ? ' doba' : dni < 5 ? ' doby' : ' dób') + ' najmu';
+    } else {
+      sumaDni.textContent = '';
+    }
+  }
+  dEv.addEventListener('change', function(){
+    if (dEv.value){
+      dOd.value = przesun(dEv.value, -1);
+      dDo.value = przesun(dEv.value, 1);
+      pokazDni();
+    }
+  });
+  dOd.addEventListener('change', pokazDni);
+  dDo.addEventListener('change', pokazDni);
+
+  /* podsumowanie kwot: najem × doby + kaucja + personalizacja (rabat −5% od 3 szt.) */
+  var STAWKA = {{ p.cena_liczba or 0 }};
+  function kwoty(){
+    var dni = dniN();
+    var najem = dni ? Math.round(STAWKA * dni) : 0;
+    document.getElementById('kw-najem-txt').textContent = dni
+      ? ('Najem: {{ p.cena }} × ' + dni + (dni === 1 ? ' doba' : dni < 5 ? ' doby' : ' dób'))
+      : 'Najem: —';
+    document.getElementById('kw-najem').textContent = dni ? (najem + ' zł') : '—';
+    var n = 0, suma = 0;
+    document.querySelectorAll('.pers-it').forEach(function(it){
+      n++;
+      suma += parseFloat(it.dataset.cena || 0);
+    });
+    var rabat = (n >= 3) ? Math.round(suma * 0.05) : 0;
+    var netto = suma - rabat;
+    document.getElementById('kw-pers-txt').textContent = 'Personalizacja: ' + n + (n === 1 ? ' produkt' : n < 5 ? ' produkty' : ' produktów')
+      + (rabat ? ' (z rabatem −5%)' : '');
+    document.getElementById('kw-pers').textContent = n ? (netto + ' zł') : '—';
+    document.getElementById('kw-razem').textContent = dni ? ((najem + 300 + netto) + ' zł') : '—';
+  }
+  function dniN(){
+    if (dOd.value && dDo.value && dOd.value <= dDo.value){
+      return Math.round((new Date(dDo.value) - new Date(dOd.value)) / 86400000) + 1;
+    }
+    return 0;
+  }
+  kwoty();
+  pokazDni();
+})();
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

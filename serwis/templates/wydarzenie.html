@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ nazwa }} — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<section class="hero">
+  <div class="wrap">
+    <h1>{{ nazwa }}</h1>
+    <p>{{ opis }}. Wybierz poziom i sprawdź wolne terminy w kalendarzu pakietu.</p>
+  </div>
+</section>
+
+{% set pers_str = pers_ids|map('string')|join(',') %}
+<div class="wrap">
+  {% set krok = 1 %}{% include '_kroki.html' %}
+  {% set pers_nastepny = url_for('wynajem_wydarzenie', ev=ev, pers=pers_str) %}
+  {% set pers_bez = url_for('wynajem_wydarzenie', ev=ev) %}
+  {% include '_pers_bar.html' %}
+
+  <a class="powrot" href="{{ url_for('wynajem', pers=pers_str) }}">← wszystkie wydarzenia</a>
+
+  <div class="pak">
+    {% for p in pakiety %}
+    <div class="pak-card {% if p.tier=='MID' %}top{% endif %}" id="pakiet-{{ p.id }}">
+      <span class="pak-tag">{{ p.tier or 'pakiet' }}</span>
+      <div class="pak-name">{{ p.nazwa }}</div>
+      <div class="pak-sub">{{ p.opis or '' }}</div>
+      <div class="pak-price"><small>wypożyczenie / doba</small>{{ p.cena }}</div>
+      <ul>{% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}</ul>
+      <a class="btn" href="{{ url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) }}">Zobacz wolne terminy</a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div style="text-align:center;margin-top:26px">
+    <a class="btn" style="background:transparent;color:var(--butelkowa);border:1px solid var(--butelkowa)"
+       href="{{ url_for('personalizacja', next=url_for('wynajem_wydarzenie', ev=ev, pers=pers_str), pers=pers_str) }}">+ Dodaj produkty spersonalizowane</a>
+    <p style="font-size:13.5px;color:rgba(51,38,28,.65);margin:10px 0 0">Personalizacja (imiona, daty, treści) jest wybierana osobno — jednorazówki płatne z góry, niepodlegające zwrotowi.</p>
+  </div>
+
+  <div class="note">
+    <b>Jak liczony jest termin:</b> dekoracje zakładamy <b>dzień przed</b> imprezą (montaż) i ściągamy <b>dzień po</b> (demontaż),
+    więc najem trwa co najmniej <b>3 doby</b>. W formularzu wybierasz zakres od–do; na 1 dobę tylko w wyjątkowych sytuacjach
+    (uzasadnij w wiadomości — rozpatrzymy ręcznie). Kaucja zwrotna 300 zł.
+  </div>
+</div>
+
+<footer style="background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px">
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/" style="color:var(--zloty)">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

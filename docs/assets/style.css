@@ -1,0 +1,572 @@
+/* ============================================================
+   Studio Sygnatura — JEDNOLITA SZATA GRAFICZNA (HTML + CSS + JS)
+   Układ kwaterowy — ten sam na każdej podstronie i na landingu:
+   A: logo+SYGNATURA | C: menu pionowe | B: pasek kontakt+social,
+   wyszukiwarka + KOSZYK/PANEL | D: treść (margines max 20px) | stopka.
+   Kolory: butelkowa #1F3A32 · brąz #6B4530 · złoto #C4A582 · krem #FBF7F0
+   ============================================================ */
+:root{
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C; --czern:#0E0E0C;
+  --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;font-size:17px}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+
+/* ============ SEGMENT B: czarny pasek kontakt + social; wyszukiwarka + KOSZYK/PANEL ============ */
+.head-kontakt{background:var(--czern);color:rgba(251,247,240,.94);font-size:15.5px;letter-spacing:.04em;
+  padding:12px clamp(12px,1.5vw,20px);display:flex;justify-content:space-between;align-items:center;
+  gap:14px;flex-wrap:wrap}
+.head-kontakt a{display:inline-flex;align-items:center;gap:8px;transition:color .2s}
+.head-kontakt a:hover{color:var(--zloty)}
+.hk-sep{opacity:.35;margin:0 10px}
+.hk-prawa{display:inline-flex;align-items:center;gap:9px;color:rgba(196,165,130,.92);
+  font-size:12.5px;letter-spacing:.1em;text-transform:uppercase}
+.hk-prawa a{width:30px;height:30px;border:1px solid rgba(196,165,130,.45);display:grid;place-items:center;
+  color:var(--zloty);transition:all .25s}
+.hk-prawa a:hover{background:var(--zloty);color:var(--butelkowa)}
+.hk-prawa svg{width:15px;height:15px}
+
+/* ============ SIATKA KWATEROWA (wspólna dla podstron) ============ */
+/* ============================================================
+   SZKIELET APLIKACJI (4 segmenty wg ustaleń właściciela):
+   A = logo + SYGNATURA (lewa góra) | C = menu pionowe (lewa dół)
+   B = pasek kontakt + social, wyszukiwarka + KOSZYK/PANEL (prawa góra)
+   D = treść podstrony (prawy dół, margines max 20px)
+   A+C od B+D oddziela brązowo-złota wstążka (max 10px).
+   ============================================================ */
+.strona-uklad{display:flex;flex-direction:column;width:100%;padding:clamp(8px,1.5vw,20px);background:var(--krem)}
+.srodek{display:flex;align-items:stretch}
+.side{flex:none;width:clamp(270px,18vw,340px)}
+.listwa{flex:none;width:10px;background:
+  repeating-linear-gradient(90deg, rgba(139,90,43,.30) 0 2px, rgba(107,69,48,.12) 2px 4px),
+  linear-gradient(180deg, #7A5338 0%, #C4A582 22%, #6B4530 50%, #C4A582 78%, #7A5338 100%);
+  box-shadow: inset 2px 0 0 #C9AE85, inset -2px 0 0 #C9AE85, inset 0 0 0 1px rgba(196,165,130,.35)}
+.prawa{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;background:var(--krem)}
+.head{flex:none}
+.stopka{flex:none}
+
+
+/* --- lewa kolumna: A (logo) + C (menu) — wszystko do góry --- */
+.side{  background:
+    radial-gradient(120% 75% at 18% -6%, rgba(63,105,85,.34) 0%, rgba(63,105,85,0) 58%),
+    linear-gradient(170deg,#26493C 0%,#1F3A32 46%,#162B24 100%);
+  color:var(--krem);display:flex;flex-direction:column;justify-content:flex-start;padding:30px 26px 26px}
+.brand-blok{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.brand-kwadrat{width:100%;aspect-ratio:1/1;background:var(--krem);border:1px solid var(--zloty);
+  display:grid;place-items:center;box-shadow:0 12px 26px rgba(0,0,0,.28)}
+.brand-kwadrat img{width:64%;height:64%;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
+.brand-nazwa{font-size:32px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
+.brand-nazwa .syg{color:#EBD9BE}
+.brand-nazwa .natura{color:var(--zloty)}
+.brand-tag{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.55)}
+
+.menu-vert{display:flex;flex-direction:column;gap:2px;margin-top:26px}
+.menu-vert a{position:relative;color:var(--krem);font-size:16.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;padding:13px 16px;border:1px solid transparent;transition:all .25s}
+.menu-vert a::after{content:"";position:absolute;left:16px;bottom:6px;width:0;height:1px;
+  background:var(--zloty);transition:width .3s}
+.menu-vert a:hover{color:var(--zloty);border-color:rgba(196,165,130,.35);background:rgba(196,165,130,.08)}
+.menu-vert a:hover::after{width:34px}
+.menu-vert a.on{color:var(--zloty);border-color:rgba(196,165,130,.55);background:rgba(196,165,130,.14)}
+.menu-vert a.on::after{width:34px}
+
+/* --- górny blok po prawej: wyszukiwarka (ładne tło) + ikony; pod spodem TYTUŁ STRONY --- */
+.head{padding:18px clamp(12px,1.5vw,20px) 4px;background:var(--krem);
+  display:flex;flex-direction:column;gap:2px}
+.head-gora{display:flex;align-items:stretch;gap:12px;padding:16px 18px;
+  background:linear-gradient(135deg,var(--krem-2) 0%,#EFE6D8 55%,var(--krem-2) 100%);
+  border:1px solid rgba(107,69,48,.28);box-shadow:0 6px 20px rgba(107,69,48,.10)}
+.szukaj{display:flex;align-items:stretch;flex:1;max-width:none;
+  border:1px solid rgba(107,69,48,.4);background:#fff;transition:border-color .25s,box-shadow .25s}
+.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(31,58,50,.14)}
+.szukaj input{flex:1;border:none;background:transparent;padding:14px 18px;font-family:inherit;
+  font-size:18px;color:var(--ink);outline:none;min-width:0}
+.szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:56px;cursor:pointer;
+  display:grid;place-items:center;transition:background .25s;font-size:16px}
+.szukaj button:hover{background:var(--brunatny)}
+.head-przyciski{display:flex;gap:10px}
+.head-przycisk{position:relative;display:inline-flex;align-items:center;gap:10px;height:56px;padding:0 18px;
+  border:1px solid rgba(107,69,48,.4);background:#fff;color:var(--butelkowa);
+  font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;transition:all .25s}
+.head-przycisk:hover{border-color:var(--butelkowa);background:var(--krem-2);color:var(--butelkowa)}
+.head-przycisk svg{width:22px;height:22px;color:var(--brunatny)}
+.head-przycisk:hover svg{color:var(--butelkowa)}
+.head-przycisk .kropka{position:absolute;top:-9px;right:-9px;min-width:27px;height:27px;border-radius:14px;
+  background:var(--zloty);border:2px solid var(--krem);color:var(--butelkowa);font-size:15px;font-weight:700;
+  display:none;place-items:center;padding:0 6px}
+.head-przycisk .kropka.widoczna{display:grid}
+
+/* tytuł strony — pod wyszukiwarką, w górnym bloku */
+h1.strona-tytul{font-size:clamp(28px,3.4vw,42px);margin:2px 14px 0;padding:8px 0 4px}
+h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;background:var(--zloty);margin-bottom:8px}
+
+/* ============ TREŚĆ ============ */
+.strona-uklad main.wrap{padding:8px clamp(12px,1.5vw,20px) 40px;max-width:none;margin:0;width:100%}
+.tag{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
+h1{font-size:clamp(30px,4.6vw,46px);font-weight:600;margin:6px 0 10px;line-height:1.15}
+.lead{font-size:clamp(16.5px,1.8vw,19px);line-height:1.6;color:rgba(51,38,28,.9);max-width:640px}
+.sub{font-size:16px;line-height:1.6;color:rgba(51,38,28,.85);margin:6px 0 14px}
+.mala{font-size:14.5px;color:rgba(51,38,28,.75);line-height:1.55}
+.powrot{display:inline-block;margin-bottom:14px;font-size:15.5px;color:var(--butelkowa);
+  border-bottom:1px solid var(--zloty)}
+.powrot:hover{color:var(--brunatny)}
+
+/* ============ PRZYCISKI ============ */
+.btn{display:inline-block;background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa);
+  padding:13px 30px;font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;transition:all .25s;text-align:center}
+.btn:hover{background:var(--zloty);color:var(--butelkowa)}
+.btn.outline{background:transparent;color:var(--butelkowa)}
+.btn.outline:hover{background:var(--brunatny);border-color:var(--brunatny);color:var(--krem)}
+.btn.ghost{background:transparent;color:var(--butelkowa);border-color:rgba(107,69,48,.4)}
+.btn.niebez{background:transparent;color:#8a2f1d;border-color:rgba(138,47,29,.4)}
+.btn.niebez:hover{background:#8a2f1d;border-color:#8a2f1d;color:var(--krem)}
+.btn.aktywne{background:var(--brunatny);border-color:var(--brunatny);color:var(--krem)}
+.btn:disabled{opacity:.55;cursor:wait}
+
+/* ============ HUB (3 kafle) ============ */
+.hub{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}
+.hub-col{background:var(--krem);border:1px solid rgba(107,69,48,.35);border-radius:2px;
+  padding:22px;display:flex;flex-direction:column;box-shadow:0 8px 26px rgba(107,69,48,.10)}
+.hub-head{font-size:21px;font-weight:700;color:var(--butelkowa);letter-spacing:.05em;margin-bottom:8px}
+.hub-head::first-letter{color:var(--brunatny)}
+.hub-body{flex:1;font-size:15.5px;line-height:1.6;color:rgba(51,38,28,.85)}
+.hub-col .btn{margin-top:16px;align-self:flex-start}
+@media (max-width:860px){.hub{grid-template-columns:1fr}}
+
+/* ============ KARTY PRODUKTÓW ============ */
+.katalog{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+@media (max-width:900px){.katalog{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.katalog{grid-template-columns:1fr}}
+.karta{position:relative;background:#fff;border:1px solid rgba(107,69,48,.3);padding:14px;
+  display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s}
+.karta:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(107,69,48,.18)}
+.karta .foto{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--krem-2)}
+.karta .nazwa{font-size:18px;font-weight:700;margin:10px 2px 2px;line-height:1.25}
+.karta .opis{font-size:14.5px;color:rgba(51,38,28,.78);line-height:1.5;flex:1}
+.karta .cena{font-size:17px;font-weight:700;color:var(--brunatny);margin:8px 2px 2px}
+.karta .wybierz{display:flex;align-items:center;gap:10px;margin-top:10px}
+.licznik{display:flex;align-items:center;border:1px solid rgba(107,69,48,.45);background:var(--krem)}
+.licznik button{width:40px;height:42px;border:none;background:none;font-size:20px;cursor:pointer;
+  color:var(--butelkowa);font-weight:700}
+.licznik button:hover{background:var(--krem-2)}
+.licznik .val{min-width:38px;text-align:center;font-size:17px;font-weight:700}
+.karta .btn-dodaj{flex:1;background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa);
+  padding:11px 12px;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  transition:all .25s}
+.karta .btn-dodaj:hover{background:var(--zloty);color:var(--butelkowa)}
+.dymek{position:absolute;top:8px;right:8px;background:var(--butelkowa);color:var(--zloty);
+  font-size:12.5px;letter-spacing:.06em;padding:4px 9px;border-radius:12px;display:none}
+.dymek.widoczny{display:block}
+
+/* ============ PASEK KOSZYKA ============ */
+.koszyk-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--butelkowa);
+  color:var(--krem);padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  box-shadow:0 -6px 24px rgba(14,14,12,.3);transform:translateY(110%);transition:transform .3s}
+.koszyk-bar.pelny{transform:translateY(0)}
+.koszyk-bar .ile{font-size:15.5px;color:var(--zloty)}
+.koszyk-bar .suma{font-size:20px;font-weight:700;color:var(--zloty);margin-left:auto}
+.koszyk-bar .btn{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty);padding:10px 22px}
+.koszyk-bar .btn:hover{background:transparent;color:var(--zloty)}
+body.ma-koszyk{padding-bottom:76px}
+
+/* ============ FORMULARZE ============ */
+.forma{background:#fff;border:1px solid rgba(107,69,48,.3);padding:22px 24px;margin-top:18px}
+.forma h2{font-size:21px;color:var(--brunatny);margin-bottom:12px}
+.pole{margin:14px 0}
+.pole label{display:block;font-size:14px;color:var(--brunatny);margin-bottom:5px;
+  text-transform:uppercase;letter-spacing:.06em}
+.pole input[type=text],.pole input[type=email],.pole input[type=password],.pole input[type=tel],.pole input[type=number],
+.pole input[type=search],.pole textarea,.pole select{width:100%;padding:11px 13px;
+  border:1px solid rgba(107,69,48,.45);background:var(--krem);font-family:inherit;font-size:17px;color:var(--ink)}
+.pole textarea{min-height:120px;resize:vertical}
+.pole input:focus,.pole textarea:focus,.pole select:focus{outline:none;border-color:var(--butelkowa);
+  box-shadow:0 0 0 3px rgba(31,58,50,.14)}
+.opcje{margin:16px 0}
+.opcje>label:first-child{display:block;font-size:14px;color:var(--brunatny);margin-bottom:8px;
+  text-transform:uppercase;letter-spacing:.06em}
+.rzad{display:flex;gap:10px;align-items:flex-start;margin:9px 0}
+.rzad input[type=radio],.rzad input[type=checkbox]{width:20px;height:20px;flex:none;margin-top:3px;
+  accent-color:var(--butelkowa)}
+.rzad .etyk{font-size:16.5px;font-weight:600}
+.rzad .opis{font-size:14.5px;color:rgba(51,38,28,.75);line-height:1.5;margin-top:2px}
+.rzad a{border-bottom:1px solid var(--zloty);color:var(--butelkowa)}
+.przyciski{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.anty-spam{display:none}
+
+/* ============ KOMUNIKATY ============ */
+.bledy-box{background:#FFF4E0;border:1px solid var(--zloty);padding:13px 16px;margin:14px 0;font-size:16px}
+.bledy-box ul{margin:0;padding-left:20px}
+.bledy-box li{margin:4px 0}
+.flash{background:var(--butelkowa);color:var(--zloty);padding:12px 16px;margin:14px 0;font-size:16px}
+.sukces{background:var(--butelkowa);color:var(--zloty);padding:26px 28px;margin-top:22px;text-align:center}
+.sukces h2{font-size:26px;font-weight:600;margin-bottom:8px}
+.sukces p{font-size:17px;line-height:1.6}
+.demo-banner{background:var(--brunatny);color:var(--krem);font-size:14.5px;padding:8px 16px;
+  text-align:center;letter-spacing:.04em}
+.demo-banner b{color:var(--zloty)}
+
+/* ============ PASEK POSTĘPU ============ */
+.progres{display:flex;margin:18px 0 8px;flex-wrap:wrap;background:var(--krem-2);
+  border:1px solid rgba(107,69,48,.35)}
+.progres .krok{flex:1;min-width:110px;text-align:center;padding:10px 12px;
+  font-size:13.5px;font-weight:700;letter-spacing:.06em;color:rgba(51,38,28,.55);text-transform:uppercase;
+  border-right:1px solid rgba(107,69,48,.35)}
+.progres .krok:last-child{border-right:none}
+.progres .krok.zrob{color:var(--butelkowa)}
+.progres .krok.akt{background:var(--butelkowa);color:var(--zloty)}
+
+/* ============ RACHUNEK ============ */
+.rachunek{background:#fff;border:1px solid rgba(107,69,48,.35);margin-top:16px}
+.rach-naglowek{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;
+  background:var(--krem-2);border-bottom:1px solid rgba(107,69,48,.3);padding:12px 16px;
+  font-size:17.5px;font-weight:700;color:var(--butelkowa)}
+.rach-wiersz{display:grid;grid-template-columns:44px 1fr 90px 110px 110px;gap:8px;align-items:baseline;
+  padding:11px 16px;border-bottom:1px dashed rgba(107,69,48,.25);font-size:16px}
+.rach-glowka{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(51,38,28,.6);
+  border-bottom:1px solid rgba(107,69,48,.35)}
+.rach-wiersz .r-pod{display:block;font-size:13.5px;color:rgba(51,38,28,.7);margin-top:2px}
+.rach-wiersz .r-tag{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--brunatny);
+  border:1px solid rgba(107,69,48,.45);padding:1px 7px;margin-left:6px;vertical-align:middle}
+.rach-wiersz .r-mob{display:none}
+.rach-wiersz .r-wart{text-align:right;font-weight:700}
+.rach-wiersz .r-minus{color:#8a2f1d}
+.rach-razem{display:flex;justify-content:space-between;align-items:baseline;padding:16px;
+  background:var(--butelkowa);color:var(--krem);font-size:16px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase}
+.rach-razem b{font-size:26px;color:var(--zloty)}
+.rach-kaucja{padding:10px 16px;font-size:15.5px;border-top:1px solid rgba(196,165,130,.4);
+  background:var(--krem-2);color:var(--ink)}
+.rach-kaucja b{color:var(--butelkowa)}
+.rachunek .uw{padding:14px 16px;font-size:14.5px;line-height:1.6;color:rgba(51,38,28,.8);
+  border-top:1px solid rgba(107,69,48,.2)}
+.rachunek .uw b{color:var(--brunatny)}
+.pomysl-box{background:var(--krem-2);border:1px dashed var(--brunatny);padding:12px 14px;margin:10px 0;font-size:15.5px}
+.pomysl-uw{display:block;font-size:14px;color:var(--brunatny);margin-top:6px}
+@media (max-width:700px){
+  .rach-wiersz{grid-template-columns:30px 1fr 70px;grid-template-areas:"lp poz wart" ". pod pod" ". ile cena"}
+  .rach-wiersz .r-lp{grid-area:lp}
+  .rach-wiersz .r-poz{grid-area:poz}
+  .rach-wiersz .r-pod{grid-area:pod}
+  .rach-wiersz .r-ile{grid-area:ile}
+  .rach-wiersz .r-cena{grid-area:cena;text-align:right;color:rgba(51,38,28,.75)}
+  .rach-wiersz .r-wart{grid-area:wart}
+}
+
+/* ============ ZAKŁADKI ADMINA ============ */
+.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;border-bottom:2px solid rgba(107,69,48,.3)}
+.admin-tab{border:none;background:transparent;font-family:inherit;font-size:14px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(51,38,28,.65);padding:12px 18px 10px;
+  cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .25s}
+.admin-tab:hover{color:var(--brunatny)}
+.admin-tab.on{color:var(--butelkowa);border-bottom-color:var(--zloty)}
+
+/* ============ TABELA ADMINA ============ */
+.tabela{width:100%;border-collapse:collapse;background:#fff;border:1px solid rgba(107,69,48,.3);
+  margin-top:14px;font-size:15.5px}
+.tabela th{background:var(--butelkowa);color:var(--zloty);text-align:left;padding:10px 12px;
+  font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+.tabela td{padding:10px 12px;border-top:1px solid rgba(107,69,48,.2);vertical-align:top}
+.tabela select{font-family:inherit;font-size:15px;padding:5px;border:1px solid rgba(107,69,48,.45);
+  background:var(--krem)}
+.tabela-wrap{overflow-x:auto}
+
+/* ============ STOPKA ============ */
+.stopka{background:var(--butelkowa);color:var(--krem);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px clamp(16px,2.5vw,32px);font-size:15.5px}
+.stopka a{color:var(--zloty);border-bottom:1px solid transparent;transition:border-color .25s}
+.stopka a:hover{border-color:var(--zloty)}
+.stopka .sep{opacity:.4;margin:0 10px}
+
+/* ============ PODSTRONY TEKSTOWE ============ */
+.regulamin{background:#fff;border:1px solid rgba(107,69,48,.3);padding:22px 26px;margin-top:16px}
+.regulamin h2{font-size:20px;color:var(--butelkowa);margin:18px 0 6px}
+.regulamin h2:first-child{margin-top:0}
+.regulamin p{font-size:16px;line-height:1.65;margin:6px 0}
+.regulamin b{color:var(--brunatny)}
+.z-ul{list-style:none;margin:8px 0;padding:0}
+.z-ul li{font-size:16px;line-height:1.6;padding:5px 0 5px 22px;position:relative}
+.z-ul li::before{content:"◆";position:absolute;left:2px;top:5px;font-size:10px;color:var(--zloty)}
+
+/* ============ REALIZACJE ============ */
+.real-karty{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+@media (max-width:900px){.real-karty{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.real-karty{grid-template-columns:1fr}}
+.real-karta{background:#fff;border:1px solid rgba(107,69,48,.3);padding:12px}
+.real-karta img{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--krem-2)}
+.real-karta .nazwa{font-size:17.5px;font-weight:700;margin:9px 2px 3px}
+.real-karta .kat{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brunatny)}
+.real-karta p{font-size:14.5px;line-height:1.55;color:rgba(51,38,28,.8);margin-top:4px}
+
+/* ============ RESPONSYWNOŚĆ (kwatery zostają, ciaśniej) ============ */
+@media (max-width:1100px) and (min-width:761px){
+  .side{width:250px;padding:20px 18px}
+  .brand-kwadrat{width:100%;aspect-ratio:1/1}
+  .brand-kwadrat img{width:64%;height:64%}
+  .brand-nazwa{font-size:24px}
+  .brand-tag{font-size:9.5px;letter-spacing:.24em}
+  .menu-vert a{font-size:15px;padding:11px 13px}
+  .head{padding:16px 18px 4px}
+  .hk-napis{display:none}
+}
+
+/* telefony: normalne przewijanie strony, wszystko jedno pod drugim */
+@media (max-width:760px){
+  .strona-uklad{padding:10px}
+  .srodek{flex-direction:column}
+  .listwa{display:none}
+  .side{width:auto;padding:20px 16px 22px}
+  .prawa{display:flex;flex-direction:column}
+  .brand-kwadrat{width:200px;aspect-ratio:1/1}
+  .brand-kwadrat img{width:64%;height:64%}
+  .brand-nazwa{font-size:24px}
+  .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
+  .menu-vert a{padding:10px 13px;font-size:15px}
+  .menu-vert a::after{display:none}
+  .head{padding:14px 18px 4px}
+  .head-kontakt{justify-content:center;gap:10px}
+  .head-gora{flex-wrap:wrap;padding:10px 12px}
+  .szukaj{order:3;max-width:none;flex-basis:100%;margin-left:0}
+  .head-przyciski{order:1;margin-left:auto;width:100%;justify-content:flex-end}
+  .hp-etyk{display:none}
+  h1.strona-tytul{margin:2px 12px 0}
+  .strona-uklad main.wrap{padding:8px 18px 40px}
+  .forma{padding:18px 16px}
+  .regulamin{padding:18px 16px}
+  .progres .krok{min-width:84px;font-size:11px}
+}
+
+/* ============ TRYB DOTYKOWY ============
+   Telefon/tablet — także z włączoną „wersją na komputer": strona dopasowuje się do
+   zawartości (krótka treść = krótka strona, zero pustej przestrzeni) i przewija się
+   normalnie, bez wewnętrznego przewijania boxa. */
+html.dotyk .strona-uklad{padding:10px}
+html.dotyk .srodek{flex-direction:column}
+html.dotyk .listwa{display:none}
+html.dotyk .side{width:auto}
+html.dotyk .brand-kwadrat{width:200px;aspect-ratio:1/1}
+html.dotyk .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:16px}
+html.dotyk .menu-vert a{padding:10px 13px;font-size:15px}
+html.dotyk .menu-vert a::after{display:none}
+
+/* ============ BLOKI KOSZYKA I DOSTAWY ============ */
+.koszyk-blok{background:#fff;border:1px solid rgba(107,69,48,.35);margin-top:18px}
+.koszyk-blok>h2{background:var(--krem-2);border-bottom:1px solid rgba(107,69,48,.3);padding:12px 16px;
+  font-size:18.5px;color:var(--butelkowa);display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;flex-wrap:wrap}
+.koszyk-blok .padd{padding:14px 16px}
+.koszyk-tabela{width:100%;border-collapse:collapse;font-size:15.5px;background:#fff;
+  table-layout:fixed}
+.koszyk-tabela th{border:1px solid rgba(107,69,48,.55);background:var(--butelkowa);color:var(--zloty);
+  text-align:left;padding:10px 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.koszyk-tabela th:last-child,.koszyk-tabela td:last-child{text-align:center}
+.koszyk-tabela td{border:1px solid rgba(107,69,48,.4);padding:12px;vertical-align:middle;
+  word-wrap:break-word;overflow-wrap:break-word}
+.koszyk-tabela tr:nth-child(even) td{background:rgba(243,237,226,.55)}
+.koszyk-tabela .num{text-align:right;white-space:nowrap}
+.koszyk-tabela .usun{border:none;background:none;color:#8a2f1d;font-size:18px;cursor:pointer;
+  padding:6px 8px;line-height:1}
+.koszyk-tabela .usun:hover{color:#5c1f13}
+.koszyk-tabela .licznik{display:inline-flex;border:1px solid rgba(107,69,48,.45);background:#fff}
+.koszyk-tabela .licznik button{width:34px;height:36px}
+.koszyk-tabela .licznik .val{min-width:32px;font-size:16px}
+.koszyk-tabela .r-pod{display:block;font-size:13.5px;color:rgba(51,38,28,.7);margin-top:2px}
+.koszyk-tabela .r-minus{color:#8a2f1d}
+.koszyk-tabela .koszyk-razem td{background:var(--butelkowa);border-color:rgba(107,69,48,.55);
+  color:var(--krem);font-size:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.koszyk-tabela .koszyk-razem td:last-child{color:var(--zloty);font-size:24px}
+
+.dostawa-opcja{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(107,69,48,.3);
+  padding:12px 14px;margin:10px 0;background:var(--krem);cursor:pointer;transition:border-color .2s,background .2s}
+.dostawa-opcja:hover{border-color:var(--butelkowa)}
+.dostawa-opcja input[type=radio]{margin-top:5px;width:18px;height:18px;flex:none;accent-color:var(--butelkowa)}
+.dostawa-opcja .d-et{display:block;font-weight:700;font-size:16px}
+.dostawa-opcja .d-op{display:block;font-size:14px;color:rgba(51,38,28,.75);margin-top:2px;line-height:1.5}
+.dostawa-opcja .d-cena{margin-left:auto;color:var(--brunatny);font-weight:700;font-size:15.5px;white-space:nowrap;flex:none}
+.dostawa-opcja.zablokowana{opacity:.45;cursor:not-allowed}
+.dostawa-opcja.zablokowana:hover{border-color:rgba(107,69,48,.3)}
+
+.pers-wiersz{border:1px solid rgba(107,69,48,.25);padding:10px 14px;margin:10px 0;background:var(--krem)}
+
+/* ============ MODAL (pomysł własny) ============ */
+.modal-tlo{position:fixed;inset:0;background:rgba(14,14,12,.62);z-index:120;display:grid;
+  place-items:center;padding:20px}
+.modal-box{background:var(--krem);border:2px solid var(--brunatny);max-width:560px;width:100%;
+  padding:26px 28px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.modal-box h3{font-size:22px;color:var(--butelkowa);margin-bottom:6px}
+
+/* ============ WSTĄŻKA NAD STOPKĄ (pozioma, jak pionowa między kolumnami) ============ */
+.listwa-poziom{height:10px;background:
+  repeating-linear-gradient(180deg, rgba(139,90,43,.30) 0 2px, rgba(107,69,48,.12) 2px 4px),
+  linear-gradient(90deg,#7A5338 0%,#C4A582 22%,#6B4530 50%,#C4A582 78%,#7A5338 100%);
+  box-shadow: inset 0 2px 0 #C9AE85, inset 0 -2px 0 #C9AE85, inset 0 0 0 1px rgba(196,165,130,.35)}
+
+/* ============ BLOG / REALIZACJE ============ */
+.blog-filtr{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
+.blog-chip{border:1px solid rgba(107,69,48,.35);background:var(--krem);color:var(--brunatny);
+  padding:7px 14px;font-size:13.5px;letter-spacing:.06em;cursor:pointer;transition:all .2s}
+.blog-chip:hover{border-color:var(--butelkowa)}
+.blog-chip.on{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa)}
+.blog-siatka{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:16px}
+.blog-kafel{position:relative;background:#fff;border:1px solid rgba(107,69,48,.35);color:inherit;
+  text-decoration:none;display:flex;flex-direction:column;overflow:hidden;transition:transform .25s,box-shadow .25s}
+.blog-kafel:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(31,58,50,.16)}
+.blog-kafel img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.blog-kafel .blog-badge{position:absolute;top:10px;right:10px;background:var(--butelkowa);color:var(--zloty);
+  font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px}
+.blog-kafel-tresc{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.blog-kafel .kat{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--brunatny)}
+.blog-kafel .nazwa{font-size:19px;font-weight:700;color:var(--butelkowa);line-height:1.25}
+.blog-kafel .blog-data{font-size:13px;color:rgba(51,38,28,.6)}
+.blog-kafel .blog-zajawka{font-size:14.5px;color:rgba(51,38,28,.8);margin-top:4px;line-height:1.5}
+
+/* strona wpisu */
+.wpis-galeria{display:flex;gap:14px;margin:18px 0 6px;flex-wrap:wrap}
+.wpis-okladka{margin:0;flex:1 1 480px;min-width:280px;cursor:zoom-in}
+.wpis-okladka img{width:100%;max-height:460px;object-fit:cover;border:1px solid rgba(107,69,48,.3)}
+.wpis-miniatury{display:flex;flex-direction:column;gap:8px}
+.wpis-mini{border:1px solid rgba(107,69,48,.3);padding:0;background:none;cursor:pointer;width:92px;height:69px;flex:none}
+.wpis-mini img{width:100%;height:100%;object-fit:cover;display:block}
+.wpis-mini:hover{border-color:var(--butelkowa)}
+.wpis-film{margin:16px 0}
+.blog-tresc{font-size:16px;line-height:1.75;margin-top:8px}
+.blog-tresc h2{color:var(--butelkowa);margin:22px 0 8px;font-size:22px}
+.blog-tresc h3{color:var(--brunatny);margin:16px 0 6px;font-size:19px}
+.blog-tresc p{margin:8px 0}
+.blog-tresc ul,.blog-tresc ol{margin:8px 0 8px 24px}
+.blog-tresc li{margin:4px 0}
+.blog-tresc img{max-width:100%;height:auto;margin:10px 0;border:1px solid rgba(107,69,48,.3)}
+.blog-tresc blockquote{border-left:3px solid var(--zloty);background:var(--krem-2);margin:12px 0;padding:10px 16px;font-style:italic}
+
+/* blok produktu na stronie wpisu */
+.wpis-produkt{margin:18px 0;border:1px solid rgba(107,69,48,.4);border-left:6px solid var(--butelkowa);
+  background:linear-gradient(135deg,var(--krem-2),#fff);padding:18px 20px}
+.wpis-produkt h2{color:var(--butelkowa);font-size:21px;margin-bottom:4px}
+
+/* lightbox */
+.lb-tlo{position:fixed;inset:0;background:rgba(14,14,12,.9);z-index:200;display:grid;place-items:center;padding:20px}
+.lb-tlo img{max-width:92vw;max-height:88vh;border:2px solid var(--zloty)}
+.lb-zamknij{position:absolute;top:14px;right:18px;background:none;border:none;color:#fff;font-size:30px;cursor:pointer}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(251,247,240,.12);border:1px solid rgba(251,247,240,.3);
+  color:#fff;font-size:34px;width:54px;height:54px;cursor:pointer;line-height:1}
+.lb-nav:hover{background:var(--butelkowa);color:var(--zloty)}
+.lb-prev{left:14px}.lb-next{right:14px}
+
+/* ============ EDYTOR TEKSTU (jak posty na forum) ============ */
+.edytor{background:#fff;border:1px solid rgba(107,69,48,.4);min-height:160px;padding:12px 14px;
+  font-size:15.5px;line-height:1.7;outline:none}
+.edytor:focus{border-color:var(--butelkowa)}
+.edytor h2{margin:10px 0 4px;font-size:20px;color:var(--butelkowa)}
+.edytor h3{margin:8px 0 2px;font-size:17px;color:var(--brunatny)}
+.edytor ul,.edytor ol{margin:6px 0 6px 22px}
+.edytor img{max-width:100%;margin:6px 0}
+.edytor blockquote{border-left:3px solid var(--zloty);background:var(--krem-2);margin:8px 0;padding:6px 12px}
+.edytor-bar{display:flex;gap:4px;flex-wrap:wrap;background:var(--krem-2);border:1px solid rgba(107,69,48,.4);
+  border-bottom:none;padding:6px}
+.edytor-bar button{border:1px solid rgba(107,69,48,.35);background:#fff;color:var(--brunatny);
+  font-size:13px;padding:5px 10px;cursor:pointer;min-width:32px}
+.edytor-bar button:hover{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa)}
+.edytor-video{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:720px;margin:8px 0}
+.edytor-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* ============ PANEL: BLOG I PODSTRONY ============ */
+.admin-dwie{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start}
+@media(max-width:980px){.admin-dwie{grid-template-columns:1fr}}
+.admin-dwie .forma{margin-top:0;border:1px solid rgba(107,69,48,.3);padding:16px 18px;background:var(--krem)}
+.bf-mini{display:flex;gap:8px;flex-wrap:wrap}
+.bf-mini-el{position:relative;border:1px solid rgba(107,69,48,.35);background:#fff;padding:4px;width:112px}
+.bf-mini-el img{width:100%;height:84px;object-fit:cover;display:block}
+.bf-mini-el label{display:flex;align-items:center;gap:4px;font-size:11.5px;margin-top:4px;cursor:pointer}
+.bf-mini-el .bf-mini-x{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:12px;
+  border:1px solid var(--brunatny);background:var(--krem);color:#8a2f1d;cursor:pointer;font-size:12px;line-height:1}
+
+/* ============ KROKI (wynajem 5 kroków) ============ */
+.krok{border:1px solid rgba(107,69,48,.3);background:#fff;padding:20px 22px;margin-top:16px}
+.krok-tytul{color:var(--butelkowa);font-size:22px;margin:0 0 10px}
+.link-przycisk{background:none;border:none;color:var(--butelkowa);border-bottom:1px solid var(--zloty);
+  cursor:pointer;font-size:14.5px;padding:0}
+.link-przycisk:hover{color:var(--brunatny)}
+.niedostepny-adnotacja{font-size:15px;font-weight:700;letter-spacing:.06em;color:var(--butelkowa);
+  border:1px dashed var(--butelkowa);background:rgba(31,58,50,.06);padding:10px 14px;margin:10px 0 16px}
+
+/* ============ KALENDARZ ============ */
+.kalendarz-wrap{max-width:560px}
+.kalendarz{border:1px solid rgba(107,69,48,.35);background:var(--krem);padding:14px}
+.kal-gora{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.kal-tytul{font-size:20px;font-weight:700;letter-spacing:.08em;color:var(--butelkowa)}
+.kal-nav{border:1px solid rgba(107,69,48,.35);background:#fff;color:var(--butelkowa);
+  width:42px;height:42px;font-size:24px;cursor:pointer;line-height:1}
+.kal-nav:hover{background:var(--butelkowa);color:var(--zloty)}
+.kal-dni-tyg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.kal-dni-tyg span{text-align:center;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--brunatny);padding:4px 0}
+.kal-siatka{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.kal-puste{aspect-ratio:1}
+.kal-dzien{aspect-ratio:1;border:1px solid rgba(107,69,48,.22);background:#fff;color:var(--butelkowa);
+  font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}
+.kal-dzien:hover:not(.przeszly):not(.zajety){border-color:var(--butelkowa);background:rgba(31,58,50,.08)}
+.kal-dzien.wybrany{background:var(--butelkowa);color:var(--zloty);border-color:var(--butelkowa);font-weight:700}
+.kal-dzien.zajety{background:rgba(138,47,29,.14);border-color:rgba(138,47,29,.35);color:#8a2f1d;
+  text-decoration:line-through;text-decoration-thickness:2px;cursor:not-allowed}
+.kal-dzien.przeszly{background:rgba(51,38,28,.05);color:rgba(51,38,28,.35);cursor:not-allowed}
+.kal-legenda{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13.5px;color:rgba(51,38,28,.8)}
+.kal-legenda span{display:inline-flex;align-items:center;gap:6px}
+.leg{width:14px;height:14px;border:1px solid rgba(107,69,48,.4);display:inline-block}
+.leg-wolny{background:#fff}
+.leg-wybrany{background:var(--butelkowa);border-color:var(--butelkowa)}
+.leg-zajety{background:rgba(138,47,29,.2);border-color:rgba(138,47,29,.4)}
+
+/* ============ KARTY PAKIETÓW ============ */
+.pakiety{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}
+.pakiet-karta{position:relative;display:flex;flex-direction:column;gap:6px;border:1px solid rgba(107,69,48,.35);
+  background:var(--krem);padding:16px 16px 18px;cursor:pointer;overflow:hidden;transition:all .2s}
+.pakiet-karta:hover:not(.niedostepny){border-color:var(--butelkowa)}
+.pakiet-karta.wybrany{border:2px solid var(--butelkowa);background:rgba(31,58,50,.05);padding:15px 15px 17px}
+.pakiet-karta input{position:absolute;left:12px;top:14px;width:18px;height:18px;accent-color:var(--butelkowa)}
+.pakiet-karta .pk-nazwa{margin-left:28px;font-weight:700;font-size:17px;color:var(--butelkowa)}
+.pakiet-karta .pk-opis{font-size:14px;color:rgba(51,38,28,.75)}
+.pakiet-karta .pk-pozycje{font-size:13.5px;color:rgba(51,38,28,.7);line-height:1.5}
+.pakiet-karta .pk-cena{margin-top:auto;font-weight:700;color:var(--brunatny);font-size:15.5px}
+.pakiet-karta.niedostepny{opacity:.5;filter:grayscale(.75);cursor:not-allowed}
+.pakiet-karta.niedostepny:hover{border-color:rgba(107,69,48,.35)}
+.pakiet-karta .pk-niedostepny{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--butelkowa);font-size:19px;font-weight:800;letter-spacing:.14em;
+  transform:rotate(-12deg);text-shadow:0 1px 2px rgba(255,255,255,.6)}
+
+/* ============ KAFELKI PERSONALIZACJI ============ */
+#pers-kafelki{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px}
+@media(max-width:900px){#pers-kafelki{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){#pers-kafelki{grid-template-columns:1fr}}
+.pers-kafel{display:flex;flex-direction:column;border:1px solid rgba(107,69,48,.35);background:#fff;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;overflow:hidden}
+.pers-kafel:hover{border-color:var(--butelkowa);box-shadow:0 8px 22px rgba(31,58,50,.14)}
+.pers-kafel.wybrany{border:2px solid var(--butelkowa)}
+.pers-kafel img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.pers-kafel .pk-tresc{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.pers-kafel .pk-zaznacz{position:absolute}
+.pers-kafel .pers-cb{width:18px;height:18px;accent-color:var(--butelkowa);margin-top:2px}
+.pers-kafel .pk-nazwa{font-weight:700;font-size:16.5px;color:var(--butelkowa);margin-left:28px}
+.pers-kafel .pk-opis{font-size:13.5px;color:rgba(51,38,28,.75);line-height:1.45;margin-left:28px}
+.pers-kafel .pk-cena{font-weight:700;color:var(--brunatny);font-size:15.5px;margin-left:28px}
+.pers-pole{display:none;padding:0 14px 12px}
+.pers-pole textarea{width:100%;min-height:74px;border:1px solid rgba(107,69,48,.35);background:var(--krem);
+  padding:8px 10px;font-size:14.5px;line-height:1.5;font-family:inherit}
+.pers-pole textarea:focus{outline:none;border-color:var(--butelkowa)}
+.pers-licznik{display:block;text-align:right;font-size:12px;color:rgba(51,38,28,.6);margin-top:3px}
+
+/* ============ ADNOTACJE DO ZAMÓWIENIA ============ */
+.adnotacje{border:2px solid #C96F1A;border-left:8px solid #C96F1A;background:#FDF3E4;
+  padding:16px 18px;margin:16px 0}
+.adnotacje h3{color:#A85A10;font-size:16.5px;letter-spacing:.1em;margin:0 0 8px}
+.adnotacje p{color:#6B3F0F;font-size:15.5px;line-height:1.65;margin:6px 0}
+
+/* ============ Etykieta pocztowa (dane w podsumowaniu) ============ */
+#dane-klienta .etykieta-wiersz{display:block;font-size:17px;line-height:1.8}
+#dane-klienta b{color:var(--butelkowa)}
+
+/* ============ Duże przyciski ============ */
+.btn.duzy{padding:16px 34px;font-size:17.5px;letter-spacing:.08em;font-weight:700}

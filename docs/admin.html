@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=296">
+</head>
+<body data-strona="">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Panel administracyjny</span>
+  <h1>Logowanie do panelu</h1>
+
+  <!-- EKRAN LOGOWANIA: wymuszany po każdym zamknięciu strony (sesja przeglądarki) -->
+  <div id="logowanie" class="forma" style="max-width:480px">
+    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia, wiadomości, blog i ustawienia strony.</p>
+    <div class="flash" id="logowanie-blad" style="display:none;background:#8a2f1d"></div>
+    <div class="pole">
+      <label for="admin-login">Login *</label>
+      <input type="text" id="admin-login" autocomplete="username">
+    </div>
+    <div class="pole">
+      <label for="admin-haslo">Hasło *</label>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input type="password" id="admin-haslo" autocomplete="current-password" style="flex:1">
+        <button type="button" class="btn outline" id="pokaz-admin-haslo" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+      </div>
+    </div>
+    <div class="przyciski">
+      <button class="btn" type="button" id="zaloguj">Zaloguj się</button>
+    </div>
+  </div>
+
+  <!-- PANEL: widoczny po zalogowaniu -->
+  <div id="panel" style="display:none">
+    <p class="sub" id="tryb-info"></p>
+    <div class="flash" id="bled" style="display:none"></div>
+
+    <!-- ZAKŁADKI -->
+    <div class="admin-tabs" id="admin-tabs">
+      <button class="admin-tab on" data-tab="zamowienia" type="button">Zamówienia</button>
+      <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
+      <button class="admin-tab" data-tab="blog" type="button">Blog</button>
+      <button class="admin-tab" data-tab="produkty" type="button">Produkty</button>
+      <button class="admin-tab" data-tab="strony" type="button">Podstrony</button>
+      <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
+    </div>
+
+    <!-- ZAMÓWIENIA -->
+    <section class="admin-sekcja" id="tab-zamowienia">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
+        <table class="tabela" id="tabela-zamowien">
+          <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- WIADOMOŚCI -->
+    <section class="admin-sekcja" id="tab-wiadomosci" style="display:none">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Wiadomości z formularza</h2>
+        <table class="tabela" id="tabela-wiadomosci">
+          <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Zapytania o termin wynajmu</h2>
+        <p class="mala" style="margin-bottom:8px">Wybrany termin NIE jest blokowany — rezerwację potwierdzamy po wpłacie.</p>
+        <table class="tabela" id="tabela-wynajem-zapytania">
+          <thead><tr><th>Data</th><th>Od</th><th>Wydarzenie</th><th>Pakiet</th><th>Termin</th><th>Personalizacja</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOG -->
+    <section class="admin-sekcja" id="tab-blog" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Blog / realizacje</h2>
+      <p class="mala">Każdy wpis to realizacja na stronie: zdjęcia, opis wykonania, film. Wpis może
+      jednocześnie być produktem sklepu — zaznacz „dodaj do sklepu", a pozycja pojawi się w zakładce
+      Produkty (tam ustalisz cenę i widoczność). W trybie demo wpisy zapisują się w tej przeglądarce.</p>
+      <div class="flash" id="blog-info" style="display:none"></div>
+      <div class="admin-dwie">
+        <div>
+          <div class="przyciski" style="justify-content:flex-start">
+            <button class="btn" type="button" id="blog-nowy">+ Nowy wpis</button>
+          </div>
+          <div class="tabela-wrap" style="margin-top:10px">
+            <table class="tabela" id="tabela-blog">
+              <thead><tr><th>Data</th><th>Tytuł</th><th>Kategoria</th><th>Sklep</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="forma" id="blog-form" style="display:none">
+          <h3 id="blog-form-tytul">Nowy wpis</h3>
+          <div class="pole">
+            <label for="bf-tytul">Tytuł wpisu *</label>
+            <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="pole">
+              <label for="bf-kategoria">Kategoria</label>
+              <input type="text" id="bf-kategoria" list="bf-kategorie" placeholder="np. Szyldy i tablice">
+              <datalist id="bf-kategorie"></datalist>
+            </div>
+            <div class="pole">
+              <label for="bf-data">Data wpisu</label>
+              <input type="date" id="bf-data">
+            </div>
+          </div>
+          <div class="pole">
+            <label for="bf-zajawka">Krótki opis (na kafelek)</label>
+            <textarea id="bf-zajawka" rows="2" placeholder="Dwa zdania, które zachęcą do kliknięcia…"></textarea>
+          </div>
+          <div class="pole">
+            <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
+            <div class="bf-mini" id="bf-mini"></div>
+            <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
+            <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="pole">
+            <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
+            <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
+          </div>
+          <div class="pole">
+            <label>Treść wpisu — zaznacz tekst i formatuj jak w edytorze forum</label>
+            <div class="editor" id="bf-tresc" style="min-height:180px"></div>
+            <input type="hidden" id="bf-zrodlo">
+          </div>
+          <div class="pole" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
+            <label style="cursor:pointer;font-weight:700">
+              <input type="checkbox" id="bf-sklep"> Dodaj ten wpis do sklepu (produkt z historią)
+            </label>
+            <div id="bf-produkt" style="display:none;margin-top:10px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="pole">
+                  <label for="bf-p-nazwa">Nazwa produktu</label>
+                  <input type="text" id="bf-p-nazwa">
+                </div>
+                <div class="pole">
+                  <label for="bf-p-link">Połącz z produktem (albo nowy)</label>
+                  <select id="bf-p-link"><option value="">— nowy produkt —</option></select>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="pole">
+                  <label for="bf-p-cena">Cena (zł)</label>
+                  <input type="number" id="bf-p-cena" step="0.01" min="0">
+                </div>
+                <div class="pole">
+                  <label for="bf-p-gabaryt">Gabaryt / rozmiar paczki</label>
+                  <input type="text" id="bf-p-gabaryt" placeholder="np. 20×20×8 cm">
+                </div>
+              </div>
+              <p class="mala">Cenę i widoczność możesz potem dopracować w zakładce „Produkty".</p>
+            </div>
+          </div>
+          <div class="przyciski">
+            <button class="btn" type="button" id="blog-zapisz">Zapisz wpis</button>
+            <button class="btn outline" type="button" id="blog-anuluj">Anuluj</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUKTY -->
+    <section class="admin-sekcja" id="tab-produkty" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
+      <p class="mala">Zmień cenę albo ukryj/pokaż produkt w sklepie. Produkty z wpisów bloga mają tu
+      dopisany link „historia →". Możesz też dodać produkt „bez historii" (np. papierowe winietki).
+      W trybie demo zmiany zapisują się w tej przeglądarce.</p>
+      <div class="flash" id="produkty-info" style="display:none"></div>
+      <div class="tabela-wrap">
+        <table class="tabela" id="tabela-produkty">
+          <thead><tr><th>Produkt</th><th>Cena (zł)</th><th>W sklepie</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="forma" id="produkt-nowy-form" style="max-width:720px;margin-top:16px;display:none">
+        <h3>Nowy produkt (bez historii)</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="pole">
+            <label for="pn-nazwa">Nazwa *</label>
+            <input type="text" id="pn-nazwa" placeholder="np. Winietki papierowe — komplet 20 szt.">
+          </div>
+          <div class="pole">
+            <label for="pn-cena">Cena (zł)</label>
+            <input type="number" id="pn-cena" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="pole">
+          <label for="pn-opis">Krótki opis</label>
+          <input type="text" id="pn-opis">
+        </div>
+        <div class="pole">
+          <label for="pn-obraz">Zdjęcie (plik)</label>
+          <input type="file" id="pn-obraz" accept="image/*">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="pn-zapisz">Dodaj produkt</button>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:flex-start">
+        <button class="btn outline" type="button" id="produkt-nowy">+ Produkt bez historii</button>
+      </div>
+    </section>
+
+    <!-- PODSTRONY -->
+    <section class="admin-sekcja" id="tab-strony" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podstrony</h2>
+      <p class="mala">Edytujesz treść PRACOWNI (prosty edytor — jak sformatujesz, tak się wyświetli)
+      i dodajesz nowe podstrony z przyciskiem w MENU. Strony-szkielety (Zamówienia, Sklep, Koszyk,
+      Kontakt, Regulamin…) mają własne układy i nie są tutaj — w tej wersji edytujemy treść
+      tekstową wybranych podstron i listę menu.</p>
+      <div class="flash" id="strony-info" style="display:none"></div>
+      <div class="admin-dwie">
+        <div>
+          <div class="przyciski" style="justify-content:flex-start">
+            <button class="btn" type="button" id="strona-nowa">+ Nowa podstrona</button>
+          </div>
+          <div class="tabela-wrap" style="margin-top:10px">
+            <table class="tabela" id="tabela-stron">
+              <thead><tr><th>Tytuł</th><th>W menu</th><th>Kolejność</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="forma" id="strona-form" style="display:none">
+          <h3 id="strona-form-tytul">Nowa podstrona</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="pole">
+              <label for="sf-slug">Identyfikator (slug)</label>
+              <input type="text" id="sf-slug" placeholder="np. o-nas">
+            </div>
+            <div class="pole">
+              <label for="sf-kol">Kolejność w menu</label>
+              <input type="number" id="sf-kol" min="1" value="10">
+            </div>
+          </div>
+          <div class="pole">
+            <label for="sf-tytul">Tytuł (widoczny w MENU i nagłówku)</label>
+            <input type="text" id="sf-tytul">
+          </div>
+          <div class="pole">
+            <label style="cursor:pointer"><input type="checkbox" id="sf-menu" checked> Pokaż w menu</label>
+          </div>
+          <div class="pole">
+            <label>Treść — jak sformatujesz, tak się wyświetli na stronie</label>
+            <div class="editor" id="sf-tresc" style="min-height:180px"></div>
+            <input type="hidden" id="sf-zrodlo">
+          </div>
+          <div class="przyciski">
+            <button class="btn" type="button" id="strona-zapisz">Zapisz podstronę</button>
+            <button class="btn outline" type="button" id="strona-anuluj">Anuluj</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- USTAWIENIA -->
+    <section class="admin-sekcja" id="tab-ustawienia" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Cennik dostawy</h2>
+      <p class="mala">Stawki za wysyłkę wg rozmiarów paczek — używane w formularzu zamówienia
+      (InPost paczkomat i kurier). W trybie demo zapisują się w tej przeglądarce; po wdrożeniu
+      trafią do arkusza Google.</p>
+      <div class="flash" id="ustawienia-info" style="display:none"></div>
+      <div class="forma" style="max-width:520px">
+        <div class="pole">
+          <label>Paczkomat InPost — paczka S (zł)</label>
+          <input type="number" id="u-paczkomat-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka M (zł)</label>
+          <input type="number" id="u-paczkomat-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka L (zł)</label>
+          <input type="number" id="u-paczkomat-l" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka S (zł)</label>
+          <input type="number" id="u-kurier-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka M (zł)</label>
+          <input type="number" id="u-kurier-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka L (zł)</label>
+          <input type="number" id="u-kurier-l" step="0.01" min="0">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="zapisz-dostawe">Zapisz cennik</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="przyciski">
+      <button class="btn outline" type="button" id="odswiez">Odśwież</button>
+      <a class="btn" href="admin.html">Wyczyść filtr</a>
+      <button class="btn niebez" type="button" id="wyloguj">Wyloguj</button>
+    </div>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=296"></script>
+<script src="assets/koszyk.js?v=296"></script>
+<script src="assets/api.js?v=296"></script>
+<script src="assets/editor.js?v=296"></script>
+<script src="data/katalog.js?v=296"></script>
+<script src="assets/main.js?v=296"></script>
+<script>
+(function(){
+  var klucz = SYG.param('klucz');
+  var info = document.getElementById('tryb-info');
+  var bled = document.getElementById('bled');
+  var logowanie = document.getElementById('logowanie');
+  var panel = document.getElementById('panel');
+  var logowanieBlad = document.getElementById('logowanie-blad');
+
+  if (SYG.TRYB_DEMO){
+    info.innerHTML = 'TRYB DEMO: zmiany zapisują się w tej przeglądarce (testy). ' +
+      'Po wdrożeniu Google Apps Script panel czyta i zapisuje dane w arkuszu — logowanie sprawdza baza administratorów.';
+  } else {
+    info.textContent = 'Połączono z arkuszem Google.';
+  }
+
+  var STAN_NAZWA = {
+    zapytanie: 'zapytanie',
+    platnosc_w_toku: 'płatność w toku',
+    zarezerwowany: 'zarezerwowany',
+    odrzucono: 'odrzucono'
+  };
+
+  /* ============ zakładki ============ */
+  var tabs = document.querySelectorAll('.admin-tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      t.classList.add('on');
+      document.querySelectorAll('.admin-sekcja').forEach(function(s){ s.style.display = 'none'; });
+      document.getElementById('tab-' + t.getAttribute('data-tab')).style.display = 'block';
+    });
+  });
+
+  /* ============ zamówienia ============ */
+  async function ladujZamowienia(){
+    var odp = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
+    if (!odp.ok){
+      bled.textContent = odp.blad || 'Brak dostępu (zły klucz?).';
+      bled.style.display = 'block';
+      return;
+    }
+    bled.style.display = 'none';
+    var lista = odp.zamowienia || [];
+    var tbody = document.querySelector('#tabela-zamowien tbody');
+    tbody.innerHTML = lista.map(function(z){
+      var pozycje = (z.pozycje || []).map(function(p){ return p.nazwa + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
+      var razem = (z.kwoty && z.kwoty.razem) ? SYG.zl(z.kwoty.razem) : '—';
+      var opcje = Object.keys(STAN_NAZWA).map(function(s){
+        return '<option value="' + s + '"' + (z.status === s ? ' selected' : '') + '>' + STAN_NAZWA[s] + '</option>';
+      }).join('');
+      return '<tr><td><b>' + z.sygnatura + '</b></td>' +
+        '<td>' + (z.data || '').slice(0, 10) + '</td>' +
+        '<td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email + '</span></td>' +
+        '<td>' + pozycje + '</td>' +
+        '<td>' + razem + '</td>' +
+        '<td><select data-syg="' + z.sygnatura + '">' + opcje + '</select></td></tr>';
+    }).join('') || '<tr><td colspan="6">Brak zamówień.</td></tr>';
+
+    tbody.querySelectorAll('select').forEach(function(sel){
+      sel.addEventListener('change', async function(){
+        var odp2 = await SYG.wezwij('zamowienie-status', { klucz: klucz, sygnatura: sel.getAttribute('data-syg'), status: sel.value });
+        if (!odp2.ok) alert(odp2.blad || 'Nie zapisano.');
+      });
+    });
+  }
+
+  /* ============ wiadomości ============ */
+  function ladujWiadomosci(){
+    var wbody = document.querySelector('#tabela-wiadomosci tbody');
+    var zbody = document.querySelector('#tabela-wynajem-zapytania tbody');
+    if (SYG.TRYB_DEMO){
+      var wiadomosci = SYG.demoDb.wiadomosci();
+      wbody.innerHTML = wiadomosci.map(function(w){
+        return '<tr><td>' + (w.data || '').slice(0, 10) + '</td><td>' + w.imie + '<br><span class="mala">' + w.email + '</span></td>' +
+          '<td>' + w.temat + '</td><td>' + w.tresc + '</td></tr>';
+      }).join('') || '<tr><td colspan="4">Brak wiadomości.</td></tr>';
+      var zap = SYG.demoDb.wynajemZapytania();
+      zbody.innerHTML = zap.map(function(z){
+        var persTxt = (z.pers || []).map(function(p){ return p.nazwa + (p.opis ? ': ' + p.opis.slice(0,60) : ''); }).join('; ') || '—';
+        var evMap = { weselny: 'Wesele', komunijny: 'Komunia / chrzest', firmowy: 'Event firmowy', jubileuszowy: 'Jubileusz / urodziny' };
+        return '<tr><td>' + (z.data || '').slice(0, 10) + '</td><td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email +
+          (z.klient.telefon ? ' · ' + z.klient.telefon : '') + '</span></td>' +
+          '<td>' + (evMap[z.ev] || z.ev || '—') + '</td>' +
+          '<td><b>' + (z.pakiet ? z.pakiet.nazwa : '—') + '</b></td>' +
+          '<td>' + (z.termin ? z.termin.data : '—') + '</td>' +
+          '<td>' + persTxt + '</td></tr>';
+      }).join('') || '<tr><td colspan="6">Brak zapytań o termin.</td></tr>';
+    } else {
+      wbody.innerHTML = '<tr><td colspan="4">Lista wiadomości z arkusza będzie dostępna po wdrożeniu (akcja „wiadomosci-lista").</td></tr>';
+      zbody.innerHTML = '<tr><td colspan="6">Zapytania o wynajem z arkusza będą dostępne po wdrożeniu.</td></tr>';
+    }
+  }
+
+  /* ============ produkty ============ */
+  async function ladujProdukty(){
+    var kat = await SYG.katalog();
+    var tbody = document.querySelector('#tabela-produkty tbody');
+    tbody.innerHTML = kat.map(function(p){
+      return '<tr>' +
+        '<td><b>' + p.nazwa + '</b><br><span class="mala">#' + p.id +
+        (p.storyId ? ' · <a href="blog-wpis.html?id=' + p.storyId + '" target="_blank" rel="noopener" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">historia →</a>' : '') +
+        '</span></td>' +
+        '<td><input type="number" step="0.01" min="0" class="p-cena" data-id="' + p.id + '" value="' + p.cena + '" style="width:110px"></td>' +
+        '<td><label style="cursor:pointer;font-size:14px"><input type="checkbox" class="p-dost" data-id="' + p.id + '"' + (p.dostepny ? ' checked' : '') + '> widoczny</label></td>' +
+        '<td><button class="btn outline" type="button" style="padding:8px 16px" data-id="' + p.id + '">Zapisz</button></td>' +
+      '</tr>';
+    }).join('') || '<tr><td colspan="4">Brak produktów.</td></tr>';
+
+    tbody.querySelectorAll('button[data-id]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        var id = Number(b.getAttribute('data-id'));
+        var cena = Number(tbody.querySelector('.p-cena[data-id="' + id + '"]').value) || 0;
+        var dost = tbody.querySelector('.p-dost[data-id="' + id + '"]').checked ? 1 : 0;
+        var odp = await SYG.wezwij('produkty-zapisz', { id: id, cena: cena, dostepny: dost });
+        var f = document.getElementById('produkty-info');
+        f.style.display = 'block';
+        f.textContent = odp.ok ? 'Zapisano: produkt #' + id + ' (' + cena + ' zł, ' + (dost ? 'widoczny' : 'ukryty') + ').' : (odp.blad || 'Nie zapisano.');
+        setTimeout(function(){ f.style.display = 'none'; }, 4000);
+      });
+    });
+  }
+
+  /* produkt bez historii */
+  var pnObraz = '';
+  document.getElementById('pn-obraz').addEventListener('change', function(){
+    var f = this.files[0];
+    if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function(){ pnObraz = fr.result; };
+    fr.readAsDataURL(f);
+  });
+  document.getElementById('produkt-nowy').addEventListener('click', function(){
+    document.getElementById('produkt-nowy-form').style.display = 'block';
+  });
+  document.getElementById('pn-zapisz').addEventListener('click', async function(){
+    var nazwa = document.getElementById('pn-nazwa').value.trim();
+    if (!nazwa){ alert('Podaj nazwę produktu.'); return; }
+    var odp = await SYG.wezwij('produkt-nowy', {
+      nazwa: nazwa,
+      cena: Number(document.getElementById('pn-cena').value) || 0,
+      opis: document.getElementById('pn-opis').value.trim(),
+      obraz: pnObraz || 'szopka.jpg'
+    });
+    var f = document.getElementById('produkty-info');
+    f.style.display = 'block';
+    f.textContent = odp.ok ? 'Dodano produkt: ' + nazwa + '.' : (odp.blad || 'Nie dodano.');
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+    if (odp.ok){
+      document.getElementById('pn-nazwa').value = '';
+      document.getElementById('pn-cena').value = '';
+      document.getElementById('pn-opis').value = '';
+      document.getElementById('pn-obraz').value = '';
+      pnObraz = '';
+      document.getElementById('produkt-nowy-form').style.display = 'none';
+      ladujProdukty();
+    }
+  });
+
+  /* ============ BLOG ============ */
+  var blogEdytor = SYG.edytor('bf-tresc', 'bf-zrodlo');
+  var edycjaWpis = null;
+  var galeria = [];
+
+  function infoBlog(txt){
+    var f = document.getElementById('blog-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  function rysujMini(){
+    var kont = document.getElementById('bf-mini');
+    kont.innerHTML = '';
+    galeria.forEach(function(g, i){
+      var el = document.createElement('div');
+      el.className = 'bf-mini-el';
+      el.innerHTML = '<img src="' + g.src + '" alt="">' +
+        '<label><input type="radio" name="bf-glowna" ' + (g.glowna ? 'checked' : '') + '> główne</label>' +
+        '<button type="button" class="bf-mini-x" title="Usuń zdjęcie">✕</button>';
+      el.querySelector('input').addEventListener('change', function(){
+        galeria.forEach(function(x){ x.glowna = false; });
+        g.glowna = true;
+        rysujMini();
+      });
+      el.querySelector('.bf-mini-x').addEventListener('click', function(){
+        galeria.splice(i, 1);
+        if (!galeria.length) galeria = [];
+        else if (!galeria.some(function(x){ return x.glowna; })) galeria[0].glowna = true;
+        rysujMini();
+      });
+      kont.appendChild(el);
+    });
+  }
+
+  document.getElementById('bf-pliki').addEventListener('change', function(){
+    var files = Array.prototype.slice.call(this.files || []);
+    files.forEach(function(f){
+      if (galeria.length >= 10){ alert('Maksymalnie 10 zdjęć.'); return; }
+      var fr = new FileReader();
+      fr.onload = function(){
+        galeria.push({ src: fr.result, glowna: galeria.length === 0 });
+        rysujMini();
+      };
+      fr.readAsDataURL(f);
+    });
+    this.value = '';
+  });
+
+  document.getElementById('bf-sklep').addEventListener('change', function(){
+    document.getElementById('bf-produkt').style.display = this.checked ? 'block' : 'none';
+  });
+
+  async function wypelnijLinkProdukty(){
+    var kat = await SYG.katalog();
+    var sel = document.getElementById('bf-p-link');
+    sel.innerHTML = '<option value="">— nowy produkt —</option>' +
+      kat.map(function(p){ return '<option value="' + p.id + '">' + p.nazwa + ' (#' + p.id + ')</option>'; }).join('');
+    /* kategorie do datalisty */
+    var odp = await SYG.wezwij('blog-lista', {});
+    var katLista = [];
+    (odp.wpisy || []).forEach(function(w){ if (w.kategoria && katLista.indexOf(w.kategoria) < 0) katLista.push(w.kategoria); });
+    document.getElementById('bf-kategorie').innerHTML = katLista.map(function(k){
+      return '<option value="' + k.replace(/"/g, '&quot;') + '">';
+    }).join('');
+  }
+
+  async function ladujBlog(){
+    await wypelnijLinkProdukty();
+    var odp = await SYG.wezwij('blog-lista', {});
+    var wpisy = odp.ok ? (odp.wpisy || []) : [];
+    var tbody = document.querySelector('#tabela-blog tbody');
+    tbody.innerHTML = wpisy.map(function(w){
+      return '<tr>' +
+        '<td>' + (w.data || '').slice(0, 10) + '</td>' +
+        '<td><b>' + w.tytul + '</b><br><span class="mala">' + (w.galeria ? w.galeria.length + 1 : 1) + ' zdj.</span></td>' +
+        '<td>' + w.kategoria + '</td>' +
+        '<td>' + (w.produkt && w.produkt.sklep ? '<b style="color:var(--butelkowa)">✓ w sklepie</b>' : '—') + '</td>' +
+        '<td style="white-space:nowrap">' +
+        '<a class="btn outline" style="padding:6px 12px;font-size:13px" href="blog-wpis.html?id=' + w.id + '" target="_blank" rel="noopener">Podgląd</a> ' +
+        '<button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="' + w.id + '">Edytuj</button> ' +
+        '<button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="' + w.id + '">Usuń</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="5">Brak wpisów.</td></tr>';
+
+    tbody.querySelectorAll('button[data-edit]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var w = wpisy.find(function(x){ return Number(x.id) === Number(b.getAttribute('data-edit')); });
+        if (!w) return;
+        edycjaWpis = w;
+        galeria = [].concat([w.okladka], (w.galeria || [])).filter(function(g, i, a){ return g && a.indexOf(g) === i; })
+          .map(function(g, i){ return { src: g, glowna: i === 0 }; });
+        document.getElementById('blog-form-tytul').textContent = 'Edycja wpisu #' + w.id;
+        document.getElementById('bf-tytul').value = w.tytul || '';
+        document.getElementById('bf-kategoria').value = w.kategoria || '';
+        document.getElementById('bf-data').value = w.data || '';
+        document.getElementById('bf-zajawka').value = w.zajawka || '';
+        document.getElementById('bf-video').value = w.video || '';
+        blogEdytor.ustaw(w.tresc || '');
+        var prod = w.produkt || {};
+        document.getElementById('bf-sklep').checked = !!prod.sklep;
+        document.getElementById('bf-produkt').style.display = prod.sklep ? 'block' : 'none';
+        document.getElementById('bf-p-nazwa').value = prod.nazwa || '';
+        document.getElementById('bf-p-link').value = prod.sklep && katProduktIstnieje(prod.id) ? String(prod.id) : '';
+        document.getElementById('bf-p-cena').value = prod.cena || '';
+        document.getElementById('bf-p-gabaryt').value = prod.gabaryt || '';
+        rysujMini();
+        document.getElementById('blog-form').style.display = 'block';
+        document.getElementById('blog-form').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    tbody.querySelectorAll('button[data-usun]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        if (!confirm('Usunąć wpis „' + (wpisy.find(function(x){ return Number(x.id) === Number(b.getAttribute('data-usun')); }) || {}).tytul + '"?')) return;
+        var odp2 = await SYG.wezwij('blog-usun', { id: Number(b.getAttribute('data-usun')) });
+        infoBlog(odp2.ok ? 'Wpis usunięty.' : (odp2.blad || 'Nie usunięto.'));
+        ladujBlog();
+      });
+    });
+  }
+
+  var _katCache = null;
+  async function katCache(){
+    if (_katCache) return _katCache;
+    _katCache = await SYG.katalog();
+    return _katCache;
+  }
+  function katProduktIstnieje(id){
+    return (_katCache || []).some(function(p){ return Number(p.id) === Number(id); });
+  }
+
+  document.getElementById('blog-nowy').addEventListener('click', function(){
+    edycjaWpis = null;
+    galeria = [];
+    document.getElementById('blog-form-tytul').textContent = 'Nowy wpis';
+    ['bf-tytul','bf-kategoria','bf-zajawka','bf-video','bf-p-nazwa','bf-p-gabaryt'].forEach(function(id){ document.getElementById(id).value = ''; });
+    document.getElementById('bf-data').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('bf-p-cena').value = '';
+    document.getElementById('bf-p-link').value = '';
+    document.getElementById('bf-sklep').checked = false;
+    document.getElementById('bf-produkt').style.display = 'none';
+    blogEdytor.ustaw('');
+    rysujMini();
+    document.getElementById('blog-form').style.display = 'block';
+    document.getElementById('blog-form').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.getElementById('blog-anuluj').addEventListener('click', function(){
+    document.getElementById('blog-form').style.display = 'none';
+  });
+
+  document.getElementById('blog-zapisz').addEventListener('click', async function(){
+    var tytul = document.getElementById('bf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł wpisu.'); return; }
+    var sklep = document.getElementById('bf-sklep').checked;
+    var link = document.getElementById('bf-p-link').value;
+    var kat = await katCache();
+    var istniejacy = kat.find(function(p){ return Number(p.id) === Number(link); });
+    var wpis = {
+      id: edycjaWpis ? edycjaWpis.id : null,
+      tytul: tytul,
+      kategoria: document.getElementById('bf-kategoria').value.trim() || 'Realizacje',
+      data: document.getElementById('bf-data').value || new Date().toISOString().slice(0, 10),
+      zajawka: document.getElementById('bf-zajawka').value.trim(),
+      okladka: galeria.length ? galeria[0].src : 'assets/media/sklep/szopka.jpg',
+      galeria: galeria.map(function(g){ return g.src; }),
+      video: document.getElementById('bf-video').value.trim(),
+      tresc: blogEdytor.pobierz(),
+      produkt: {
+        sklep: sklep,
+        id: istniejacy ? Number(link) : (edycjaWpis && edycjaWpis.produkt && edycjaWpis.produkt.id ? edycjaWpis.produkt.id : 0),
+        nazwa: document.getElementById('bf-p-nazwa').value.trim() || tytul,
+        cena: Number(document.getElementById('bf-p-cena').value) || (istniejacy ? istniejacy.cena : 0),
+        gabaryt: document.getElementById('bf-p-gabaryt').value.trim()
+      }
+    };
+    var odp = await SYG.wezwij('blog-zapisz', { wpis: wpis });
+    infoBlog(odp.ok ? 'Wpis zapisany' + (sklep ? ' i dodany do sklepu.' : '.') : (odp.blad || 'Nie zapisano.'));
+    if (odp.ok){ _katCache = null; ladujBlog(); ladujProdukty(); }
+  });
+
+  /* ============ PODSTRONY ============ */
+  var stronaEdytor = SYG.edytor('sf-tresc', 'sf-zrodlo');
+  var edycjaStrona = null;
+
+  function infoStrony(txt){
+    var f = document.getElementById('strony-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  async function ladujStrony(){
+    var odp = await SYG.wezwij('strony-lista', {});
+    var lista = odp.ok ? (odp.strony || []) : [];
+    var tbody = document.querySelector('#tabela-stron tbody');
+    tbody.innerHTML = lista.map(function(s){
+      return '<tr>' +
+        '<td><b>' + s.tytul + '</b><br><span class="mala">/' + s.slug + '</span></td>' +
+        '<td>' + (s.menu ? '✓' : '—') + '</td>' +
+        '<td>' + s.kol + '</td>' +
+        '<td style="white-space:nowrap">' +
+        '<a class="btn outline" style="padding:6px 12px;font-size:13px" href="podstrona.html?s=' + encodeURIComponent(s.slug) + '" target="_blank" rel="noopener">Podgląd</a> ' +
+        '<button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="' + s.slug + '">Edytuj</button> ' +
+        '<button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="' + s.slug + '">Usuń</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="4">Brak podstron. Dodaj pierwszą.</td></tr>';
+
+    tbody.querySelectorAll('button[data-edit]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var s = lista.find(function(x){ return x.slug === b.getAttribute('data-edit'); });
+        if (!s) return;
+        edycjaStrona = s.slug;
+        document.getElementById('strona-form-tytul').textContent = 'Edycja: ' + s.tytul;
+        document.getElementById('sf-slug').value = s.slug;
+        document.getElementById('sf-tytul').value = s.tytul || '';
+        document.getElementById('sf-menu').checked = s.menu !== 0;
+        document.getElementById('sf-kol').value = s.kol || 10;
+        stronaEdytor.ustaw(s.tresc || '');
+        document.getElementById('strona-form').style.display = 'block';
+      });
+    });
+    tbody.querySelectorAll('button[data-usun]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        if (!confirm('Usunąć podstronę „' + b.getAttribute('data-usun') + '"? Zniknie też z menu.')) return;
+        var odp2 = await SYG.wezwij('strona-usun', { slug: b.getAttribute('data-usun') });
+        infoStrony(odp2.ok ? 'Podstrona usunięta.' : (odp2.blad || 'Nie usunięto.'));
+        ladujStrony();
+      });
+    });
+  }
+
+  document.getElementById('strona-nowa').addEventListener('click', function(){
+    edycjaStrona = null;
+    document.getElementById('strona-form-tytul').textContent = 'Nowa podstrona';
+    document.getElementById('sf-slug').value = '';
+    document.getElementById('sf-tytul').value = '';
+    document.getElementById('sf-menu').checked = true;
+    document.getElementById('sf-kol').value = 10;
+    stronaEdytor.ustaw('');
+    document.getElementById('strona-form').style.display = 'block';
+  });
+
+  document.getElementById('strona-anuluj').addEventListener('click', function(){
+    document.getElementById('strona-form').style.display = 'none';
+  });
+
+  document.getElementById('strona-zapisz').addEventListener('click', async function(){
+    var slug = document.getElementById('sf-slug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+    var tytul = document.getElementById('sf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł podstrony.'); return; }
+    if (!slug){ slug = tytul.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40); }
+    var odp = await SYG.wezwij('strona-zapisz', {
+      strona: {
+        slug: slug, tytul: tytul,
+        menu: document.getElementById('sf-menu').checked ? 1 : 0,
+        kol: Number(document.getElementById('sf-kol').value) || 10,
+        tresc: stronaEdytor.pobierz()
+      }
+    });
+    infoStrony(odp.ok ? 'Podstrona zapisana („/' + slug + '").' : (odp.blad || 'Nie zapisano.'));
+    if (odp.ok){ edycjaStrona = null; ladujStrony(); }
+  });
+
+  /* ============ ustawienia (cennik dostawy) ============ */
+  function ladujUstawienia(){
+    var c = SYG.ustawieniaDostawa();
+    document.getElementById('u-paczkomat-s').value = c.paczkomat.S;
+    document.getElementById('u-paczkomat-m').value = c.paczkomat.M;
+    document.getElementById('u-paczkomat-l').value = c.paczkomat.L;
+    document.getElementById('u-kurier-s').value = c.kurier.S;
+    document.getElementById('u-kurier-m').value = c.kurier.M;
+    document.getElementById('u-kurier-l').value = c.kurier.L;
+  }
+  document.getElementById('zapisz-dostawe').addEventListener('click', async function(){
+    var cennik = {
+      paczkomat: { S: Number(document.getElementById('u-paczkomat-s').value) || 0,
+                   M: Number(document.getElementById('u-paczkomat-m').value) || 0,
+                   L: Number(document.getElementById('u-paczkomat-l').value) || 0 },
+      kurier: { S: Number(document.getElementById('u-kurier-s').value) || 0,
+                M: Number(document.getElementById('u-kurier-m').value) || 0,
+                L: Number(document.getElementById('u-kurier-l').value) || 0 }
+    };
+    var odp = await SYG.wezwij('ustawienia-dostawa-zapisz', { cennik: cennik });
+    var f = document.getElementById('ustawienia-info');
+    f.style.display = 'block';
+    f.textContent = odp.ok ? 'Cennik dostawy zapisany — formularz zamówienia używa nowych stawek.' : (odp.blad || 'Nie zapisano.');
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  });
+
+  /* ============ logowanie wymuszane po każdym zamknięciu strony (sesja) ============ */
+  function pokazPanel(){
+    logowanie.style.display = 'none';
+    panel.style.display = 'block';
+    ladujZamowienia();
+    ladujWiadomosci();
+    ladujProdukty();
+    ladujBlog();
+    ladujStrony();
+    ladujUstawienia();
+  }
+
+  var zalogowany = false;
+  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
+  if (zalogowany){
+    pokazPanel();
+  } else {
+    logowanie.style.display = 'block';
+  }
+
+  document.getElementById('pokaz-admin-haslo').addEventListener('click', function(){
+    var inp = document.getElementById('admin-haslo');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    this.classList.toggle('aktywne', inp.type === 'text');
+  });
+
+  document.getElementById('zaloguj').addEventListener('click', async function(){
+    var l = document.getElementById('admin-login').value.trim();
+    var h = document.getElementById('admin-haslo').value;
+    if (!l || !h){
+      logowanieBlad.textContent = 'Podaj login i hasło.';
+      logowanieBlad.style.display = 'block';
+      return;
+    }
+    if (SYG.TRYB_DEMO){
+      if (l === SYG.ADMIN_DEMO_LOGIN && h === SYG.ADMIN_DEMO_HASLO){
+        try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
+        logowanieBlad.style.display = 'none';
+        pokazPanel();
+      } else {
+        logowanieBlad.textContent = 'Nieprawidłowy login lub hasło.';
+        logowanieBlad.style.display = 'block';
+      }
+    } else {
+      var odp = await SYG.wezwij('admin-login', { login: l, haslo: h, klucz: klucz });
+      if (odp.ok){
+        try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
+        logowanieBlad.style.display = 'none';
+        pokazPanel();
+      } else {
+        logowanieBlad.textContent = odp.blad || 'Nieprawidłowy login lub hasło.';
+        logowanieBlad.style.display = 'block';
+      }
+    }
+  });
+
+  document.getElementById('wyloguj').addEventListener('click', function(){
+    try { sessionStorage.removeItem('syg-admin'); } catch(e){}
+    window.location.reload();
+  });
+
+  document.getElementById('odswiez').addEventListener('click', function(){
+    _katCache = null;
+    ladujZamowienia();
+    ladujWiadomosci();
+    ladujProdukty();
+    ladujBlog();
+    ladujStrony();
+  });
+})();
+</script>
+</body>
+</html>

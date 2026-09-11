@@ -1,0 +1,1950 @@
+# -*- coding: utf-8 -*-
+"""Studio Sygnatura — serwis z panelem administracyjnym.
+
+URUCHOMIENIE (lokalnie na swoim komputerze):
+    cd serwis
+    python app.py
+    -> otwórz http://127.0.0.1:8000
+
+Wymagane: pip install flask  (raz)
+Baza: data/serwis.db (SQLite, tworzy się sama; usunięcie pliku = reset do danych startowych)
+
+Struktura:
+    serwis/app.py        — ta aplikacja (trasy, formularze, API)
+    serwis/db.py         — baza danych + dane startowe
+    serwis/core.py       — statusy, sygnatury, e-maile, Google Sheets, treści maili
+    serwis/templates/    — szablony HTML (Jinja2) — tu edytujesz wygląd
+    serwis/static/       — pliki statyczne (style, ikony)
+    serwis/data/         — baza + dokumenty (NIE wrzucaj do gita, jest w .gitignore)
+"""
+import os
+import re
+import json
+import sqlite3
+import datetime
+import secrets
+from functools import wraps
+
+from flask import (Flask, g, request, render_template, render_template_string,
+                   redirect, url_for as _flask_url_for, session, send_from_directory, abort, flash,
+                   has_request_context)
+
+import db as baza_mod
+import core
+
+
+def url_for(koniec, **kw):
+    """Wrapper na url_for: na stronach admina dokleja do adresu token logowania (klucz),
+    żeby panel działał także w przeglądarkach blokujących ciasteczka (iframe/podgląd/telefon)."""
+    if has_request_context():
+        klucz = request.args.get('klucz')
+        if klucz and str(koniec).startswith('admin') and str(koniec) != 'admin_login':
+            kw.setdefault('klucz', klucz)
+    return _flask_url_for(koniec, **kw)
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+V4 = os.path.normpath(os.path.join(ROOT, '..', 'v4'))
+DATA = os.path.join(ROOT, 'data')
+os.makedirs(DATA, exist_ok=True)
+
+app = Flask(__name__)
+
+# tajny klucz sesji (trwały, generowany raz)
+SECRET = os.path.join(DATA, 'secret.txt')
+if not os.path.exists(SECRET):
+    with open(SECRET, 'w') as f:
+        f.write(os.urandom(24).hex())
+app.secret_key = open(SECRET).read()
+
+
+def url_obrazu(obraz, typ='sklep'):
+    """Adres zdjęcia: pełny URL (https://…, np. z Dysku Google) zostaje BEZ ZMIAN,
+    lokalna nazwa pliku dostaje ścieżkę serwisu. Dzięki temu zdjęcia można trzymać
+    na zewnątrz (Dysk Google itp.) i nie obciążają one serwera ani miejsca na dysku."""
+    obraz = (obraz or '').strip()
+    if not obraz:
+        return ''
+    if obraz.startswith(('http://', 'https://', '//')):
+        return obraz
+    if typ == 'realizacja':
+        return '/media/' + obraz
+    return '/static/media/sklep/' + obraz
+
+
+@app.template_filter('obrazek')
+def filtr_obrazek(obraz, typ='sklep'):
+    """W szablonach: {{ nazwa|obrazek('sklep') }} / {{ nazwa|obrazek('realizacja') }}."""
+    return url_obrazu(obraz, typ)
+
+# baza tworzy się automatycznie (też przy starcie przez WSGI/gunicorn — nie tylko `python app.py`)
+baza_mod.inicjuj()
+
+# token logowania doklejany do linków panelu w szablonach (tak samo jak w trasach)
+app.jinja_env.globals['url_for'] = url_for
+
+MIESIACE = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec',
+            'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień']
+DZIEN = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
+
+EV_GRUPY = {
+    'komunijny': ('Pakiet Komunijny', 'komunia / chrzest — esencja, mid i full'),
+    'weselny': ('Pakiet Weselny', 'wesele — opcje i.w.'),
+    'firmowy': ('Pakiet Firmowy', 'konferencja, gala, event firmowy'),
+    'jubileuszowy': ('Pakiet Jubileuszowy', 'urodziny, rocznica, jubileusz'),
+    'inne': ('Inne', 'pozostałe pakiety'),
+}
+
+# ---------------------------------------------------------------- baza per żądanie
+def get_db():
+    if 'db' not in g:
+        g.db = sqlite3.connect(baza_mod.BAZA)
+        g.db.row_factory = sqlite3.Row
+        g.db.execute('PRAGMA foreign_keys = ON')
+    return g.db
+
+
+@app.teardown_appcontext
+def zamknij_db(exc):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
+
+
+def redirect303(cel, **kw):
+    """Redirect po formularzu POST - kod 303 wymusza GET (przegladarka nie ponawia POST).
+    Przyjmuje GOTOWY adres (wynik url_for), nie endpoint."""
+    return redirect(cel, code=303)
+
+
+def redirect_msg(koniec, wiadomosc, **kw):
+    """Redirect 303 z komunikatem w adresie (?msg=...) — działa także wtedy,
+    gdy przeglądarka blokuje ciasteczka (panel w iframe/podglądzie), gdzie
+    zwykły flash() by zniknął. Szablony admin_base pokazują ?msg."""
+    from urllib.parse import quote
+    adres = url_for(koniec, **kw)
+    sep = '&' if '?' in adres else '?'
+    return redirect(adres + sep + 'msg=' + quote(wiadomosc), code=303)
+
+
+def admin_required(fn):
+    @wraps(fn)
+    def wrap(*a, **kw):
+        if not session.get('admin'):
+            # logowanie przez token w adresie (działa bez ciasteczek — iframe/podgląd/telefon)
+            klucz = request.args.get('klucz') or request.form.get('klucz') or request.headers.get('X-Admin-Klucz')
+            if klucz:
+                db = get_db()
+                row = db.execute('SELECT 1 FROM admin_tokens WHERE token=? AND wygasa>?', (klucz, core.teraz())).fetchone()
+                if row:
+                    session['admin'] = '1'
+                    session['admin_klucz'] = klucz
+                else:
+                    return redirect303(url_for('admin_login', dalej=request.path))
+            else:
+                return redirect303(url_for('admin_login', dalej=request.path))
+        return fn(*a, **kw)
+    return wrap
+
+
+# ---------------------------------------------------------------- strony statyczne (kopie z v4)
+STATYCZNE = ['index.html', 'warsztat.html', 'galeria.html', 'sklep.html', 'kontakt.html', 'hero-picker.html']
+
+def wczytaj_v4(nazwa, **ctx):
+    """Czyta stronę z folderu v4 i przepisuje ścieżki na trasy Flaska:
+    assets/ -> /assets/ oraz wynajem.html -> /zamowienia/.
+    Strona główna (index.html) dostaje kontekst z bazy (slider: nowości, bestsellery,
+    ostatnia realizacja) — brak zmiennych = szablon pokazuje treści zastępcze."""
+    sciezka = os.path.join(V4, nazwa)
+    if not os.path.exists(sciezka):
+        abort(404)
+    tresc = open(sciezka, encoding='utf-8').read()
+    tresc = tresc.replace('assets/', '/assets/')
+    # „Wynajem"/„Personalizacja" w menu prowadzą teraz do hubu ZAMÓWIENIA (kreator 5 kroków)
+    tresc = tresc.replace('wynajem.html">Personalizacja', '/zamowienia/">Zamówienia')
+    tresc = tresc.replace('wynajem.html', '/zamowienia/')
+    tresc = tresc.replace('>Wynajem<', '>Zamówienia<')
+    tresc = tresc.replace('galeria.html', '/realizacje/')
+    tresc = tresc.replace('kontakt.html', '/kontakt/')
+    tresc = tresc.replace('index.html', '/')
+    tresc = tresc.replace('>Galeria<', '>Realizacje<')
+    return render_template_string(tresc, **ctx)
+
+
+def top_produkty_sklepu(db, limit=3):
+    """Najczęściej zamawiane produkty sklepu — liczone z rezerwacji (pozycje JSON).
+    Gdy brak zamówień, zwraca pierwsze produkty z katalogu (kolejność sklepowa)."""
+    licznik = {}
+    try:
+        for r in db.execute("SELECT pozycje FROM rezerwacje WHERE pozycje IS NOT NULL AND pozycje!='' AND pozycje!='[]'").fetchall():
+            for p in json.loads(r['pozycje'] or '[]'):
+                nazwa = p.get('nazwa')
+                if nazwa:
+                    licznik[nazwa] = licznik.get(nazwa, 0) + int(p.get('ile') or 1)
+    except Exception:
+        licznik = {}
+    rows = db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    rows = sorted(rows, key=lambda x: (-licznik.get(x['nazwa'], 0), x['kolejnosc'] or 0, x['id']))
+    return rows[:limit]
+
+
+@app.route('/')
+def index():
+    """Strona główna (landing v5): slider czerpie dane z bazy — nowości, bestsellery, ostatnia realizacja."""
+    db = get_db()
+    nowosci = db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 ORDER BY id DESC LIMIT 3').fetchall()
+    top = top_produkty_sklepu(db, 3)
+    realizacja = db.execute("SELECT * FROM realizacje WHERE widoczna=1 ORDER BY id DESC LIMIT 1").fetchone()
+    return wczytaj_v4('index.html', nowosci=nowosci, top=top, realizacja=realizacja)
+
+
+@app.route('/szukaj/')
+def szukaj():
+    """Wyszukiwarka strony głównej — przeszukuje sklep, personalizacje, pakiety i realizacje."""
+    db = get_db()
+    q = (request.args.get('q') or '').strip()
+    wyniki = []
+    if len(q) >= 2:
+        like = '%' + q.replace('%', '').replace('_', '') + '%'
+        for r in db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'sklep', 'grupa': 'Sklep', 'tytul': r['nazwa'], 'opis': r['opis'],
+                           'meta': '%.0f zł / szt.' % (r['cena'] or 0), 'url': url_for('z_sklep_katalog'),
+                           'obraz': url_obrazu(r['obraz'], 'sklep')})
+        for r in db.execute('SELECT * FROM personalizacje WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'personalizacja', 'grupa': 'Personalizacja', 'tytul': r['nazwa'], 'opis': r['opis'],
+                           'meta': '%.0f zł' % (r['cena'] or 0), 'url': url_for('z_pers_samodzielna'), 'obraz': ''})
+        for r in db.execute('SELECT * FROM pakiety WHERE dostepny=1 AND (nazwa LIKE ? OR opis LIKE ?) ORDER BY kolejnosc, id LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'pakiet', 'grupa': 'Pakiety na wynajem', 'tytul': r['nazwa'], 'opis': r['opis'],
+                           'meta': r['cena'] or '', 'url': url_for('z_wynajem_termin'), 'obraz': ''})
+        for r in db.execute('SELECT * FROM realizacje WHERE widoczna=1 AND (tytul LIKE ? OR opis LIKE ?) ORDER BY id DESC LIMIT 12', (like, like)).fetchall():
+            wyniki.append({'typ': 'realizacja', 'grupa': 'Realizacje', 'tytul': r['tytul'], 'opis': r['opis'],
+                           'meta': r['kategoria'] or '', 'url': url_for('realizacja_szczegoly', rid=r['id']),
+                           'obraz': url_obrazu(r['zdjecie'], 'realizacja')})
+    return render_template('szukaj.html', q=q, wyniki=wyniki)
+
+
+@app.route('/warsztat.html')
+def warsztat():
+    return wczytaj_v4('warsztat.html')
+
+
+@app.route('/galeria.html')
+def galeria():
+    return wczytaj_v4('galeria.html')
+
+
+@app.route('/sklep.html')
+def sklep():
+    return wczytaj_v4('sklep.html')
+
+
+@app.route('/kontakt.html')
+def kontakt():
+    return wczytaj_v4('kontakt.html')
+
+
+@app.route('/hero-picker.html')
+def hero_picker():
+    return wczytaj_v4('hero-picker.html')
+
+
+@app.route('/assets/<path:nazwa>')
+def assets(nazwa):
+    return send_from_directory(os.path.join(V4, 'assets'), nazwa)
+
+
+@app.route('/static/<path:nazwa>')
+def static_pliki(nazwa):
+    # wspólna szata graficzna serwisu (CSS/JS) — edytowalna bez Pythona.
+    # max_age=0 -> przeglądarka ZAWSZE pobiera świeży plik (koniec z rozjechanym
+    # wyglądem przez stary CSS w pamięci telefonu).
+    return send_from_directory(os.path.join(ROOT, 'static'), nazwa, max_age=0)
+
+
+# ---------------------------------------------------------------- PLAN MINIMUM: portfolio + kontakt
+@app.route('/realizacje/')
+def realizacje():
+    db = get_db()
+    rows = db.execute("SELECT * FROM realizacje WHERE widoczna=1 ORDER BY kolejnosc, id DESC").fetchall()
+    kategorie = [r['kategoria'] for r in db.execute(
+        "SELECT DISTINCT kategoria FROM realizacje WHERE widoczna=1 AND kategoria!='' ORDER BY kategoria").fetchall()]
+    return render_template('realizacje.html', rows=rows, kategorie=kategorie)
+
+
+@app.route('/realizacje/<int:rid>/')
+def realizacja_szczegoly(rid):
+    db = get_db()
+    row = db.execute('SELECT * FROM realizacje WHERE id=? AND widoczna=1', (rid,)).fetchone()
+    if not row:
+        abort(404)
+    return render_template('realizacja_szczegoly.html', r=row)
+
+
+@app.route('/media/<nazwa>')
+def media(nazwa):
+    # zdjęcia realizacji wgrane przez panel (data/uploads)
+    return send_from_directory(os.path.join(DATA, 'uploads'), nazwa)
+
+
+@app.route('/kontakt/', methods=['GET', 'POST'])
+def kontakt_form():
+    db = get_db()
+    bledy = []
+    dane = {'imie': '', 'email': '', 'telefon': '', 'tresc': '', 'temat': 'inne'}
+    ok = False
+    if request.method == 'POST':
+        honeypot = request.form.get('strona_www', '')
+        dane = {
+            'imie': (request.form.get('imie') or '').strip(),
+            'email': (request.form.get('email') or '').strip(),
+            'telefon': (request.form.get('telefon') or '').strip(),
+            'tresc': (request.form.get('tresc') or '').strip(),
+            'temat': (request.form.get('temat') or '').strip(),
+        }
+        if dane['temat'] not in TEMATY_KONTAKT:
+            dane['temat'] = 'inne'
+        zgoda = request.form.get('zgoda') == 'on'
+        if not honeypot:  # boty wypełniają ukryte pole — udajemy sukces, nic nie zapisujemy
+            if len(dane['imie']) < 2:
+                bledy.append('Podaj imię (min. 2 znaki).')
+            if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', dane['email']):
+                bledy.append('Podaj poprawny adres e-mail.')
+            if len(dane['tresc']) < 10:
+                bledy.append('Napisz kilka słów (min. 10 znaków) — w czym możemy pomóc?')
+            if not zgoda:
+                bledy.append('Zaznacz zgodę na kontakt — bez niej nie możemy odpisać (PKE art. 398).')
+            if not bledy:
+                db.execute('INSERT INTO wiadomosci (imie, email, telefon, tresc, temat, zgoda, status, data) VALUES (?,?,?,?,?,?,?,?)',
+                           (dane['imie'], dane['email'], dane['telefon'], dane['tresc'],
+                            TEMATY_KONTAKT[dane['temat']], 1, 'nowa', core.teraz()))
+                db.commit()
+                wiad = {'imie': dane['imie'], 'email': dane['email'], 'telefon': dane['telefon'],
+                        'temat': TEMATY_KONTAKT[dane['temat']], 'tresc': dane['tresc'], 'zgoda': True,
+                        'data': core.teraz()}
+                core.wyslij_do_studia(db, 'Nowa wiadomość z formularza: %s' % dane['imie'], core.mail_kontakt_studio(wiad))
+                core.wyslij_szablon(db, 'kontakt', wiad, dane['email'])
+                ok = True
+        else:
+            ok = True
+    else:
+        # preselekcja tematu z linku (np. /kontakt/?temat=wspolpraca lub ?temat=projekt)
+        t = request.args.get('temat', '').strip()
+        dane['temat'] = t if t in TEMATY_KONTAKT else 'inne'
+        # opis projektu spersonalizowanego z kreatora (popup „własny projekt") — wklejany do wiadomości
+        dane['tresc'] = request.args.get('opis', '').strip()
+    return render_template('kontakt.html', bledy=bledy, dane=dane, ok=ok,
+                           tematy=TEMATY_KONTAKT)
+
+
+@app.route('/regulamin/')
+def regulamin():
+    """Regulamin serwisu (podstrona) — treść edytowalna w szablonie."""
+    return render_template('regulamin.html')
+
+
+@app.route('/jak-pracujemy/')
+def jak_pracujemy():
+    """Jak pracujemy (podstrona) — treść edytowalna w szablonie."""
+    return render_template('jak_pracujemy.html')
+
+
+@app.route('/pracownia/')
+def pracownia():
+    """Pracownia = „o nas" — kim jesteśmy, co robimy, skąd się wzięła Sygnatura."""
+    return render_template('pracownia.html')
+
+
+@app.route('/wspolpraca/')
+def wspolpraca():
+    """Współpraca B2B: dekoratorzy, hotele, kwiaciarnie, firmy eventowe, imprezy firmowe."""
+    return render_template('wspolpraca.html')
+
+
+# ---------------------------------------------------------------- strona wynajmu
+def stan_dnia(db, pakiet_id, data):
+    """(klasa_css, tytul, czy_zablokowany) dla jednego dnia.
+    pakiet_id=None -> sprawdza rezerwacje WSZYSTKICH pakietów (zestaw własny = wspólna pula towaru)."""
+    if pakiet_id:
+        row = db.execute(
+            "SELECT status FROM rezerwacje WHERE pakiet_id=? AND status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+            "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+            (pakiet_id, data)).fetchone()
+    else:
+        row = db.execute(
+            "SELECT status FROM rezerwacje WHERE status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+            "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+            (data,)).fetchone()
+    if not row:
+        return '', '', False
+    status = row['status']
+    if status == 'zarezerwowany':
+        return 'st-zarezerwowany', 'Termin zarezerwowany', True
+    if status == 'platnosc_w_toku':
+        return 'st-platnosc', 'Płatność w toku — termin wstrzymany', True
+    return 'st-zapytanie', 'Wysłano zapytanie — nadal można pytać o ten termin', False
+
+
+def siatka_miesiaca(db, pakiet_id, rok, mies):
+    """Zwraca listę dni miesiąca z klasami statusów (poniedziałek = kolumna 1)."""
+    pierwszy = datetime.date(rok, mies, 1)
+    przesun = pierwszy.weekday()  # Pn=0
+    ile = (datetime.date(rok + (mies // 12), (mies % 12) + 1, 1) - pierwszy).days
+    dni = []
+    for i in range(przesun):
+        dni.append({'nr': '', 'data': '', 'klasa': 'pusty', 'tytul': '', 'zajety': False})
+    for nr in range(1, ile + 1):
+        data = '%04d-%02d-%02d' % (rok, mies, nr)
+        klasa, tytul, zajety = stan_dnia(db, pakiet_id, data)
+        if datetime.date(rok, mies, nr) < datetime.date.today():
+            klasa, tytul, zajety = 'przeszly', 'Termin minął', True
+        dni.append({'nr': nr, 'data': data, 'klasa': klasa, 'tytul': tytul, 'zajety': zajety})
+    return dni
+
+
+def zakres_domyslny(data):
+    """Domyślny zakres najmu: dzień przed imprezą (montaż) i dzień po (demontaż) = min. 3 doby."""
+    if not data:
+        return '', ''
+    try:
+        d = datetime.date.fromisoformat(data)
+    except ValueError:
+        return '', ''
+    return (d - datetime.timedelta(days=1)).isoformat(), (d + datetime.timedelta(days=1)).isoformat()
+
+
+def konflikty_zakresu(db, pakiet_id, od, do):
+    """Sprawdza cały zakres od–do dzień po dniu.
+    Zwraca (konflikty_blokujace, ostrzezenia_zapytania).
+    pakiet_id=None -> sprawdza całą pulę (zestaw własny)."""
+    blok, pyt = [], []
+    dzien = od
+    while dzien <= do:
+        iso = dzien.isoformat()
+        if pakiet_id:
+            row = db.execute(
+                "SELECT status FROM rezerwacje WHERE pakiet_id=? AND status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+                "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+                (pakiet_id, iso)).fetchone()
+        else:
+            row = db.execute(
+                "SELECT status FROM rezerwacje WHERE status!='odrzucono' AND ? BETWEEN data_od AND data_do "
+                "ORDER BY CASE status WHEN 'zarezerwowany' THEN 0 WHEN 'platnosc_w_toku' THEN 1 ELSE 2 END LIMIT 1",
+                (iso,)).fetchone()
+        if row:
+            if row['status'] in ('zarezerwowany', 'platnosc_w_toku'):
+                blok.append((iso, row['status']))
+            else:
+                pyt.append(iso)
+        dzien += datetime.timedelta(days=1)
+    return blok, pyt
+
+
+def wczytaj_pers(db, parametr):
+    """Wybrane produkty spersonalizowane (parametr pers='1,2') — lista id + obiekty z bazy.
+    Wybór wędruje przez całą ścieżkę zamówienia (wynajem -> wydarzenie -> pakiet -> formularz),
+    żeby nic nie ginęło przy nawigacji."""
+    pers_ids = [int(x) for x in (parametr or '').split(',') if x.strip().isdigit()]
+    widziane, personalizacje = set(), []
+    for pid3 in pers_ids:
+        if pid3 in widziane:
+            continue
+        widziane.add(pid3)
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            personalizacje.append(pr)
+    return [x for x in pers_ids if x in widziane], personalizacje
+
+
+# ---------------------------------------------------------------- kreator zamówienia (szkice)
+def szkic_nowy(db, dane):
+    """Tworzy szkic zamówienia (kreator krokowy) i zwraca klucz wędrujący w adresie (?w=...).
+    Stare szkice (ponad 48 h) są sprzątane przy okazji."""
+    db.execute('DELETE FROM szkice WHERE utworzono < ?', (core.teraz_plus(-48 * 3600),))
+    klucz = secrets.token_urlsafe(18)
+    db.execute('INSERT INTO szkice (klucz, typ, dane, utworzono) VALUES (?,?,?,?)',
+               (klucz, dane.get('typ', 'wynajem'), json.dumps(dane, ensure_ascii=False), core.teraz()))
+    db.commit()
+    return klucz
+
+
+def szkic_pobierz(db, klucz):
+    if not klucz:
+        return None
+    row = db.execute('SELECT * FROM szkice WHERE klucz=?', (klucz,)).fetchone()
+    if not row:
+        return None
+    try:
+        dane = json.loads(row['dane'] or '{}')
+    except Exception:
+        dane = {}
+    dane['_klucz'] = row['klucz']
+    return dane
+
+
+def szkic_zapisz(db, klucz, dane):
+    db.execute('UPDATE szkice SET dane=? WHERE klucz=?', (json.dumps(dane, ensure_ascii=False), klucz))
+    db.commit()
+
+
+def kwoty_zamowienia(db, zam):
+    """Podsumowanie kwot zależnie od typu zamówienia:
+    - wynajem: najem × doby + kaucja 300 zł + personalizacja
+    - personalizacja: tylko produkty personalizowane (pełna przedpłata)
+    - sklep: produkty z katalogu (cena × szt.) + opcjonalna personalizacja
+    Rabat: personalizacja −5% od 3 szt. + ewentualny kod (od całości bez kaucji)."""
+    typ = zam.get('typ') or 'wynajem'
+    pozycje = zam.get('pozycje') or []
+    pers_list = zam.get('pers') or []
+    p = None
+    if zam.get('pakiet_id'):
+        p = db.execute('SELECT * FROM pakiety WHERE id=?', (zam['pakiet_id'],)).fetchone()
+    najem_kwota, stawka_txt, dni, kaucja, pozycje_suma = 0, '', 0, 0, 0
+    if typ == 'wynajem':
+        dni = int(zam.get('dni') or 0)
+        if p:
+            stawka = p['cena_liczba'] or 0
+            stawka_txt = p['cena']
+        else:
+            stawka = sum(float(x.get('cena') or 0) for x in pozycje)
+            stawka_txt = '%d zł / doba (zestaw własny)' % stawka
+        najem_kwota = round(stawka * dni)
+        kaucja = 300
+    elif typ == 'sklep':
+        pozycje_suma = sum(float(x.get('cena') or 0) * int(x.get('ile') or 1) for x in pozycje)
+    pers_suma = sum(float(x.get('cena') or 0) for x in pers_list)
+    pers_rabat = round(pers_suma * 0.05) if len(pers_list) >= 3 else 0
+    pers_netto = pers_suma - pers_rabat
+    podstawa = najem_kwota + pozycje_suma + pers_netto
+    razem = podstawa + kaucja
+    kod = (zam.get('kod') or '').strip()
+    rabat_proc, _ = core.rabat_od_kodu(db, kod)
+    rabat_kod = round(podstawa * rabat_proc / 100) if rabat_proc else 0
+    return {'typ': typ, 'najem': najem_kwota, 'stawka_txt': stawka_txt, 'dni': dni,
+            'pozycje_suma': pozycje_suma, 'pers_suma': pers_suma, 'pers_rabat': pers_rabat,
+            'pers_netto': pers_netto, 'kaucja': kaucja, 'razem': razem, 'kod': kod,
+            'rabat_kod': rabat_kod, 'razem_po': razem - rabat_kod}
+
+
+def finalizuj_zamowienie(db, zam):
+    """Tworzy zamówienie (rezerwację) ze słownika zam — wspólne dla WSZYSTKICH
+    przepływów (wynajem / personalizacja / sklep) i starego formularza.
+    Wysyła maile (Studio + autoresponder) i push do arkusza Google.
+    Zwraca (rez, kwoty, blad) — przy blad='' zamówienie zostało utworzone."""
+    typ = zam.get('typ') or 'wynajem'
+    pakiet_id = zam.get('pakiet_id') or 0
+    p = None
+    if pakiet_id:
+        p = db.execute('SELECT * FROM pakiety WHERE id=?', (pakiet_id,)).fetchone()
+        if not p:
+            return None, None, 'Nie znaleziono pakietu — wróć do wyboru pakietu.'
+    pozycje = zam.get('pozycje') or []
+    pers_list = zam.get('pers') or []
+    pomysl = (zam.get('pomysl') or '').strip()
+    tresc = (zam.get('tresc') or '').strip()
+
+    data, data_od, data_do, dni, pyt = '', '', '', 0, []
+    if typ == 'wynajem':
+        data = zam.get('data') or ''
+        data_od = zam.get('data_od') or ''
+        data_do = zam.get('data_do') or ''
+        try:
+            d_ev = datetime.date.fromisoformat(data)
+            d_od = datetime.date.fromisoformat(data_od)
+            d_do = datetime.date.fromisoformat(data_do)
+        except ValueError:
+            return None, None, 'Podaj poprawne daty (RRRR-MM-DD).'
+        if not (d_od <= d_ev <= d_do):
+            return None, None, 'Data imprezy musi się mieścić między „od" a „do".'
+        if d_od < datetime.date.today():
+            return None, None, 'Termin nie może zaczynać się w przeszłości.'
+        dni = (d_do - d_od).days + 1
+        blok, pyt = konflikty_zakresu(db, pakiet_id, d_od, d_do)
+        if blok:
+            opis = ', '.join('%s (%s)' % (d, core.STATUSY_PL[s]) for d, s in blok[:5])
+            return None, None, 'Termin został w międzyczasie zajęty: %s. Wróć do kalendarza i wybierz inny zakres.' % opis
+        if dni == 1 and len(tresc) < 20:
+            return None, None, 'Najem na 1 dobę to wyjątek — dekoracje zakładamy dzień przed i ściągamy dzień po imprezie. Krótko uzasadnij w wiadomości, a rozpatrzymy to ręcznie.'
+    elif typ == 'personalizacja':
+        if not pers_list and len(pomysl) < 10:
+            return None, None, 'Wybierz co najmniej jeden produkt do personalizacji albo opisz swój pomysł (min. 10 znaków).'
+    elif typ == 'sklep':
+        if not pozycje:
+            return None, None, 'Wybierz co najmniej jeden produkt z katalogu sklepu.'
+
+    email = (zam.get('email') or '').strip()
+    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+        return None, None, 'Podaj poprawny adres e-mail.'
+    sygnatura = (zam.get('sygnatura') or '').strip().upper()
+    if not sygnatura:
+        sygnatura = core.nowa_sygnatura(db)
+    temat = (zam.get('temat') or 'Rezerwacja terminu').strip()
+    imie = (zam.get('imie') or '').strip()
+    telefon = (zam.get('telefon') or '').strip()
+    dostawa = (zam.get('dostawa') or '').strip()
+    adres = (zam.get('adres') or '').strip()
+    kod = (zam.get('kod') or '').strip()
+    if typ == 'wynajem':
+        pakiet_nazwa = p['nazwa'] if p else 'Zestaw własny'
+    elif typ == 'personalizacja':
+        pakiet_nazwa = 'Personalizacja (samodzielna)'
+    else:
+        pakiet_nazwa = 'Produkty ze sklepu'
+    zam['dni'] = dni
+    kwoty = kwoty_zamowienia(db, zam)
+    dodatkowe = json.dumps({'typ': typ, 'pomysl': pomysl, 'zgody': zam.get('zgody') or {}},
+                           ensure_ascii=False)
+    if pomysl:
+        tresc = (tresc + '\n\nPOMYSŁ WŁASNY (personalizacja spoza katalogu):\n' + pomysl +
+                 '\n\nUWAGA: pomysł własny zostanie wyceniony OSOBNO — ofertę wyślemy e-mailem '                 'pod tą samą sygnaturą w ciągu 2 dni roboczych. Kwoty w podsumowaniu nie obejmują tej części.').strip()
+    teraz = core.teraz()
+    db.execute(
+        'INSERT INTO rezerwacje (sygnatura, data, data_od, data_do, dni, pakiet_id, pakiet_nazwa, temat, imie, email, telefon, tresc, pozycje, personalizacje, '
+        'kwoty, status, rozliczenie, dostawa, adres, kod, dodatkowe, utworzono, zmieniono, historia) '
+        'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        (sygnatura, data, data_od, data_do, dni, p['id'] if p else None, pakiet_nazwa, temat, imie, email, telefon, tresc,
+         json.dumps(pozycje, ensure_ascii=False),
+         json.dumps(pers_list, ensure_ascii=False),
+         json.dumps(kwoty, ensure_ascii=False),
+         'zapytanie', zam.get('rozliczenie') or 'wspolne', dostawa, adres, kod, dodatkowe,
+         teraz, teraz, json.dumps([{'kiedy': teraz, 'status': 'zapytanie', 'uwaga': 'zgłoszenie przez kreator zamówienia'}], ensure_ascii=False)))
+    db.commit()
+    rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (sygnatura,)).fetchone()
+
+    if pyt:
+        db.execute('UPDATE rezerwacje SET tresc=? WHERE id=?',
+                   ((rez['tresc'] + '\n\nUWAGA: w zakresie są dni z istniejącymi zapytaniami: ' + ', '.join(pyt)).strip(), rez['id']))
+        db.commit()
+        rez = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rez['id'],)).fetchone()
+
+    rez_z_kwotami = dict(rez)
+    rez_z_kwotami['kwoty'] = kwoty
+    rez_z_kwotami['typ'] = typ
+    # 1) e-mail do Studia (powiadomienie)
+    if typ == 'wynajem':
+        naglowek = 'Nowe zapytanie — %s — %s–%s' % (rez['pakiet_nazwa'], data_od, data_do)
+    else:
+        naglowek = 'Nowe zamówienie (%s) — %s' % ('personalizacja' if typ == 'personalizacja' else 'sklep', sygnatura)
+    core.wyslij_do_studia(db, naglowek, core.mail_studio_zapytanie(rez_z_kwotami))
+    # 2) autoresponder do klienta — szablon z bazy wg typu / tematu
+    if typ != 'wynajem':
+        klucz_szablonu = 'zamowienie'
+    else:
+        temat_zgloszenia = (rez['temat'] or '').lower()
+        if 'rezerwac' in temat_zgloszenia and 'termin' in temat_zgloszenia:
+            klucz_szablonu = 'rezerwacja-terminu'
+        elif pers_list:
+            klucz_szablonu = 'zamowienie'
+        else:
+            klucz_szablonu = 'zapytanie'
+    core.wyslij_szablon(db, klucz_szablonu, rez_z_kwotami, email)
+    # 3) arkusz Google (bez URL nic nie wysyła — log w Ustawieniach)
+    core.push_do_sheets(db, rez)
+    return rez, kwoty, ''
+
+
+@app.route('/wynajem/')
+def wynajem():
+    """Strona główna wynajmu: WYBÓR TYPU WYDARZENIA — bez kalendarzy."""
+    db = get_db()
+    pakiety = db.execute('SELECT * FROM pakiety WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    liczba = {}
+    for p in pakiety:
+        liczba[p['ev']] = liczba.get(p['ev'], 0) + 1
+    grupy = []
+    for ev, (nazwa_g, opis_g) in EV_GRUPY.items():
+        if liczba.get(ev):
+            grupy.append({'ev': ev, 'nazwa': nazwa_g, 'opis': opis_g, 'ile': liczba[ev]})
+    kategorie = db.execute('SELECT * FROM kategorie ORDER BY kolejnosc, id').fetchall()
+    produkty = db.execute('SELECT * FROM produkty WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    produkty_wg = {}
+    for pr in produkty:
+        produkty_wg.setdefault(pr['kategoria_id'], []).append(pr)
+    pers_ids, personalizacje = wczytaj_pers(db, request.args.get('pers', ''))
+    return render_template('wynajem.html', grupy=grupy, kategorie=kategorie, produkty_wg=produkty_wg,
+                           pers_ids=pers_ids, personalizacje=personalizacje)
+
+
+@app.route('/wynajem/komponuje/')
+def komponuje():
+    """Kompozytor własnego zestawu: katalog z kalkulatorem + termin od–do."""
+    db = get_db()
+    kategorie = db.execute('SELECT * FROM kategorie ORDER BY kolejnosc, id').fetchall()
+    produkty = db.execute('SELECT * FROM produkty WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    produkty_wg = {}
+    for pr in produkty:
+        produkty_wg.setdefault(pr['kategoria_id'], []).append(pr)
+    rok = int(request.args.get('rok') or datetime.date.today().year)
+    mies = int(request.args.get('mies') or datetime.date.today().month)
+    dni = siatka_miesiaca(db, None, rok, mies)  # zajętość z CAŁEJ puli towaru
+    poprz = (rok - 1, 12) if mies == 1 else (rok, mies - 1)
+    nast = (rok + 1, 1) if mies == 12 else (rok, mies + 1)
+    data = request.args.get('data', '')
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    if data and not data_od:
+        data_od, data_do = zakres_domyslny(data)
+    # preselekcja: produkty z katalogu + personalizacje (powrót z /personalizacja/)
+    try:
+        poz_ids = [int(x) for x in json.loads(request.args.get('pozycje') or '[]')]
+    except Exception:
+        poz_ids = []
+    pers_ids = [int(x) for x in request.args.get('pers', '').split(',') if x.strip().isdigit()]
+    personalizacje = []
+    for pid3 in pers_ids:
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            personalizacje.append(pr)
+    return render_template('komponuje.html', kategorie=kategorie, produkty_wg=produkty_wg,
+                           liczba=len(produkty), poz_ids=poz_ids, personalizacje=personalizacje, pers_ids=pers_ids,
+                           dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
+                           poprz=poprz, nast=nast, data=data, data_od=data_od, data_do=data_do)
+
+
+@app.route('/personalizacja/')
+def personalizacja():
+    """Podstrona personalizacji: jednorazówki płatne z góry, bezzwrotne.
+    Wybór wraca do formularza (parametr next)."""
+    db = get_db()
+    pozycje = db.execute('SELECT * FROM personalizacje WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    nastepny = request.args.get('next') or url_for('wynajem')
+    if not nastepny.startswith('/'):
+        nastepny = url_for('wynajem')
+    pers = request.args.get('pers', '')
+    return render_template('personalizacja.html', pozycje=pozycje, nastepny=nastepny, pers=pers)
+
+
+@app.route('/wynajem/<ev>/')
+def wynajem_wydarzenie(ev):
+    """Wybrany typ wydarzenia: poziomy ESENCJA / MID / FULL — bez kalendarzy."""
+    if ev not in EV_GRUPY:
+        abort(404)
+    db = get_db()
+    pakiety = db.execute('SELECT * FROM pakiety WHERE ev=? AND dostepny=1 ORDER BY kolejnosc, id', (ev,)).fetchall()
+    if not pakiety:
+        abort(404)
+    pers_ids, personalizacje = wczytaj_pers(db, request.args.get('pers', ''))
+    return render_template('wydarzenie.html', ev=ev, nazwa=EV_GRUPY[ev][0], opis=EV_GRUPY[ev][1],
+                           pakiety=pakiety, pers_ids=pers_ids, personalizacje=personalizacje)
+
+
+@app.route('/wynajem/pakiet/<int:pid>/')
+def pakiet_szczegoly(pid):
+    """Konkretny pakiet: kalendarz dostępności + wejście do rezerwacji od–do."""
+    db = get_db()
+    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pid,)).fetchone()
+    if not p:
+        abort(404)
+    rok = int(request.args.get('rok') or datetime.date.today().year)
+    mies = int(request.args.get('mies') or datetime.date.today().month)
+    dni = siatka_miesiaca(db, p['id'], rok, mies)
+    poprz = (rok - 1, 12) if mies == 1 else (rok, mies - 1)
+    nast = (rok + 1, 1) if mies == 12 else (rok, mies + 1)
+    pers_ids, personalizacje = wczytaj_pers(db, request.args.get('pers', ''))
+    return render_template('pakiet.html', p=p, dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
+                           poprz=poprz, nast=nast, ev_nazwa=EV_GRUPY.get(p['ev'], ('Inne', ''))[0],
+                           pers_ids=pers_ids, personalizacje=personalizacje)
+
+
+@app.route('/wynajem/pakiet/<int:pid>/rezerwuj')
+def rezerwuj(pid):
+    db = get_db()
+    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pid,)).fetchone()
+    if not p:
+        abort(404)
+    data = request.args.get('data', '')
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    if data and not data_od:
+        data_od, data_do = zakres_domyslny(data)
+    # produkty spersonalizowane wybrane wcześniej na /personalizacja/
+    pers_ids = [int(x) for x in request.args.get('pers', '').split(',') if x.strip().isdigit()]
+    personalizacje = []
+    for pid3 in pers_ids:
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            personalizacje.append(pr)
+    return render_template('formularz.html', p=p, data=data, data_od=data_od, data_do=data_do,
+                           personalizacje=personalizacje, pers_ids=pers_ids)
+
+
+@app.route('/wynajem/<int:pakiet_id>/rezerwuj')
+def rezerwuj_stare(pakiet_id):
+    """Stary adres — przekierowanie na nową strukturę."""
+    return redirect(url_for('rezerwuj', pid=pakiet_id, data=request.args.get('data', '')), code=301)
+
+
+@app.route('/api/rezerwuj', methods=['POST'])
+def api_rezerwuj():
+    db = get_db()
+    pakiet_id = int(request.form.get('pakiet_id') or 0)
+    p = None
+    if pakiet_id:
+        p = db.execute('SELECT * FROM pakiety WHERE id=?', (pakiet_id,)).fetchone()
+        if not p:
+            abort(404)
+
+    def wroc(data='', data_od='', data_do='', pers=''):
+        kw = dict(data=data, data_od=data_od, data_do=data_do)
+        if pers:
+            kw['pers'] = pers
+        if pakiet_id:
+            return redirect303(url_for('rezerwuj', pid=pakiet_id, **kw))
+        return redirect303(url_for('komponuje', **kw))
+
+    data = (request.form.get('data') or '').strip()
+    data_od = (request.form.get('data_od') or '').strip()
+    data_do = (request.form.get('data_do') or '').strip()
+    # wybrane produkty spersonalizowane — parsujemy od razu, żeby NIE GINĘŁY
+    # przy poprawianiu formularza po błędzie walidacji
+    try:
+        pers_ids = [int(x) for x in json.loads(request.form.get('pers') or '[]')]
+    except Exception:
+        pers_ids = []
+    pers_param = ','.join(str(x) for x in pers_ids)
+
+    # zestaw własny: skład z katalogu
+    pozycje = []
+    if not pakiet_id:
+        try:
+            ids = [int(x) for x in json.loads(request.form.get('pozycje') or '[]')]
+        except Exception:
+            ids = []
+        for pid2 in ids:
+            pr = db.execute('SELECT * FROM produkty WHERE id=?', (pid2,)).fetchone()
+            if pr:
+                pozycje.append({'nazwa': pr['nazwa'], 'cena': pr['cena_doba']})
+        if not pozycje:
+            flash('Zaznacz co najmniej jeden produkt z katalogu.')
+            return wroc(data, data_od, data_do, pers_param)
+
+    # produkty spersonalizowane (jednorazówki) — KAŻDY z własnym opisem
+    pers_list = []
+    for pid3 in pers_ids:
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if pr:
+            opis = (request.form.get('pers_opis_%d' % pr['id']) or '').strip()
+            if not opis:
+                flash('Uzupełnij opis personalizacji: %s (co i jak ma być spersonalizowane).' % pr['nazwa'])
+                return wroc(data, data_od, data_do, pers_param)
+            pers_list.append({'nazwa': pr['nazwa'], 'cena': pr['cena'], 'opis': opis})
+
+    # checkboxy: value=nowa / value=istniejaca (zaznaczony "istniejaca" ma priorytet)
+    tryb = 'istniejaca' if 'istniejaca' in request.form.getlist('tryb_sygnatury') else 'nowa'
+    sygnatura = ''
+    if tryb == 'istniejaca':
+        sygnatura = (request.form.get('sygnatura') or '').strip().upper()
+        if not sygnatura:
+            flash('Wpisz sygnaturę sprawy albo zaznacz „nadaj nową sygnaturę".')
+            return wroc(data, data_od, data_do, pers_param)
+
+    # wspólna finalizacja (walidacja dat/konfliktów/maila + zapis + maile + arkusz)
+    zam = {
+        'pakiet_id': pakiet_id,
+        'data': data, 'data_od': data_od, 'data_do': data_do,
+        'pozycje': pozycje, 'pers': pers_list,
+        'imie': (request.form.get('imie') or '').strip(),
+        'email': (request.form.get('email') or '').strip(),
+        'telefon': (request.form.get('telefon') or '').strip(),
+        'temat': (request.form.get('temat') or 'Rezerwacja terminu').strip(),
+        'sygnatura': sygnatura,
+        'tresc': (request.form.get('tresc') or '').strip(),
+    }
+    rez, kwoty, blad = finalizuj_zamowienie(db, zam)
+    if blad:
+        flash(blad)
+        return wroc(data, data_od, data_do, pers_param)
+    return redirect303(url_for('dziekuje', sygnatura=rez['sygnatura']))
+
+
+@app.route('/wynajem/dziekuje')
+def dziekuje():
+    db = get_db()
+    syg = request.args.get('sygnatura', '')
+    rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (syg,)).fetchone() if syg else None
+    pers_n = 0
+    if rez:
+        try:
+            pers_n = len(json.loads(rez['personalizacje'] or '[]'))
+        except Exception:
+            pers_n = 0
+    return render_template('dziekuje.html', rez=rez, sygnatura=syg, pers_n=pers_n)
+
+
+# ---------------------------------------------------------------- kreator: ZAMÓWIENIA (hub + 5 kroków)
+@app.route('/zamowienia/')
+def zamowienia():
+    """Hub zamówień: 3 kafle — Wynajem dekoracji / Personalizacja / Sklep."""
+    return render_template('zamowienia.html')
+
+
+@app.route('/zamowienia/wynajem/')
+def z_wynajem_termin():
+    """KROK 1: wybór terminu wydarzenia (kalendarz całej puli + zakres od–do)."""
+    db = get_db()
+    rok = int(request.args.get('rok') or datetime.date.today().year)
+    mies = int(request.args.get('mies') or datetime.date.today().month)
+    dni = siatka_miesiaca(db, None, rok, mies)
+    poprz = (rok - 1, 12) if mies == 1 else (rok, mies - 1)
+    nast = (rok + 1, 1) if mies == 12 else (rok, mies + 1)
+    data = request.args.get('data', '')
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    if data and not data_od:
+        data_od, data_do = zakres_domyslny(data)
+    pakiet_id = int(request.args.get('pakiet') or 0)
+    p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pakiet_id,)).fetchone() if pakiet_id else None
+    return render_template('z_wynajem_1.html', dni=dni, rok=rok, mies=mies, mies_nazwa=MIESIACE[mies - 1],
+                           poprz=poprz, nast=nast, data=data, data_od=data_od, data_do=data_do, p=p,
+                           msg=request.args.get('msg', ''))
+
+
+@app.route('/zamowienia/wynajem/pakiet/')
+def z_wynajem_pakiet():
+    """KROK 2: pakiety dostępne w wybranym zakresie + lista niedostępnych."""
+    db = get_db()
+    data = request.args.get('data', '')
+    data_od = request.args.get('data_od', '')
+    data_do = request.args.get('data_do', '')
+    try:
+        d_ev = datetime.date.fromisoformat(data)
+        d_od = datetime.date.fromisoformat(data_od)
+        d_do = datetime.date.fromisoformat(data_do)
+    except ValueError:
+        return redirect_msg('z_wynajem_termin', 'Najpierw wybierz termin wydarzenia w kalendarzu.')
+    if not (d_od <= d_ev <= d_do):
+        return redirect_msg('z_wynajem_termin', 'Zakres terminów jest niepoprawny — wybierz datę ponownie.')
+    dni_n = (d_do - d_od).days + 1
+    pakiet_param = int(request.args.get('pakiet') or 0)
+    dostepne, niedostepne = [], []
+    for p in db.execute('SELECT * FROM pakiety WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall():
+        blok, pyt = konflikty_zakresu(db, p['id'], d_od, d_do)
+        (niedostepne if blok else dostepne).append({'p': p, 'blok': blok, 'pyt': pyt})
+    return render_template('z_wynajem_2.html', data=data, data_od=data_od, data_do=data_do, dni=dni_n,
+                           dostepne=dostepne, niedostepne=niedostepne, pakiet_param=pakiet_param,
+                           statusy=core.STATUSY_PL)
+
+
+TEMATY_KONTAKT = {
+    'wynajem': 'Wynajem dekoracji',
+    'personalizacja': 'Personalizacja i prezenty',
+    'projekt': 'Zapytanie o projekt spersonalizowany',
+    'sklep': 'Sklep i produkty',
+    'wspolpraca': 'Współpraca (dla firm)',
+    'inne': 'Inny temat',
+}
+
+
+DOSTAWA_WARIANTY = {
+    'wynajem': {
+        'dowoz': ('Dowóz i montaż przez Studio', 'Przywozimy dekoracje na miejsce imprezy, montujemy i odbieramy po wydarzeniu.'),
+        'odbior': ('Odbiór osobisty w pracowni', 'Odbierasz i zwracasz dekoracje osobiście — szczegóły prześlemy w odpowiedzi.'),
+    },
+    'personalizacja': {
+        'wysylka': ('Wysyłka kurierem', 'Paczkę nada kurier — koszt wysyłki potwierdzimy w odpowiedzi na zamówienie.'),
+        'odbior': ('Odbiór osobisty w pracowni', 'Gotowe zamówienie odbierzesz u nas — umówimy dogodny termin.'),
+    },
+    'sklep': {
+        'wysylka': ('Wysyłka kurierem', 'Paczkę nada kurier — koszt wysyłki potwierdzimy w odpowiedzi na zamówienie.'),
+        'odbior': ('Odbiór osobisty w pracowni', 'Zakupy odbierzesz u nas — umówimy dogodny termin.'),
+    },
+}
+
+ETAPY_TYPU = {
+    'wynajem': ['Termin', 'Pakiet', 'Personalizacja', 'Dane', 'Podsumowanie'],
+    'personalizacja': ['Personalizacja', 'Dane', 'Podsumowanie'],
+    'sklep': ['Katalog', 'Personalizacja', 'Dane', 'Podsumowanie'],
+}
+
+
+def pers_z_formularza(db, form, wymagane_opisy=True):
+    """Zbiera wybrane produkty personalizowane + opisy z formularza.
+    Zwraca (pers_list, bledy)."""
+    wybrane = [int(x) for x in form.getlist('pers') if x.isdigit()]
+    pers_list, bledy = [], []
+    for pid3 in wybrane:
+        pr = db.execute('SELECT * FROM personalizacje WHERE id=? AND dostepny=1', (pid3,)).fetchone()
+        if not pr:
+            continue
+        opis = (form.get('pers_opis_%d' % pid3) or '').strip()
+        if wymagane_opisy and not opis:
+            bledy.append('Dopisz opis do „%s" — co i jak ma być spersonalizowane.' % pr['nazwa'])
+        else:
+            pers_list.append({'id': pr['id'], 'nazwa': pr['nazwa'], 'cena': pr['cena'], 'opis': opis})
+    return pers_list, bledy
+
+
+def szkic_podstawowy(typ):
+    """Wspólne pola szkicu dla wszystkich typów zamówień."""
+    return {'typ': typ, 'pers': [], 'pomysl': '', 'pers_pom': False,
+            'klient': {}, 'sygnatura_tryb': 'nowa', 'sygnatura': '',
+            'dostawa': '', 'adres': '', 'kod': '', 'zgody': {}}
+
+
+@app.route('/zamowienia/wynajem/personalizacja/', methods=['GET', 'POST'])
+def z_wynajem_pers():
+    """A: BLOK 3 — dodaj personalizację do rezerwacji terminu (można pominąć).
+    POST tworzy szkic (lub aktualizuje istniejący przy w=) i idzie do bloku 4."""
+    db = get_db()
+    klucz = request.values.get('w', '')
+    szkic = szkic_pobierz(db, klucz) if klucz else None
+    if szkic and szkic.get('typ') != 'wynajem':
+        szkic = None
+    if szkic:
+        data, data_od, data_do = szkic['data'], szkic['data_od'], szkic['data_do']
+        pakiet_id, dni_n = szkic['pakiet_id'], szkic.get('dni', 3)
+        p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pakiet_id,)).fetchone()
+    else:
+        data = request.values.get('data', '')
+        data_od = request.values.get('data_od', '')
+        data_do = request.values.get('data_do', '')
+        pakiet_id = int(request.values.get('pakiet') or 0)
+        p = db.execute('SELECT * FROM pakiety WHERE id=? AND dostepny=1', (pakiet_id,)).fetchone() if pakiet_id else None
+        try:
+            d_ev = datetime.date.fromisoformat(data)
+            d_od = datetime.date.fromisoformat(data_od)
+            d_do = datetime.date.fromisoformat(data_do)
+            if not (d_od <= d_ev <= d_do):
+                raise ValueError
+        except ValueError:
+            return redirect_msg('z_wynajem_termin', 'Najpierw wybierz termin wydarzenia.')
+        if not p:
+            return redirect_msg('z_wynajem_pakiet', 'Najpierw wybierz pakiet.', data=data, data_od=data_od, data_do=data_do)
+        dni_n = (d_do - d_od).days + 1
+    pozycje = db.execute('SELECT * FROM personalizacje WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    wybrane = [x['id'] for x in (szkic.get('pers') or [])] if szkic else []
+    opisy = {x['id']: x.get('opis', '') for x in (szkic.get('pers') or [])} if szkic else {}
+    pomysl = szkic.get('pomysl', '') if szkic else ''
+    bledy = []
+    if request.method == 'POST':
+        pomijam = request.form.get('akcja') == 'pomijam'
+        pers_list, bledy = pers_z_formularza(db, request.form)
+        pomysl = (request.form.get('pomysl') or '').strip() if not pomijam else ''
+        if not bledy:
+            if szkic:
+                szkic['pers'] = pers_list
+                szkic['pomysl'] = pomysl
+                szkic['pers_pom'] = pomijam
+                szkic_zapisz(db, klucz, szkic)
+                return redirect303(url_for('zamowienia_dane', w=klucz))
+            nowy = szkic_podstawowy('wynajem')
+            nowy.update({
+                'data': data, 'data_od': data_od, 'data_do': data_do, 'dni': dni_n,
+                'pakiet_id': p['id'],
+                'pakiet': {'id': p['id'], 'nazwa': p['nazwa'], 'tier': p['tier'], 'cena': p['cena'],
+                           'cena_liczba': p['cena_liczba'], 'opis': p['opis'], 'pozycje': p['pozycje']},
+                'pers': pers_list, 'pomysl': pomysl, 'pers_pom': pomijam,
+            })
+            klucz2 = szkic_nowy(db, nowy)
+            return redirect303(url_for('zamowienia_dane', w=klucz2))
+        wybrane = [int(x) for x in request.form.getlist('pers') if x.isdigit()]
+        opisy = {k: request.form.get('pers_opis_%d' % k, '') for k in wybrane}
+    return render_template('z_wynajem_3.html', data=data, data_od=data_od, data_do=data_do,
+                           p=p, dni=dni_n, pozycje=pozycje, wybrane=wybrane, opisy=opisy,
+                           pomysl=pomysl, bledy=bledy, w=klucz)
+
+
+@app.route('/zamowienia/personalizacja/', methods=['GET', 'POST'])
+def z_pers_samodzielna():
+    """B: BLOK 3 jako samodzielny przepływ — personalizacja bez terminu i pakietu.
+    Specjalny przypadek: własny projekt BEZ wybranych produktów → monit (popup) z wyborem:
+    „Chcę wysłać zapytanie" → formularz kontaktowy z tematem „Zapytanie o projekt spersonalizowany"
+    i wklejonym opisem; „Anuluj" → powrót do katalogu personalizacji."""
+    db = get_db()
+    klucz = request.values.get('w', '')
+    szkic = szkic_pobierz(db, klucz) if klucz else None
+    if szkic and szkic.get('typ') != 'personalizacja':
+        szkic = None
+    pozycje = db.execute('SELECT * FROM personalizacje WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    wybrane = [x['id'] for x in (szkic.get('pers') or [])] if szkic else []
+    opisy = {x['id']: x.get('opis', '') for x in (szkic.get('pers') or [])} if szkic else {}
+    pomysl = szkic.get('pomysl', '') if szkic else ''
+    projekt = bool(szkic and szkic.get('projekt_wlasny'))
+    bledy = []
+    if request.method == 'POST':
+        pers_list, bledy = pers_z_formularza(db, request.form)
+        pomysl = (request.form.get('pomysl') or '').strip()
+        projekt = request.form.get('projekt_wlasny') == 'on'
+        # własny projekt bez produktu = zapytanie przez formularz kontaktowy (nie zamówienie)
+        if not pers_list and projekt and len(pomysl) >= 10:
+            from urllib.parse import urlencode
+            adres = url_for('kontakt_form') + '?' + urlencode({'temat': 'projekt', 'opis': pomysl})
+            return redirect(adres, code=303)
+        if not pers_list and len(pomysl) < 10:
+            bledy.append('Wybierz co najmniej jeden produkt do personalizacji albo opisz swój pomysł (min. 10 znaków).')
+        if not bledy:
+            if szkic:
+                szkic['pers'] = pers_list
+                szkic['pomysl'] = pomysl
+                szkic['projekt_wlasny'] = projekt
+                szkic_zapisz(db, klucz, szkic)
+                return redirect303(url_for('zamowienia_dane', w=klucz))
+            nowy = szkic_podstawowy('personalizacja')
+            nowy.update({'pers': pers_list, 'pomysl': pomysl, 'dostawa': 'wysylka',
+                         'projekt_wlasny': projekt})
+            klucz2 = szkic_nowy(db, nowy)
+            return redirect303(url_for('zamowienia_dane', w=klucz2))
+        wybrane = [int(x) for x in request.form.getlist('pers') if x.isdigit()]
+        opisy = {k: request.form.get('pers_opis_%d' % k, '') for k in wybrane}
+    return render_template('z_pers_1.html', pozycje=pozycje, wybrane=wybrane, opisy=opisy,
+                           pomysl=pomysl, bledy=bledy, w=klucz, projekt=projekt)
+
+
+@app.route('/zamowienia/sklep/', methods=['GET', 'POST'])
+def z_sklep_katalog():
+    """C: BLOK 7 — katalog produktów sklepu (wybór + ilości)."""
+    db = get_db()
+    klucz = request.values.get('w', '')
+    szkic = szkic_pobierz(db, klucz) if klucz else None
+    if szkic and szkic.get('typ') != 'sklep':
+        szkic = None
+    produkty = db.execute('SELECT * FROM sklep_produkty WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    ilosci = {x['id']: x.get('ile', 1) for x in (szkic.get('pozycje') or [])} if szkic else {}
+    bledy = []
+    if request.method == 'POST':
+        wybrane = []
+        for pr in produkty:
+            try:
+                ile = int(request.form.get('ile_%d' % pr['id']) or 0)
+            except ValueError:
+                ile = 0
+            if ile > 0:
+                wybrane.append({'id': pr['id'], 'nazwa': pr['nazwa'], 'cena': pr['cena'], 'ile': ile})
+        if not wybrane:
+            bledy.append('Wybierz co najmniej jeden produkt (podaj ilość).')
+        else:
+            if szkic:
+                szkic['pozycje'] = wybrane
+                szkic_zapisz(db, klucz, szkic)
+                return redirect303(url_for('z_sklep_pers', w=klucz))
+            nowy = szkic_podstawowy('sklep')
+            nowy.update({'pozycje': wybrane, 'dostawa': 'wysylka'})
+            klucz2 = szkic_nowy(db, nowy)
+            return redirect303(url_for('z_sklep_pers', w=klucz2))
+        ilosci = {pr['id']: int(request.form.get('ile_%d' % pr['id']) or 0) for pr in produkty}
+    return render_template('z_sklep_1.html', produkty=produkty, ilosci=ilosci, bledy=bledy, w=klucz)
+
+
+@app.route('/zamowienia/sklep/personalizacja/', methods=['GET', 'POST'])
+def z_sklep_pers():
+    """C: BLOK 3 po katalogu — opcjonalna personalizacja do zakupów (można pominąć)."""
+    db = get_db()
+    klucz = request.values.get('w', '')
+    szkic = szkic_pobierz(db, klucz)
+    if not szkic or szkic.get('typ') != 'sklep':
+        return redirect_msg('zamowienia', 'Sesja wygasła lub link jest niepełny — wybierz produkty z katalogu sklepu.')
+    pozycje = db.execute('SELECT * FROM personalizacje WHERE dostepny=1 ORDER BY kolejnosc, id').fetchall()
+    wybrane = [x['id'] for x in (szkic.get('pers') or [])]
+    opisy = {x['id']: x.get('opis', '') for x in (szkic.get('pers') or [])}
+    pomysl = szkic.get('pomysl', '')
+    bledy = []
+    if request.method == 'POST':
+        pomijam = request.form.get('akcja') == 'pomijam'
+        pers_list, bledy = pers_z_formularza(db, request.form)
+        pomysl = (request.form.get('pomysl') or '').strip() if not pomijam else ''
+        if not bledy:
+            szkic['pers'] = pers_list
+            szkic['pomysl'] = pomysl
+            szkic['pers_pom'] = pomijam
+            szkic_zapisz(db, klucz, szkic)
+            return redirect303(url_for('zamowienia_dane', w=klucz))
+        wybrane = [int(x) for x in request.form.getlist('pers') if x.isdigit()]
+        opisy = {k: request.form.get('pers_opis_%d' % k, '') for k in wybrane}
+    return render_template('z_sklep_2.html', szkic=szkic, pozycje=pozycje, wybrane=wybrane,
+                           opisy=opisy, pomysl=pomysl, bledy=bledy)
+
+
+@app.route('/zamowienia/dane/', methods=['GET', 'POST'])
+def zamowienia_dane():
+    """BLOK 4 (wspólny): dane klienta, sygnatura, dostawa, kod, zgody."""
+    db = get_db()
+    klucz = request.values.get('w', '')
+    szkic = szkic_pobierz(db, klucz)
+    if not szkic:
+        return redirect_msg('zamowienia', 'Twoja sesja wygasła lub link jest niepełny — wróć na stronę Zamówienia i zacznij od nowa.')
+    typ = szkic.get('typ') or 'wynajem'
+    warianty = DOSTAWA_WARIANTY.get(typ, DOSTAWA_WARIANTY['personalizacja'])
+    domyslna_dostawa = szkic.get('dostawa') or ('dowoz' if typ == 'wynajem' else 'wysylka')
+    bledy = []
+    if request.method == 'POST':
+        d = {
+            'imie': (request.form.get('imie') or '').strip(),
+            'email': (request.form.get('email') or '').strip(),
+            'telefon': (request.form.get('telefon') or '').strip(),
+        }
+        tryb = 'istniejaca' if request.form.get('tryb_sygnatury') == 'istniejaca' else 'nowa'
+        sygnatura = (request.form.get('sygnatura') or '').strip().upper()
+        dostawa = request.form.get('dostawa', domyslna_dostawa)
+        if dostawa not in warianty:
+            dostawa = domyslna_dostawa
+        adres = (request.form.get('adres') or '').strip()
+        kod = (request.form.get('kod') or '').strip()
+        zgody = {
+            'pke': request.form.get('zgoda_pke') == 'on',
+            'procedura': request.form.get('zgoda_procedura') == 'on',
+            'dane': request.form.get('zgoda_dane') == 'on',
+            'pers': request.form.get('zgoda_pers') == 'on',
+        }
+        if len(d['imie']) < 2:
+            bledy.append('Podaj imię i nazwisko (min. 2 znaki).')
+        if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', d['email']):
+            bledy.append('Podaj poprawny adres e-mail.')
+        if tryb == 'istniejaca' and not sygnatura:
+            bledy.append('Wpisz swoją sygnaturę sprawy albo zaznacz „nadaj nową sygnaturę".')
+        if dostawa in ('dowoz', 'wysylka') and len(adres) < 10:
+            bledy.append('Podaj adres (miejscowość, ulica, kod) — ' +
+                         ('dowozimy i montujemy dekoracje na miejscu imprezy.' if typ == 'wynajem' else 'pod niego wyślemy zamówienie.'))
+        if not zgody['pke']:
+            bledy.append('Zaznacz zgodę na kontakt (PKE art. 398) — bez niej nie możemy odpowiedzieć.')
+        if not zgody['procedura']:
+            bledy.append('Potwierdź zapoznanie się z ' + ('procedurą najmu i dokumentami.' if typ == 'wynajem' else 'regulaminem zamówień.'))
+        if not zgody['dane']:
+            bledy.append('Potwierdź, że podane dane zostaną użyte wyłącznie do realizacji zamówienia.')
+        if (typ == 'personalizacja' or szkic.get('pers')) and not zgody['pers']:
+            bledy.append('Zaznacz oświadczenie o produktach personalizowanych (bezzwrotne, płatne z góry).')
+        if kod:
+            _, blad_kodu = core.rabat_od_kodu(db, kod)
+            if blad_kodu:
+                bledy.append(blad_kodu)
+        if bledy:
+            zam = dict(szkic)
+            zam['kod'] = kod
+            kwoty = kwoty_zamowienia(db, zam)
+            return render_template('z_dane.html', szkic=szkic, bledy=bledy, kwoty=kwoty,
+                                   d=d, tryb=tryb, sygnatura=sygnatura, dostawa=dostawa, adres=adres,
+                                   kod=kod, zgody=zgody, warianty=warianty, typ=typ)
+        szkic['klient'] = d
+        szkic['sygnatura_tryb'] = tryb
+        szkic['sygnatura'] = sygnatura
+        szkic['dostawa'] = dostawa
+        szkic['adres'] = adres
+        szkic['kod'] = kod
+        szkic['zgody'] = zgody
+        szkic_zapisz(db, klucz, szkic)
+        return redirect303(url_for('zamowienia_podsumowanie', w=klucz))
+    d = szkic.get('klient') or {'imie': '', 'email': '', 'telefon': ''}
+    kwoty = kwoty_zamowienia(db, szkic)
+    return render_template('z_dane.html', szkic=szkic, bledy=[], kwoty=kwoty,
+                           d=d, tryb=szkic.get('sygnatura_tryb', 'nowa'), sygnatura=szkic.get('sygnatura', ''),
+                           dostawa=domyslna_dostawa, adres=szkic.get('adres', ''),
+                           kod=szkic.get('kod', ''), zgody=szkic.get('zgody') or {},
+                           warianty=warianty, typ=typ)
+
+
+@app.route('/zamowienia/wynajem/dane/', methods=['GET', 'POST'])
+def z_wynajem_dane():
+    """Alias starego adresu bloku 4 (wynajem) — wspólny formularz."""
+    return zamowienia_dane()
+
+
+@app.route('/zamowienia/podsumowanie/')
+def zamowienia_podsumowanie():
+    """BLOK 5 (wspólny): podsumowanie całości + wiadomość + „Zamawiam z obowiązkiem zapłaty"."""
+    db = get_db()
+    klucz = request.args.get('w', '')
+    szkic = szkic_pobierz(db, klucz)
+    if not szkic:
+        return redirect_msg('zamowienia', 'Twoja sesja wygasła — wróć na stronę Zamówienia i zacznij od nowa.')
+    if not szkic.get('klient'):
+        return redirect303(url_for('zamowienia_dane', w=klucz))
+    kwoty = kwoty_zamowienia(db, szkic)
+    typ = szkic.get('typ') or 'wynajem'
+    warianty = DOSTAWA_WARIANTY.get(typ, DOSTAWA_WARIANTY['personalizacja'])
+    dostawa_wartosc = szkic.get('dostawa') or ('dowoz' if typ == 'wynajem' else 'wysylka')
+    dostawa_label = warianty.get(dostawa_wartosc, (dostawa_wartosc, ''))[0]
+    return render_template('z_podsumowanie.html', szkic=szkic, kwoty=kwoty, typ=typ,
+                           dostawa_label=dostawa_label, msg=request.args.get('msg', ''))
+
+
+@app.route('/zamowienia/wynajem/podsumowanie/')
+def z_wynajem_podsumowanie():
+    """Alias starego adresu bloku 5 (wynajem)."""
+    return zamowienia_podsumowanie()
+
+
+@app.route('/zamowienia/zamow/', methods=['POST'])
+def zamowienia_zamow():
+    """Finalizacja (wspólna): tworzy zamówienie, maile, arkusz — i czyści szkic."""
+    db = get_db()
+    klucz = request.form.get('w', '')
+    szkic = szkic_pobierz(db, klucz)
+    if not szkic:
+        return redirect_msg('zamowienia', 'Twoja sesja wygasła — wróć na stronę Zamówienia i zacznij od nowa.')
+    if not szkic.get('klient'):
+        return redirect303(url_for('zamowienia_dane', w=klucz))
+    typ = szkic.get('typ') or 'wynajem'
+    klient = szkic['klient']
+    warianty = DOSTAWA_WARIANTY.get(typ, DOSTAWA_WARIANTY['personalizacja'])
+    dostawa_wartosc = szkic.get('dostawa') or ('dowoz' if typ == 'wynajem' else 'wysylka')
+    zam = {
+        'typ': typ,
+        'pakiet_id': szkic.get('pakiet_id') or 0,
+        'data': szkic.get('data', ''), 'data_od': szkic.get('data_od', ''), 'data_do': szkic.get('data_do', ''),
+        'pozycje': szkic.get('pozycje') or [], 'pers': szkic.get('pers') or [],
+        'pomysl': szkic.get('pomysl') or '',
+        'imie': klient.get('imie', ''), 'email': klient.get('email', ''),
+        'telefon': klient.get('telefon', ''),
+        'temat': {'wynajem': 'Rezerwacja terminu', 'personalizacja': 'Zamówienie personalizacji', 'sklep': 'Zamówienie ze sklepu'}.get(typ, 'Zamówienie'),
+        'sygnatura': szkic.get('sygnatura', '') if szkic.get('sygnatura_tryb') == 'istniejaca' else '',
+        'dostawa': warianty.get(dostawa_wartosc, ('', ''))[0],
+        'adres': szkic.get('adres', ''), 'kod': szkic.get('kod', ''),
+        'zgody': szkic.get('zgody') or {},
+        'tresc': (request.form.get('tresc') or '').strip(),
+    }
+    rez, kwoty, blad = finalizuj_zamowienie(db, zam)
+    if blad:
+        return redirect_msg('zamowienia_podsumowanie', blad, w=klucz)
+    db.execute('DELETE FROM szkice WHERE klucz=?', (klucz,))
+    db.commit()
+    return redirect303(url_for('zamowienia_dziekuje', sygnatura=rez['sygnatura']))
+
+
+@app.route('/zamowienia/wynajem/zamow/', methods=['POST'])
+def z_wynajem_zamow():
+    """Alias starego adresu finalizacji (wynajem)."""
+    return zamowienia_zamow()
+
+
+@app.route('/zamowienia/dziekuje/')
+def zamowienia_dziekuje():
+    """BLOK 6 (wspólny): podziękowanie za zamówienie."""
+    db = get_db()
+    syg = request.args.get('sygnatura', '')
+    rez = db.execute('SELECT * FROM rezerwacje WHERE sygnatura=?', (syg,)).fetchone() if syg else None
+    kwoty = {}
+    typ = 'wynajem'
+    pomysl = ''
+    szkic = {}
+    if rez:
+        rez = dict(rez)
+        try:
+            kwoty = json.loads(rez['kwoty'] or '{}')
+        except Exception:
+            kwoty = {}
+        typ = kwoty.get('typ') or 'wynajem'
+        try:
+            pomysl = (json.loads(rez['dodatkowe'] or '{}') or {}).get('pomysl') or ''
+        except Exception:
+            pomysl = ''
+        # pseudo-szkic do wspólnego rachunku (_kwoty_box.html)
+        try:
+            szkic['pozycje'] = json.loads(rez['pozycje'] or '[]')
+        except Exception:
+            szkic['pozycje'] = []
+        try:
+            szkic['pers'] = json.loads(rez['personalizacje'] or '[]')
+        except Exception:
+            szkic['pers'] = []
+        szkic['pakiet'] = {'nazwa': rez['pakiet_nazwa'] or 'Pakiet dekoracji'}
+        szkic['pomysl'] = pomysl
+        szkic['dostawa'] = rez.get('dostawa') or ''
+    return render_template('zamowienie_dziekuje.html', rez=rez, kwoty=kwoty, sygnatura=syg,
+                           typ=typ, pomysl=pomysl, szkic=szkic)
+
+
+# ---------------------------------------------------------------- pliki (dokumenty)
+@app.route('/pliki/<nazwa>')
+def pliki(nazwa):
+    return send_from_directory(os.path.join(DATA, 'dokumenty'), nazwa)
+
+
+# ---------------------------------------------------------------- ADMIN: logowanie
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    db = get_db()
+    if request.method == 'POST':
+        from werkzeug.security import check_password_hash
+        haslo = (request.form.get('haslo') or '').strip()
+        zapisane = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='admin_hash'").fetchone()
+        if zapisane and check_password_hash(zapisane['wartosc'], haslo):
+            session['admin'] = '1'
+            # token logowania w adresie — panel działa też bez ciasteczek (iframe/podgląd/telefon)
+            token = secrets.token_urlsafe(24)
+            db.execute('DELETE FROM admin_tokens WHERE wygasa<?', (core.teraz(),))
+            db.execute('INSERT INTO admin_tokens (token, utworzono, wygasa) VALUES (?,?,?)',
+                       (token, core.teraz(), core.teraz_plus(12 * 3600)))
+            db.commit()
+            cel = request.args.get('dalej') or url_for('admin_dash')
+            if not cel.startswith('/admin'):
+                cel = url_for('admin_dash')
+            return redirect(cel + (('&' if '?' in cel else '?') + 'klucz=' + token), code=303)
+        flash('Błędne hasło — spróbuj jeszcze raz (możesz pokazać hasło, żeby sprawdzić literówkę).')
+    return render_template('admin_login.html')
+
+
+@app.route('/admin/logout', methods=['POST'])
+def admin_logout():
+    db = get_db()
+    klucz = request.args.get('klucz') or request.form.get('klucz') or session.get('admin_klucz')
+    if klucz:
+        db.execute('DELETE FROM admin_tokens WHERE token=?', (klucz,))
+        db.commit()
+    session.pop('admin', None)
+    session.pop('admin_klucz', None)
+    return redirect303(url_for('index'))
+
+
+@app.route('/admin/')
+@admin_required
+def admin_dash():
+    db = get_db()
+    licznik = {}
+    for status in core.STATUSY:
+        licznik[status] = db.execute('SELECT COUNT(*) c FROM rezerwacje WHERE status=?', (status,)).fetchone()['c']
+    nadchodzace = db.execute(
+        "SELECT * FROM rezerwacje WHERE data>=? AND status!='odrzucono' ORDER BY data LIMIT 8",
+        (datetime.date.today().isoformat(),)).fetchall()
+    maile = db.execute('SELECT * FROM mail_outbox ORDER BY id DESC LIMIT 6').fetchall()
+    smtp_off = not (db.execute("SELECT wartosc FROM ustawienia WHERE klucz='smtp_host'").fetchone()['wartosc'] or '').strip()
+    sheets_off = not (db.execute("SELECT wartosc FROM ustawienia WHERE klucz='sheets_url'").fetchone()['wartosc'] or '').strip()
+    return render_template('admin.html', licznik=licznik, nadchodzace=nadchodzace,
+                           maile=maile, smtp_off=smtp_off, sheets_off=sheets_off,
+                           statusy=core.STATUSY_PL)
+
+
+# ---------------------------------------------------------------- ADMIN: kategorie
+@app.route('/admin/kategorie')
+@admin_required
+def admin_kategorie():
+    db = get_db()
+    rows = db.execute('SELECT * FROM kategorie ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_kategorie.html', rows=rows)
+
+
+@app.route('/admin/kategorie/dodaj', methods=['POST'])
+@admin_required
+def kategorie_dodaj():
+    db = get_db()
+    nazwa = (request.form.get('nazwa') or '').strip()
+    if nazwa:
+        db.execute('INSERT INTO kategorie (nazwa, opis) VALUES (?,?)', (nazwa, request.form.get('opis', '').strip()))
+        db.commit()
+    return redirect303(url_for('admin_kategorie'))
+
+
+@app.route('/admin/kategorie/<int:kid>/edytuj', methods=['POST'])
+@admin_required
+def kategorie_edytuj(kid):
+    db = get_db()
+    db.execute('UPDATE kategorie SET nazwa=?, opis=? WHERE id=?',
+               (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(), kid))
+    db.commit()
+    return redirect303(url_for('admin_kategorie'))
+
+
+@app.route('/admin/kategorie/<int:kid>/usun', methods=['POST'])
+@admin_required
+def kategorie_usun(kid):
+    db = get_db()
+    if db.execute('SELECT 1 FROM produkty WHERE kategoria_id=? LIMIT 1', (kid,)).fetchone():
+        return redirect_msg('admin_kategorie', 'Nie można usunąć: kategoria ma przypisane produkty.')
+    db.execute('DELETE FROM kategorie WHERE id=?', (kid,))
+    db.commit()
+    return redirect303(url_for('admin_kategorie'))
+
+
+# ---------------------------------------------------------------- ADMIN: produkty
+@app.route('/admin/produkty')
+@admin_required
+def admin_produkty():
+    db = get_db()
+    rows = db.execute('SELECT p.*, k.nazwa AS kategoria FROM produkty p LEFT JOIN kategorie k ON k.id=p.kategoria_id ORDER BY p.kolejnosc, p.id').fetchall()
+    kat = db.execute('SELECT * FROM kategorie ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_produkty.html', rows=rows, kat=kat)
+
+
+@app.route('/admin/produkty/dodaj', methods=['POST'])
+@admin_required
+def produkty_dodaj():
+    db = get_db()
+    db.execute('INSERT INTO produkty (nazwa, kategoria_id, opis, cena_doba, dostepny) VALUES (?,?,?,?,?)',
+               (request.form.get('nazwa', '').strip(), int(request.form.get('kategoria_id') or 0),
+                request.form.get('opis', '').strip(), float(request.form.get('cena_doba') or 0),
+                1 if request.form.get('dostepny') else 0))
+    db.commit()
+    return redirect303(url_for('admin_produkty'))
+
+
+@app.route('/admin/produkty/<int:pid>/edytuj', methods=['POST'])
+@admin_required
+def produkty_edytuj(pid):
+    db = get_db()
+    db.execute('UPDATE produkty SET nazwa=?, kategoria_id=?, opis=?, cena_doba=?, dostepny=? WHERE id=?',
+               (request.form.get('nazwa', '').strip(), int(request.form.get('kategoria_id') or 0),
+                request.form.get('opis', '').strip(), float(request.form.get('cena_doba') or 0),
+                1 if request.form.get('dostepny') else 0, pid))
+    db.commit()
+    return redirect303(url_for('admin_produkty'))
+
+
+@app.route('/admin/produkty/<int:pid>/usun', methods=['POST'])
+@admin_required
+def produkty_usun(pid):
+    db = get_db()
+    db.execute('DELETE FROM produkty WHERE id=?', (pid,))
+    db.commit()
+    return redirect303(url_for('admin_produkty'))
+
+
+# ---------------------------------------------------------------- ADMIN: pakiety
+@app.route('/admin/pakiety')
+@admin_required
+def admin_pakiety():
+    db = get_db()
+    rows = db.execute('SELECT * FROM pakiety ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_pakiety.html', rows=rows, ev_grupy=EV_GRUPY)
+
+
+@app.route('/admin/pakiety/dodaj', methods=['POST'])
+@admin_required
+def pakiety_dodaj():
+    db = get_db()
+    db.execute('INSERT INTO pakiety (ev, nazwa, opis, cena, tier, pozycje, dostepny) VALUES (?,?,?,?,?,?,?)',
+               (request.form.get('ev', 'inne'), request.form.get('nazwa', '').strip(),
+                request.form.get('opis', '').strip(), request.form.get('cena', '').strip(),
+                request.form.get('tier', '').strip(), request.form.get('pozycje', '').strip(),
+                1 if request.form.get('dostepny') else 0))
+    db.commit()
+    return redirect303(url_for('admin_pakiety'))
+
+
+@app.route('/admin/pakiety/<int:pid>/edytuj', methods=['POST'])
+@admin_required
+def pakiety_edytuj(pid):
+    db = get_db()
+    db.execute('UPDATE pakiety SET ev=?, nazwa=?, opis=?, cena=?, tier=?, pozycje=?, dostepny=? WHERE id=?',
+               (request.form.get('ev', 'inne'), request.form.get('nazwa', '').strip(),
+                request.form.get('opis', '').strip(), request.form.get('cena', '').strip(),
+                request.form.get('tier', '').strip(), request.form.get('pozycje', '').strip(),
+                1 if request.form.get('dostepny') else 0, pid))
+    db.commit()
+    return redirect303(url_for('admin_pakiety'))
+
+
+@app.route('/admin/pakiety/<int:pid>/usun', methods=['POST'])
+@admin_required
+def pakiety_usun(pid):
+    db = get_db()
+    if db.execute('SELECT 1 FROM rezerwacje WHERE pakiet_id=? LIMIT 1', (pid,)).fetchone():
+        return redirect_msg('admin_pakiety', 'Nie można usunąć: pakiet ma zgłoszenia. Zamiast tego odznacz „Dostępny na stronie".')
+    db.execute('DELETE FROM pakiety WHERE id=?', (pid,))
+    db.commit()
+    return redirect303(url_for('admin_pakiety'))
+
+
+# ---------------------------------------------------------------- ADMIN: personalizacje
+@app.route('/admin/personalizacje')
+@admin_required
+def admin_personalizacje():
+    db = get_db()
+    rows = db.execute('SELECT * FROM personalizacje ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_personalizacje.html', rows=rows)
+
+
+@app.route('/admin/personalizacje/dodaj', methods=['POST'])
+@admin_required
+def personalizacje_dodaj():
+    db = get_db()
+    db.execute('INSERT INTO personalizacje (nazwa, opis, cena, dostepny) VALUES (?,?,?,?)',
+               (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0))
+    db.commit()
+    return redirect303(url_for('admin_personalizacje'))
+
+
+@app.route('/admin/personalizacje/<int:pid>/edytuj', methods=['POST'])
+@admin_required
+def personalizacje_edytuj(pid):
+    db = get_db()
+    db.execute('UPDATE personalizacje SET nazwa=?, opis=?, cena=?, dostepny=? WHERE id=?',
+               (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0, pid))
+    db.commit()
+    return redirect303(url_for('admin_personalizacje'))
+
+
+@app.route('/admin/personalizacje/<int:pid>/usun', methods=['POST'])
+@admin_required
+def personalizacje_usun(pid):
+    db = get_db()
+    db.execute('DELETE FROM personalizacje WHERE id=?', (pid,))
+    db.commit()
+    return redirect303(url_for('admin_personalizacje'))
+
+
+# ---------------------------------------------------------------- ADMIN: sklep
+@app.route('/admin/sklep')
+@admin_required
+def admin_sklep():
+    db = get_db()
+    rows = db.execute('SELECT * FROM sklep_produkty ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_sklep.html', rows=rows)
+
+
+@app.route('/admin/sklep/dodaj', methods=['POST'])
+@admin_required
+def sklep_dodaj():
+    db = get_db()
+    db.execute('INSERT INTO sklep_produkty (nazwa, opis, cena, dostepny, obraz) VALUES (?,?,?,?,?)',
+               (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0,
+                request.form.get('obraz', '').strip()))
+    db.commit()
+    return redirect303(url_for('admin_sklep'))
+
+
+@app.route('/admin/sklep/<int:pid>/edytuj', methods=['POST'])
+@admin_required
+def sklep_edytuj(pid):
+    db = get_db()
+    db.execute('UPDATE sklep_produkty SET nazwa=?, opis=?, cena=?, dostepny=?, obraz=? WHERE id=?',
+               (request.form.get('nazwa', '').strip(), request.form.get('opis', '').strip(),
+                float(request.form.get('cena') or 0), 1 if request.form.get('dostepny') else 0,
+                request.form.get('obraz', '').strip(), pid))
+    db.commit()
+    return redirect303(url_for('admin_sklep'))
+
+
+@app.route('/admin/sklep/<int:pid>/usun', methods=['POST'])
+@admin_required
+def sklep_usun(pid):
+    db = get_db()
+    db.execute('DELETE FROM sklep_produkty WHERE id=?', (pid,))
+    db.commit()
+    return redirect303(url_for('admin_sklep'))
+
+
+# ---------------------------------------------------------------- ADMIN: rezerwacje
+@app.route('/admin/rezerwacje')
+@admin_required
+def admin_rezerwacje():
+    db = get_db()
+    filtr = request.args.get('status', '')
+    q = 'SELECT * FROM rezerwacje'
+    args = ()
+    if filtr in core.STATUSY:
+        q += ' WHERE status=?'
+        args = (filtr,)
+    q += ' ORDER BY data DESC, id DESC'
+    rows = db.execute(q, args).fetchall()
+    return render_template('admin_rezerwacje.html', rows=rows, filtr=filtr, statusy=core.STATUSY_PL)
+
+
+@app.route('/admin/rezerwacje/<int:rid>')
+@admin_required
+def admin_rezerwacja(rid):
+    db = get_db()
+    r = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rid,)).fetchone()
+    if not r:
+        abort(404)
+    historia = json.loads(r['historia'] or '[]')
+    pozycje = json.loads(r['pozycje'] or '[]')
+    personalizacje = json.loads(r['personalizacje'] or '[]')
+    return render_template('admin_rezerwacja.html', r=r, historia=historia, pozycje=pozycje,
+                           personalizacje=personalizacje, statusy=core.STATUSY_PL)
+
+
+@app.route('/admin/rezerwacje/<int:rid>/status', methods=['POST'])
+@admin_required
+def rezerwacja_status(rid):
+    db = get_db()
+    r = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rid,)).fetchone()
+    if not r:
+        abort(404)
+    nowy = request.form.get('status')
+    if nowy not in core.STATUSY:
+        return redirect_msg('admin_rezerwacja', 'Nieznany status.', rid=rid)
+    powod = (request.form.get('powod') or '').strip()
+    historia = json.loads(r['historia'] or '[]')
+    historia.append({'kiedy': core.teraz(), 'status': nowy, 'uwaga': powod or 'zmiana statusu'})
+    db.execute('UPDATE rezerwacje SET status=?, zmieniono=?, historia=? WHERE id=?',
+               (nowy, core.teraz(), json.dumps(historia, ensure_ascii=False), rid))
+    db.commit()
+    r = db.execute('SELECT * FROM rezerwacje WHERE id=?', (rid,)).fetchone()
+
+    # autorespondery przy zmianie statusu (treści edytowalne: Ustawienia → Autorespondery)
+    rez_z_kwotami = dict(r)
+    rez_z_kwotami['kwoty'] = json.loads(r['kwoty']) if r['kwoty'] else None
+    rez_z_kwotami['powod'] = powod
+    mapa_szablonow = {'platnosc_w_toku': 'kaucja', 'zarezerwowany': 'potwierdzenie', 'odrzucono': 'odrzucono'}
+    if nowy in mapa_szablonow:
+        core.wyslij_szablon(db, mapa_szablonow[nowy], rez_z_kwotami, r['email'])
+    # aktualizacja arkusza Google (status leci do API)
+    core.push_do_sheets(db, r)
+    return redirect_msg('admin_rezerwacja', 'Status zmieniony na: %s' % core.STATUSY_PL[nowy], rid=rid)
+
+
+@app.route('/admin/rezerwacje/<int:rid>/usun', methods=['POST'])
+@admin_required
+def rezerwacja_usun(rid):
+    db = get_db()
+    db.execute('DELETE FROM rezerwacje WHERE id=?', (rid,))
+    db.commit()
+    return redirect_msg('admin_rezerwacje', 'Zgłoszenie usunięte.')
+
+
+# ---------------------------------------------------------------- ADMIN: realizacje (portfolio)
+def zapisz_zdjecie(plik):
+    """Zapisuje wgrane zdjęcie do data/uploads. Zwraca (nazwa_pliku, komunikat_bledu)."""
+    from werkzeug.utils import secure_filename
+    if not plik or not plik.filename:
+        return '', ''
+    nazwa = secure_filename(plik.filename)
+    rozsz = os.path.splitext(nazwa)[1].lower()
+    if rozsz not in ('.jpg', '.jpeg', '.png', '.webp'):
+        return '', 'Niedozwolony format pliku (dozwolone: JPG, PNG, WEBP).'
+    if plik.content_length and plik.content_length > 8 * 1024 * 1024:
+        return '', 'Plik za duży (maks. 8 MB).'
+    katalog = os.path.join(DATA, 'uploads')
+    os.makedirs(katalog, exist_ok=True)
+    baza_nazwy = os.path.splitext(nazwa)[0][:40]
+    nazwa = '%s_%d%s' % (baza_nazwy, int(datetime.datetime.now().timestamp()), rozsz)
+    plik.save(os.path.join(katalog, nazwa))
+    return nazwa, ''
+
+
+@app.route('/admin/realizacje')
+@admin_required
+def admin_realizacje():
+    db = get_db()
+    rows = db.execute('SELECT * FROM realizacje ORDER BY kolejnosc, id').fetchall()
+    return render_template('admin_realizacje.html', rows=rows)
+
+
+@app.route('/admin/realizacje/dodaj', methods=['POST'])
+@admin_required
+def realizacje_dodaj():
+    db = get_db()
+    # zdjęcie: link zewnętrzny (Dysk Google itp.) ma pierwszeństwo przed plikiem
+    zdj = (request.form.get('zdjecie_url') or '').strip()
+    if zdj and not zdj.startswith(('http://', 'https://')):
+        zdj = ''
+    blad = ''
+    if not zdj:
+        zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
+    db.execute('INSERT INTO realizacje (tytul, kategoria, opis, zdjecie, kolejnosc, widoczna, utworzono) VALUES (?,?,?,?,?,?,?)',
+               (request.form.get('tytul', '').strip(), request.form.get('kategoria', '').strip(),
+                request.form.get('opis', '').strip(), zdj, int(request.form.get('kolejnosc') or 0),
+                1 if request.form.get('widoczna') else 0, core.teraz()))
+    db.commit()
+    if blad:
+        return redirect_msg('admin_realizacje', 'Zapisano, ale zdjęcie odrzucone: %s' % blad)
+
+
+@app.route('/admin/realizacje/<int:rid>/edytuj', methods=['POST'])
+@admin_required
+def realizacje_edytuj(rid):
+    db = get_db()
+    row = db.execute('SELECT * FROM realizacje WHERE id=?', (rid,)).fetchone()
+    if not row:
+        abort(404)
+    # link zewnętrzny ma pierwszeństwo; bez linku — wgrany plik; bez pliku — zostaje stare
+    zdj = (request.form.get('zdjecie_url') or '').strip()
+    if zdj and not zdj.startswith(('http://', 'https://')):
+        zdj = ''
+    blad = ''
+    if zdj:
+        blad = ''
+    else:
+        zdj, blad = zapisz_zdjecie(request.files.get('zdjecie'))
+        if not zdj:
+            zdj = row['zdjecie']
+    db.execute('UPDATE realizacje SET tytul=?, kategoria=?, opis=?, zdjecie=?, kolejnosc=?, widoczna=? WHERE id=?',
+               (request.form.get('tytul', '').strip(), request.form.get('kategoria', '').strip(),
+                request.form.get('opis', '').strip(), zdj, int(request.form.get('kolejnosc') or 0),
+                1 if request.form.get('widoczna') else 0, rid))
+    db.commit()
+    if blad:
+        flash('Zapisano, ale zdjęcie odrzucone: %s' % blad)
+    return redirect303(url_for('admin_realizacje'))
+
+
+@app.route('/admin/realizacje/<int:rid>/usun', methods=['POST'])
+@admin_required
+def realizacje_usun(rid):
+    db = get_db()
+    db.execute('DELETE FROM realizacje WHERE id=?', (rid,))
+    db.commit()
+    return redirect303(url_for('admin_realizacje'))
+
+
+# ---------------------------------------------------------------- ADMIN: wiadomości (formularz kontaktowy)
+@app.route('/admin/wiadomosci')
+@admin_required
+def admin_wiadomosci():
+    db = get_db()
+    rows = db.execute('SELECT * FROM wiadomosci ORDER BY id DESC').fetchall()
+    return render_template('admin_wiadomosci.html', rows=rows)
+
+
+@app.route('/admin/wiadomosci/<int:wid>', methods=['GET', 'POST'])
+@admin_required
+def admin_wiadomosc(wid):
+    db = get_db()
+    row = db.execute('SELECT * FROM wiadomosci WHERE id=?', (wid,)).fetchone()
+    if not row:
+        abort(404)
+    if request.method == 'POST':
+        nowy = request.form.get('status', 'nowa')
+        if nowy in ('nowa', 'przeczytana', 'odpowiedziano'):
+            db.execute('UPDATE wiadomosci SET status=? WHERE id=?', (nowy, wid))
+            db.commit()
+        return redirect303(url_for('admin_wiadomosc', wid=wid))
+    return render_template('admin_wiadomosc.html', w=row)
+
+
+# ---------------------------------------------------------------- ADMIN: maile (outbox)
+@app.route('/admin/maile')
+@admin_required
+def admin_maile():
+    db = get_db()
+    rows = db.execute('SELECT * FROM mail_outbox ORDER BY id DESC LIMIT 200').fetchall()
+    return render_template('admin_maile.html', rows=rows)
+
+
+@app.route('/admin/maile/<int:mid>/ponow', methods=['POST'])
+@admin_required
+def mail_ponow(mid):
+    db = get_db()
+    m = db.execute('SELECT * FROM mail_outbox WHERE id=?', (mid,)).fetchone()
+    if m:
+        ok, blad = core.wyslij_mail(db, m['do_kogo'], m['temat'], m['tresc'], m['typ'])
+        return redirect_msg('admin_maile', 'Wysłano ponownie.' if ok else ('Błąd: %s' % blad))
+
+
+# ---------------------------------------------------------------- ADMIN: ustawienia
+@app.route('/admin/ustawienia', methods=['GET', 'POST'])
+@admin_required
+def admin_ustawienia():
+    db = get_db()
+    if request.method == 'POST':
+        pola = ['kontakt_email', 'nadawca', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_haslo', 'sheets_url', 'kody_rabatowe']
+        for p in pola:
+            db.execute('UPDATE ustawienia SET wartosc=? WHERE klucz=?', (request.form.get(p, '').strip(), p))
+        db.execute("UPDATE ustawienia SET wartosc=? WHERE klucz='smtp_ssl'", ('1' if request.form.get('smtp_ssl') else '0',))
+        nowe_haslo = (request.form.get('haslo') or '').strip()
+        if nowe_haslo:
+            from werkzeug.security import generate_password_hash
+            db.execute("UPDATE ustawienia SET wartosc=? WHERE klucz='admin_hash'", (generate_password_hash(nowe_haslo),))
+        db.commit()
+        return redirect_msg('admin_ustawienia', 'Ustawienia zapisane.')
+    u = {r['klucz']: r['wartosc'] for r in db.execute('SELECT klucz, wartosc FROM ustawienia').fetchall()}
+    dokumenty = json.loads(u.get('dokumenty') or '[]')
+    pliki = sorted(os.listdir(os.path.join(DATA, 'dokumenty'))) if os.path.isdir(os.path.join(DATA, 'dokumenty')) else []
+    sheets_log = db.execute('SELECT * FROM sheets_log ORDER BY id DESC LIMIT 5').fetchall()
+    return render_template('admin_ustawienia.html', u=u, dokumenty=dokumenty, pliki=pliki, sheets_log=sheets_log)
+
+
+@app.route('/admin/ustawienia/test-sheets', methods=['POST'])
+@admin_required
+def test_sheets():
+    db = get_db()
+    test = {'sygnatura': 'TEST', 'temat': 'Test połączenia', 'imie': 'Panel admina',
+            'email': 'kontakt@studiosygnatura.pl', 'tresc': 'Testowy wpis z panelu — sprawdzenie webhooka.'}
+    ok, komunikat = core.push_do_sheets(db, test, typ='test')
+    if ok:
+        return redirect_msg('admin_ustawienia', 'Webhook Google Sheets odpowiedział poprawnie (%s). Sprawdź arkusz.' % komunikat)
+    else:
+        return redirect_msg('admin_ustawienia', 'Webhook NIE odpowiada: %s — sprawdź URL arkusza i skrypt.' % komunikat)
+
+
+@app.route('/admin/ustawienia/test-smtp', methods=['POST'])
+@admin_required
+def test_smtp():
+    db = get_db()
+    cel = (request.form.get('test_email') or '').strip()
+    if not cel:
+        return redirect_msg('admin_ustawienia', 'Podaj adres, na który wysłać test.')
+    test = {'imie': 'Test SMTP', 'temat': 'Test połączenia', 'tresc': 'To jest test wysyłki.',
+            'status': 'test', 'kwoty': None, 'sygnatura': 'TEST', 'email': cel,
+            'pakiet_nazwa': '', 'data': '', 'data_od': '', 'data_do': '', 'dni': 0, 'telefon': ''}
+    ok, blad = core.wyslij_szablon(db, 'test', test, cel)
+    if ok:
+        return redirect_msg('admin_ustawienia', 'E-mail testowy wysłany na %s. Sprawdź skrzynkę (i spam).' % cel)
+    return redirect_msg('admin_ustawienia', 'Błąd wysyłki: %s' % blad)
+
+
+# ---------------------------------------------------------------- ADMIN: autorespondery
+@app.route('/admin/szablony')
+@admin_required
+def admin_szablony():
+    db = get_db()
+    rows = db.execute('SELECT * FROM szablony_maili ORDER BY klucz').fetchall()
+    zmienne = ['%(sygnatura)s', '%(imie)s', '%(email)s', '%(telefon)s', '%(temat)s', '%(tresc)s',
+               '%(pakiet)s', '%(zakres)s', '%(dni)s', '%(data)s', '%(status)s', '%(powod)s',
+               '%(pozycje)s', '%(personalizacje)s', '%(kwoty)s', '%(kwoty_lacznie)s',
+               '%(kontakt_email)s', '%(rok)s', '%(kwartal)s']
+    return render_template('admin_szablony.html', rows=rows, zmienne=zmienne)
+
+
+@app.route('/admin/szablony/<klucz>', methods=['POST'])
+@admin_required
+def szablon_zapisz(klucz):
+    db = get_db()
+    temat = (request.form.get('temat') or '').strip()
+    tresc = request.form.get('tresc') or ''
+    aktywny = 1 if request.form.get('aktywny') else 0
+    db.execute('UPDATE szablony_maili SET temat=?, tresc=?, aktywny=?, zmieniono=? WHERE klucz=?',
+               (temat, tresc, aktywny, core.teraz(), klucz))
+    db.commit()
+    return redirect_msg('admin_szablony', 'Szablon „%s" zapisany.' % klucz)
+
+
+# ---------------------------------------------------------------- ADMIN: rozliczenie (na kogo wpływa przychód)
+@app.route('/admin/rezerwacje/<int:rid>/rozliczenie', methods=['POST'])
+@admin_required
+def rezerwacja_rozliczenie(rid):
+    db = get_db()
+    wartosc = request.form.get('rozliczenie', 'wspolne')
+    if wartosc not in ('maz', 'zona', 'wspolne'):
+        wartosc = 'wspolne'
+    db.execute('UPDATE rezerwacje SET rozliczenie=?, zmieniono=? WHERE id=?', (wartosc, core.teraz(), rid))
+    db.commit()
+    core.push_do_sheets(db, db.execute('SELECT * FROM rezerwacje WHERE id=?', (rid,)).fetchone(), typ='rozliczenie')
+    return redirect_msg('admin_rezerwacja', 'Rozliczenie zapisane.', rid=rid)
+
+
+@app.route('/admin/ustawienia/upload-dokument', methods=['POST'])
+@admin_required
+def upload_dokument():
+    db = get_db()
+    f = request.files.get('plik')
+    if f and f.filename:
+        import werkzeug.utils
+        nazwa = werkzeug.utils.secure_filename(f.filename)
+        kat = os.path.join(DATA, 'dokumenty')
+        os.makedirs(kat, exist_ok=True)
+        f.save(os.path.join(kat, nazwa))
+        u = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='dokumenty'").fetchone()
+        dok = json.loads(u['wartosc'] or '[]')
+        dok.append({'nazwa': request.form.get('nazwa', nazwa).strip() or nazwa, 'plik': nazwa})
+        db.execute("UPDATE ustawienia SET wartosc=? WHERE klucz='dokumenty'", (json.dumps(dok, ensure_ascii=False),))
+        db.commit()
+        flash('Dokument dodany.')
+    return redirect303(url_for('admin_ustawienia'))
+
+
+@app.route('/admin/ustawienia/dokument-usun/<int:idx>', methods=['POST'])
+@admin_required
+def dokument_usun(idx):
+    db = get_db()
+    u = db.execute("SELECT wartosc FROM ustawienia WHERE klucz='dokumenty'").fetchone()
+    dok = json.loads(u['wartosc'] or '[]')
+    if 0 <= idx < len(dok):
+        dok.pop(idx)
+        db.execute("UPDATE ustawienia SET wartosc=? WHERE klucz='dokumenty'", (json.dumps(dok, ensure_ascii=False),))
+        db.commit()
+    return redirect303(url_for('admin_ustawienia'))
+
+
+@app.errorhandler(404)
+def brak_strony(e):
+    return render_template('404.html'), 404
+
+
+if __name__ == '__main__':
+    baza_mod.inicjuj()
+    print('=' * 60)
+    print('Studio Sygnatura — serwis lokalny')
+    print('  strona:  http://127.0.0.1:8000')
+    print('  panel:   http://127.0.0.1:8000/admin/  (hasło startowe: sygnatura-2026)')
+    print('=' * 60)
+    app.run(host='0.0.0.0', port=8000, debug=True)
