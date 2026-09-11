@@ -34,6 +34,30 @@
     ['kontakt.html', 'Kontakt']
   ];
 
+  /* menu = pozycje stałe + podstrony zarządzane z panelu admina (zakładka „Podstrony") */
+  let POZYCJE_MENU = MENU.slice();
+  let STRONY_MENU = [];
+  async function ladujPozycjeMenu(){
+    try {
+      const odp = await SYG.wezwij('strony-lista', {});
+      const strony = (odp.ok && odp.strony) || [];
+      STRONY_MENU = strony;
+      POZYCJE_MENU = MENU.concat(
+        strony.filter(function (s) { return s.menu; })
+          .sort(function (a, b) { return (a.kol || 10) - (b.kol || 10); })
+          .map(function (s) { return ['podstrona.html?s=' + encodeURIComponent(s.slug), s.tytul]; })
+      );
+    } catch (e) { /* brak danych — zostaje menu stałe */ }
+    document.querySelectorAll('.menu-vert').forEach(function (nav) {
+      nav.innerHTML = pozycjeHtml(document.body.getAttribute('data-strona') || '');
+    });
+  }
+  function pozycjeHtml(aktywna){
+    return POZYCJE_MENU.map(function (m) {
+      return '<a href="' + m[0] + '"' + (m[1] === aktywna ? ' class="on"' : '') + '>' + m[1] + '</a>';
+    }).join('');
+  }
+
   function ikonaSvg(sciezki, widok) {
     return '<svg viewBox="' + (widok || '0 0 24 24') + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + sciezki + '</svg>';
   }
@@ -46,10 +70,6 @@
   const SVG_FB = '<path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/>';
 
   function szkielet(aktywna) {
-    let pozycje = '';
-    MENU.forEach(function (m) {
-      pozycje += '<a href="' + m[0] + '"' + (m[1] === aktywna ? ' class="on"' : '') + '>' + m[1] + '</a>';
-    });
     return '' +
       '<div class="srodek">' +
       /* A + C: logo i menu */
@@ -59,7 +79,7 @@
       '<div class="brand-nazwa"><span class="syg">Syg</span><span class="natura">natura</span></div>' +
       '<div class="brand-tag">drewno · światło · detal</div>' +
       '</div>' +
-      '<nav class="menu-vert" aria-label="Menu główne">' + pozycje + '</nav>' +
+      '<nav class="menu-vert" aria-label="Menu główne"></nav>' +
       '</aside>' +
       '<div class="listwa" aria-hidden="true"></div>' +
       /* B + D: prawa kolumna */
@@ -97,9 +117,12 @@
   }
 
   function stopka() {
-    return '<span><a href="regulamin.html">Regulamin</a><span class="sep">·</span>' +
-      '<a href="jak-pracujemy.html">Jak pracujemy</a></span>' +
-      '<span>© Sygnatura 2026 · wersja 28.12</span>';
+    const czesci = ['<a href="regulamin.html">Regulamin</a>', '<a href="jak-pracujemy.html">Jak pracujemy</a>'];
+    STRONY_MENU.filter(function (s) { return s.menu; }).forEach(function (s) {
+      czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
+    });
+    return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
+      '<span>© Sygnatura 2026 · wersja 28.13</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -146,6 +169,9 @@
 
     window.KOSZYK.odswiez();
   });
+
+  /* wypełnienie menu (stałe + podstrony z panelu) — na wszystkich stronach z .menu-vert */
+  document.addEventListener('DOMContentLoaded', ladujPozycjeMenu);
 
   /* ============ pasek postępu (kamienie milowe) ============ */
   window.PROGRES = {

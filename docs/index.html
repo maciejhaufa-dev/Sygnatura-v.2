@@ -56,7 +56,7 @@ a{text-decoration:none;color:inherit}
 .listwa{flex:none;width:10px;background:
   repeating-linear-gradient(90deg, rgba(139,90,43,.30) 0 2px, rgba(107,69,48,.12) 2px 4px),
   linear-gradient(180deg, #7A5338 0%, #C4A582 22%, #6B4530 50%, #C4A582 78%, #7A5338 100%);
-  box-shadow: inset 0 0 0 1px rgba(196,165,130,.35)}
+  box-shadow: inset 2px 0 0 #C9AE85, inset -2px 0 0 #C9AE85, inset 0 0 0 1px rgba(196,165,130,.35)}
 
 .prawa{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;background:var(--krem)}
 
@@ -202,7 +202,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .listwa-poziom{height:10px;background:
   repeating-linear-gradient(180deg, rgba(139,90,43,.30) 0 2px, rgba(107,69,48,.12) 2px 4px),
   linear-gradient(90deg,#7A5338 0%,#C4A582 22%,#6B4530 50%,#C4A582 78%,#7A5338 100%);
-  box-shadow: inset 0 0 0 1px rgba(196,165,130,.35)}
+  box-shadow: inset 0 2px 0 #C9AE85, inset 0 -2px 0 #C9AE85, inset 0 0 0 1px rgba(196,165,130,.35)}
 
 /* --- stopka --- */
 .foot{flex:none;background:var(--butelkowa);color:var(--krem);display:flex;align-items:center;
@@ -407,8 +407,8 @@ html.dotyk .social{margin-top:14px}
   <div class="listwa-poziom" aria-hidden="true"></div>
 
   <footer class="foot">
-    <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a></span>
-    <span>© Sygnatura 2026 · wersja 28.12</span>
+    <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
+    <span>© Sygnatura 2026 · wersja 28.13</span>
   </footer>
 </div>
 
@@ -452,10 +452,10 @@ html.dotyk .social{margin-top:14px}
 })();
 </script>
 
-<script src="data/katalog.js?v=292"></script>
-<script src="assets/koszyk.js?v=292"></script>
-<script src="assets/config.js?v=292"></script>
-<script src="assets/main.js?v=292"></script>
+<script src="data/katalog.js?v=293"></script>
+<script src="assets/koszyk.js?v=293"></script>
+<script src="assets/config.js?v=293"></script>
+<script src="assets/main.js?v=293"></script>
 <script>
 (function(){
   /* ===== slider: autoplay w pętli, strzałki, kropki ===== */

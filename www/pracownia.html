@@ -8,18 +8,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=292">
+<link rel="stylesheet" href="assets/style.css?v=293">
 </head>
-<body data-strona="Pracownia">
+<body data-strona="Pracownia" data-podstrona="1">
 <div id="naglowek"></div>
 
 <main class="wrap">
-  <h1>Pracownia</h1>
-  <p class="mala" style="border:1px dashed rgba(107,69,48,.5);padding:10px 14px;background:var(--krem-2)">
-    Dokument roboczy — treść „o nas" do przejrzenia i uzupełnienia przez Studio.
-  </p>
-
-  <div class="regulamin">
+  <div class="regulamin" id="podstrona-tresc">
     <h2>Kim jesteśmy</h2>
     <p>Studio Sygnatura to <b>rodzinna manufaktura</b> — w naszych rzeczach spotykają się drewno, światło i detal.
     Nie jesteśmy fabryką: każdy szyld, każda szopka i każda tablica przechodzi przez nasze ręce od deski do ostatniego
@@ -45,9 +40,24 @@
 </main>
 
 <div id="stopka"></div>
-<script src="assets/config.js?v=292"></script>
-<script src="assets/koszyk.js?v=292"></script>
-<script src="assets/api.js?v=292"></script>
-<script src="assets/main.js?v=292"></script>
+<script src="assets/config.js?v=293"></script>
+<script src="assets/koszyk.js?v=293"></script>
+<script src="assets/api.js?v=293"></script>
+<script src="assets/main.js?v=293"></script>
+<script>
+(function(){
+  /* treść PRACOWNI jest zarządzana z panelu admina (zakładka „Podstrony").
+     Po zapisie edytor w panelu podaje tu sformatowany HTML; przy braku zapisu
+     zostaje treść domyślna (powyżej). */
+  async function laduj(){
+    var kontener = document.getElementById('podstrona-tresc');
+    var odp = await SYG.wezwij('strony-lista', {});
+    var strona = (odp.strony || []).find(function(s){ return s.slug === 'pracownia'; });
+    if (strona && strona.tresc) kontener.innerHTML = strona.tresc;
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', laduj);
+  else laduj();
+})();
+</script>
 </body>
 </html>

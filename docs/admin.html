@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=292">
+<link rel="stylesheet" href="assets/style.css?v=293">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -19,7 +19,7 @@
 
   <!-- EKRAN LOGOWANIA: wymuszany po każdym zamknięciu strony (sesja przeglądarki) -->
   <div id="logowanie" class="forma" style="max-width:480px">
-    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia, wiadomości i ustawienia strony.</p>
+    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia, wiadomości, blog i ustawienia strony.</p>
     <div class="flash" id="logowanie-blad" style="display:none;background:#8a2f1d"></div>
     <div class="pole">
       <label for="admin-login">Login *</label>
@@ -46,7 +46,9 @@
     <div class="admin-tabs" id="admin-tabs">
       <button class="admin-tab on" data-tab="zamowienia" type="button">Zamówienia</button>
       <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
+      <button class="admin-tab" data-tab="blog" type="button">Blog</button>
       <button class="admin-tab" data-tab="produkty" type="button">Produkty</button>
+      <button class="admin-tab" data-tab="strony" type="button">Podstrony</button>
       <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
     </div>
 
@@ -72,17 +74,188 @@
       </div>
     </section>
 
+    <!-- BLOG -->
+    <section class="admin-sekcja" id="tab-blog" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Blog / realizacje</h2>
+      <p class="mala">Każdy wpis to realizacja na stronie: zdjęcia, opis wykonania, film. Wpis może
+      jednocześnie być produktem sklepu — zaznacz „dodaj do sklepu", a pozycja pojawi się w zakładce
+      Produkty (tam ustalisz cenę i widoczność). W trybie demo wpisy zapisują się w tej przeglądarce.</p>
+      <div class="flash" id="blog-info" style="display:none"></div>
+      <div class="admin-dwie">
+        <div>
+          <div class="przyciski" style="justify-content:flex-start">
+            <button class="btn" type="button" id="blog-nowy">+ Nowy wpis</button>
+          </div>
+          <div class="tabela-wrap" style="margin-top:10px">
+            <table class="tabela" id="tabela-blog">
+              <thead><tr><th>Data</th><th>Tytuł</th><th>Kategoria</th><th>Sklep</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="forma" id="blog-form" style="display:none">
+          <h3 id="blog-form-tytul">Nowy wpis</h3>
+          <div class="pole">
+            <label for="bf-tytul">Tytuł wpisu *</label>
+            <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="pole">
+              <label for="bf-kategoria">Kategoria</label>
+              <input type="text" id="bf-kategoria" list="bf-kategorie" placeholder="np. Szyldy i tablice">
+              <datalist id="bf-kategorie"></datalist>
+            </div>
+            <div class="pole">
+              <label for="bf-data">Data wpisu</label>
+              <input type="date" id="bf-data">
+            </div>
+          </div>
+          <div class="pole">
+            <label for="bf-zajawka">Krótki opis (na kafelek)</label>
+            <textarea id="bf-zajawka" rows="2" placeholder="Dwa zdania, które zachęcą do kliknięcia…"></textarea>
+          </div>
+          <div class="pole">
+            <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
+            <div class="bf-mini" id="bf-mini"></div>
+            <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
+            <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="pole">
+            <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
+            <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
+          </div>
+          <div class="pole">
+            <label>Treść wpisu — zaznacz tekst i formatuj jak w edytorze forum</label>
+            <div class="editor" id="bf-tresc" style="min-height:180px"></div>
+            <input type="hidden" id="bf-zrodlo">
+          </div>
+          <div class="pole" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
+            <label style="cursor:pointer;font-weight:700">
+              <input type="checkbox" id="bf-sklep"> Dodaj ten wpis do sklepu (produkt z historią)
+            </label>
+            <div id="bf-produkt" style="display:none;margin-top:10px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="pole">
+                  <label for="bf-p-nazwa">Nazwa produktu</label>
+                  <input type="text" id="bf-p-nazwa">
+                </div>
+                <div class="pole">
+                  <label for="bf-p-link">Połącz z produktem (albo nowy)</label>
+                  <select id="bf-p-link"><option value="">— nowy produkt —</option></select>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="pole">
+                  <label for="bf-p-cena">Cena (zł)</label>
+                  <input type="number" id="bf-p-cena" step="0.01" min="0">
+                </div>
+                <div class="pole">
+                  <label for="bf-p-gabaryt">Gabaryt / rozmiar paczki</label>
+                  <input type="text" id="bf-p-gabaryt" placeholder="np. 20×20×8 cm">
+                </div>
+              </div>
+              <p class="mala">Cenę i widoczność możesz potem dopracować w zakładce „Produkty".</p>
+            </div>
+          </div>
+          <div class="przyciski">
+            <button class="btn" type="button" id="blog-zapisz">Zapisz wpis</button>
+            <button class="btn outline" type="button" id="blog-anuluj">Anuluj</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- PRODUKTY -->
     <section class="admin-sekcja" id="tab-produkty" style="display:none">
       <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
-      <p class="mala">Zmień cenę albo ukryj/pokaż produkt w sklepie. W trybie demo zmiany zapisują się
-      w tej przeglądarce i od razu widać je w sklepie; po wdrożeniu trafią do arkusza Google.</p>
+      <p class="mala">Zmień cenę albo ukryj/pokaż produkt w sklepie. Produkty z wpisów bloga mają tu
+      dopisany link „historia →". Możesz też dodać produkt „bez historii" (np. papierowe winietki).
+      W trybie demo zmiany zapisują się w tej przeglądarce.</p>
       <div class="flash" id="produkty-info" style="display:none"></div>
       <div class="tabela-wrap">
         <table class="tabela" id="tabela-produkty">
           <thead><tr><th>Produkt</th><th>Cena (zł)</th><th>W sklepie</th><th></th></tr></thead>
           <tbody></tbody>
         </table>
+      </div>
+      <div class="forma" id="produkt-nowy-form" style="max-width:720px;margin-top:16px;display:none">
+        <h3>Nowy produkt (bez historii)</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="pole">
+            <label for="pn-nazwa">Nazwa *</label>
+            <input type="text" id="pn-nazwa" placeholder="np. Winietki papierowe — komplet 20 szt.">
+          </div>
+          <div class="pole">
+            <label for="pn-cena">Cena (zł)</label>
+            <input type="number" id="pn-cena" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="pole">
+          <label for="pn-opis">Krótki opis</label>
+          <input type="text" id="pn-opis">
+        </div>
+        <div class="pole">
+          <label for="pn-obraz">Zdjęcie (plik)</label>
+          <input type="file" id="pn-obraz" accept="image/*">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="pn-zapisz">Dodaj produkt</button>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:flex-start">
+        <button class="btn outline" type="button" id="produkt-nowy">+ Produkt bez historii</button>
+      </div>
+    </section>
+
+    <!-- PODSTRONY -->
+    <section class="admin-sekcja" id="tab-strony" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podstrony</h2>
+      <p class="mala">Edytujesz treść PRACOWNI (prosty edytor — jak sformatujesz, tak się wyświetli)
+      i dodajesz nowe podstrony z przyciskiem w MENU. Strony-szkielety (Zamówienia, Sklep, Koszyk,
+      Kontakt, Regulamin…) mają własne układy i nie są tutaj — w tej wersji edytujemy treść
+      tekstową wybranych podstron i listę menu.</p>
+      <div class="flash" id="strony-info" style="display:none"></div>
+      <div class="admin-dwie">
+        <div>
+          <div class="przyciski" style="justify-content:flex-start">
+            <button class="btn" type="button" id="strona-nowa">+ Nowa podstrona</button>
+          </div>
+          <div class="tabela-wrap" style="margin-top:10px">
+            <table class="tabela" id="tabela-stron">
+              <thead><tr><th>Tytuł</th><th>W menu</th><th>Kolejność</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="forma" id="strona-form" style="display:none">
+          <h3 id="strona-form-tytul">Nowa podstrona</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="pole">
+              <label for="sf-slug">Identyfikator (slug)</label>
+              <input type="text" id="sf-slug" placeholder="np. o-nas">
+            </div>
+            <div class="pole">
+              <label for="sf-kol">Kolejność w menu</label>
+              <input type="number" id="sf-kol" min="1" value="10">
+            </div>
+          </div>
+          <div class="pole">
+            <label for="sf-tytul">Tytuł (widoczny w MENU i nagłówku)</label>
+            <input type="text" id="sf-tytul">
+          </div>
+          <div class="pole">
+            <label style="cursor:pointer"><input type="checkbox" id="sf-menu" checked> Pokaż w menu</label>
+          </div>
+          <div class="pole">
+            <label>Treść — jak sformatujesz, tak się wyświetli na stronie</label>
+            <div class="editor" id="sf-tresc" style="min-height:180px"></div>
+            <input type="hidden" id="sf-zrodlo">
+          </div>
+          <div class="przyciski">
+            <button class="btn" type="button" id="strona-zapisz">Zapisz podstronę</button>
+            <button class="btn outline" type="button" id="strona-anuluj">Anuluj</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -134,11 +307,12 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=292"></script>
-<script src="assets/koszyk.js?v=292"></script>
-<script src="assets/api.js?v=292"></script>
-<script src="data/katalog.js?v=292"></script>
-<script src="assets/main.js?v=292"></script>
+<script src="assets/config.js?v=293"></script>
+<script src="assets/koszyk.js?v=293"></script>
+<script src="assets/api.js?v=293"></script>
+<script src="assets/editor.js?v=293"></script>
+<script src="data/katalog.js?v=293"></script>
+<script src="assets/main.js?v=293"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -216,7 +390,7 @@
           '<td>' + w.temat + '</td><td>' + w.tresc + '</td></tr>';
       }).join('') || '<tr><td colspan="4">Brak wiadomości.</td></tr>';
     } else {
-      wbody.innerHTML = '<tr><td colspan="4">Lista wiadomości z arkusza będzie dostępna po wdrożeniu (akcja „wiadomosci-lista" — w kolejnej wersji silnika).</td></tr>';
+      wbody.innerHTML = '<tr><td colspan="4">Lista wiadomości z arkusza będzie dostępna po wdrożeniu (akcja „wiadomosci-lista").</td></tr>';
     }
   }
 
@@ -226,7 +400,9 @@
     var tbody = document.querySelector('#tabela-produkty tbody');
     tbody.innerHTML = kat.map(function(p){
       return '<tr>' +
-        '<td><b>' + p.nazwa + '</b><br><span class="mala">#' + p.id + '</span></td>' +
+        '<td><b>' + p.nazwa + '</b><br><span class="mala">#' + p.id +
+        (p.storyId ? ' · <a href="blog-wpis.html?id=' + p.storyId + '" target="_blank" rel="noopener" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">historia →</a>' : '') +
+        '</span></td>' +
         '<td><input type="number" step="0.01" min="0" class="p-cena" data-id="' + p.id + '" value="' + p.cena + '" style="width:110px"></td>' +
         '<td><label style="cursor:pointer;font-size:14px"><input type="checkbox" class="p-dost" data-id="' + p.id + '"' + (p.dostepny ? ' checked' : '') + '> widoczny</label></td>' +
         '<td><button class="btn outline" type="button" style="padding:8px 16px" data-id="' + p.id + '">Zapisz</button></td>' +
@@ -246,6 +422,307 @@
       });
     });
   }
+
+  /* produkt bez historii */
+  var pnObraz = '';
+  document.getElementById('pn-obraz').addEventListener('change', function(){
+    var f = this.files[0];
+    if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function(){ pnObraz = fr.result; };
+    fr.readAsDataURL(f);
+  });
+  document.getElementById('produkt-nowy').addEventListener('click', function(){
+    document.getElementById('produkt-nowy-form').style.display = 'block';
+  });
+  document.getElementById('pn-zapisz').addEventListener('click', async function(){
+    var nazwa = document.getElementById('pn-nazwa').value.trim();
+    if (!nazwa){ alert('Podaj nazwę produktu.'); return; }
+    var odp = await SYG.wezwij('produkt-nowy', {
+      nazwa: nazwa,
+      cena: Number(document.getElementById('pn-cena').value) || 0,
+      opis: document.getElementById('pn-opis').value.trim(),
+      obraz: pnObraz || 'szopka.jpg'
+    });
+    var f = document.getElementById('produkty-info');
+    f.style.display = 'block';
+    f.textContent = odp.ok ? 'Dodano produkt: ' + nazwa + '.' : (odp.blad || 'Nie dodano.');
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+    if (odp.ok){
+      document.getElementById('pn-nazwa').value = '';
+      document.getElementById('pn-cena').value = '';
+      document.getElementById('pn-opis').value = '';
+      document.getElementById('pn-obraz').value = '';
+      pnObraz = '';
+      document.getElementById('produkt-nowy-form').style.display = 'none';
+      ladujProdukty();
+    }
+  });
+
+  /* ============ BLOG ============ */
+  var blogEdytor = SYG.edytor('bf-tresc', 'bf-zrodlo');
+  var edycjaWpis = null;
+  var galeria = [];
+
+  function infoBlog(txt){
+    var f = document.getElementById('blog-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  function rysujMini(){
+    var kont = document.getElementById('bf-mini');
+    kont.innerHTML = '';
+    galeria.forEach(function(g, i){
+      var el = document.createElement('div');
+      el.className = 'bf-mini-el';
+      el.innerHTML = '<img src="' + g.src + '" alt="">' +
+        '<label><input type="radio" name="bf-glowna" ' + (g.glowna ? 'checked' : '') + '> główne</label>' +
+        '<button type="button" class="bf-mini-x" title="Usuń zdjęcie">✕</button>';
+      el.querySelector('input').addEventListener('change', function(){
+        galeria.forEach(function(x){ x.glowna = false; });
+        g.glowna = true;
+        rysujMini();
+      });
+      el.querySelector('.bf-mini-x').addEventListener('click', function(){
+        galeria.splice(i, 1);
+        if (!galeria.length) galeria = [];
+        else if (!galeria.some(function(x){ return x.glowna; })) galeria[0].glowna = true;
+        rysujMini();
+      });
+      kont.appendChild(el);
+    });
+  }
+
+  document.getElementById('bf-pliki').addEventListener('change', function(){
+    var files = Array.prototype.slice.call(this.files || []);
+    files.forEach(function(f){
+      if (galeria.length >= 10){ alert('Maksymalnie 10 zdjęć.'); return; }
+      var fr = new FileReader();
+      fr.onload = function(){
+        galeria.push({ src: fr.result, glowna: galeria.length === 0 });
+        rysujMini();
+      };
+      fr.readAsDataURL(f);
+    });
+    this.value = '';
+  });
+
+  document.getElementById('bf-sklep').addEventListener('change', function(){
+    document.getElementById('bf-produkt').style.display = this.checked ? 'block' : 'none';
+  });
+
+  async function wypelnijLinkProdukty(){
+    var kat = await SYG.katalog();
+    var sel = document.getElementById('bf-p-link');
+    sel.innerHTML = '<option value="">— nowy produkt —</option>' +
+      kat.map(function(p){ return '<option value="' + p.id + '">' + p.nazwa + ' (#' + p.id + ')</option>'; }).join('');
+    /* kategorie do datalisty */
+    var odp = await SYG.wezwij('blog-lista', {});
+    var katLista = [];
+    (odp.wpisy || []).forEach(function(w){ if (w.kategoria && katLista.indexOf(w.kategoria) < 0) katLista.push(w.kategoria); });
+    document.getElementById('bf-kategorie').innerHTML = katLista.map(function(k){
+      return '<option value="' + k.replace(/"/g, '&quot;') + '">';
+    }).join('');
+  }
+
+  async function ladujBlog(){
+    await wypelnijLinkProdukty();
+    var odp = await SYG.wezwij('blog-lista', {});
+    var wpisy = odp.ok ? (odp.wpisy || []) : [];
+    var tbody = document.querySelector('#tabela-blog tbody');
+    tbody.innerHTML = wpisy.map(function(w){
+      return '<tr>' +
+        '<td>' + (w.data || '').slice(0, 10) + '</td>' +
+        '<td><b>' + w.tytul + '</b><br><span class="mala">' + (w.galeria ? w.galeria.length + 1 : 1) + ' zdj.</span></td>' +
+        '<td>' + w.kategoria + '</td>' +
+        '<td>' + (w.produkt && w.produkt.sklep ? '<b style="color:var(--butelkowa)">✓ w sklepie</b>' : '—') + '</td>' +
+        '<td style="white-space:nowrap">' +
+        '<a class="btn outline" style="padding:6px 12px;font-size:13px" href="blog-wpis.html?id=' + w.id + '" target="_blank" rel="noopener">Podgląd</a> ' +
+        '<button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="' + w.id + '">Edytuj</button> ' +
+        '<button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="' + w.id + '">Usuń</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="5">Brak wpisów.</td></tr>';
+
+    tbody.querySelectorAll('button[data-edit]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var w = wpisy.find(function(x){ return Number(x.id) === Number(b.getAttribute('data-edit')); });
+        if (!w) return;
+        edycjaWpis = w;
+        galeria = [].concat([w.okladka], (w.galeria || [])).filter(function(g, i, a){ return g && a.indexOf(g) === i; })
+          .map(function(g, i){ return { src: g, glowna: i === 0 }; });
+        document.getElementById('blog-form-tytul').textContent = 'Edycja wpisu #' + w.id;
+        document.getElementById('bf-tytul').value = w.tytul || '';
+        document.getElementById('bf-kategoria').value = w.kategoria || '';
+        document.getElementById('bf-data').value = w.data || '';
+        document.getElementById('bf-zajawka').value = w.zajawka || '';
+        document.getElementById('bf-video').value = w.video || '';
+        blogEdytor.ustaw(w.tresc || '');
+        var prod = w.produkt || {};
+        document.getElementById('bf-sklep').checked = !!prod.sklep;
+        document.getElementById('bf-produkt').style.display = prod.sklep ? 'block' : 'none';
+        document.getElementById('bf-p-nazwa').value = prod.nazwa || '';
+        document.getElementById('bf-p-link').value = prod.sklep && katProduktIstnieje(prod.id) ? String(prod.id) : '';
+        document.getElementById('bf-p-cena').value = prod.cena || '';
+        document.getElementById('bf-p-gabaryt').value = prod.gabaryt || '';
+        rysujMini();
+        document.getElementById('blog-form').style.display = 'block';
+        document.getElementById('blog-form').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    tbody.querySelectorAll('button[data-usun]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        if (!confirm('Usunąć wpis „' + (wpisy.find(function(x){ return Number(x.id) === Number(b.getAttribute('data-usun')); }) || {}).tytul + '"?')) return;
+        var odp2 = await SYG.wezwij('blog-usun', { id: Number(b.getAttribute('data-usun')) });
+        infoBlog(odp2.ok ? 'Wpis usunięty.' : (odp2.blad || 'Nie usunięto.'));
+        ladujBlog();
+      });
+    });
+  }
+
+  var _katCache = null;
+  async function katCache(){
+    if (_katCache) return _katCache;
+    _katCache = await SYG.katalog();
+    return _katCache;
+  }
+  function katProduktIstnieje(id){
+    return (_katCache || []).some(function(p){ return Number(p.id) === Number(id); });
+  }
+
+  document.getElementById('blog-nowy').addEventListener('click', function(){
+    edycjaWpis = null;
+    galeria = [];
+    document.getElementById('blog-form-tytul').textContent = 'Nowy wpis';
+    ['bf-tytul','bf-kategoria','bf-zajawka','bf-video','bf-p-nazwa','bf-p-gabaryt'].forEach(function(id){ document.getElementById(id).value = ''; });
+    document.getElementById('bf-data').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('bf-p-cena').value = '';
+    document.getElementById('bf-p-link').value = '';
+    document.getElementById('bf-sklep').checked = false;
+    document.getElementById('bf-produkt').style.display = 'none';
+    blogEdytor.ustaw('');
+    rysujMini();
+    document.getElementById('blog-form').style.display = 'block';
+    document.getElementById('blog-form').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.getElementById('blog-anuluj').addEventListener('click', function(){
+    document.getElementById('blog-form').style.display = 'none';
+  });
+
+  document.getElementById('blog-zapisz').addEventListener('click', async function(){
+    var tytul = document.getElementById('bf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł wpisu.'); return; }
+    var sklep = document.getElementById('bf-sklep').checked;
+    var link = document.getElementById('bf-p-link').value;
+    var kat = await katCache();
+    var istniejacy = kat.find(function(p){ return Number(p.id) === Number(link); });
+    var wpis = {
+      id: edycjaWpis ? edycjaWpis.id : null,
+      tytul: tytul,
+      kategoria: document.getElementById('bf-kategoria').value.trim() || 'Realizacje',
+      data: document.getElementById('bf-data').value || new Date().toISOString().slice(0, 10),
+      zajawka: document.getElementById('bf-zajawka').value.trim(),
+      okladka: galeria.length ? galeria[0].src : 'assets/media/sklep/szopka.jpg',
+      galeria: galeria.map(function(g){ return g.src; }),
+      video: document.getElementById('bf-video').value.trim(),
+      tresc: blogEdytor.pobierz(),
+      produkt: {
+        sklep: sklep,
+        id: istniejacy ? Number(link) : (edycjaWpis && edycjaWpis.produkt && edycjaWpis.produkt.id ? edycjaWpis.produkt.id : 0),
+        nazwa: document.getElementById('bf-p-nazwa').value.trim() || tytul,
+        cena: Number(document.getElementById('bf-p-cena').value) || (istniejacy ? istniejacy.cena : 0),
+        gabaryt: document.getElementById('bf-p-gabaryt').value.trim()
+      }
+    };
+    var odp = await SYG.wezwij('blog-zapisz', { wpis: wpis });
+    infoBlog(odp.ok ? 'Wpis zapisany' + (sklep ? ' i dodany do sklepu.' : '.') : (odp.blad || 'Nie zapisano.'));
+    if (odp.ok){ _katCache = null; ladujBlog(); ladujProdukty(); }
+  });
+
+  /* ============ PODSTRONY ============ */
+  var stronaEdytor = SYG.edytor('sf-tresc', 'sf-zrodlo');
+  var edycjaStrona = null;
+
+  function infoStrony(txt){
+    var f = document.getElementById('strony-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  async function ladujStrony(){
+    var odp = await SYG.wezwij('strony-lista', {});
+    var lista = odp.ok ? (odp.strony || []) : [];
+    var tbody = document.querySelector('#tabela-stron tbody');
+    tbody.innerHTML = lista.map(function(s){
+      return '<tr>' +
+        '<td><b>' + s.tytul + '</b><br><span class="mala">/' + s.slug + '</span></td>' +
+        '<td>' + (s.menu ? '✓' : '—') + '</td>' +
+        '<td>' + s.kol + '</td>' +
+        '<td style="white-space:nowrap">' +
+        '<a class="btn outline" style="padding:6px 12px;font-size:13px" href="podstrona.html?s=' + encodeURIComponent(s.slug) + '" target="_blank" rel="noopener">Podgląd</a> ' +
+        '<button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="' + s.slug + '">Edytuj</button> ' +
+        '<button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="' + s.slug + '">Usuń</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="4">Brak podstron. Dodaj pierwszą.</td></tr>';
+
+    tbody.querySelectorAll('button[data-edit]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var s = lista.find(function(x){ return x.slug === b.getAttribute('data-edit'); });
+        if (!s) return;
+        edycjaStrona = s.slug;
+        document.getElementById('strona-form-tytul').textContent = 'Edycja: ' + s.tytul;
+        document.getElementById('sf-slug').value = s.slug;
+        document.getElementById('sf-tytul').value = s.tytul || '';
+        document.getElementById('sf-menu').checked = s.menu !== 0;
+        document.getElementById('sf-kol').value = s.kol || 10;
+        stronaEdytor.ustaw(s.tresc || '');
+        document.getElementById('strona-form').style.display = 'block';
+      });
+    });
+    tbody.querySelectorAll('button[data-usun]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        if (!confirm('Usunąć podstronę „' + b.getAttribute('data-usun') + '"? Zniknie też z menu.')) return;
+        var odp2 = await SYG.wezwij('strona-usun', { slug: b.getAttribute('data-usun') });
+        infoStrony(odp2.ok ? 'Podstrona usunięta.' : (odp2.blad || 'Nie usunięto.'));
+        ladujStrony();
+      });
+    });
+  }
+
+  document.getElementById('strona-nowa').addEventListener('click', function(){
+    edycjaStrona = null;
+    document.getElementById('strona-form-tytul').textContent = 'Nowa podstrona';
+    document.getElementById('sf-slug').value = '';
+    document.getElementById('sf-tytul').value = '';
+    document.getElementById('sf-menu').checked = true;
+    document.getElementById('sf-kol').value = 10;
+    stronaEdytor.ustaw('');
+    document.getElementById('strona-form').style.display = 'block';
+  });
+
+  document.getElementById('strona-anuluj').addEventListener('click', function(){
+    document.getElementById('strona-form').style.display = 'none';
+  });
+
+  document.getElementById('strona-zapisz').addEventListener('click', async function(){
+    var slug = document.getElementById('sf-slug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+    var tytul = document.getElementById('sf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł podstrony.'); return; }
+    if (!slug){ slug = tytul.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40); }
+    var odp = await SYG.wezwij('strona-zapisz', {
+      strona: {
+        slug: slug, tytul: tytul,
+        menu: document.getElementById('sf-menu').checked ? 1 : 0,
+        kol: Number(document.getElementById('sf-kol').value) || 10,
+        tresc: stronaEdytor.pobierz()
+      }
+    });
+    infoStrony(odp.ok ? 'Podstrona zapisana („/' + slug + '").' : (odp.blad || 'Nie zapisano.'));
+    if (odp.ok){ edycjaStrona = null; ladujStrony(); }
+  });
 
   /* ============ ustawienia (cennik dostawy) ============ */
   function ladujUstawienia(){
@@ -280,6 +757,8 @@
     ladujZamowienia();
     ladujWiadomosci();
     ladujProdukty();
+    ladujBlog();
+    ladujStrony();
     ladujUstawienia();
   }
 
@@ -333,9 +812,12 @@
   });
 
   document.getElementById('odswiez').addEventListener('click', function(){
+    _katCache = null;
     ladujZamowienia();
     ladujWiadomosci();
     ladujProdukty();
+    ladujBlog();
+    ladujStrony();
   });
 })();
 </script>

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=292">
+<link rel="stylesheet" href="assets/style.css?v=293">
 </head>
 <body data-strona="Zamówienia">
 <div id="naglowek"></div>
@@ -44,6 +44,18 @@
     </div>
   </div>
 
+  <div class="koszyk-blok">
+    <h2>Zgoda na publikację projektu</h2>
+    <div class="padd">
+      <label class="rzad" style="align-items:flex-start;cursor:pointer;margin:0">
+        <input type="checkbox" id="zgoda-marketing" style="margin-top:5px">
+        <span>Wyrażam zgodę, aby mój spersonalizowany projekt został wykorzystany w celach
+        marketingowych — jako wpis na blogu „Nasze realizacje" oraz materiał na social media.
+        <span class="mala" style="display:block;margin-top:4px">(opcjonalne — ale dzięki temu Twoja rzecz może trafić na naszą stronę i pokazać innym, co potrafimy razem zrobić.)</span></span>
+      </label>
+    </div>
+  </div>
+
   <div class="przyciski" style="justify-content:flex-end">
     <button class="btn" type="button" id="dalej">Przejdź do danych →</button>
   </div>
@@ -66,11 +78,11 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=292"></script>
-<script src="assets/koszyk.js?v=292"></script>
-<script src="assets/api.js?v=292"></script>
-<script src="data/katalog.js?v=292"></script>
-<script src="assets/main.js?v=292"></script>
+<script src="assets/config.js?v=293"></script>
+<script src="assets/koszyk.js?v=293"></script>
+<script src="assets/api.js?v=293"></script>
+<script src="data/katalog.js?v=293"></script>
+<script src="assets/main.js?v=293"></script>
 <script>
 (function(){
   window.PROGRES.wstaw(document.getElementById('progres'), ['Personalizacja','Dane','Podsumowanie'], 1);
@@ -110,8 +122,14 @@
     });
   });
 
-  /* pomysł własny — odtworzenie */
+  /* pomysł własny — odtworzenie; ?produkt= z bloga/karty daje punkt zaczepienia */
+  var zProduktu = SYG.param('produkt');
   if (k.pomysl) document.getElementById('pomysl').value = k.pomysl;
+  else if (zProduktu){
+    document.getElementById('pomysl').value = 'Chcę spersonalizowaną wersję produktu: „' + zProduktu + '" — ';
+    document.getElementById('pomysl').focus();
+  }
+  if (k.zgoda) document.getElementById('zgoda-marketing').checked = true;
 
   var modal = document.getElementById('modal');
   document.getElementById('modal-anuluj').addEventListener('click', function(){ modal.style.display = 'none'; });
@@ -157,6 +175,8 @@
       if (ist >= 0) k.pers[ist] = p; else k.pers.push(p);
     });
     k.pomysl = pomysl;
+    k.produkt = zProduktu || k.produkt || '';
+    k.zgoda = document.getElementById('zgoda-marketing').checked ? 1 : 0;
     KOSZYK.zapisz(k);
     window.location.href = 'dane.html';
   });

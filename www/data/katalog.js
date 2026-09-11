@@ -13,7 +13,9 @@ window.SYG_KATALOG = [
     opis: 'Flagowy produkt pracowni: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.',
     cena: 249,
     obraz: 'szopka.jpg',
-    dostepny: 1
+    dostepny: 1,
+    gabaryt: '20×20×8 cm',
+    storyId: 1
   },
   {
     id: 2,
@@ -21,7 +23,9 @@ window.SYG_KATALOG = [
     opis: 'Drewniany szyld powitalny z grawerem — do domu, na wesele lub do lokalu.',
     cena: 189,
     obraz: 'szyld.jpg',
-    dostepny: 1
+    dostepny: 1,
+    gabaryt: '50×25×2 cm',
+    storyId: 2
   },
   {
     id: 3,
@@ -37,6 +41,8 @@ window.SYG_KATALOG = [
     opis: 'Ramka ze sklejki z wybraną sentencją lub imionami i datą.',
     cena: 89,
     obraz: 'ramka.jpg',
-    dostepny: 1
+    dostepny: 1,
+    gabaryt: '20×25×2 cm',
+    storyId: 3
   }
 ];
