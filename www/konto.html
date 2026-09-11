@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=290">
+<link rel="stylesheet" href="assets/style.css?v=291">
 </head>
 <body data-strona="Konto">
 <div id="naglowek"></div>
@@ -17,59 +17,196 @@
   <span class="tag">Panel klienta</span>
   <h1>Logowanie do konta</h1>
   <p class="sub">Zaloguj się, aby śledzić swoje zamówienia, sygnatury spraw i historię zakupów.
-  Konto zakładasz przy pierwszym zamówieniu — resztę panelu uruchomimy razem z bazą klientów.</p>
+  Konto zakładasz przy pierwszym zamówieniu.</p>
 
-  <div class="forma" style="max-width:560px">
+  <div id="komunikat" style="display:none" class="sukces"></div>
+
+  <!-- LOGOWANIE -->
+  <div class="forma" style="max-width:560px" id="blok-logowanie">
     <form id="forma" novalidate>
       <div class="pole">
         <label for="email">Adres e-mail *</label>
-        <input type="email" id="email" name="email" placeholder="adres@poczta.pl">
+        <input type="email" id="email" name="email" placeholder="adres@poczta.pl" autocomplete="email">
       </div>
       <div class="pole">
         <label for="haslo">Hasło *</label>
-        <input type="password" id="haslo" name="haslo" placeholder="••••••••">
+        <div style="display:flex;gap:8px;align-items:stretch">
+          <input type="password" id="haslo" name="haslo" placeholder="••••••••" autocomplete="current-password" style="flex:1">
+          <button type="button" class="btn outline" id="pokaz-haslo" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+        </div>
       </div>
       <div class="przyciski">
         <button class="btn" type="submit">Zaloguj się</button>
       </div>
-      <p style="font-size:13.5px;color:rgba(51,38,28,.75);margin-top:14px">
-        Nie pamiętasz hasła? Napisz na <a href="mailto:kontakt@studiosygnatura.pl" style="color:var(--brunatny);border-bottom:1px solid var(--zloty)">kontakt@studiosygnatura.pl</a> — odzyskamy dostęp ręcznie.
+      <p style="font-size:14.5px;color:rgba(51,38,28,.75);margin-top:14px">
+        <a href="#" id="odzysk-link" style="color:var(--brunatny);border-bottom:1px solid var(--zloty)">Nie pamiętasz hasła?</a>
       </p>
     </form>
   </div>
 
-  <div id="komunikat" style="display:none" class="sukces"></div>
+  <!-- ODZYSKIWANIE HASŁA (automat) -->
+  <div class="forma" style="max-width:560px;display:none" id="blok-odzysk">
+    <h2>Odzyskiwanie hasła</h2>
+    <p class="mala" style="margin-bottom:10px">Podaj adres e-mail, na który założono konto.
+    Wyślemy na niego automatyczny link do ustawienia nowego hasła.</p>
+    <form id="forma-odzysk" novalidate>
+      <div class="pole">
+        <label for="odzysk-email">Adres e-mail *</label>
+        <input type="email" id="odzysk-email" placeholder="adres@poczta.pl" autocomplete="email">
+      </div>
+      <div class="przyciski">
+        <button class="btn" type="submit">Wyślij link do zresetowania</button>
+        <button class="btn outline" type="button" id="odzysk-wroc">← Wróć do logowania</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- USTAWIENIE NOWEGO HASŁA (po wejściu z linku) -->
+  <div class="forma" style="max-width:560px;display:none" id="blok-nowe">
+    <h2>Ustaw nowe hasło</h2>
+    <p class="mala" style="margin-bottom:10px">Twoje konto zostało zweryfikowane. Ustaw nowe hasło.</p>
+    <form id="forma-nowe" novalidate>
+      <div class="pole">
+        <label for="nowe-haslo">Nowe hasło (min. 8 znaków) *</label>
+        <div style="display:flex;gap:8px;align-items:stretch">
+          <input type="password" id="nowe-haslo" autocomplete="new-password" style="flex:1">
+          <button type="button" class="btn outline" id="pokaz-nowe" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+        </div>
+      </div>
+      <div class="pole">
+        <label for="nowe-haslo2">Powtórz hasło *</label>
+        <input type="password" id="nowe-haslo2" autocomplete="new-password">
+      </div>
+      <div class="przyciski">
+        <button class="btn" type="submit">Zapisz nowe hasło</button>
+      </div>
+    </form>
+  </div>
 </main>
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=290"></script>
-<script src="assets/koszyk.js?v=290"></script>
-<script src="assets/api.js?v=290"></script>
-<script src="data/katalog.js?v=290"></script>
-<script src="assets/main.js?v=290"></script>
+<script src="assets/config.js?v=291"></script>
+<script src="assets/koszyk.js?v=291"></script>
+<script src="assets/api.js?v=291"></script>
+<script src="data/katalog.js?v=291"></script>
+<script src="assets/main.js?v=291"></script>
 <script>
 (function(){
-  var forma = document.getElementById('forma');
   var komunikat = document.getElementById('komunikat');
-  forma.addEventListener('submit', function(ev){
+  function pokaz(msg, blad){
+    komunikat.style.display = 'block';
+    if (blad) komunikat.style.background = '#8a2f1d';
+    else komunikat.removeAttribute('style');
+    komunikat.innerHTML = msg;
+    komunikat.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  /* podgląd hasła (oko) */
+  function podglad(btnId, inputId){
+    document.getElementById(btnId).addEventListener('click', function(){
+      var inp = document.getElementById(inputId);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      this.textContent = inp.type === 'password' ? '👁' : '🙈';
+    });
+  }
+  podglad('pokaz-haslo', 'haslo');
+  podglad('pokaz-nowe', 'nowe-haslo');
+
+  /* link do resetu: formularz odzyskiwania */
+  document.getElementById('odzysk-link').addEventListener('click', function(e){
+    e.preventDefault();
+    document.getElementById('blok-logowanie').style.display = 'none';
+    document.getElementById('blok-odzysk').style.display = 'block';
+    document.getElementById('blok-nowe').style.display = 'none';
+  });
+  document.getElementById('odzysk-wroc').addEventListener('click', function(){
+    document.getElementById('blok-odzysk').style.display = 'none';
+    document.getElementById('blok-logowanie').style.display = 'block';
+  });
+
+  /* wejście z linku resetującego: konto.html?reset=TOKEN */
+  var token = SYG.param('reset');
+  if (token){
+    document.getElementById('blok-logowanie').style.display = 'none';
+    document.getElementById('blok-odzysk').style.display = 'none';
+    document.getElementById('blok-nowe').style.display = 'block';
+  }
+
+  /* logowanie */
+  document.getElementById('forma').addEventListener('submit', function(ev){
     ev.preventDefault();
     var email = document.getElementById('email').value.trim();
     var haslo = document.getElementById('haslo').value;
     if (!email || !haslo){
-      komunikat.style.display = 'block';
-      komunikat.style.background = '#8a2f1d';
-      komunikat.innerHTML = '<h2>Uzupełnij pola</h2><p>Podaj adres e-mail i hasło, żeby się zalogować.</p>';
+      pokaz('<h2>Uzupełnij pola</h2><p>Podaj adres e-mail i hasło, żeby się zalogować.</p>', true);
       return;
     }
-    /* Panel logowania gotowy; weryfikacja kont nastąpi z bazą klientów
-       (Google Apps Script + arkusz) — kolejny etap wdrożenia. */
-    komunikat.style.display = 'block';
-    komunikat.style.background = '';
-    komunikat.innerHTML = '<h2>Panel logowania gotowy</h2>' +
-      '<p>Konta klientów (baza w arkuszu Google) uruchomimy w kolejnym etapie — wtedy logowanie ' +
-      'będzie sprawdzać Twoje dane w bazie. Do tego czasu zamówienia obsługujemy formularzami ' +
-      'z sygnaturą sprawy wysyłaną na e-mail.</p>';
+    if (SYG.TRYB_DEMO){
+      pokaz('<h2>Panel logowania gotowy</h2><p>Konta klientów (baza w arkuszu Google) uruchomimy w kolejnym etapie — ' +
+        'wtedy logowanie będzie sprawdzać Twoje dane w bazie. Do tego czasu zamówienia obsługujemy formularzami ' +
+        'z sygnaturą sprawy wysyłaną na e-mail.</p>');
+      return;
+    }
+    SYG.wezwij('konto-login', { email: email, haslo: haslo }).then(function(odp){
+      if (odp.ok){
+        try { sessionStorage.setItem('syg-konto', JSON.stringify(odp.konto)); } catch(e){}
+        window.location.href = 'konto.html?moje=1';
+      } else {
+        pokaz('<h2>Nie udało się zalogować</h2><p>' + (odp.blad || 'Nieprawidłowy e-mail lub hasło.') + '</p>', true);
+      }
+    });
+  });
+
+  /* automatyczne odzyskiwanie hasła */
+  document.getElementById('forma-odzysk').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var email = document.getElementById('odzysk-email').value.trim();
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+      pokaz('<h2>Podaj poprawny adres e-mail</h2>', true);
+      return;
+    }
+    if (SYG.TRYB_DEMO){
+      pokaz('<h2>Link wysłany (symulacja trybu demo)</h2><p>Gdyby serwis działał na bazie klientów, na adres <b>' +
+        email + '</b> wyszedłby właśnie automatyczny e-mail z linkiem do ustawienia nowego hasła. ' +
+        'Ten automat uruchomi się razem z wdrożeniem Google Apps Script.</p>');
+      return;
+    }
+    SYG.wezwij('haslo-reset', { email: email }).then(function(odp){
+      if (odp.ok){
+        pokaz('<h2>Link wysłany</h2><p>Jeśli konto o tym adresie istnieje, na <b>' + email +
+          '</b> wysłaliśmy e-mail z linkiem do ustawienia nowego hasła. Sprawdź skrzynkę (i folder spam).</p>');
+      } else {
+        pokaz('<h2>Nie udało się wysłać</h2><p>' + (odp.blad || 'Spróbuj ponownie za chwilę.') + '</p>', true);
+      }
+    });
+  });
+
+  /* zapisanie nowego hasła z linku resetującego */
+  document.getElementById('forma-nowe').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var h1 = document.getElementById('nowe-haslo').value;
+    var h2 = document.getElementById('nowe-haslo2').value;
+    if (h1.length < 8){
+      pokaz('<h2>Hasło za krótkie</h2><p>Nowe hasło musi mieć co najmniej 8 znaków.</p>', true);
+      return;
+    }
+    if (h1 !== h2){
+      pokaz('<h2>Hasła się różnią</h2><p>Wpisz dwa razy to samo hasło.</p>', true);
+      return;
+    }
+    if (SYG.TRYB_DEMO){
+      pokaz('<h2>Hasło ustawione (symulacja)</h2><p>W trybie demo nic nie zapisujemy — pełny automat zadziała ' +
+        'po wdrożeniu bazy klientów.</p>');
+      return;
+    }
+    SYG.wezwij('haslo-ustaw', { token: token, haslo: h1 }).then(function(odp){
+      if (odp.ok){
+        pokaz('<h2>Hasło zmienione</h2><p>Możesz się teraz <a href="konto.html" style="color:var(--krem);border-bottom:1px solid var(--zloty)">zalogować</a> nowym hasłem.</p>');
+      } else {
+        pokaz('<h2>Nie udało się</h2><p>' + (odp.blad || 'Link mógł wygasnąć — poproś o nowy.') + '</p>', true);
+      }
+    });
   });
 })();
 </script>

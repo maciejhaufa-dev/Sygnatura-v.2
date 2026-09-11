@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=290">
+<link rel="stylesheet" href="assets/style.css?v=291">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -19,7 +19,7 @@
 
   <!-- EKRAN LOGOWANIA: wymuszany po każdym zamknięciu strony (sesja przeglądarki) -->
   <div id="logowanie" class="forma" style="max-width:480px">
-    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia i wiadomości.</p>
+    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia, wiadomości i ustawienia strony.</p>
     <div class="flash" id="logowanie-blad" style="display:none;background:#8a2f1d"></div>
     <div class="pole">
       <label for="admin-login">Login *</label>
@@ -37,24 +37,89 @@
   <!-- PANEL: widoczny po zalogowaniu -->
   <div id="panel" style="display:none">
     <p class="sub" id="tryb-info"></p>
-
     <div class="flash" id="bled" style="display:none"></div>
 
-    <div class="tabela-wrap" id="zamowienia-blok">
-      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
-      <table class="tabela" id="tabela-zamowien">
-        <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
-        <tbody></tbody>
-      </table>
+    <!-- ZAKŁADKI -->
+    <div class="admin-tabs" id="admin-tabs">
+      <button class="admin-tab on" data-tab="zamowienia" type="button">Zamówienia</button>
+      <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
+      <button class="admin-tab" data-tab="produkty" type="button">Produkty</button>
+      <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
     </div>
 
-    <div class="tabela-wrap" id="wiadomosci-blok">
-      <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Wiadomości z formularza</h2>
-      <table class="tabela" id="tabela-wiadomosci">
-        <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
+    <!-- ZAMÓWIENIA -->
+    <section class="admin-sekcja" id="tab-zamowienia">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
+        <table class="tabela" id="tabela-zamowien">
+          <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- WIADOMOŚCI -->
+    <section class="admin-sekcja" id="tab-wiadomosci" style="display:none">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Wiadomości z formularza</h2>
+        <table class="tabela" id="tabela-wiadomosci">
+          <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRODUKTY -->
+    <section class="admin-sekcja" id="tab-produkty" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
+      <p class="mala">Zmień cenę albo ukryj/pokaż produkt w sklepie. W trybie demo zmiany zapisują się
+      w tej przeglądarce i od razu widać je w sklepie; po wdrożeniu trafią do arkusza Google.</p>
+      <div class="flash" id="produkty-info" style="display:none"></div>
+      <div class="tabela-wrap">
+        <table class="tabela" id="tabela-produkty">
+          <thead><tr><th>Produkt</th><th>Cena (zł)</th><th>W sklepie</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- USTAWIENIA -->
+    <section class="admin-sekcja" id="tab-ustawienia" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Cennik dostawy</h2>
+      <p class="mala">Stawki za wysyłkę wg rozmiarów paczek — używane w formularzu zamówienia
+      (InPost paczkomat i kurier). W trybie demo zapisują się w tej przeglądarce; po wdrożeniu
+      trafią do arkusza Google.</p>
+      <div class="flash" id="ustawienia-info" style="display:none"></div>
+      <div class="forma" style="max-width:520px">
+        <div class="pole">
+          <label>Paczkomat InPost — paczka S (zł)</label>
+          <input type="number" id="u-paczkomat-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka M (zł)</label>
+          <input type="number" id="u-paczkomat-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka L (zł)</label>
+          <input type="number" id="u-paczkomat-l" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka S (zł)</label>
+          <input type="number" id="u-kurier-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka M (zł)</label>
+          <input type="number" id="u-kurier-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka L (zł)</label>
+          <input type="number" id="u-kurier-l" step="0.01" min="0">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="zapisz-dostawe">Zapisz cennik</button>
+        </div>
+      </div>
+    </section>
 
     <div class="przyciski">
       <button class="btn outline" type="button" id="odswiez">Odśwież</button>
@@ -66,11 +131,11 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=290"></script>
-<script src="assets/koszyk.js?v=290"></script>
-<script src="assets/api.js?v=290"></script>
-<script src="data/katalog.js?v=290"></script>
-<script src="assets/main.js?v=290"></script>
+<script src="assets/config.js?v=291"></script>
+<script src="assets/koszyk.js?v=291"></script>
+<script src="assets/api.js?v=291"></script>
+<script src="data/katalog.js?v=291"></script>
+<script src="assets/main.js?v=291"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -81,8 +146,8 @@
   var logowanieBlad = document.getElementById('logowanie-blad');
 
   if (SYG.TRYB_DEMO){
-    info.innerHTML = 'TRYB DEMO: widzisz dane zapisane w tej przeglądarce (z testów formularzy). ' +
-      'Po wdrożeniu Google Apps Script ten sam panel czyta zamówienia z arkusza — logowanie sprawdza baza administratorów.';
+    info.innerHTML = 'TRYB DEMO: zmiany zapisują się w tej przeglądarce (testy). ' +
+      'Po wdrożeniu Google Apps Script panel czyta i zapisuje dane w arkuszu — logowanie sprawdza baza administratorów.';
   } else {
     info.textContent = 'Połączono z arkuszem Google.';
   }
@@ -94,7 +159,19 @@
     odrzucono: 'odrzucono'
   };
 
-  async function laduj(){
+  /* ============ zakładki ============ */
+  var tabs = document.querySelectorAll('.admin-tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      t.classList.add('on');
+      document.querySelectorAll('.admin-sekcja').forEach(function(s){ s.style.display = 'none'; });
+      document.getElementById('tab-' + t.getAttribute('data-tab')).style.display = 'block';
+    });
+  });
+
+  /* ============ zamówienia ============ */
+  async function ladujZamowienia(){
     var odp = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
     if (!odp.ok){
       bled.textContent = odp.blad || 'Brak dostępu (zły klucz?).';
@@ -124,10 +201,13 @@
         if (!odp2.ok) alert(odp2.blad || 'Nie zapisano.');
       });
     });
+  }
 
-    var wiadomosci = SYG.TRYB_DEMO ? SYG.demoDb.wiadomosci() : [];
+  /* ============ wiadomości ============ */
+  function ladujWiadomosci(){
     var wbody = document.querySelector('#tabela-wiadomosci tbody');
     if (SYG.TRYB_DEMO){
+      var wiadomosci = SYG.demoDb.wiadomosci();
       wbody.innerHTML = wiadomosci.map(function(w){
         return '<tr><td>' + (w.data || '').slice(0, 10) + '</td><td>' + w.imie + '<br><span class="mala">' + w.email + '</span></td>' +
           '<td>' + w.temat + '</td><td>' + w.tresc + '</td></tr>';
@@ -137,11 +217,67 @@
     }
   }
 
-  /* --- logowanie wymuszane po każdym zamknięciu strony (sesja) --- */
+  /* ============ produkty ============ */
+  async function ladujProdukty(){
+    var kat = await SYG.katalog();
+    var tbody = document.querySelector('#tabela-produkty tbody');
+    tbody.innerHTML = kat.map(function(p){
+      return '<tr>' +
+        '<td><b>' + p.nazwa + '</b><br><span class="mala">#' + p.id + '</span></td>' +
+        '<td><input type="number" step="0.01" min="0" class="p-cena" data-id="' + p.id + '" value="' + p.cena + '" style="width:110px"></td>' +
+        '<td><label style="cursor:pointer;font-size:14px"><input type="checkbox" class="p-dost" data-id="' + p.id + '"' + (p.dostepny ? ' checked' : '') + '> widoczny</label></td>' +
+        '<td><button class="btn outline" type="button" style="padding:8px 16px" data-id="' + p.id + '">Zapisz</button></td>' +
+      '</tr>';
+    }).join('') || '<tr><td colspan="4">Brak produktów.</td></tr>';
+
+    tbody.querySelectorAll('button[data-id]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        var id = Number(b.getAttribute('data-id'));
+        var cena = Number(tbody.querySelector('.p-cena[data-id="' + id + '"]').value) || 0;
+        var dost = tbody.querySelector('.p-dost[data-id="' + id + '"]').checked ? 1 : 0;
+        var odp = await SYG.wezwij('produkty-zapisz', { id: id, cena: cena, dostepny: dost });
+        var f = document.getElementById('produkty-info');
+        f.style.display = 'block';
+        f.textContent = odp.ok ? 'Zapisano: produkt #' + id + ' (' + cena + ' zł, ' + (dost ? 'widoczny' : 'ukryty') + ').' : (odp.blad || 'Nie zapisano.');
+        setTimeout(function(){ f.style.display = 'none'; }, 4000);
+      });
+    });
+  }
+
+  /* ============ ustawienia (cennik dostawy) ============ */
+  function ladujUstawienia(){
+    var c = SYG.ustawieniaDostawa();
+    document.getElementById('u-paczkomat-s').value = c.paczkomat.S;
+    document.getElementById('u-paczkomat-m').value = c.paczkomat.M;
+    document.getElementById('u-paczkomat-l').value = c.paczkomat.L;
+    document.getElementById('u-kurier-s').value = c.kurier.S;
+    document.getElementById('u-kurier-m').value = c.kurier.M;
+    document.getElementById('u-kurier-l').value = c.kurier.L;
+  }
+  document.getElementById('zapisz-dostawe').addEventListener('click', async function(){
+    var cennik = {
+      paczkomat: { S: Number(document.getElementById('u-paczkomat-s').value) || 0,
+                   M: Number(document.getElementById('u-paczkomat-m').value) || 0,
+                   L: Number(document.getElementById('u-paczkomat-l').value) || 0 },
+      kurier: { S: Number(document.getElementById('u-kurier-s').value) || 0,
+                M: Number(document.getElementById('u-kurier-m').value) || 0,
+                L: Number(document.getElementById('u-kurier-l').value) || 0 }
+    };
+    var odp = await SYG.wezwij('ustawienia-dostawa-zapisz', { cennik: cennik });
+    var f = document.getElementById('ustawienia-info');
+    f.style.display = 'block';
+    f.textContent = odp.ok ? 'Cennik dostawy zapisany — formularz zamówienia używa nowych stawek.' : (odp.blad || 'Nie zapisano.');
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  });
+
+  /* ============ logowanie wymuszane po każdym zamknięciu strony (sesja) ============ */
   function pokazPanel(){
     logowanie.style.display = 'none';
     panel.style.display = 'block';
-    laduj();
+    ladujZamowienia();
+    ladujWiadomosci();
+    ladujProdukty();
+    ladujUstawienia();
   }
 
   var zalogowany = false;
@@ -161,8 +297,6 @@
       return;
     }
     if (SYG.TRYB_DEMO){
-      /* tryb demo: dane do logowania w config.js (SYG.ADMIN_DEMO_LOGIN / HASLO);
-         po wdrożeniu API sprawdza je Google Apps Script (baza administratorów) */
       if (l === SYG.ADMIN_DEMO_LOGIN && h === SYG.ADMIN_DEMO_HASLO){
         try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
         logowanieBlad.style.display = 'none';
@@ -189,7 +323,11 @@
     window.location.reload();
   });
 
-  document.getElementById('odswiez').addEventListener('click', laduj);
+  document.getElementById('odswiez').addEventListener('click', function(){
+    ladujZamowienia();
+    ladujWiadomosci();
+    ladujProdukty();
+  });
 })();
 </script>
 </body>

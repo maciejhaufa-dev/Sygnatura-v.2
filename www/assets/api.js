@@ -9,12 +9,39 @@
 
   /* ---------- magazyn demo (localStorage) ---------- */
   const KL = { katalog: 'syg-demo-katalog', wiadomosci: 'syg-demo-wiadomosci',
-               zamowienia: 'syg-demo-zamowienia', licznik: 'syg-demo-licznik' };
+               zamowienia: 'syg-demo-zamowienia', licznik: 'syg-demo-licznik',
+               produkty: 'syg-admin-produkty', dostawa: 'syg-admin-dostawa' };
   function czytaj(klucz) {
     try { return JSON.parse(localStorage.getItem(klucz) || 'null'); } catch (e) { return null; }
   }
   function zapisz(klucz, wart) { localStorage.setItem(klucz, JSON.stringify(wart)); }
   function teraz() { return new Date().toISOString(); }
+
+  /* cennik dostawy: nadpisania z panelu admina albo wartości z config.js */
+  SYG.ustawieniaDostawa = function () {
+    if (SYG.TRYB_DEMO) {
+      const o = czytaj(KL.dostawa);
+      if (o && o.paczkomat && o.kurier) return o;
+    }
+    return SYG.DOSTAWA;
+  };
+
+  /* nadpisania produktów z panelu admina (tryb demo) — nanoszone na katalog,
+     żeby zmiany od razu było widać w sklepie */
+  function naniesNadpisania() {
+    const o = czytaj(KL.produkty) || {};
+    const kat = window.SYG_KATALOG || [];
+    let zmiana = false;
+    kat.forEach(function (p) {
+      if (o[p.id]) {
+        p.cena = Number(o[p.id].cena) || p.cena;
+        p.dostepny = o[p.id].dostepny ? 1 : 0;
+        zmiana = true;
+      }
+    });
+    return zmiana;
+  }
+  if (SYG.TRYB_DEMO) naniesNadpisania();
 
   SYG.demoDb = {
     czytaj: czytaj, zapisz: zapisz,
@@ -66,6 +93,20 @@
         z.historia = z.historia || [];
         z.historia.push({ t: teraz(), s: d.status });
         zapisz(KL.zamowienia, lista);
+        return { ok: true };
+      }
+
+      case 'produkty-zapisz': {
+        const o = czytaj(KL.produkty) || {};
+        o[d.id] = { cena: Number(d.cena) || 0, dostepny: d.dostepny ? 1 : 0 };
+        zapisz(KL.produkty, o);
+        naniesNadpisania();
+        return { ok: true };
+      }
+
+      case 'ustawienia-dostawa-zapisz': {
+        if (!d.cennik || !d.cennik.paczkomat || !d.cennik.kurier) return { ok: false, blad: 'Niekompletny cennik.' };
+        zapisz(KL.dostawa, d.cennik);
         return { ok: true };
       }
 
