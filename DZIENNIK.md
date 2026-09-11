@@ -323,3 +323,16 @@ Wykonane:
 - Fakty (search): Odoo One App Free = hosting Odoo, własna domena gratis tylko 1. rok, dalej płatne; e-commerce = płatne plany (~$16.90+/user/msc). VPS EU: Hetzner CX22 €3.79/msc (~200 zł/rok), OVH VPS Starter ~€3.50/msc. Budżet 50–100 zł/rok = realnie tylko ultra-tanie VPS USA (ryzyko) → rekomendacja: Oracle start, VPS jako Plan B.
 
 NASTĘPNY KROK: decyzje z checklisty (konto Oracle i karta do weryfikacji? / dane SMTP OVH do ustawień? / arkusz teraz czy w etapie 2? / potwierdzenie zdjęć lokalnie?) → wdrożenie etapu 1.
+
+---
+
+## Sesja 25 — SeoHost jako kandydat (KOREKTA: seohost deklaruje obsługę Pythona)
+
+- User ponownie spytał o seohost.pl (37 zł/rok) i podał ranking rankinghostingow.pl.
+- KOREKTA mojej wcześniejszej oceny („tylko PHP"): seohost DEKLARUJE możliwość uruchamiania aplikacji Python (panel DirectAdmin/Passenger) + Node.js + PHP, SSH, cron, backupy 7 dni, SSL. Źródła: recenzje tenodwordpressa.pl, hostingowy.top, rankhost.pl, tophosting.pl, businesshost.pl.
+- Rankinghostingow.pl = serwis porównawczy/afiliacyjny — traktować jako punkt startowy, nie dowód; weryfikacja u supportu + okres testowy.
+- ARCHITEKTURA.md: tabela opcji uzupełniona o SeoHost SH2 jako KANDYDAT #1 „kup i zapomnij" (jeśli potwierdzi 4 warunki): (1) Python/Flask na pakiecie 37 zł i limity RAM/procesów, (2) cron + SQLite zapis, (3) zewnętrzny SMTP do OVH (smtp.mail.ovh.net:587) — inaczej SPF trzeba dostosować, (4) cena odnowienia (rozbieżność: 37 zł promocja vs 127–217 zł netto standard), (5) git pull + restart aplikacji Python.
+- Alternatywa na „kup i zapomnij": MyDevil MD1 (~130 zł/rok 1. rok) — sprawdzony hosting z Pythonem.
+- Jeżeli seohost potwierdzi warunki: wdrożenie = wgrać serwis + `passenger_wsgi.py` (adaptacja deploy pod Passenger zamiast systemd/nginx) — przygotować po decyzji.
+
+NASTĘPNY KROK: użytkownik wysyła pytania do supportu seohost (treść w rozmowie) albo decyduje MyDevil/Oracle.

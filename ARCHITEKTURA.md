@@ -128,10 +128,21 @@ Aktualizacje robię ja (albo przycisk w panelu — do zrobienia w etapie 2).
 
 | Opcja | Koszt | Utrzymanie | Werdykt |
 |-------|-------|------------|---------|
-| **Oracle Always Free** (nasz plan) | 0 zł (wymaga karty do weryfikacji, bez obciążeń) | po jednorazowym postawieniu (skrypt gotowy w `deploy/`): ~0 h/tydzień + monitor + plan B | **START TUJ** |
-| **Płatny VPS EU** (Hetzner CX22 ~€3,79/msc ≈ 200 zł/rok; OVH VPS Starter ~€3,50/msc) | ~150–220 zł/rok | takie samo jak Oracle, ale bez ryzyka „reklamacji" — **PLAN B** (kupujemy tylko, jeśli Oracle zawiedzie) | awaryjny |
-| **WordPress + WooCommerce** na hostingu PHP | hosting ~150–300 zł/rok + płatne wtyczki (rezerwacje/kaucje) | ⚠️ WIĘCEJ pracy: aktualizacje WP i wtyczek, łatki bezpieczeństwa, konfiguracja wynajmu/kaucji/personalizacji od zera. **Cały nasz system (kreator A/B/C, sygnatury, rozliczenia) poszedłby do kosza i musiałby być zbudowany od nowa we wtyczkach.** | tylko gdybyśmy mieli porzucać własny system |
-| **Odoo** | „One App Free" = 0 zł, ale: hosting Odoo, bez dostępu do własnego kodu; własna domena gratis tylko przez 1. rok, potem płatna; e-commerce/księgowość = płatne plany (~70–135 zł/msc+) | budowa sklepu od zera w ich builderze; nasza logika (wynajem, kaucje, sygnatury) i tak nie przeniesie się | nie dla nas |
+| **SeoHost SH2 (37 zł/rok)** | 45 zł brutto 1. rok (promocja); odnowienie wg cennika 127–217 zł netto (dopytać!) | hosting współdzielony: panel DirectAdmin, **deklarowana obsługa aplikacji Python** (Passenger) + Node.js + PHP; SSH, cron, backupy 7 dni | **KANDYDAT #1 na „kup i zapomnij"** — wymaga potwierdzenia 4 warunków (poniżej) |
+| **MyDevil MD 1** | ~130 zł brutto 1. rok, ~200 zł odnowienie | hosting współdzielony z pełnym Pythonem (sprawdzony kierunek) | plan B na „kup i zapomnij" |
+| **Oracle Always Free** | 0 zł (karta do weryfikacji) | my administrujemy (skrypty gotowe w `deploy/`) + monitor + plan B | 0 zł, ale najwięcej po naszej stronie |
+| **Płatny VPS EU** (Hetzner CX22 ~€3,79/msc; OVH VPS Starter ~€3,50/msc) | ~150–220 zł/rok | jak Oracle, pełna swoboda | awaryjny |
+| **WordPress + WooCommerce** | hosting + wtyczki | ⚠️ WIĘCEJ pracy: nasz cały system (kreator A/B/C, sygnatury, rozliczenia) musiałby powstać od nowa we wtyczkach | tylko gdybyśmy porzucali własny system |
+| **Odoo** | free plan = hosting Odoo bez własnego kodu; własna domena gratis 1. rok | nasza logika (wynajem, kaucje) i tak nie przeniesie się | nie dla nas |
+
+**SEOHOST — 4 WARUNKI DO POTWIERDZENIA u supportu (przed zakupem):**
+1. Czy aplikacja **Python (Flask, przez Passenger/WSGI)** jest dostępna na pakiecie SH1/SH2 (37 zł/rok), czy wymaga droższego planu? Ile procesów/RAM dostaje aplikacja?
+2. Czy można tworzyć **zadania cron** (nocny backup bazy) i czy **SQLite** ma prawa zapisu (nasza baza to plik)?
+3. Czy serwer może **wysyłać maile przez zewnętrzny SMTP** (smtp.mail.ovh.net:587 — nasza poczta w OVH)? Jeśli nie — musimy użyć ich SMTP i dostosować SPF w domenie.
+4. **Cena odnowienia** pakietu SH1/SH2 po pierwszym roku (netto/brutto) — w materiałach różne liczby (37 zł promocja vs 127–217 zł standard).
+5. (bonus) Czy wgrywanie plików przez panel/FTP i aktualizacja przez `git pull` + restart aplikacji Python są możliwe?
+
+**UWAGA o rankingach (rankinghostingow.pl i podobne):** to serwisy porównawcze/afiliacyjne — dobre jako punkt startowy, ale NIE są niezależnym potwierdzeniem parametrów (prowizje za kliknięcia). Ostateczną prawdę zawsze potwierdza support dostawcy + test 14 dni (SeoHost ma okres testowy).
 
 **Budżet 50–100 zł/rok na serwer:** realnie kupimy za to tylko ultra-tanie VPS-y z USA (promocje typu RackNerd ~50–70 zł/rok) — jako produkcja dla firmy to ryzyko. Dlatego rekomendacja:
 **start na Oracle (0 zł, budżet nietknięty) + plan B w kieszeni (Hetzner/OVH ~150–220 zł/rok, decyzja o zakupie dopiero, gdyby Oracle zrobił problem).** Migracja między nimi to ten sam skrypt i <1 h.
