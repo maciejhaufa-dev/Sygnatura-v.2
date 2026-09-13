@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=297">
+<link rel="stylesheet" href="assets/style.css?v=298">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -44,7 +44,8 @@
 
     <!-- ZAKŁADKI -->
     <div class="admin-tabs" id="admin-tabs">
-      <button class="admin-tab on" data-tab="zamowienia" type="button">Zamówienia</button>
+      <button class="admin-tab on" data-tab="strona-glowna" type="button">Strona główna</button>
+      <button class="admin-tab" data-tab="zamowienia" type="button">Zamówienia</button>
       <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
       <button class="admin-tab" data-tab="blog" type="button">Blog</button>
       <button class="admin-tab" data-tab="produkty" type="button">Produkty</button>
@@ -52,8 +53,41 @@
       <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
     </div>
 
+    <!-- STRONA GŁÓWNA -->
+    <section class="admin-sekcja" id="tab-strona-glowna">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Strona główna — treści</h2>
+      <p class="mala">Wszystko, co zapiszesz tutaj, od razu pokaże się klientom na stronie głównej:
+      slajdy u góry, sekcja „Jak działamy" i przyciski pod nią. W trybie demo dane zapisują się
+      w tej przeglądarce; po wdrożeniu trafią do arkusza Google.</p>
+      <div class="flash" id="sg-info" style="display:none"></div>
+
+      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Slajdy (kolejność na stronie)</h3>
+      <p class="mala">Slajd 1 „Nowości" i slajd 2 „Bestsellery" zawsze pokazują karty produktów
+      z katalogu sklepu (też edytowalnego w zakładce Produkty). Tło slajdów to zdjęcia stałe.</p>
+      <div id="sg-slajdy"></div>
+
+      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Sekcja „Jak działamy" (pod sliderem)</h3>
+      <div class="forma" style="max-width:640px">
+        <div class="pole"><label>Tytuł sekcji</label><input type="text" id="sg-jak-tytul"></div>
+        <div class="pole"><label>Podtytuł</label><input type="text" id="sg-jak-pod"></div>
+        <div class="pole"><label>Krok 1 — tytuł</label><input type="text" id="sg-k1-t"></div>
+        <div class="pole"><label>Krok 1 — opis</label><textarea id="sg-k1-o" style="min-height:70px"></textarea></div>
+        <div class="pole"><label>Krok 2 — tytuł</label><input type="text" id="sg-k2-t"></div>
+        <div class="pole"><label>Krok 2 — opis</label><textarea id="sg-k2-o" style="min-height:70px"></textarea></div>
+        <div class="pole"><label>Krok 3 — tytuł</label><input type="text" id="sg-k3-t"></div>
+        <div class="pole"><label>Krok 3 — opis</label><textarea id="sg-k3-o" style="min-height:70px"></textarea></div>
+      </div>
+
+      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Przyciski pod krokami</h3>
+      <div class="forma" style="max-width:520px">
+        <div class="pole"><label>Przycisk 1 (złoty)</label><input type="text" id="sg-cta1"></div>
+        <div class="pole"><label>Przycisk 2 (obrysowany)</label><input type="text" id="sg-cta2"></div>
+        <div class="przyciski"><button class="btn" type="button" id="sg-zapisz">Zapisz stronę główną</button></div>
+      </div>
+    </section>
+
     <!-- ZAMÓWIENIA -->
-    <section class="admin-sekcja" id="tab-zamowienia">
+    <section class="admin-sekcja" id="tab-zamowienia" style="display:none">
       <div class="tabela-wrap">
         <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
         <table class="tabela" id="tabela-zamowien">
@@ -313,12 +347,12 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=297"></script>
-<script src="assets/koszyk.js?v=297"></script>
-<script src="assets/api.js?v=297"></script>
-<script src="assets/editor.js?v=297"></script>
-<script src="data/katalog.js?v=297"></script>
-<script src="assets/main.js?v=297"></script>
+<script src="assets/config.js?v=298"></script>
+<script src="assets/koszyk.js?v=298"></script>
+<script src="assets/api.js?v=298"></script>
+<script src="assets/editor.js?v=298"></script>
+<script src="data/katalog.js?v=298"></script>
+<script src="assets/main.js?v=298"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -351,6 +385,100 @@
       document.querySelectorAll('.admin-sekcja').forEach(function(s){ s.style.display = 'none'; });
       document.getElementById('tab-' + t.getAttribute('data-tab')).style.display = 'block';
     });
+  });
+
+  /* ============ strona główna ============ */
+  var SG_DOMYS = {
+    slajdy: [
+      { id:'nowosci', tag:'Nowości', tytul:'Najnowsze produkty z pracowni',
+        opis:'Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.',
+        btn:'Zobacz w sklepie →', link:'sklep.html' },
+      { id:'bestsellery', tag:'Bestsellery', tytul:'Najczęściej zamawiane',
+        opis:'Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.',
+        btn:'Zamów teraz →', link:'sklep.html' },
+      { id:'aktualnosci', tag:'Aktualności z pracowni', tytul:'Z pracowni prosto do Was',
+        opis:'Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.',
+        btn:'Zobacz realizacje →', link:'realizacje.html' },
+      { id:'sezonowa', tag:'Oferta sezonowa', tytul:'Sezon świąteczny — czas na szopkę',
+        opis:'Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.',
+        btn:'Sprawdź ofertę →', link:'sklep.html' }
+    ],
+    jak: { tytul:'Jak działamy', pod:'Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.',
+      kroki: [
+        { t:'Wybierz i zamów online', o:'Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.' },
+        { t:'Dostajesz sygnaturę sprawy', o:'W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.' },
+        { t:'Płacisz — my działamy', o:'Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.' }
+      ] },
+    cta1: 'Zarezerwuj termin', cta2: 'Złóż zamówienie'
+  };
+  function sgEsc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function ladujStronaGlowna(){
+    var dane = SYG.demoDb.stronaGlowna() || SG_DOMYS;
+    var slajdy = dane.slajdy || SG_DOMYS.slajdy;
+    var html = '';
+    slajdy.forEach(function(sl, i){
+      html += '<div class="forma" style="max-width:640px;margin-bottom:14px">' +
+        '<h4 style="font-size:15.5px;color:var(--butelkowa);margin:0 0 6px">Slajd ' + (i + 1) + '</h4>' +
+        '<div class="pole"><label>Znacznik (mały napis u góry)</label>' +
+        '<input type="text" data-sg-sl="' + sl.id + '" data-f="tag" value="' + sgEsc(sl.tag) + '"></div>' +
+        '<div class="pole"><label>Nagłówek</label>' +
+        '<input type="text" data-sg-sl="' + sl.id + '" data-f="tytul" value="' + sgEsc(sl.tytul) + '"></div>' +
+        '<div class="pole"><label>Opis</label>' +
+        '<textarea data-sg-sl="' + sl.id + '" data-f="opis" style="min-height:64px">' + sgEsc(sl.opis) + '</textarea></div>' +
+        '<div class="pole" style="display:flex;gap:10px">' +
+        '<div style="flex:2"><label>Tekst przycisku</label>' +
+        '<input type="text" data-sg-sl="' + sl.id + '" data-f="btn" value="' + sgEsc(sl.btn) + '"></div>' +
+        '<div style="flex:1"><label>Strona docelowa</label>' +
+        '<input type="text" data-sg-sl="' + sl.id + '" data-f="link" value="' + sgEsc(sl.link) + '"></div></div>' +
+        '</div>';
+    });
+    document.getElementById('sg-slajdy').innerHTML = html;
+    var jak = dane.jak || SG_DOMYS.jak;
+    document.getElementById('sg-jak-tytul').value = jak.tytul || '';
+    document.getElementById('sg-jak-pod').value = jak.pod || '';
+    for (var i = 0; i < 3; i++){
+      var kr = (jak.kroki && jak.kroki[i]) || { t:'', o:'' };
+      document.getElementById('sg-k' + (i + 1) + '-t').value = kr.t || '';
+      document.getElementById('sg-k' + (i + 1) + '-o').value = kr.o || '';
+    }
+    document.getElementById('sg-cta1').value = dane.cta1 || '';
+    document.getElementById('sg-cta2').value = dane.cta2 || '';
+  }
+
+  document.getElementById('sg-zapisz').addEventListener('click', async function(){
+    var slajdy = ['nowosci','bestsellery','aktualnosci','sezonowa'].map(function(id){
+      function q(f){
+        var el = document.querySelector('[data-sg-sl="' + id + '"][data-f="' + f + '"]');
+        return el ? el.value : '';
+      }
+      return { id: id, tag: q('tag').trim(), tytul: q('tytul').trim(),
+               opis: q('opis').trim(), btn: q('btn').trim(), link: q('link').trim() };
+    });
+    var dane = {
+      slajdy: slajdy,
+      jak: { tytul: document.getElementById('sg-jak-tytul').value.trim(),
+             pod: document.getElementById('sg-jak-pod').value.trim(),
+             kroki: [
+               { t: document.getElementById('sg-k1-t').value.trim(), o: document.getElementById('sg-k1-o').value.trim() },
+               { t: document.getElementById('sg-k2-t').value.trim(), o: document.getElementById('sg-k2-o').value.trim() },
+               { t: document.getElementById('sg-k3-t').value.trim(), o: document.getElementById('sg-k3-o').value.trim() }
+             ] },
+      cta1: document.getElementById('sg-cta1').value.trim(),
+      cta2: document.getElementById('sg-cta2').value.trim()
+    };
+    var info = document.getElementById('sg-info');
+    var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
+    info.style.display = 'block';
+    if (odp.ok){
+      info.textContent = 'Zapisano — strona główna zaktualizowana.';
+      info.style.background = 'var(--butelkowa)';
+    } else {
+      info.textContent = odp.blad || 'Nie udało się zapisać.';
+      info.style.background = '#8a2f1d';
+    }
+    setTimeout(function(){ info.style.display = 'none'; }, 5000);
   });
 
   /* ============ zamówienia ============ */
@@ -773,6 +901,7 @@
   function pokazPanel(){
     logowanie.style.display = 'none';
     panel.style.display = 'block';
+    ladujStronaGlowna();
     ladujZamowienia();
     ladujWiadomosci();
     ladujProdukty();
@@ -832,6 +961,7 @@
 
   document.getElementById('odswiez').addEventListener('click', function(){
     _katCache = null;
+    ladujStronaGlowna();
     ladujZamowienia();
     ladujWiadomosci();
     ladujProdukty();

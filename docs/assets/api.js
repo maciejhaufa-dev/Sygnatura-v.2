@@ -12,7 +12,7 @@
                zamowienia: 'syg-demo-zamowienia', licznik: 'syg-demo-licznik',
                produkty: 'syg-admin-produkty', dostawa: 'syg-admin-dostawa',
                blog: 'syg-demo-blog', strony: 'syg-demo-strony', dodane: 'syg-demo-dodane',
-               zapytaniaWynajem: 'syg-demo-wynajem-zapytania' };
+               zapytaniaWynajem: 'syg-demo-wynajem-zapytania', stronaGlowna: 'syg-demo-strona-glowna' };
   function czytaj(klucz) {
     try { return JSON.parse(localStorage.getItem(klucz) || 'null'); } catch (e) { return null; }
   }
@@ -60,7 +60,8 @@
     czytaj: czytaj, zapisz: zapisz,
     wiadomosci: function () { return czytaj(KL.wiadomosci) || []; },
     zamowienia: function () { return czytaj(KL.zamowienia) || []; },
-    wynajemZapytania: function () { return czytaj(KL.zapytaniaWynajem) || []; }
+    wynajemZapytania: function () { return czytaj(KL.zapytaniaWynajem) || []; },
+    stronaGlowna: function () { return czytaj(KL.stronaGlowna) || null; }
   };
 
   /* ---------- BLOG: wpisy (realizacje) ---------- */
@@ -129,6 +130,16 @@
           status: 'nowa' });
         zapisz(KL.wiadomosci, lista);
         return { ok: true, id: lista[0].id };
+      }
+
+      case 'strona-glowna-pobierz':
+        /* klient renderuje zapisane treści; null = treści domyślne ze strony */
+        return { ok: true, dane: czytaj(KL.stronaGlowna) || null };
+
+      case 'strona-glowna-zapisz': {
+        if (!d.dane || typeof d.dane !== 'object') return { ok: false, blad: 'Brak danych do zapisu.' };
+        zapisz(KL.stronaGlowna, d.dane);
+        return { ok: true };
       }
 
       case 'wynajem-zapytanie': {

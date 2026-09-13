@@ -333,7 +333,7 @@ html.dotyk .social{margin-top:14px}
       <div class="sl-track" id="sl-track">
 
         <!-- 1. NOWOŚCI -->
-        <div class="sl-slide">
+        <div class="sl-slide" data-sl="nowosci">
           <div class="sl-bg" style="background-image:url('assets/media/sklep/szopka.jpg')"></div>
           <div class="sl-cien"></div>
           <div class="sl-tresc">
@@ -346,7 +346,7 @@ html.dotyk .social{margin-top:14px}
         </div>
 
         <!-- 2. NAJCZĘŚCIEJ ZAMAWIANE -->
-        <div class="sl-slide">
+        <div class="sl-slide" data-sl="bestsellery">
           <div class="sl-bg" style="background-image:url('assets/media/sklep/szyld.jpg')"></div>
           <div class="sl-cien"></div>
           <div class="sl-tresc">
@@ -359,7 +359,7 @@ html.dotyk .social{margin-top:14px}
         </div>
 
         <!-- 3. AKTUALNOŚCI -->
-        <div class="sl-slide">
+        <div class="sl-slide" data-sl="aktualnosci">
           <div class="sl-bg" style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"></div>
           <div class="sl-cien"></div>
           <div class="sl-tresc">
@@ -371,7 +371,7 @@ html.dotyk .social{margin-top:14px}
         </div>
 
         <!-- 4. OFERTA SEZONOWA -->
-        <div class="sl-slide">
+        <div class="sl-slide" data-sl="sezonowa">
           <div class="sl-bg" style="background-image:url('assets/hero.jpg')"></div>
           <div class="sl-cien"></div>
           <div class="sl-tresc">
@@ -389,7 +389,7 @@ html.dotyk .social{margin-top:14px}
     </div>
   </main>
 
-  <section class="cta">
+  <section class="cta" id="cta-sekcja">
     <div class="jak">
       <h2>Jak działamy</h2>
       <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
@@ -399,8 +399,8 @@ html.dotyk .social{margin-top:14px}
         <div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>
       </div>
       <div class="cta-btn">
-        <a class="btn" href="zamowienia.html">Zarezerwuj termin</a>
-        <a class="btn outline" href="zamowienia.html">Złóż zamówienie</a>
+        <a class="btn" href="zamowienia.html" id="cta-btn-1">Zarezerwuj termin</a>
+        <a class="btn outline" href="zamowienia.html" id="cta-btn-2">Złóż zamówienie</a>
       </div>
     </div>
   </section>
@@ -411,41 +411,127 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.17</span>
+    <span>© Sygnatura 2026 · wersja 28.18</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=297"></script>
-<script src="assets/koszyk.js?v=297"></script>
-<script src="assets/config.js?v=297"></script>
-<script src="assets/main.js?v=297"></script>
+<script src="data/katalog.js?v=298"></script>
+<script src="assets/koszyk.js?v=298"></script>
+<script src="assets/config.js?v=298"></script>
+<script src="assets/api.js?v=298"></script>
+<script src="assets/main.js?v=298"></script>
 <script>
-/* mini-karty w slajdach — dane z katalogu (data/katalog.js) */
+/* ============ TREŚĆ STRONY GŁÓWNEJ (z panelu admina) ============
+   Slajdy, „Jak działamy" i przyciski renderują się z danych zapisanych
+   w panelu (zakładka STRONA GŁÓWNA). W trybie demo dane zapisują się
+   w tej przeglądarce; po wdrożeniu trafią z arkusza Google.
+   Slajdy „Nowości"/„Bestsellery" zawsze pokazują karty produktów
+   z katalogu (sklep). */
 (function(){
+  var DOMYS = {
+    slajdy: [
+      { id:'nowosci', tag:'Nowości', tytul:'Najnowsze produkty z pracowni',
+        opis:'Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.',
+        btn:'Zobacz w sklepie →', link:'sklep.html' },
+      { id:'bestsellery', tag:'Bestsellery', tytul:'Najczęściej zamawiane',
+        opis:'Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.',
+        btn:'Zamów teraz →', link:'sklep.html' },
+      { id:'aktualnosci', tag:'Aktualności z pracowni', tytul:'Z pracowni prosto do Was',
+        opis:'Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.',
+        btn:'Zobacz realizacje →', link:'realizacje.html' },
+      { id:'sezonowa', tag:'Oferta sezonowa', tytul:'Sezon świąteczny — czas na szopkę',
+        opis:'Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.',
+        btn:'Sprawdź ofertę →', link:'sklep.html' }
+    ],
+    jak: { tytul:'Jak działamy', pod:'Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.',
+      kroki: [
+        { t:'Wybierz i zamów online', o:'Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.' },
+        { t:'Dostajesz sygnaturę sprawy', o:'W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.' },
+        { t:'Płacisz — my działamy', o:'Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.' }
+      ] },
+    cta1: 'Zarezerwuj termin', cta2: 'Złóż zamówienie'
+  };
+
+  function esc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
   function karta(pr){
     var obraz = pr.obraz && /^https?:/.test(pr.obraz) ? pr.obraz : 'assets/media/sklep/' + pr.obraz;
-    var img = pr.obraz ? '<img src="' + obraz + '" alt="' + pr.nazwa + '">' : '<span class="pusty">' + (pr.nazwa[0]||'') + '</span>';
+    var img = pr.obraz ? '<img src="' + obraz + '" alt="' + esc(pr.nazwa) + '">'
+                       : '<span class="pusty">' + esc(pr.nazwa[0] || '') + '</span>';
     return '<a class="sl-karta" href="sklep.html">' + img +
-      '<span><span class="nazwa">' + pr.nazwa + '</span><br><span class="cena">' + pr.cena + ' zł / szt.</span></span></a>';
+      '<span><span class="nazwa">' + esc(pr.nazwa) + '</span><br>' +
+      '<span class="cena">' + esc(pr.cena) + ' zł / szt.</span></span></a>';
+  }
+  function placeholder(){
+    return '<span class="sl-karta sl-karta-pusta"><span><span class="nazwa">Wkrótce</span><br>' +
+      '<span class="cena">nowe prace w drodze</span></span></span>';
   }
   function wypelnij(id, lista){
     var el = document.getElementById(id);
     if (!el) return;
     var html = lista.map(karta).join('');
-    for (var i = lista.length; i < 3; i++){
-      html += '<span class="sl-karta sl-karta-pusta"><span><span class="nazwa">Wkrótce</span><br>' +
-        '<span class="cena">nowe prace w drodze</span></span></span>';
-    }
+    for (var i = lista.length; i < 3; i++) html += placeholder();
     el.innerHTML = html;
   }
-  var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
-  if (kat.length){
-    wypelnij('sl-nowosci', kat.slice(0,3));
-    wypelnij('sl-top', kat.slice().reverse().slice(0,3));
-  } else {
-    wypelnij('sl-nowosci', []);
-    wypelnij('sl-top', []);
+
+  async function wczytaj(){
+    var dane = DOMYS;
+    try {
+      var odp = await SYG.wezwij('strona-glowna-pobierz', {});
+      if (odp && odp.ok && odp.dane) dane = odp.dane;
+    } catch (e) { /* brak danych — zostają domyślne */ }
+
+    /* slajdy */
+    (dane.slajdy || DOMYS.slajdy).forEach(function(sl){
+      var slajd = document.querySelector('.sl-slide[data-sl="' + sl.id + '"]');
+      if (!slajd) return;
+      var tag = slajd.querySelector('.sl-tag');
+      var h2 = slajd.querySelector('h2');
+      var p = slajd.querySelector('.sl-tresc > p');
+      var btn = slajd.querySelector('.sl-btn');
+      if (tag && sl.tag) tag.textContent = sl.tag;
+      if (h2 && sl.tytul) h2.textContent = sl.tytul;
+      if (p && sl.opis) p.textContent = sl.opis;
+      if (btn){ btn.textContent = sl.btn || 'Zobacz →'; btn.setAttribute('href', sl.link || 'sklep.html'); }
+    });
+
+    /* karty produktów w slajdach 1 i 2 */
+    var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
+    if (kat.length){
+      wypelnij('sl-nowosci', kat.slice(0, 3));
+      wypelnij('sl-top', kat.slice().reverse().slice(0, 3));
+    } else {
+      wypelnij('sl-nowosci', []);
+      wypelnij('sl-top', []);
+    }
+
+    /* CTA „Jak działamy" */
+    var jak = dane.jak || DOMYS.jak;
+    var jakEl = document.getElementById('cta-sekcja');
+    if (jakEl){
+      var h2j = jakEl.querySelector('h2');
+      var pod = jakEl.querySelector('.pod');
+      if (h2j) h2j.textContent = jak.tytul || '';
+      if (pod) pod.textContent = jak.pod || '';
+      var kroki = jakEl.querySelectorAll('.kroki .krok');
+      for (var i = 0; i < kroki.length; i++){
+        var kr = (jak.kroki && jak.kroki[i]);
+        if (!kr) continue;
+        var b = kroki[i].querySelector('b');
+        var pp = kroki[i].querySelector('p');
+        if (b) b.textContent = kr.t || '';
+        if (pp) pp.textContent = kr.o || '';
+      }
+    }
+
+    /* przyciski CTA */
+    var c1 = document.getElementById('cta-btn-1');
+    var c2 = document.getElementById('cta-btn-2');
+    if (c1) c1.textContent = dane.cta1 || DOMYS.cta1;
+    if (c2) c2.textContent = dane.cta2 || DOMYS.cta2;
   }
+  wczytaj();
 })();
 </script>
 
