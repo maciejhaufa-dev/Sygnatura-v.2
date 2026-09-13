@@ -1075,6 +1075,43 @@ Testy: HTML zbilansowany, node --check (skrypty admina/indexa/assety), grep bez 
 (0 wystąpień sgZapiszWszystko w handlerach kafli), sync docs, Pages built | 990c601,
 fetch_page live: admin (wskaźnik niezapisanych zmian, edytor z podglądem, ZASTOSUJ DO
 PODGLĄDU/ODRZUĆ, ZAPISZ ZMIANY STRONY GŁÓWNEJ), index (slider 4 kafle z kartami).
+## Sesja 28 — EDYTOR TREŚCI v3: treść pod sliderem, drag&drop obiektów, justowanie (commit 9b6ba03, wersja 28.21)
+
+Właściciel: (1) edycja pozostałych treści pod sliderem („Jak działamy" + przyciski) ma być
+takim samym edytorem jak dla kafli; (2) brak drag&drop położenia przycisku jak „ramka dla
+obrazka" w MS Word — pisanie tylko linia po linii, wyrównane do lewej, drugi przycisk
+wpadał do następnej linii (naprawić bezwzględnie); (3) brak justowania jak w Wordzie,
+wyrównywania zaznaczonych obiektów i przesuwania ich drag&drop; (4) brak opcji wstawienia
+bloku z ramką (jak na screenie) i przezroczystego tła przycisku.
+
+WYKONANE:
+- TREŚĆ POD SLIDEREM: pola „Jak działamy"/przyciski zastąpione EDYTOREM TREŚCI na JASNYM
+  PODGLĄDZIE (biały box .jak z min-height 380px; style .edtr-tresc-jasna odwzorowują sekcję:
+  h2, .pod, .kroki grid 3, .krok z paskiem, .num, .cta-btn z .btn złotym/obrysowanym, sl-tag,
+  tre-blok). Dane: dane.ctaTresc (HTML); migracja starego formatu (jak/cta1/cta2) po stronie
+  klienta i admina; index.html renderuje #cta-tresc-box z ctaTresc; CSS tre-* dodany do
+  wbudowanych stylów index.html (przyciski/kolumny/tabele/blok z edytora wyświetlają się
+  też na stronie klienta).
+- DRAG&DROP OBIEKTÓW (jak ramka w MS Word): przyciski i obrazki w polu edycji przeciąga
+  się myszą (pointer capture; przy przekroczeniu 4px obiekt przechodzi na position:absolute
+  z położeniem w % względem pola — skaluje się na stronie). Po przeciągnięciu klik nie
+  otwiera okna edycji. Położenie zapisywane w treści HTML.
+- PRZYCISKI OBOK SIEBIE: wstawienie przycisku, gdy zaznaczony jest inny obiekt-przycisk,
+  wkłada nowy OD RAZU OBOK (insertAdjacentHTML afterend) — stoją w jednej linii.
+- WYRÓWNANIE: pasek narzędzi ma grupę „Wyrównanie (jak w Wordzie)": do lewej / środka /
+  prawej / WYJUSTUJ (justifyFull). Grupa „Obiekty": przyciski ⬅ ↔ ➡ ⬆ ↕ ⬇ — wyrównanie
+  zaznaczonego obiektu do krawędzi lub środka pola edycji (obiekt przechodzi w tryb
+  absolutny, jeśli jeszcze nie jest).
+- BLOKI: „🏷 Etykieta" wstawia blok-etykietę w ramce (p.sl-tag — taki jak „Nowości" na
+  kaflach), „▭ Blok" wstawia blok z ramką (.tre-blok); przycisk ma teraz checkbox
+  „Przezroczyste tło (bez koloru)" (tło transparentne, ramka zostaje).
+- Wersja 28.21, zasoby ?v=301.
+
+Testy: HTML zbilansowany, node --check (skrypty index/admin/assety), grep: stare pola
+sg-jak-*/sg-cta* usunięte; Node API: zapis/odczyt ctaTresc, stary format zwracany surowo
+(migracja po stronie); sync docs, Pages built | 9b6ba03, fetch_page live: index (sekcja
+CTA z ctaTresc wygląda identycznie), admin (edytor „Treść pod sliderem" + ZAPISZ ZMIANY
+STRONY GŁÓWNEJ).
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
