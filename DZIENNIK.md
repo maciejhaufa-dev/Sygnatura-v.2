@@ -972,6 +972,30 @@ WYKONANE:
 Testy: HTML zbilansowany, node --check OK, kontrole grep (stary tekst nieobecny, stare
 hasło nieobecne, kropki ::before w CSS), sync docs, Pages built | baffc7c, fetch_page
 live: koszyk.html czysty (bez tekstu o dekoracjach, bez „Krok x z y").
+## Sesja 28 — panel: zakładka STRONA GŁÓWNA (commit 2fcd044, wersja 28.18)
+
+Właściciel: pracujemy strona po stronie — spójność między tym, co widzi klient, a tym, co
+można zmienić w panelu admina. Pierwsza: STRONA GŁÓWNA (pierwsza zakładka panelu).
+
+WYKONANE:
+- Panel admina: NOWA PIERWSZA ZAKŁADKA „Strona główna" (przed Zamówieniami):
+  * Slajdy 1–4 (Nowości / Bestsellery / Aktualności / Oferta sezonowa) — edycja znacznika,
+    nagłówka, opisu, tekstu przycisku i strony docelowej; slajdy 1–2 zawsze pokazują karty
+    produktów z katalogu (adnotacja w panelu).
+  * Sekcja „Jak działamy" — tytuł, podtytuł, 3 kroki (tytuł + opis).
+  * Przyciski CTA pod krokami (złoty i obrysowany).
+  * „Zapisz stronę główną" — zapis do wspólnego magazynu (akcja api strona-glowna-zapisz).
+- Strona główna renderuje teraz treści Z MAGAZYNU (akcja strona-glowna-pobierz; brak zapisu =
+  treści domyślne, identyczne z obecnymi): slajdy mają znaczniki data-sl, sekcja CTA id,
+  przyciski id; loader treści zastąpił skrypt mini-kart (karty produktów nadal się wypełniają).
+- api.js: akcje demo strona-glowna-pobierz / strona-glowna-zapisz, klucz KL.stronaGlowna,
+  demoDb.stronaGlowna(). Ładuj przy otwarciu panelu i przy „Odśwież".
+- Wersja 28.18, zasoby ?v=298.
+
+Testy: HTML zbilansowany (wszystkie strony), node --check OK (skrypty admina też), Node:
+pobierz=null bez zapisu → zapis → pobierz zwraca dane, demoDb spójne, walidacja złego zapisu;
+sync docs, Pages built | 2fcd044, fetch_page live: index.html renderuje domyślne treści
+(slajdy+karty+CTA), admin.html ma zakładkę STRONA GŁÓWNA jako pierwszą z formularzem.
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
