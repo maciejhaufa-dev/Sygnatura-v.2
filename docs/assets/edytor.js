@@ -827,13 +827,7 @@
           if (ob.classList && ob.classList.contains('tre-blok') && ob.isContentEditable) return;
           e.preventDefault();
           if (edytowanyBlok && edytowanyBlok !== ob) zakonczEdycjeBloku();
-          if (e.ctrlKey || e.metaKey){
-            var ix = wybrane.indexOf(ob);
-            if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob);
-          } else if (wybrane.indexOf(ob) < 0){
-            wybrane = [ob];
-          }
-          odswiezWybranie();
+          /* zaznaczanie odbywa się w pointerdown (jedno miejsce) — tu tylko blokujemy edycję/linki */
           return;
         }
         var a = t.closest('a');
