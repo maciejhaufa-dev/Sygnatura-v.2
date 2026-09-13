@@ -1181,6 +1181,35 @@ Testy: node --check (edytor.js v5, skrypty index/admin, assety), HTML zbilansowa
 stary Kol usunięty, nowe elementy (dblclick/tre-ksztalt/edtr-paleta/tre-wybrany/tre-uchwyt/
 selectionchange) obecne; sync docs, Pages built | 344dd4d, fetch_page live: index OK (sekcja
 CTA renderuje kroki i przyciski).
+## Sesja 28 — EDYTOR v5.1: wyrównanie względem siebie, bloki-prostokąty, fix treści pod sliderem (commit c874e20, wersja 28.24)
+
+Właściciel (doprecyzowanie): (1) wyrównywanie zaznaczonych obiektów musi działać WZGLĘDEM
+SIEBIE — ułożenie przycisków/bloków w jednej linii lub kolumnie; (2) zmiana rozmiaru bloku
+jak prostokąta łapiąc za narożnik (a nie tylko pełna szerokość); (3) treść z edytora pod
+sliderem musi się wyświetlać wyraźnie — wstawiony przycisk wyskoczył i zakrył część slidera.
+
+WYKONANE (wersja 28.24, ?v=304):
+- WYRÓWNANIE WZGLĘDEM SIEBIE: jeden obiekt = do krawędzi/środka pola; KILKA zaznaczonych
+  (Ctrl+klik) = wyrównanie do wspólnej krawędzi/środka GRUPY (⬅ lewa krawędź grupy, ↔ środek
+  w kolumnie, ➡ prawa, ⬆ góra w linii, ↕ środek w linii, ⬇ dół) — przyciski/bloki/kształty
+  ustawiają się w jednej linii/kolumnie; pozycje liczone w px i zapisywane w % (skalowalne).
+- ROZKŁADANIE: nowe przyciski ⇶ (rozłóż w poziomie) i ⇵ (rozłóż w pionie) — co najmniej
+  3 zaznaczone obiekty dostają JEDNAKOWE odstępy (między skrajnymi).
+- BLOK = PROSTOKĄT: .tre-blok dołączony do systemu obiektów (zaznaczanie, grupy, drag,
+  wyrównanie, rozłożenie); KLIK = zaznaczenie, 2×KLIK = edycja tekstu w środku (blok dostaje
+  contenteditable, klik obok/Esc kończy), NAROŻNY UCHWYT = zmiana rozmiaru (dowolna szerokość
+  i wysokość); modal bloku ma listę szerokości (100%/75%/50%/33%) i podpowiedź; bloki w
+  zapisanym HTML mają contenteditable=false (na stronie nieedytowalne); box-sizing:border-box
+  + overflow:auto; pobierz() kończy edycję bloku przed zapisem.
+- TREŚĆ NIE ZAKRYWA SLIDERA: .jak (biały box sekcji) dostał position:relative — obiekty
+  pozycjonowane absolutnie (przeciągnięte przyciski itp.) kotwiczą WEWNĄTRZ boxu pod
+  sliderem zamiast do strony; .sl-tresc miała już position:relative (kafle OK);
+  .jak .tre-*/img max-width:100%.
+- Podpowiedzi w panelu opisują wyrównanie względem siebie, rozłożenie i bloki-prostokąty.
+
+Testy: node --check (edytor.js, skrypty index/admin, assety), HTML zbilansowany, grep:
+stare selektory wyrównania usunięte; sync docs, Pages built | c874e20, fetch_page live:
+index OK (slider + sekcja CTA renderują się; .jak kotwiczy obiekty).
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
