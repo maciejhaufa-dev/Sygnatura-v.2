@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=301">
+<link rel="stylesheet" href="assets/style.css?v=302">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -113,7 +113,22 @@
               <select id="sg-obraz" style="flex:1;min-width:240px"></select>
               <button class="btn outline" type="button" id="sg-obraz-wgraj" style="flex:none">Wgraj własne zdjęcie…</button>
             </div>
-            <input type="file" id="sg-obraz-plik" accept="image/*" style="display:none">
+            <div id="sg-obraz-wgraj-box" style="display:none;border:1px dashed rgba(107,69,48,.55);background:#FBF7F0;padding:10px 12px;margin-top:8px">
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:220px"><label style="font-size:13.5px;color:var(--brunatny);display:block;margin-bottom:4px">Nazwa zdjęcia (w wersji docelowej: folder sieciowy assets/media/przeslane/)</label>
+                <input type="text" id="sg-obraz-nazwa" placeholder="np. kafla-tlo"></div>
+                <div><label style="font-size:13.5px;color:var(--brunatny);display:block;margin-bottom:4px">Plik ze zdjęciem</label>
+                <input type="file" id="sg-obraz-plik" accept="image/*"></div>
+                <button class="btn" type="button" id="sg-obraz-zapisz">Zapisz do biblioteki</button>
+              </div>
+              <p class="mala" style="margin:6px 0 0">Zdjęcie zapisuje się w bibliotece pod KRÓTKĄ nazwą — na liście
+              nie będzie już długich „tasiemców". W wersji demo biblioteka jest w tej przeglądarce;
+              po wdrożeniu Google Apps Script plik trafi do folderu sieciowego <b>assets/media/przeslane/</b> pod tą samą nazwą.</p>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn outline" type="button" id="sg-obraz-zmien" style="display:none">✏ Zmień nazwę</button>
+              <button class="btn outline" type="button" id="sg-obraz-usun" style="display:none">🗑 Usuń z biblioteki</button>
+            </div>
             <div class="sg-obraz-podglad" id="sg-obraz-podglad">podgląd tła</div>
           </div>
           <div class="pole">
@@ -148,7 +163,8 @@
           <div class="edtr-tresc edtr-tresc-jasna" id="sg-cta-pole" contenteditable="true"></div>
         </div>
       </div>
-      <div class="przyciski" style="margin-top:14px">
+      <div class="przyciski" style="justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
+        <button class="btn-odrzuc" type="button" id="sg-odrzuc-strona">ODRZUĆ ZMIANY STRONY GŁÓWNEJ</button>
         <button class="btn-zapisz" type="button" id="sg-zapisz">ZAPISZ ZMIANY STRONY GŁÓWNEJ</button>
       </div>
     </section>
@@ -414,13 +430,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=301"></script>
-<script src="assets/koszyk.js?v=301"></script>
-<script src="assets/api.js?v=301"></script>
-<script src="assets/editor.js?v=301"></script>
-<script src="assets/edytor.js?v=301"></script>
-<script src="data/katalog.js?v=301"></script>
-<script src="assets/main.js?v=301"></script>
+<script src="assets/config.js?v=302"></script>
+<script src="assets/koszyk.js?v=302"></script>
+<script src="assets/api.js?v=302"></script>
+<script src="assets/editor.js?v=302"></script>
+<script src="assets/edytor.js?v=302"></script>
+<script src="data/katalog.js?v=302"></script>
+<script src="assets/main.js?v=302"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -519,6 +535,70 @@
   function sgEsc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
+  /* ---------- biblioteka własnych zdjęć (nazwa -> dataURL) ----------
+     W wersji demo biblioteka siedzi w tej przeglądarce (localStorage);
+     po wdrożeniu Google Apps Script pliki trafią do folderu sieciowego
+     assets/media/przeslane/ pod tymi samymi nazwami. */
+  var SG_MEDIA_KLUCZ = 'syg-media-v1';
+  function sgMediaBiblioteka(){
+    try { return JSON.parse(localStorage.getItem(SG_MEDIA_KLUCZ) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function sgMediaZapisz(bib){ localStorage.setItem(SG_MEDIA_KLUCZ, JSON.stringify(bib)); }
+  function sgMediaRozwiaz(o){
+    if (String(o).indexOf('media:') === 0){
+      var d = sgMediaBiblioteka()[o.slice(6)];
+      return d || 'assets/hero.jpg';
+    }
+    return o;
+  }
+  function sgMediaNazwa(z){
+    var n = String(z || '').toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/gi, '-')
+      .replace(/^-+|-+$/g, '').slice(0, 40);
+    return n || 'obraz';
+  }
+  /* stare dataURL („tasiemce") w kafelkach -> wpisy w bibliotece z nazwą */
+  function sgNaprawObrazy(dane){
+    if (!dane || !dane.slider) return dane;
+    var bib = sgMediaBiblioteka();
+    var zmiana = false;
+    dane.slider.kafle.forEach(function (k, i) {
+      if (k.obraz && String(k.obraz).indexOf('data:image') === 0){
+        var baza = sgMediaNazwa('wgrany-' + (i + 1));
+        var n = baza, j = 2;
+        while (bib[n]) n = baza + '-' + (j++);
+        bib[n] = k.obraz;
+        k.obraz = 'media:' + n;
+        zmiana = true;
+      }
+    });
+    if (zmiana) sgMediaZapisz(bib);
+    return dane;
+  }
+  /* rozwijana lista zdjęć: stałe ścieżki + własne z biblioteki (same nazwy) */
+  function sgObrazOpcje(wybor){
+    var sel = document.getElementById('sg-obraz');
+    var bib = sgMediaBiblioteka();
+    var opcje = SG_OBRAZY.slice();
+    if (wybor && opcje.indexOf(wybor) < 0 && String(wybor).indexOf('media:') !== 0) opcje.push(wybor);
+    var html = opcje.map(function (o) {
+      return '<option value="' + sgEsc(o) + '"' + (o === wybor ? ' selected' : '') + '>' +
+        (o === 'gradient' ? 'Gradient butelkowo-brązowy (bez zdjęcia)' : sgEsc(o)) + '</option>';
+    }).join('');
+    html += Object.keys(bib).sort().map(function (nazwa) {
+      var val = 'media:' + nazwa;
+      return '<option value="' + sgEsc(val) + '"' + (val === wybor ? ' selected' : '') +
+        '>📁 ' + sgEsc(nazwa) + ' (własne zdjęcie)</option>';
+    }).join('');
+    sel.innerHTML = html;
+    sgObrazGuziki();
+  }
+  function sgObrazGuziki(){
+    var wlasne = String(document.getElementById('sg-obraz').value).indexOf('media:') === 0;
+    document.getElementById('sg-obraz-zmien').style.display = wlasne ? '' : 'none';
+    document.getElementById('sg-obraz-usun').style.display = wlasne ? '' : 'none';
+  }
+
   /* migracja starego formatu (slajdy tag/tytul/opis/btn i jak/cta) na kafle + ctaTresc */
   function sgMigrujStare(dane){
     var kopia = null;
@@ -553,6 +633,7 @@
 
   function kafelObrazCss(obraz){
     /* pojedyncze apostrofy: podwójne łamały atrybut style="background-image:url(...)" */
+    obraz = sgMediaRozwiaz(obraz);
     return obraz === 'gradient' ? 'linear-gradient(135deg,#1F3A32,#6B4530)'
       : "url('" + String(obraz || '').replace(/'/g, '%27') + "')";
   }
@@ -665,13 +746,7 @@
     SG_EDYCJA = { id: String(kafel.id), kopia: JSON.parse(JSON.stringify(kafel)), nowy: !!nowy };
     document.getElementById('sg-edycja-tytul').textContent = 'Edycja kafla ' + (i + 1);
     /* tło */
-    var sel = document.getElementById('sg-obraz');
-    var opcje = SG_OBRAZY.slice();
-    if (kafel.obraz && opcje.indexOf(kafel.obraz) < 0) opcje.push(kafel.obraz);
-    sel.innerHTML = opcje.map(function(o){
-      return '<option value="' + sgEsc(o) + '"' + (o === kafel.obraz ? ' selected' : '') + '>' +
-        (o === 'gradient' ? 'Gradient butelkowo-brązowy (bez zdjęcia)' : sgEsc(o)) + '</option>';
-    }).join('');
+    sgObrazOpcje(kafel.obraz);
     odswiezPodgladObrazu();
     document.getElementById('sg-karty').checked = !!kafel.karty;
     if (!SG_EDYTOR) SG_EDYTOR = SYG.edytorTresci.stworz(
@@ -726,29 +801,83 @@
     rysujKafle();
   });
 
-  /* wgranie własnego zdjęcia w tle */
+  /* ---------- biblioteka własnych zdjęć: panel wgrywania ---------- */
   document.getElementById('sg-obraz-wgraj').addEventListener('click', function(){
-    document.getElementById('sg-obraz-plik').click();
+    var box = document.getElementById('sg-obraz-wgraj-box');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
   });
   document.getElementById('sg-obraz-plik').addEventListener('change', function(){
     var f = this.files && this.files[0];
     if (!f) return;
+    /* proponowana nazwa = nazwa pliku bez rozszerzenia */
+    document.getElementById('sg-obraz-nazwa').value =
+      sgMediaNazwa(String(f.name).replace(/\.[^.]+$/, ''));
+  });
+  document.getElementById('sg-obraz-zapisz').addEventListener('click', function(){
+    var f = document.getElementById('sg-obraz-plik').files &&
+            document.getElementById('sg-obraz-plik').files[0];
+    var nazwa = sgMediaNazwa(document.getElementById('sg-obraz-nazwa').value);
+    if (!f){ alert('Najpierw wybierz plik ze zdjęciem.'); return; }
+    var bib = sgMediaBiblioteka();
+    if (bib[nazwa] && !confirm('Zdjęcie „' + nazwa + '" już jest w bibliotece. Nadpisać?')) return;
     var fr = new FileReader();
     fr.onload = function(){
-      var sel = document.getElementById('sg-obraz');
-      var op = document.createElement('option');
-      op.value = fr.result;
-      op.textContent = 'Wgrany obraz (z tego komputera)';
-      sel.appendChild(op);
-      sel.value = fr.result;
+      bib[nazwa] = fr.result;
+      sgMediaZapisz(bib);
+      sgObrazOpcje('media:' + nazwa);
       odswiezPodgladObrazu();
+      odswiezTloEdytora();
+      if (SG_EDYCJA){
+        var kafle = sgKafle();
+        var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+        if (i >= 0){ kafle[i].obraz = 'media:' + nazwa; ustawBrudny(); rysujKafle(); }
+      }
+      document.getElementById('sg-obraz-wgraj-box').style.display = 'none';
+      sgInfo('Zdjęcie zapisane w bibliotece jako „' + nazwa + '".', false);
     };
     fr.readAsDataURL(f);
-    this.value = '';
+  });
+  document.getElementById('sg-obraz-zmien').addEventListener('click', function(){
+    var val = document.getElementById('sg-obraz').value;
+    if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby zmienić nazwę.'); return; }
+    var stara = val.slice(6);
+    var nowa = sgMediaNazwa(prompt('Nowa nazwa zdjęcia:', stara) || '');
+    if (!nowa || nowa === stara) return;
+    var bib = sgMediaBiblioteka();
+    if (bib[nowa] && !confirm('Zdjęcie „' + nowa + '" już jest w bibliotece. Nadpisać?')) return;
+    bib[nowa] = bib[stara];
+    delete bib[stara];
+    sgMediaZapisz(bib);
+    var nowaRef = 'media:' + nowa;
+    sgKafle().forEach(function(k){ if (k.obraz === val) k.obraz = nowaRef; });
+    if (SG_EDYCJA && SG_EDYCJA.kopia && SG_EDYCJA.kopia.obraz === val) SG_EDYCJA.kopia.obraz = nowaRef;
+    ustawBrudny();
+    sgObrazOpcje(nowaRef);
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    rysujKafle();
+    sgInfo('Nazwa zmieniona na „' + nowa + '".', false);
+  });
+  document.getElementById('sg-obraz-usun').addEventListener('click', function(){
+    var val = document.getElementById('sg-obraz').value;
+    if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby je usunąć.'); return; }
+    var nazwa = val.slice(6);
+    if (!confirm('Usunąć zdjęcie „' + nazwa + '" z biblioteki? Kafle, które go używają, dostaną domyślne tło.')) return;
+    var bib = sgMediaBiblioteka();
+    delete bib[nazwa];
+    sgMediaZapisz(bib);
+    sgKafle().forEach(function(k){ if (k.obraz === val) k.obraz = 'assets/hero.jpg'; });
+    ustawBrudny();
+    sgObrazOpcje('assets/hero.jpg');
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    rysujKafle();
+    sgInfo('Zdjęcie „' + nazwa + '" usunięte z biblioteki.', false);
   });
   document.getElementById('sg-obraz').addEventListener('change', function(){
     odswiezPodgladObrazu();
     odswiezTloEdytora();
+    sgObrazGuziki();
     if (SG_EDYCJA){
       var kafle = sgKafle();
       var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
@@ -761,9 +890,9 @@
   });
 
   function ladujStronaGlowna(){
-    SG_DANE = sgMigrujStare(SYG.demoDb.stronaGlowna()) || SG_DOMYS;
+    SG_DANE = sgNaprawObrazy(sgMigrujStare(SYG.demoDb.stronaGlowna()) || SG_DOMYS);
     if (!SG_DANE.slider) SG_DANE.slider = SG_DOMYS.slider;
-    if (!SG_DANE.jak) SG_DANE.jak = SG_DOMYS.jak;
+    if (SG_DANE.ctaTresc == null) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
     document.getElementById('sg-autoplay').value =
       (SG_DANE.slider.autoplay != null) ? SG_DANE.slider.autoplay : SG_DOMYS.slider.autoplay;
     if (!SG_EDYTOR_CTA) SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
@@ -783,6 +912,13 @@
   if (ctaPole) ctaPole.addEventListener('input', ustawBrudny);
 
   document.getElementById('sg-zapisz').addEventListener('click', sgZapiszWszystko);
+
+  /* ODRZUĆ ZMIANY STRONY GŁÓWNEJ — wraca wersja zapisana */
+  document.getElementById('sg-odrzuc-strona').addEventListener('click', function(){
+    if (!confirm('Odrzucić WSZYSTKIE niezapisane zmiany strony głównej (slider i treść pod sliderem)? Wróci wersja zapisana.')) return;
+    ladujStronaGlowna();
+    sgInfo('Wszystkie niezapisane zmiany strony głównej odrzucone.', false);
+  });
 
   /* ============ zamówienia ============ */
   async function ladujZamowienia(){

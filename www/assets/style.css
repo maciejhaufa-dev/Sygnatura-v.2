@@ -584,6 +584,12 @@ html.dotyk .menu-vert a::after{display:none}
   font-family:inherit;font-size:13.5px;padding:6px 10px;cursor:pointer;line-height:1.2}
 .edtr-bar button:hover{background:var(--krem-2);border-color:var(--brunatny)}
 .edtr-gr{color:rgba(107,69,48,.4);font-size:13px;padding:0 2px}
+.edtr-bar select.edtr-sel{font-size:12.5px;padding:4px 6px;border:1px solid rgba(107,69,48,.4);
+  border-radius:6px;background:#fff;color:var(--brunatny);max-width:140px}
+.edtr-kolor{display:inline-flex;align-items:center;gap:3px;border:1px solid rgba(107,69,48,.35);
+  border-radius:6px;padding:2px 5px;background:#fff}
+.edtr-kolor span{font-size:11.5px;font-weight:700;color:var(--brunatny)}
+.edtr-kolor input[type=color]{width:26px;height:22px;border:none;padding:0;background:none;cursor:pointer}
 .edtr-pole{min-height:240px;max-height:560px;overflow:auto;padding:16px 18px;font-size:17px;
   line-height:1.6;color:var(--ink);font-family:var(--serif)}
 .edtr-pole:focus{outline:none}

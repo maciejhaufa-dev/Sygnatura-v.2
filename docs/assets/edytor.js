@@ -1,5 +1,5 @@
 /* ============================================================
-   Studio Sygnatura — EDYTOR TREŚCI (edytor.js) v3
+   Studio Sygnatura — EDYTOR TREŚCI (edytor.js) v4
    Uniwersalny silnik edycji treści („EDYTOR TREŚCI") — jeden
    dla całego serwisu: kafle slidera, sekcje strony głównej,
    wpisy bloga, podstrony. Zachowuje się jak MS Word / Canva:
@@ -20,6 +20,8 @@
      położenie zapisuje się w % (skaluje się na stronie).
    • WYRÓWNIANIE OBIEKTÓW: do lewej / środka / prawej / góry /
      środka pionowo / dołu pola edycji.
+   • CZCIONKA (FONT) i WIELKOŚĆ tekstu, KOLOR tekstu i KOLOR TŁA
+     tekstu (podświetlenie) — jak w Wordzie; STYL AKAPITU (paragraph)
    • Separator, wyczyść formatowanie
 
    Użycie:
@@ -32,6 +34,12 @@
   var SANS = "'Segoe UI',Arial,sans-serif";
   var SERIF = "'Cormorant Garamond','Playfair Display',Georgia,serif";
   var MONO = "'Courier New',Courier,monospace";
+  var FONTY = {
+    serif: SERIF, sans: SANS, mono: MONO,
+    georgia: 'Georgia,serif', times: "'Times New Roman',Times,serif",
+    arial: 'Arial,Helvetica,sans-serif', verdana: 'Verdana,Geneva,sans-serif',
+    impact: 'Impact,Charcoal,sans-serif'
+  };
 
   function escA(t){ return String(t == null ? '' : t).replace(/[&"<>]/g, function(c){
     return { '&':'&amp;', '"':'&quot;', '<':'&lt;', '>':'&gt;' }[c]; }); }
@@ -167,10 +175,94 @@
       s.className = 'edtr-gr'; s.title = tytul; s.innerHTML = etykieta;
       bar.appendChild(s);
     }
+    function Sel(opcje, tytul, cb) {
+      var s = document.createElement('select');
+      s.className = 'edtr-sel'; s.title = tytul;
+      opcje.forEach(function (o) {
+        var op = document.createElement('option');
+        op.value = o.v; op.textContent = o.t;
+        s.appendChild(op);
+      });
+      s.addEventListener('change', function () {
+        var v = s.value;
+        s.value = '';
+        cb(v);
+      });
+      bar.appendChild(s);
+      return s;
+    }
+    function Kol(znak, tytul, cmd) {
+      var l = document.createElement('span');
+      l.className = 'edtr-kolor'; l.title = tytul;
+      var z = document.createElement('span');
+      z.textContent = znak;
+      var i = document.createElement('input');
+      i.type = 'color'; i.value = '#6B4530';
+      l.appendChild(z); l.appendChild(i);
+      bar.appendChild(l);
+      i.addEventListener('input', function () {
+        pole.focus();
+        document.execCommand(cmd, false, i.value);
+      });
+      return l;
+    }
+    function owinSpan(styl) {
+      var sel = window.getSelection();
+      if (!sel || sel.isCollapsed) return false;
+      try {
+        var r = sel.getRangeAt(0);
+        var sp = document.createElement('span');
+        sp.setAttribute('style', styl);
+        sp.appendChild(r.extractContents());
+        r.insertNode(sp);
+        sel.removeAllRanges();
+        return true;
+      } catch (e) { return false; }
+    }
+    function stylAkapi(v) {
+      pole.focus();
+      if (v === 'div.sl-tag' || v === 'div.tre-blok') {
+        document.execCommand('formatBlock', false, 'div');
+        var sel = window.getSelection();
+        var n = sel && sel.anchorNode;
+        while (n && n !== pole && !(n.nodeType === 1 && n.tagName === 'DIV')) n = n.parentNode;
+        if (n && n !== pole) n.className = v.slice(4);
+      } else {
+        document.execCommand('formatBlock', false, v);
+      }
+    }
 
     B('Tytuł', 'Tytuł (nagłówek 2)', 'formatBlock', 'h2');
     B('Podtytuł', 'Podtytuł (nagłówek 3)', 'formatBlock', 'h3');
     B('Tekst', 'Zwykły akapit', 'formatBlock', 'p');
+    Gr('|', 'Czcionka (FONT), wielkość, kolory');
+    Sel([{v:'',t:'Czcionka…'},{v:'serif',t:'Serif (styl studia)'},{v:'georgia',t:'Georgia'},
+      {v:'times',t:'Times New Roman'},{v:'arial',t:'Arial'},{v:'verdana',t:'Verdana'},
+      {v:'sans',t:'Segoe UI'},{v:'mono',t:'Courier New'},{v:'impact',t:'Impact'}],
+      'Czcionka — zaznacz tekst i wybierz (FONT)', function (v) {
+        if (!v) return;
+        var css = FONTY[v] || v;
+        if (!owinSpan('font-family:' + css)) document.execCommand('fontName', false, css);
+      });
+    Sel([{v:'',t:'Rozmiar…'},{v:'10',t:'10 px'},{v:'12',t:'12 px'},{v:'14',t:'14 px'},{v:'16',t:'16 px'},
+      {v:'18',t:'18 px'},{v:'20',t:'20 px'},{v:'24',t:'24 px'},{v:'28',t:'28 px'},{v:'32',t:'32 px'},
+      {v:'36',t:'36 px'},{v:'48',t:'48 px'}],
+      'Wielkość tekstu — zaznacz tekst i wybierz', function (v) {
+        if (!v) return;
+        if (!owinSpan('font-size:' + v + 'px')) {
+          var m = { '10':'1','12':'2','14':'3','16':'4','18':'4','20':'5','24':'5','28':'6','32':'7','36':'7','48':'7' };
+          document.execCommand('fontSize', false, m[v] || '4');
+        }
+      });
+    Kol('A', 'Kolor tekstu — zaznacz tekst i wybierz kolor', 'foreColor');
+    Kol('🖍', 'Kolor tła tekstu (podświetlenie) — zaznacz tekst i wybierz kolor', 'hiliteColor');
+    Gr('|', 'Styl akapitu (paragraph)');
+    Sel([{v:'',t:'Styl akapitu…'},{v:'p',t:'Akapit'},{v:'h2',t:'Tytuł'},{v:'h3',t:'Podtytuł'},
+      {v:'blockquote',t:'Cytat'},{v:'div.sl-tag',t:'Etykieta (ramka)'},{v:'div.tre-blok',t:'Blok (ramka)'}],
+      'Styl akapitu — przekształca bieżący akapit (jak Word)', function (v) {
+        if (!v) return;
+        stylAkapi(v);
+      });
     B('<b>B</b>', 'Pogrubienie (Ctrl+B)', 'bold');
     B('<i>I</i>', 'Kursywa (Ctrl+I)', 'italic');
     B('<u>U</u>', 'Podkreślenie', 'underline');
@@ -294,11 +386,21 @@
       document.execCommand('insertHTML', false, '<p class="sl-tag">' + escA(txt) + '</p>');
     });
     bar.querySelector('button[title^="Blok z ramką"]').addEventListener('click', function () {
-      var txt = prompt('Tekst bloku:', 'Treść bloku');
-      if (!txt) return;
-      pole.focus();
-      document.execCommand('insertHTML', false,
-        '<div class="tre-blok"><p>' + escA(txt) + '</p></div><p><br></p>');
+      modal('Blok z ramką (wyróżniony box)',
+        '<div class="pole"><label>Tekst bloku</label><textarea id="eb-blok-t" style="min-height:70px">Treść bloku</textarea></div>' +
+        '<div class="pole"><label style="cursor:pointer"><input type="checkbox" id="eb-blok-bez" style="width:auto;margin-right:8px"> Bez tła (sama ramka)</label></div>' +
+        '<div class="pole"><label>Kolor tła bloku</label><input type="color" id="eb-blok-tlo" value="#1F3A32"></div>',
+        function (okno) {
+          var txt = okno.querySelector('#eb-blok-t').value.trim();
+          if (!txt) { alert('Podaj tekst bloku.'); return false; }
+          var bez = okno.querySelector('#eb-blok-bez').checked;
+          var styl = bez
+            ? ' style="background:transparent"'
+            : ' style="background:' + okno.querySelector('#eb-blok-tlo').value + '"';
+          pole.focus();
+          document.execCommand('insertHTML', false,
+            '<div class="tre-blok"' + styl + '><p>' + escA(txt) + '</p></div><p><br></p>');
+        });
     });
     bar.querySelector('button[title="Pozioma linia"]').addEventListener('click', function () {
       pole.focus();
