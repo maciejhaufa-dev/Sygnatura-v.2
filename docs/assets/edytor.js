@@ -9,12 +9,14 @@
    • Linki, obrazy (plik / schowek), film YouTube
    • Kolumny (2 lub 3) — bloki obok siebie
    • Tabele z obramowaniem i bez
-   • PRZYCISKI — własne okno: tekst, link, rozmiar (S/M/L),
-     kolor tła, kolor tekstu, czcionka
+   • PRZYCISKI jak obiekty/obrazki — wstawiasz, widzisz od razu,
+     klikasz, aby edytować (tekst, link, styl: złoty klasyczny
+     albo własny: rozmiar S/M/L, kolor tła, kolor tekstu, czcionka)
    • Separator, wyczyść formatowanie
 
    Użycie:
-     var ed = SYG.edytorTresci.stworz(document.getElementById('kontener'));
+     var ed = SYG.edytorTresci.stworz(kontener);           // standardowo
+     var ed = SYG.edytorTresci.stworz(kontener, poleEl);   // z własnym polem
      ed.ustaw('<h2>…</h2>');   // wczytaj HTML
      ed.pobierz();             // aktualny HTML (do zapisu)
    ============================================================ */
@@ -23,8 +25,11 @@
   var SERIF = "'Cormorant Garamond','Playfair Display',Georgia,serif";
   var MONO = "'Courier New',Courier,monospace";
 
-  /* ---------- mały modal (przycisk / pomoc) ---------- */
-  function modal(tytul, trescHtml, okCb) {
+  function escA(t){ return String(t == null ? '' : t).replace(/[&"<>]/g, function(c){
+    return { '&':'&amp;', '"':'&quot;', '<':'&lt;', '>':'&gt;' }[c]; }); }
+
+  /* ---------- mały modal ---------- */
+  function modal(tytul, trescHtml, okCb, okEtykieta) {
     var tlo = document.createElement('div');
     tlo.className = 'edtr-modal-tlo';
     var okno = document.createElement('div');
@@ -36,7 +41,7 @@
     var anuluj = document.createElement('button');
     anuluj.type = 'button'; anuluj.className = 'btn outline'; anuluj.textContent = 'Anuluj';
     var ok = document.createElement('button');
-    ok.type = 'button'; ok.className = 'btn'; ok.textContent = 'Wstaw';
+    ok.type = 'button'; ok.className = 'btn'; ok.textContent = okEtykieta || 'Wstaw';
     guzy.appendChild(anuluj); guzy.appendChild(ok);
     okno.appendChild(guzy);
     tlo.appendChild(okno);
@@ -51,21 +56,86 @@
     return okno;
   }
 
+  /* ---------- HTML przycisku (obiektu) ---------- */
+  function budujPrzycisk(d) {
+    var font = d.czcionka === 'sans' ? SANS : (d.czcionka === 'mono' ? MONO : SERIF);
+    var srodek = d.styl === 'zloty'
+      ? '<a class="sl-btn" href="' + escA(d.link) + '">' + escA(d.tekst) + '</a>'
+      : '<a class="tre-przycisk tre-' + escA(d.rozmiar) + '" href="' + escA(d.link) +
+        '" style="background:' + escA(d.tlo) + ';color:' + escA(d.kolor) + ';font-family:' + font + '">' +
+        escA(d.tekst) + '</a>';
+    return '<span class="tre-przycisk-obiekt" contenteditable="false"' +
+      ' data-tb-styl="' + escA(d.styl) + '" data-tb-tekst="' + escA(d.tekst) + '"' +
+      ' data-tb-link="' + escA(d.link) + '" data-tb-rozmiar="' + escA(d.rozmiar) + '"' +
+      ' data-tb-tlo="' + escA(d.tlo) + '" data-tb-kolor="' + escA(d.kolor) + '"' +
+      ' data-tb-czcionka="' + escA(d.czcionka) + '">' + srodek + '</span>';
+  }
+  function czytajPrzycisk(ob) {
+    return {
+      styl: ob.getAttribute('data-tb-styl') || 'wlasny',
+      tekst: ob.getAttribute('data-tb-tekst') || '',
+      link: ob.getAttribute('data-tb-link') || '#',
+      rozmiar: ob.getAttribute('data-tb-rozmiar') || 'm',
+      tlo: ob.getAttribute('data-tb-tlo') || '#1F3A32',
+      kolor: ob.getAttribute('data-tb-kolor') || '#C4A582',
+      czcionka: ob.getAttribute('data-tb-czcionka') || 'serif'
+    };
+  }
+  function oknoPrzycisku(init, cb) {
+    var modalOkno = modal('Przycisk',
+      '<div class="pole"><label>Tekst przycisku</label><input type="text" id="eb-tekst" value="' + escA(init.tekst) + '"></div>' +
+      '<div class="pole"><label>Link (strona docelowa)</label><input type="text" id="eb-link" value="' + escA(init.link) + '" placeholder="np. sklep.html lub https://…"></div>' +
+      '<div class="pole"><label>Styl przycisku</label><select id="eb-styl">' +
+      '<option value="zloty"' + (init.styl === 'zloty' ? ' selected' : '') + '>Złoty klasyczny (jak przycisk slajdu)</option>' +
+      '<option value="wlasny"' + (init.styl !== 'zloty' ? ' selected' : '') + '>Własny (kolory, rozmiar, czcionka)</option></select></div>' +
+      '<div id="eb-wlasny" style="display:' + (init.styl === 'zloty' ? 'none' : 'block') + '">' +
+      '<div class="pole"><label>Rozmiar</label><select id="eb-rozmiar">' +
+      '<option value="s"' + (init.rozmiar === 's' ? ' selected' : '') + '>Mały (S)</option>' +
+      '<option value="m"' + (init.rozmiar === 'm' ? ' selected' : '') + '>Średni (M)</option>' +
+      '<option value="l"' + (init.rozmiar === 'l' ? ' selected' : '') + '>Duży (L)</option></select></div>' +
+      '<div class="pole" style="display:flex;gap:10px">' +
+      '<div style="flex:1"><label>Kolor tła</label><input type="color" id="eb-tlo" value="' + escA(init.tlo) + '"></div>' +
+      '<div style="flex:1"><label>Kolor tekstu</label><input type="color" id="eb-kolor" value="' + escA(init.kolor) + '"></div></div>' +
+      '<div class="pole"><label>Czcionka</label><select id="eb-czcionka">' +
+      '<option value="serif"' + (init.czcionka === 'serif' ? ' selected' : '') + '>Serif (styl studia)</option>' +
+      '<option value="sans"' + (init.czcionka === 'sans' ? ' selected' : '') + '>Bezszeryfowa (nowoczesna)</option>' +
+      '<option value="mono"' + (init.czcionka === 'mono' ? ' selected' : '') + '>Maszyna (monospace)</option></select></div>' +
+      '</div>' +
+      '<p class="mala">Wstawiony przycisk jest OBIEKTEM jak obrazek — kliknij go w treści, aby edytować; Backspace usuwa go w całości.</p>',
+      function (okno) {
+        var tekst = okno.querySelector('#eb-tekst').value.trim();
+        var link = okno.querySelector('#eb-link').value.trim() || '#';
+        if (!tekst) { alert('Podaj tekst przycisku.'); return false; }
+        var styl = okno.querySelector('#eb-styl').value;
+        var d = { styl: styl, tekst: tekst, link: link,
+          rozmiar: okno.querySelector('#eb-rozmiar').value,
+          tlo: okno.querySelector('#eb-tlo').value,
+          kolor: okno.querySelector('#eb-kolor').value,
+          czcionka: okno.querySelector('#eb-czcionka').value };
+        if (cb(d) === false) return false;
+      }, init.styl === 'zloty' ? 'Wstaw' : 'Wstaw');
+    modalOkno.querySelector('#eb-styl').addEventListener('change', function(){
+      modalOkno.querySelector('#eb-wlasny').style.display = this.value === 'zloty' ? 'none' : 'block';
+    });
+    return modalOkno;
+  }
+
   /* ---------- fabryka edytora ---------- */
-  function stworz(kontener) {
+  function stworz(kontener, poleWlasne) {
     if (!kontener) return null;
     kontener.classList.add('edtr');
 
     var bar = document.createElement('div');
     bar.className = 'edtr-bar';
-    kontener.innerHTML = '';
-    kontener.appendChild(bar);
+    kontener.insertBefore(bar, kontener.firstChild);
 
-    var pole = document.createElement('div');
-    pole.className = 'edtr-pole';
+    var pole = poleWlasne || document.createElement('div');
+    if (!poleWlasne){
+      pole.className = 'edtr-pole';
+      kontener.appendChild(pole);
+    }
     pole.contentEditable = 'true';
     pole.setAttribute('aria-label', 'Edytor treści');
-    kontener.appendChild(pole);
 
     /* ---------- narzędzia ---------- */
     function B(etykieta, tytul, cmd, arg) {
@@ -104,7 +174,7 @@
     B('▦ Tabela', 'Tabela z obramowaniem (2×2)', 'tabela');
     B('▢ Tabela bez', 'Tabela bez obramowania (2×2)', 'tabelaBez');
     B('⎯ Przerwa', 'Pozioma linia', 'linia');
-    B('✱', 'Przycisk (tekst, link, kolory, rozmiar)', 'przycisk');
+    B('✱ Przycisk', 'Wstaw przycisk (obiekt jak obrazek)', 'przycisk');
     B('✕ Format', 'Wyczyść formatowanie zaznaczenia', 'removeFormat');
 
     /* ---------- link ---------- */
@@ -114,7 +184,7 @@
       if (url && url !== 'https://') document.execCommand('createLink', false, url);
     });
 
-    /* ---------- obraz: plik lub schowek ---------- */
+    /* ---------- obraz ---------- */
     var imgInput = document.createElement('input');
     imgInput.type = 'file';
     imgInput.accept = 'image/*';
@@ -194,34 +264,33 @@
       document.execCommand('insertHTML', false, '<hr class="tre-linia"><p><br></p>');
     });
 
-    /* ---------- PRZYCISK: okno konfiguracji ---------- */
-    bar.querySelector('button[title^="Przycisk"]').addEventListener('click', function () {
-      var modalOkno = modal('Wstaw przycisk',
-        '<div class="pole"><label>Tekst przycisku</label><input type="text" id="eb-tekst" value="Zobacz więcej"></div>' +
-        '<div class="pole"><label>Link (strona docelowa)</label><input type="text" id="eb-link" value="sklep.html" placeholder="np. sklep.html lub https://…"></div>' +
-        '<div class="pole"><label>Rozmiar</label><select id="eb-rozmiar">' +
-        '<option value="s">Mały (S)</option><option value="m" selected>Średni (M)</option><option value="l">Duży (L)</option></select></div>' +
-        '<div class="pole" style="display:flex;gap:10px">' +
-        '<div style="flex:1"><label>Kolor tła</label><input type="color" id="eb-tlo" value="#1F3A32"></div>' +
-        '<div style="flex:1"><label>Kolor tekstu</label><input type="color" id="eb-kolor" value="#C4A582"></div></div>' +
-        '<div class="pole"><label>Czcionka</label><select id="eb-czcionka">' +
-        '<option value="serif" selected>Serif (styl studia)</option>' +
-        '<option value="sans">Bezszeryfowa (nowoczesna)</option>' +
-        '<option value="mono">Maszyna (monospace)</option></select></div>',
-        function (okno) {
-          var tekst = okno.querySelector('#eb-tekst').value.trim();
-          var link = okno.querySelector('#eb-link').value.trim() || '#';
-          if (!tekst) { alert('Podaj tekst przycisku.'); return false; }
-          var rozmiar = okno.querySelector('#eb-rozmiar').value;
-          var tlo = okno.querySelector('#eb-tlo').value;
-          var kolor = okno.querySelector('#eb-kolor').value;
-          var czcionka = okno.querySelector('#eb-czcionka').value;
-          var font = czcionka === 'sans' ? SANS : (czcionka === 'mono' ? MONO : SERIF);
-          pole.focus();
-          document.execCommand('insertHTML', false,
-            '<a class="tre-przycisk tre-' + rozmiar + '" href="' + link + '" style="background:' + tlo + ';color:' + kolor +
-            ';font-family:' + font + '">' + tekst + '</a>&nbsp;');
-        });
+    /* ---------- PRZYCISK (obiekt jak obrazek) ---------- */
+    bar.querySelector('button[title^="Wstaw przycisk"]').addEventListener('click', function () {
+      oknoPrzycisku({ styl:'wlasny', tekst:'Zobacz więcej', link:'sklep.html', rozmiar:'m',
+        tlo:'#1F3A32', kolor:'#C4A582', czcionka:'serif' }, function (d) {
+        pole.focus();
+        document.execCommand('insertHTML', false, budujPrzycisk(d) + '&nbsp;');
+      });
+    });
+
+    /* ---------- klik w pole: obiekty i linki ---------- */
+    pole.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.closest){
+        var ob = t.closest('.tre-przycisk-obiekt');
+        if (ob){
+          e.preventDefault();
+          var init = czytajPrzycisk(ob);
+          oknoPrzycisku(init, function (d) {
+            var tmp = document.createElement('div');
+            tmp.innerHTML = budujPrzycisk(d);
+            ob.parentNode.replaceChild(tmp.firstChild, ob);
+          });
+          return;
+        }
+        var a = t.closest('a');
+        if (a) e.preventDefault(); /* linki w edytorze nie nawigują */
+      }
     });
 
     /* ---------- API ---------- */

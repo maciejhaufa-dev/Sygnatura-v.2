@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=299">
+<link rel="stylesheet" href="assets/style.css?v=300">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -90,6 +90,11 @@
       EDYTUJ, aby otworzyć EDYTOR TREŚCI danego kafla. W trybie demo dane zapisują się w tej
       przeglądarce; po wdrożeniu trafią do arkusza Google.</p>
       <div class="flash" id="sg-info" style="display:none"></div>
+      <div class="flash" id="sg-brudny" style="display:none;background:#8a5a1d">
+        Masz <b>niezapisane zmiany</b> — strona główna zostanie zapisana dopiero po kliknięciu
+        <a href="#sg-zapisz" style="color:#fff;border-bottom:1px solid #fff">ZAPISZ ZMIANY STRONY GŁÓWNEJ</a>
+        na dole zakładki.
+      </div>
 
       <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Slider</h3>
       <div class="pole" style="max-width:300px">
@@ -116,12 +121,20 @@
             Pokaż karty produktów ze sklepu pod treścią</label>
           </div>
           <div class="pole">
-            <label>Treść kafla — EDYTOR TREŚCI (tytuły, podtytuły, tekst, kolumny, tabele, przyciski, linki)</label>
-            <div id="sg-tresc-edytor"></div>
+            <label>Treść kafla — EDYTOR TREŚCI (edytujesz kafla na żywo, na jego tle: tytuły,
+            podtytuły, tekst, kolumny, tabele, przyciski-obiekty, linki)</label>
+            <div id="sg-tresc-edytor">
+              <div class="edtr-podglad">
+                <div class="edtr-bg" id="sg-tresc-bg"></div>
+                <div class="edtr-tresc" id="sg-tresc-pole" contenteditable="true"></div>
+              </div>
+            </div>
           </div>
-          <div class="przyciski" style="justify-content:space-between;margin-top:14px">
+          <p class="mala" style="margin-top:10px">Zmiany w kaflu trafiają do podglądu poniżej.
+          Strona główna zostaje ZAPISANA dopiero po kliknięciu „ZAPISZ ZMIANY STRONY GŁÓWNEJ" na dole zakładki.</p>
+          <div class="przyciski" style="justify-content:space-between;margin-top:10px">
             <button class="btn-odrzuc" type="button" id="sg-odrzuc">ODRZUĆ ZMIANY</button>
-            <button class="btn-zapisz" type="button" id="sg-zapisz-kafel">ZAPISZ ZMIANY</button>
+            <button class="btn-zapisz" type="button" id="sg-zapisz-kafel">ZASTOSUJ DO PODGLĄDU</button>
           </div>
         </div>
       </div>
@@ -142,7 +155,7 @@
       <div class="forma" style="max-width:520px">
         <div class="pole"><label>Przycisk 1 (złoty)</label><input type="text" id="sg-cta1"></div>
         <div class="pole"><label>Przycisk 2 (obrysowany)</label><input type="text" id="sg-cta2"></div>
-        <div class="przyciski"><button class="btn" type="button" id="sg-zapisz">Zapisz stronę główną</button></div>
+        <div class="przyciski"><button class="btn-zapisz" type="button" id="sg-zapisz">ZAPISZ ZMIANY STRONY GŁÓWNEJ</button></div>
       </div>
     </section>
 
@@ -407,13 +420,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=299"></script>
-<script src="assets/koszyk.js?v=299"></script>
-<script src="assets/api.js?v=299"></script>
-<script src="assets/editor.js?v=299"></script>
-<script src="assets/edytor.js?v=299"></script>
-<script src="data/katalog.js?v=299"></script>
-<script src="assets/main.js?v=299"></script>
+<script src="assets/config.js?v=300"></script>
+<script src="assets/koszyk.js?v=300"></script>
+<script src="assets/api.js?v=300"></script>
+<script src="assets/editor.js?v=300"></script>
+<script src="assets/edytor.js?v=300"></script>
+<script src="data/katalog.js?v=300"></script>
+<script src="assets/main.js?v=300"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -460,9 +473,21 @@
   }
 
   /* ============ STRONA GŁÓWNA: slider (kafle) + treści ============ */
-  var SG_DANE = null;   /* robocza kopia danych strony głównej */
-  var SG_EDYCJA = null; /* { id, kopia } — edytowany kafel */
+  var SG_DANE = null;   /* robocza kopia danych strony głównej (zapis TYLKO przyciskiem) */
+  var SG_EDYCJA = null; /* { id, kopia, nowy } — edytowany kafel */
   var SG_EDYTOR = null; /* instancja EDYTORA TREŚCI */
+  var SG_BRUDNY = false;/* czy są niezapisane zmiany */
+
+  function ustawBrudny(){
+    SG_BRUDNY = true;
+    var b = document.getElementById('sg-brudny');
+    if (b) b.style.display = 'block';
+  }
+  function wyczyscBrudny(){
+    SG_BRUDNY = false;
+    var b = document.getElementById('sg-brudny');
+    if (b) b.style.display = 'none';
+  }
 
   var SG_DOMYS = {
     slider: {
@@ -519,7 +544,9 @@
   function sgKafle(){ return (SG_DANE && SG_DANE.slider && SG_DANE.slider.kafle) || []; }
 
   function kafelObrazCss(obraz){
-    return obraz === 'gradient' ? 'linear-gradient(135deg,#1F3A32,#6B4530)' : 'url("' + obraz + '")';
+    /* pojedyncze apostrofy: podwójne łamały atrybut style="background-image:url(...)" */
+    return obraz === 'gradient' ? 'linear-gradient(135deg,#1F3A32,#6B4530)'
+      : "url('" + String(obraz || '').replace(/'/g, '%27') + "')";
   }
 
   function sgInfo(txt, zle){
@@ -544,7 +571,7 @@
       cta2: document.getElementById('sg-cta2').value.trim()
     };
     var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
-    if (odp.ok){ SG_DANE = dane; sgInfo('Zapisano — strona główna zaktualizowana.', false); }
+    if (odp.ok){ SG_DANE = dane; wyczyscBrudny(); sgInfo('Strona główna zapisana.', false); }
     else sgInfo(odp.blad || 'Nie udało się zapisać.', true);
     return odp.ok;
   }
@@ -578,17 +605,17 @@
         if (!confirm('Usunąć kafel „' + ((kafel && kafel.tresc) || '').replace(/<[^>]+>/g, '').slice(0, 40) + '"?') ) return;
         SG_DANE.slider.kafle = kafle.filter(function(k){ return String(k.id) !== id; });
         if (SG_EDYCJA && SG_EDYCJA.id === id) pokazEdycje(false);
-        sgZapiszWszystko(); rysujKafle();
+        ustawBrudny(); rysujKafle();
       });
       el.querySelector('.km-lewo').addEventListener('click', function(){
         if (i === 0) return;
         var t = kafle[i - 1]; kafle[i - 1] = kafle[i]; kafle[i] = t;
-        sgZapiszWszystko(); rysujKafle();
+        ustawBrudny(); rysujKafle();
       });
       el.querySelector('.km-prawo').addEventListener('click', function(){
         if (i === kafle.length - 1) return;
         var t = kafle[i + 1]; kafle[i + 1] = kafle[i]; kafle[i] = t;
-        sgZapiszWszystko(); rysujKafle();
+        ustawBrudny(); rysujKafle();
       });
       /* Drag & Drop — jak ustawianie monitorów */
       el.addEventListener('dragstart', function(e){
@@ -614,7 +641,7 @@
         if (zi < 0 || ci < 0) return;
         var przen = lista.splice(zi, 1)[0];
         lista.splice(ci, 0, przen);
-        sgZapiszWszystko(); rysujKafle();
+        ustawBrudny(); rysujKafle();
       });
     });
     var dodaj = document.getElementById('sg-dodaj-kafel');
@@ -622,6 +649,7 @@
       var nowyKafel = { id: 'k' + Date.now(), obraz: 'assets/hero.jpg', karty: false,
         tresc: '<p class="sl-tag">Nowy kafel</p><h2>Tytuł kafla</h2><p>Opis — edytuj mnie w EDYTORZE TREŚCI.</p>' };
       SG_DANE.slider.kafle.push(nowyKafel);
+      ustawBrudny();
       rysujKafle();
       otworzEdycje(nowyKafel, sgKafle().length - 1, true);
     });
@@ -646,8 +674,10 @@
     }).join('');
     odswiezPodgladObrazu();
     document.getElementById('sg-karty').checked = !!kafel.karty;
-    if (!SG_EDYTOR) SG_EDYTOR = SYG.edytorTresci.stworz(document.getElementById('sg-tresc-edytor'));
+    if (!SG_EDYTOR) SG_EDYTOR = SYG.edytorTresci.stworz(
+      document.getElementById('sg-tresc-edytor'), document.getElementById('sg-tresc-pole'));
     SG_EDYTOR.ustaw(kafel.tresc || '');
+    odswiezTloEdytora();
     pokazEdycje(true);
   }
 
@@ -656,6 +686,11 @@
     var el = document.getElementById('sg-obraz-podglad');
     el.style.backgroundImage = kafelObrazCss(v);
     el.textContent = v === 'gradient' ? 'gradient' : '';
+  }
+  function odswiezTloEdytora(){
+    var v = document.getElementById('sg-obraz').value;
+    var bg = document.getElementById('sg-tresc-bg');
+    if (bg) bg.style.backgroundImage = kafelObrazCss(v);
   }
 
   /* ODRZUĆ ZMIANY — wraca poprzednia wersja kafla (nowy kafel znika) */
@@ -670,13 +705,14 @@
       kafle[i] = SG_EDYCJA.kopia;
     }
     SG_EDYCJA = null;
+    ustawBrudny();
     pokazEdycje(false);
     rysujKafle();
     sgInfo('Zmiany odrzucone.', false);
   });
 
-  /* ZAPISZ ZMIANY — kafel idzie do danych i zapisuje się całość */
-  document.getElementById('sg-zapisz-kafel').addEventListener('click', async function(){
+  /* ZASTOSUJ DO PODGLĄDU — kafel trafia do roboczej wersji (bez zapisu strony) */
+  document.getElementById('sg-zapisz-kafel').addEventListener('click', function(){
     if (!SG_EDYCJA) return;
     var kafle = sgKafle();
     var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
@@ -684,12 +720,10 @@
     kafle[i].obraz = document.getElementById('sg-obraz').value;
     kafle[i].karty = document.getElementById('sg-karty').checked;
     kafle[i].tresc = SG_EDYTOR ? SG_EDYTOR.pobierz() : kafle[i].tresc;
-    var ok = await sgZapiszWszystko();
-    if (ok){
-      SG_EDYCJA = null;
-      pokazEdycje(false);
-      rysujKafle();
-    }
+    SG_EDYCJA = null;
+    ustawBrudny();
+    pokazEdycje(false);
+    rysujKafle();
   });
 
   /* wgranie własnego zdjęcia w tle */
@@ -712,7 +746,19 @@
     fr.readAsDataURL(f);
     this.value = '';
   });
-  document.getElementById('sg-obraz').addEventListener('change', odswiezPodgladObrazu);
+  document.getElementById('sg-obraz').addEventListener('change', function(){
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    if (SG_EDYCJA){
+      var kafle = sgKafle();
+      var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (i >= 0){
+        kafle[i].obraz = document.getElementById('sg-obraz').value;
+        ustawBrudny();
+        rysujKafle();
+      }
+    }
+  });
 
   function ladujStronaGlowna(){
     SG_DANE = sgMigrujStare(SYG.demoDb.stronaGlowna()) || SG_DOMYS;
@@ -733,7 +779,14 @@
     SG_EDYCJA = null;
     pokazEdycje(false);
     rysujKafle();
+    wyczyscBrudny();
   }
+
+  ['sg-autoplay','sg-jak-tytul','sg-jak-pod','sg-k1-t','sg-k1-o','sg-k2-t','sg-k2-o',
+   'sg-k3-t','sg-k3-o','sg-cta1','sg-cta2'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', ustawBrudny);
+  });
 
   document.getElementById('sg-zapisz').addEventListener('click', sgZapiszWszystko);
 

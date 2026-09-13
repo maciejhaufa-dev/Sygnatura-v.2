@@ -410,15 +410,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.19</span>
+    <span>© Sygnatura 2026 · wersja 28.20</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=299"></script>
-<script src="assets/koszyk.js?v=299"></script>
-<script src="assets/config.js?v=299"></script>
-<script src="assets/api.js?v=299"></script>
-<script src="assets/main.js?v=299"></script>
+<script src="data/katalog.js?v=300"></script>
+<script src="assets/koszyk.js?v=300"></script>
+<script src="assets/config.js?v=300"></script>
+<script src="assets/api.js?v=300"></script>
+<script src="assets/main.js?v=300"></script>
 <script>
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość
@@ -489,7 +489,7 @@ html.dotyk .social{margin-top:14px}
     track.innerHTML = kafle.map(function(k){
       var tlo = k.obraz === 'gradient'
         ? 'background-image:linear-gradient(135deg,#1F3A32,#6B4530)'
-        : 'background-image:url(' + JSON.stringify(k.obraz || '') + ')';
+        : "background-image:url('" + String(k.obraz || '').replace(/'/g, '%27') + "')";
       return '<div class="sl-slide" data-sl="' + esc(k.id || '') + '">' +
         '<div class="sl-bg" style="' + tlo + '"></div>' +
         '<div class="sl-cien"></div>' +
