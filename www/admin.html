@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=300">
+<link rel="stylesheet" href="assets/style.css?v=301">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -139,23 +139,17 @@
         </div>
       </div>
 
-      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Sekcja „Jak działamy" (pod sliderem)</h3>
-      <div class="forma" style="max-width:640px">
-        <div class="pole"><label>Tytuł sekcji</label><input type="text" id="sg-jak-tytul"></div>
-        <div class="pole"><label>Podtytuł</label><input type="text" id="sg-jak-pod"></div>
-        <div class="pole"><label>Krok 1 — tytuł</label><input type="text" id="sg-k1-t"></div>
-        <div class="pole"><label>Krok 1 — opis</label><textarea id="sg-k1-o" style="min-height:70px"></textarea></div>
-        <div class="pole"><label>Krok 2 — tytuł</label><input type="text" id="sg-k2-t"></div>
-        <div class="pole"><label>Krok 2 — opis</label><textarea id="sg-k2-o" style="min-height:70px"></textarea></div>
-        <div class="pole"><label>Krok 3 — tytuł</label><input type="text" id="sg-k3-t"></div>
-        <div class="pole"><label>Krok 3 — opis</label><textarea id="sg-k3-o" style="min-height:70px"></textarea></div>
+      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Treść pod sliderem („Jak działamy" i przyciski)</h3>
+      <p class="mala">Edytujesz całą sekcję pod sliderem w EDYTORZE TREŚCI na jasnym podglądzie
+      (biały box jak na stronie): nagłówki, tekst, kolumny, tabele, przyciski. Obiekty
+      (przyciski, obrazki) przeciągniesz myszą w dowolne miejsce — jak w edytorze graficznym.</p>
+      <div id="sg-cta-edytor">
+        <div class="edtr-podglad edtr-podglad-jasny">
+          <div class="edtr-tresc edtr-tresc-jasna" id="sg-cta-pole" contenteditable="true"></div>
+        </div>
       </div>
-
-      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Przyciski pod krokami</h3>
-      <div class="forma" style="max-width:520px">
-        <div class="pole"><label>Przycisk 1 (złoty)</label><input type="text" id="sg-cta1"></div>
-        <div class="pole"><label>Przycisk 2 (obrysowany)</label><input type="text" id="sg-cta2"></div>
-        <div class="przyciski"><button class="btn-zapisz" type="button" id="sg-zapisz">ZAPISZ ZMIANY STRONY GŁÓWNEJ</button></div>
+      <div class="przyciski" style="margin-top:14px">
+        <button class="btn-zapisz" type="button" id="sg-zapisz">ZAPISZ ZMIANY STRONY GŁÓWNEJ</button>
       </div>
     </section>
 
@@ -420,13 +414,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=300"></script>
-<script src="assets/koszyk.js?v=300"></script>
-<script src="assets/api.js?v=300"></script>
-<script src="assets/editor.js?v=300"></script>
-<script src="assets/edytor.js?v=300"></script>
-<script src="data/katalog.js?v=300"></script>
-<script src="assets/main.js?v=300"></script>
+<script src="assets/config.js?v=301"></script>
+<script src="assets/koszyk.js?v=301"></script>
+<script src="assets/api.js?v=301"></script>
+<script src="assets/editor.js?v=301"></script>
+<script src="assets/edytor.js?v=301"></script>
+<script src="data/katalog.js?v=301"></script>
+<script src="assets/main.js?v=301"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -475,7 +469,8 @@
   /* ============ STRONA GŁÓWNA: slider (kafle) + treści ============ */
   var SG_DANE = null;   /* robocza kopia danych strony głównej (zapis TYLKO przyciskiem) */
   var SG_EDYCJA = null; /* { id, kopia, nowy } — edytowany kafel */
-  var SG_EDYTOR = null; /* instancja EDYTORA TREŚCI */
+  var SG_EDYTOR = null;     /* instancja EDYTORA TREŚCI (kafel) */
+  var SG_EDYTOR_CTA = null; /* instancja EDYTORA TREŚCI (treść pod sliderem) */
   var SG_BRUDNY = false;/* czy są niezapisane zmiany */
 
   function ustawBrudny(){
@@ -503,13 +498,13 @@
           tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="sklep.html">Sprawdź ofertę →</a>' }
       ]
     },
-    jak: { tytul:'Jak działamy', pod:'Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.',
-      kroki: [
-        { t:'Wybierz i zamów online', o:'Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.' },
-        { t:'Dostajesz sygnaturę sprawy', o:'W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.' },
-        { t:'Płacisz — my działamy', o:'Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.' }
-      ] },
-    cta1: 'Zarezerwuj termin', cta2: 'Złóż zamówienie'
+    ctaTresc: '<h2>Jak działamy</h2><p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>' +
+      '<div class="kroki">' +
+      '<div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>' +
+      '<div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>' +
+      '<div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>' +
+      '</div>' +
+      '<div class="cta-btn"><a class="btn" href="zamowienia.html">Zarezerwuj termin</a><a class="btn outline" href="zamowienia.html">Złóż zamówienie</a></div>'
   };
 
   var SG_OBRAZY = [
@@ -524,12 +519,14 @@
   function sgEsc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
-  /* migracja starego formatu (slajdy tag/tytul/opis/btn) na kafle */
+  /* migracja starego formatu (slajdy tag/tytul/opis/btn i jak/cta) na kafle + ctaTresc */
   function sgMigrujStare(dane){
+    var kopia = null;
     if (dane && dane.slajdy && !dane.slider){
       var obrazWg = { nowosci:'assets/media/sklep/szopka.jpg', bestellery:'assets/media/sklep/szyld.jpg',
                       aktualnosci:'gradient', sezonowa:'assets/hero.jpg' };
-      dane = JSON.parse(JSON.stringify(dane));
+      kopia = JSON.parse(JSON.stringify(dane));
+      dane = kopia;
       dane.slider = { autoplay: 4.5, kafle: dane.slajdy.map(function(sl){
         return { id: sl.id || 'k', obraz: obrazWg[sl.id] || 'assets/hero.jpg',
                  karty: sl.id === 'nowosci' || sl.id === 'bestsellery',
@@ -537,6 +534,17 @@
                         '<a class="sl-btn" href="' + sgEsc(sl.link || 'sklep.html') + '">' + sgEsc(sl.btn || 'Zobacz →') + '</a>' };
       }) };
       delete dane.slajdy;
+    }
+    if (dane && dane.jak && !dane.ctaTresc){
+      if (!kopia){ kopia = JSON.parse(JSON.stringify(dane)); dane = kopia; }
+      var jak = dane.jak || {};
+      var h = '<h2>' + sgEsc(jak.tytul) + '</h2><p class="pod">' + sgEsc(jak.pod) + '</p><div class="kroki">';
+      (jak.kroki || []).forEach(function(kr, i){
+        h += '<div class="krok"><span class="num">0' + (i + 1) + '</span><b>' + sgEsc(kr.t) + '</b><p>' + sgEsc(kr.o) + '</p></div>';
+      });
+      h += '</div><div class="cta-btn"><a class="btn" href="zamowienia.html">' + sgEsc(dane.cta1) +
+           '</a><a class="btn outline" href="zamowienia.html">' + sgEsc(dane.cta2) + '</a></div>';
+      dane.ctaTresc = h;
     }
     return dane;
   }
@@ -560,15 +568,7 @@
   async function sgZapiszWszystko(){
     var dane = {
       slider: { autoplay: Number(document.getElementById('sg-autoplay').value) || 0, kafle: sgKafle() },
-      jak: { tytul: document.getElementById('sg-jak-tytul').value.trim(),
-             pod: document.getElementById('sg-jak-pod').value.trim(),
-             kroki: [
-               { t: document.getElementById('sg-k1-t').value.trim(), o: document.getElementById('sg-k1-o').value.trim() },
-               { t: document.getElementById('sg-k2-t').value.trim(), o: document.getElementById('sg-k2-o').value.trim() },
-               { t: document.getElementById('sg-k3-t').value.trim(), o: document.getElementById('sg-k3-o').value.trim() }
-             ] },
-      cta1: document.getElementById('sg-cta1').value.trim(),
-      cta2: document.getElementById('sg-cta2').value.trim()
+      ctaTresc: SG_EDYTOR_CTA ? SG_EDYTOR_CTA.pobierz() : (SG_DANE ? SG_DANE.ctaTresc : '')
     };
     var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
     if (odp.ok){ SG_DANE = dane; wyczyscBrudny(); sgInfo('Strona główna zapisana.', false); }
@@ -766,27 +766,21 @@
     if (!SG_DANE.jak) SG_DANE.jak = SG_DOMYS.jak;
     document.getElementById('sg-autoplay').value =
       (SG_DANE.slider.autoplay != null) ? SG_DANE.slider.autoplay : SG_DOMYS.slider.autoplay;
-    var jak = SG_DANE.jak;
-    document.getElementById('sg-jak-tytul').value = jak.tytul || '';
-    document.getElementById('sg-jak-pod').value = jak.pod || '';
-    for (var i = 0; i < 3; i++){
-      var kr = (jak.kroki && jak.kroki[i]) || { t:'', o:'' };
-      document.getElementById('sg-k' + (i + 1) + '-t').value = kr.t || '';
-      document.getElementById('sg-k' + (i + 1) + '-o').value = kr.o || '';
-    }
-    document.getElementById('sg-cta1').value = SG_DANE.cta1 || '';
-    document.getElementById('sg-cta2').value = SG_DANE.cta2 || '';
+    if (!SG_EDYTOR_CTA) SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
+      document.getElementById('sg-cta-edytor'), document.getElementById('sg-cta-pole'));
+    SG_EDYTOR_CTA.ustaw(SG_DANE.ctaTresc || SG_DOMYS.ctaTresc);
     SG_EDYCJA = null;
     pokazEdycje(false);
     rysujKafle();
     wyczyscBrudny();
   }
 
-  ['sg-autoplay','sg-jak-tytul','sg-jak-pod','sg-k1-t','sg-k1-o','sg-k2-t','sg-k2-o',
-   'sg-k3-t','sg-k3-o','sg-cta1','sg-cta2'].forEach(function(id){
+  ['sg-autoplay'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', ustawBrudny);
   });
+  var ctaPole = document.getElementById('sg-cta-pole');
+  if (ctaPole) ctaPole.addEventListener('input', ustawBrudny);
 
   document.getElementById('sg-zapisz').addEventListener('click', sgZapiszWszystko);
 

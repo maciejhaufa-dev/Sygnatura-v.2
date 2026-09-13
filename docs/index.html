@@ -265,6 +265,26 @@ html.dotyk .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;g
 html.dotyk .menu-vert a{padding:10px 13px;font-size:15px}
 html.dotyk .menu-vert a::after{display:none}
 html.dotyk .social{margin-top:14px}
+
+/* ============ EDYTOR TREŚCI — elementy renderowane na stronie ============ */
+.tre-przycisk{display:inline-block;text-decoration:none;border:1px solid rgba(107,69,48,.65);
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.15;margin:4px 8px 4px 0;
+  transition:filter .2s,transform .2s}
+.tre-przycisk:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.tre-przycisk.tre-s{font-size:12px;padding:8px 16px}
+.tre-przycisk.tre-m{font-size:13.5px;padding:11px 22px}
+.tre-przycisk.tre-l{font-size:16px;padding:14px 30px}
+.tre-kolumny{display:grid;gap:16px;margin:10px 0}
+.tre-k-2{grid-template-columns:1fr 1fr}
+.tre-k-3{grid-template-columns:1fr 1fr 1fr}
+.tre-kol{min-width:0}
+.tre-tabela{width:100%;border-collapse:collapse;margin:10px 0;font-size:16px}
+.tre-tabela td{border:1px solid rgba(107,69,48,.6);padding:8px 12px;vertical-align:top;background:rgba(251,247,240,.5)}
+.tre-tabela.tre-bez td{border:none;background:transparent}
+.tre-linia{border:none;border-top:2px solid var(--zloty);margin:14px 0}
+.tre-blok{border:1.5px solid rgba(196,165,130,.85);background:rgba(14,14,12,.35);padding:12px 16px;margin:8px 0}
+.edtr-video{margin:10px 0}
+.edtr-video iframe{max-width:100%}
 </style>
 </head>
 <body data-strona="Strona główna">
@@ -389,7 +409,7 @@ html.dotyk .social{margin-top:14px}
   </main>
 
   <section class="cta" id="cta-sekcja">
-    <div class="jak">
+    <div class="jak" id="cta-tresc-box">
       <h2>Jak działamy</h2>
       <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
       <div class="kroki">
@@ -410,15 +430,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.20</span>
+    <span>© Sygnatura 2026 · wersja 28.21</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=300"></script>
-<script src="assets/koszyk.js?v=300"></script>
-<script src="assets/config.js?v=300"></script>
-<script src="assets/api.js?v=300"></script>
-<script src="assets/main.js?v=300"></script>
+<script src="data/katalog.js?v=301"></script>
+<script src="assets/koszyk.js?v=301"></script>
+<script src="assets/config.js?v=301"></script>
+<script src="assets/api.js?v=301"></script>
+<script src="assets/main.js?v=301"></script>
 <script>
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość
@@ -439,24 +459,26 @@ html.dotyk .social{margin-top:14px}
           tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="sklep.html">Sprawdź ofertę →</a>' }
       ]
     },
-    jak: { tytul:'Jak działamy', pod:'Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.',
-      kroki: [
-        { t:'Wybierz i zamów online', o:'Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.' },
-        { t:'Dostajesz sygnaturę sprawy', o:'W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.' },
-        { t:'Płacisz — my działamy', o:'Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.' }
-      ] },
-    cta1: 'Zarezerwuj termin', cta2: 'Złóż zamówienie'
+    ctaTresc: '<h2>Jak działamy</h2><p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>' +
+      '<div class="kroki">' +
+      '<div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>' +
+      '<div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>' +
+      '<div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>' +
+      '</div>' +
+      '<div class="cta-btn"><a class="btn" href="zamowienia.html">Zarezerwuj termin</a><a class="btn outline" href="zamowienia.html">Złóż zamówienie</a></div>'
   };
 
   function esc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
-  /* migracja starego formatu (slajdy tag/tytul/opis/btn) na kafle */
+  /* migracja starego formatu (slajdy tag/tytul/opis/btn i jak/cta) na kafle + ctaTresc */
   function migrujStare(dane){
+    var kopia = null;
     if (dane && dane.slajdy && !dane.slider){
       var obrazWg = { nowosci:'assets/media/sklep/szopka.jpg', bestellery:'assets/media/sklep/szyld.jpg',
                       aktualnosci:'gradient', sezonowa:'assets/hero.jpg' };
-      dane = JSON.parse(JSON.stringify(dane));
+      kopia = JSON.parse(JSON.stringify(dane));
+      dane = kopia;
       dane.slider = { autoplay: 4.5, kafle: dane.slajdy.map(function(sl){
         return { id: sl.id || 'k', obraz: obrazWg[sl.id] || 'assets/hero.jpg',
                  karty: (sl.id === 'nowosci') ? true : (sl.id === 'bestsellery' ? 'odwrotnie' : false),
@@ -464,6 +486,17 @@ html.dotyk .social{margin-top:14px}
                         '<a class="sl-btn" href="' + esc(sl.link || 'sklep.html') + '">' + esc(sl.btn || 'Zobacz →') + '</a>' };
       }) };
       delete dane.slajdy;
+    }
+    if (dane && dane.jak && !dane.ctaTresc){
+      if (!kopia){ kopia = JSON.parse(JSON.stringify(dane)); dane = kopia; }
+      var jak = dane.jak || {};
+      var h = '<h2>' + esc(jak.tytul) + '</h2><p class="pod">' + esc(jak.pod) + '</p><div class="kroki">';
+      (jak.kroki || []).forEach(function(kr, i){
+        h += '<div class="krok"><span class="num">0' + (i + 1) + '</span><b>' + esc(kr.t) + '</b><p>' + esc(kr.o) + '</p></div>';
+      });
+      h += '</div><div class="cta-btn"><a class="btn" href="zamowienia.html">' + esc(dane.cta1) +
+           '</a><a class="btn outline" href="zamowienia.html">' + esc(dane.cta2) + '</a></div>';
+      dane.ctaTresc = h;
     }
     return dane;
   }
@@ -566,28 +599,9 @@ html.dotyk .social{margin-top:14px}
     budujSlajdy(kafle);
     uruchomSlider(autoplayS);
 
-    /* CTA „Jak działamy" */
-    var jak = dane.jak || DOMYS.jak;
-    var jakEl = document.getElementById('cta-sekcja');
-    if (jakEl){
-      var h2j = jakEl.querySelector('h2');
-      var pod = jakEl.querySelector('.pod');
-      if (h2j) h2j.textContent = jak.tytul || '';
-      if (pod) pod.textContent = jak.pod || '';
-      var kroki = jakEl.querySelectorAll('.kroki .krok');
-      for (var i = 0; i < kroki.length; i++){
-        var kr = (jak.kroki && jak.kroki[i]);
-        if (!kr) continue;
-        var bb = kroki[i].querySelector('b');
-        var pp = kroki[i].querySelector('p');
-        if (bb) bb.textContent = kr.t || '';
-        if (pp) pp.textContent = kr.o || '';
-      }
-    }
-    var c1 = document.getElementById('cta-btn-1');
-    var c2 = document.getElementById('cta-btn-2');
-    if (c1) c1.textContent = dane.cta1 || DOMYS.cta1;
-    if (c2) c2.textContent = dane.cta2 || DOMYS.cta2;
+    /* treść pod sliderem („Jak działamy" + przyciski) — z EDYTORA TREŚCI */
+    var box = document.getElementById('cta-tresc-box');
+    if (box) box.innerHTML = dane.ctaTresc || DOMYS.ctaTresc;
   }
   wczytaj();
 })();
