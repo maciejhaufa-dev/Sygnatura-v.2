@@ -344,12 +344,14 @@
     Gr('|', 'Obiekty');
     B('✱ Przycisk', 'Wstaw przycisk (obiekt jak obrazek)', 'przycisk');
     B('◆ Kształt', 'Wstaw kształt (prostokąt, elipsa, linia — obiekt z tekstem i kolorami)', 'ksztalt');
-    B('⬅', 'Obiekt: do lewej krawędzi', 'obj-lewo');
-    B('↔', 'Obiekt: do środka (poziomo)', 'obj-srodek');
-    B('➡', 'Obiekt: do prawej krawędzi', 'obj-prawo');
-    B('⬆', 'Obiekt: do góry', 'obj-gora');
-    B('↕', 'Obiekt: do środka (pionowo)', 'obj-srodek-pion');
-    B('⬇', 'Obiekt: do dołu', 'obj-dol');
+    B('⬅', 'Wyrównaj: do lewej krawędzi (kilka obiektów — względem siebie)', 'obj-lewo');
+    B('↔', 'Wyrównaj: do środka (poziomo) (kilka — w jednej kolumnie)', 'obj-srodek');
+    B('➡', 'Wyrównaj: do prawej krawędzi (kilka obiektów — względem siebie)', 'obj-prawo');
+    B('⬆', 'Wyrównaj: do góry (kilka — w jednej linii)', 'obj-gora');
+    B('↕', 'Wyrównaj: do środka (pionowo) (kilka — w jednej linii)', 'obj-srodek-pion');
+    B('⬇', 'Wyrównaj: do dołu (kilka obiektów — względem siebie)', 'obj-dol');
+    B('⇶', 'Rozłóż w poziomie (jednakowe odstępy)', 'rozloz-poziom');
+    B('⇵', 'Rozłóż w pionie (jednakowe odstępy)', 'rozloz-pion');
     B('✕ Format', 'Wyczyść formatowanie zaznaczenia', 'removeFormat');
 
     /* ---------- link ---------- */
@@ -441,20 +443,23 @@
       document.execCommand('insertHTML', false, '<p class="sl-tag">' + escA(txt) + '</p>');
     });
     bar.querySelector('button[title^="Blok z ramką"]').addEventListener('click', function () {
-      modal('Blok z ramką (wyróżniony box)',
+      modal('Blok z ramką (prostokąt)',
         '<div class="pole"><label>Tekst bloku</label><textarea id="eb-blok-t" style="min-height:70px">Treść bloku</textarea></div>' +
+        '<div class="pole"><label>Szerokość</label><select id="eb-blok-szer">' +
+        '<option value="100%">Pełna szerokość</option><option value="75%">¾ szerokości</option>' +
+        '<option value="50%">Połowa (½)</option><option value="33%">Jedna trzecia (⅓)</option></select></div>' +
         '<div class="pole"><label style="cursor:pointer"><input type="checkbox" id="eb-blok-bez" style="width:auto;margin-right:8px"> Bez tła (sama ramka)</label></div>' +
-        '<div class="pole"><label>Kolor tła bloku</label><input type="color" id="eb-blok-tlo" value="#1F3A32"></div>',
+        '<div class="pole"><label>Kolor tła bloku</label><input type="color" id="eb-blok-tlo" value="#1F3A32"></div>' +
+        '<p class="mala">Blok jest OBIEKTEM (prostokątem): klik = zaznaczenie, 2×klik = edycja tekstu w środku, przeciąganie = przesunięcie, narożny uchwyt = zmiana rozmiaru (dowolna szerokość i wysokość), Ctrl+klik = grupa (wyrównanie względem siebie), Backspace = usunięcie.</p>',
         function (okno) {
           var txt = okno.querySelector('#eb-blok-t').value.trim();
           if (!txt) { alert('Podaj tekst bloku.'); return false; }
           var bez = okno.querySelector('#eb-blok-bez').checked;
-          var styl = bez
-            ? ' style="background:transparent"'
-            : ' style="background:' + okno.querySelector('#eb-blok-tlo').value + '"';
+          var szer = okno.querySelector('#eb-blok-szer').value;
+          var styl = (bez ? ' style="background:transparent;width:' : ' style="background:' + okno.querySelector('#eb-blok-tlo').value + ';width:') + szer + '"';
           pole.focus();
           document.execCommand('insertHTML', false,
-            '<div class="tre-blok"' + styl + '><p>' + escA(txt) + '</p></div><p><br></p>');
+            '<div class="tre-blok" contenteditable="false"' + styl + '><p>' + escA(txt) + '</p></div><p><br></p>');
         });
     });
     bar.querySelector('button[title="Pozioma linia"]').addEventListener('click', function () {
@@ -467,7 +472,7 @@
     var uchwyt = null;
     function obiektyEl(){
       var lista = [];
-      pole.querySelectorAll('.tre-przycisk-obiekt, .tre-ksztalt, img').forEach(function (el) { lista.push(el); });
+      pole.querySelectorAll('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img').forEach(function (el) { lista.push(el); });
       return lista;
     }
     function rysujUchwyt(){
@@ -475,7 +480,8 @@
       uchwyt = null;
       if (wybrane.length !== 1) return;
       var ob = wybrane[0];
-      var czy = ob.tagName === 'IMG' || (ob.classList && ob.classList.contains('tre-ksztalt'));
+      var czy = ob.tagName === 'IMG' || (ob.classList &&
+        (ob.classList.contains('tre-ksztalt') || ob.classList.contains('tre-blok')));
       if (!czy) return;
       var pr = pole.getBoundingClientRect();
       var r = ob.getBoundingClientRect();
@@ -496,6 +502,26 @@
     }
     function obiektZaznaczony(){
       return wybrane.length === 1 ? wybrane[0] : (wybrane[wybrane.length - 1] || null);
+    }
+    /* blok (prostokąt): 2×klik włącza edycję tekstu w środku */
+    var edytowanyBlok = null;
+    function wejdzEdycjeBloku(bl){
+      zakonczEdycjeBloku();
+      edytowanyBlok = bl;
+      bl.setAttribute('contenteditable', 'true');
+      bl.focus();
+      var sel = window.getSelection();
+      var r = document.createRange();
+      r.selectNodeContents(bl);
+      r.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(r);
+    }
+    function zakonczEdycjeBloku(){
+      if (edytowanyBlok){
+        edytowanyBlok.setAttribute('contenteditable', 'false');
+        edytowanyBlok = null;
+      }
     }
 
     /* ---------- PRZYCISK: wstaw obok zaznaczonego obiektu ---------- */
@@ -619,32 +645,96 @@
         return;
       }
       var pr = pole.getBoundingClientRect();
-      wybrane.forEach(function (ob) {
+      function pxn(p){ return (p / pr.width * 100) + '%'; }
+      function pyn(p){ return (p / pr.height * 100) + '%'; }
+      var dane = wybrane.map(function (ob) {
         var or = ob.getBoundingClientRect();
-        if (ob.style.position !== 'absolute'){
-          ob.style.position = 'absolute';
-          ob.style.left = Math.max(0, (or.left - pr.left) / pr.width * 100) + '%';
-          ob.style.top = Math.max(0, (or.top - pr.top) / pr.height * 100) + '%';
-          ob.style.right = 'auto'; ob.style.bottom = 'auto';
-          ob.style.margin = '0'; ob.style.zIndex = 5;
-          or = ob.getBoundingClientRect();
-        }
-        var w = or.width, h = or.height;
-        if (strona === 'lewo'){ ob.style.left = '1.5%'; ob.style.right = 'auto'; ob.style.marginLeft = '0'; }
-        if (strona === 'prawo'){ ob.style.left = 'auto'; ob.style.right = '1.5%'; ob.style.marginLeft = '0'; }
-        if (strona === 'srodek'){ ob.style.left = '50%'; ob.style.right = 'auto'; ob.style.marginLeft = (-w / 2) + 'px'; }
-        if (strona === 'gora'){ ob.style.top = '1.5%'; ob.style.bottom = 'auto'; ob.style.marginTop = '0'; }
-        if (strona === 'dol'){ ob.style.top = 'auto'; ob.style.bottom = '1.5%'; ob.style.marginTop = '0'; }
-        if (strona === 'srodek-pion'){ ob.style.top = '50%'; ob.style.bottom = 'auto'; ob.style.marginTop = (-h / 2) + 'px'; }
+        return { ob: ob, l: or.left - pr.left, t: or.top - pr.top, w: or.width, h: or.height };
+      });
+      if (wybrane.length === 1){
+        /* jeden obiekt — do krawędzi / środka POLA */
+        var it = dane[0];
+        if (strona === 'lewo') it.ob.style.left = '1.5%';
+        if (strona === 'prawo') it.ob.style.left = pxn(Math.max(0, pr.width - it.w - pr.width * 0.015));
+        if (strona === 'srodek') it.ob.style.left = pxn(Math.max(0, (pr.width - it.w) / 2));
+        if (strona === 'gora') it.ob.style.top = '1.5%';
+        if (strona === 'dol') it.ob.style.top = pyn(Math.max(0, pr.height - it.h - pr.height * 0.015));
+        if (strona === 'srodek-pion') it.ob.style.top = pyn(Math.max(0, (pr.height - it.h) / 2));
+      } else {
+        /* kilka obiektów — WYRÓWNANIE WZGLĘDEM SIEBIE (jak PowerPoint):
+           np. przyciski w jednej linii / w jednej kolumnie */
+        var minL = Math.min.apply(null, dane.map(function (x) { return x.l; }));
+        var maxR = Math.max.apply(null, dane.map(function (x) { return x.l + x.w; }));
+        var minT = Math.min.apply(null, dane.map(function (x) { return x.t; }));
+        var maxB = Math.max.apply(null, dane.map(function (x) { return x.t + x.h; }));
+        var sx = (minL + maxR) / 2, sy = (minT + maxB) / 2;
+        dane.forEach(function (it) {
+          var L = it.l, T = it.t;
+          if (strona === 'lewo') L = minL;
+          if (strona === 'prawo') L = maxR - it.w;
+          if (strona === 'srodek') L = sx - it.w / 2;
+          if (strona === 'gora') T = minT;
+          if (strona === 'dol') T = maxB - it.h;
+          if (strona === 'srodek-pion') T = sy - it.h / 2;
+          it.ob.style.left = pxn(Math.max(0, Math.min(L, pr.width - it.w)));
+          it.ob.style.top = pyn(Math.max(0, Math.min(T, pr.height - it.h)));
+        });
+      }
+      dane.forEach(function (it) {
+        it.ob.style.position = 'absolute';
+        it.ob.style.right = 'auto'; it.ob.style.bottom = 'auto';
+        it.ob.style.margin = '0'; it.ob.style.zIndex = 5;
       });
       odswiezWybranie();
     }
-    bar.querySelector('button[title="Obiekt: do lewej krawędzi"]').addEventListener('click', function(){ wyrownajObiekt('lewo'); });
-    bar.querySelector('button[title="Obiekt: do środka (poziomo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek'); });
-    bar.querySelector('button[title="Obiekt: do prawej krawędzi"]').addEventListener('click', function(){ wyrownajObiekt('prawo'); });
-    bar.querySelector('button[title="Obiekt: do góry"]').addEventListener('click', function(){ wyrownajObiekt('gora'); });
-    bar.querySelector('button[title="Obiekt: do środka (pionowo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek-pion'); });
-    bar.querySelector('button[title="Obiekt: do dołu"]').addEventListener('click', function(){ wyrownajObiekt('dol'); });
+    /* rozłożenie równo: przyciski/bloki w równych odstępach (linia lub kolumna) */
+    function rozlozObiekty(kier){
+      if (wybrane.length < 3){
+        alert('Zaznacz co najmniej 3 obiekty (Ctrl+klik), aby je rozłożyć w równych odstępach.');
+        return;
+      }
+      var pr = pole.getBoundingClientRect();
+      var dane = wybrane.map(function (ob) {
+        var or = ob.getBoundingClientRect();
+        return { ob: ob, l: or.left - pr.left, t: or.top - pr.top, w: or.width, h: or.height };
+      });
+      if (kier === 'poziom'){
+        dane.sort(function (a, b) { return a.l - b.l; });
+        var sumaW = dane.reduce(function (su, x) { return su + x.w; }, 0);
+        var minL = dane[0].l, maxR = dane[dane.length - 1].l + dane[dane.length - 1].w;
+        var gap = Math.max(0, (maxR - minL - sumaW) / (dane.length - 1));
+        var x = dane[0].l;
+        dane.forEach(function (it) {
+          it.ob.style.left = (x / pr.width * 100) + '%';
+          it.ob.style.position = 'absolute';
+          it.ob.style.right = 'auto'; it.ob.style.bottom = 'auto';
+          it.ob.style.margin = '0'; it.ob.style.zIndex = 5;
+          x += it.w + gap;
+        });
+      } else {
+        dane.sort(function (a, b) { return a.t - b.t; });
+        var sumaH = dane.reduce(function (su, x) { return su + x.h; }, 0);
+        var minT = dane[0].t, maxB = dane[dane.length - 1].t + dane[dane.length - 1].h;
+        var gap2 = Math.max(0, (maxB - minT - sumaH) / (dane.length - 1));
+        var y = dane[0].t;
+        dane.forEach(function (it) {
+          it.ob.style.top = (y / pr.height * 100) + '%';
+          it.ob.style.position = 'absolute';
+          it.ob.style.right = 'auto'; it.ob.style.bottom = 'auto';
+          it.ob.style.margin = '0'; it.ob.style.zIndex = 5;
+          y += it.h + gap2;
+        });
+      }
+      odswiezWybranie();
+    }
+    bar.querySelector('button[title="Wyrównaj: do lewej krawędzi"]').addEventListener('click', function(){ wyrownajObiekt('lewo'); });
+    bar.querySelector('button[title="Wyrównaj: do środka (poziomo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek'); });
+    bar.querySelector('button[title="Wyrównaj: do prawej krawędzi"]').addEventListener('click', function(){ wyrownajObiekt('prawo'); });
+    bar.querySelector('button[title="Wyrównaj: do góry"]').addEventListener('click', function(){ wyrownajObiekt('gora'); });
+    bar.querySelector('button[title="Wyrównaj: do środka (pionowo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek-pion'); });
+    bar.querySelector('button[title="Wyrównaj: do dołu"]').addEventListener('click', function(){ wyrownajObiekt('dol'); });
+    bar.querySelector('button[title="Rozłóż w poziomie (jednakowe odstępy)"]').addEventListener('click', function(){ rozlozObiekty('poziom'); });
+    bar.querySelector('button[title="Rozłóż w pionie (jednakowe odstępy)"]').addEventListener('click', function(){ rozlozObiekty('pion'); });
 
     /* ---------- DRAG&DROP obiektów (pojedynczo i w grupie) + uchwyt rozmiaru ---------- */
     var drag = null, justDragged = false, uchwytDrag = null;
@@ -666,8 +756,9 @@
         return;
       }
       if (!(t && t.closest) || e.button !== 0) return;
-      var ob = t.closest('.tre-przycisk-obiekt, .tre-ksztalt, img');
+      var ob = t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img');
       if (!ob) return;
+      if (ob.classList && ob.classList.contains('tre-blok') && ob.isContentEditable) return;
       if (e.ctrlKey || e.metaKey){
         var ix = wybrane.indexOf(ob);
         if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob);
@@ -731,9 +822,11 @@
       var t = e.target;
       if (t === uchwyt) return;
       if (t && t.closest){
-        var ob = t.closest('.tre-przycisk-obiekt, .tre-ksztalt, img');
+        var ob = t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img');
         if (ob){
+          if (ob.classList && ob.classList.contains('tre-blok') && ob.isContentEditable) return;
           e.preventDefault();
+          if (edytowanyBlok && edytowanyBlok !== ob) zakonczEdycjeBloku();
           if (e.ctrlKey || e.metaKey){
             var ix = wybrane.indexOf(ob);
             if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob);
@@ -745,6 +838,7 @@
         }
         var a = t.closest('a');
         if (a) e.preventDefault(); /* linki w edytorze nie nawigują */
+        if (edytowanyBlok) zakonczEdycjeBloku();
         if (!e.ctrlKey && !e.metaKey) czyscWybranie();
       }
     });
@@ -791,8 +885,30 @@
         });
       }
     });
+    pole.addEventListener('dblclick', function (e2) {
+      var t2 = e2.target;
+      if (!(t2 && t2.closest)) return;
+      var bl = t2.closest('.tre-blok');
+      if (bl){
+        e2.preventDefault();
+        wybrane = [bl];
+        odswiezWybranie();
+        wejdzEdycjeBloku(bl);
+      }
+    });
+    pole.addEventListener('focusout', function (e2) {
+      if (edytowanyBlok && !(e2.relatedTarget && edytowanyBlok.contains(e2.relatedTarget))){
+        zakonczEdycjeBloku();
+      }
+    });
     function usunWybrane(e){
       var tg = e.target;
+      if (e.key === 'Escape'){
+        if (edytowanyBlok) zakonczEdycjeBloku();
+        if (wybrane.length) czyscWybranie();
+        return;
+      }
+      if (edytowanyBlok && (tg === edytowanyBlok || edytowanyBlok.contains(tg))) return;
       if ((e.key === 'Delete' || e.key === 'Backspace') && wybrane.length){
         var wPolu = tg === pole || (pole.contains(tg) &&
           !(tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT'));
@@ -803,7 +919,6 @@
           czyscWybranie();
         }
       }
-      if (e.key === 'Escape' && wybrane.length) czyscWybranie();
     }
     pole.addEventListener('keydown', usunWybrane);
     document.addEventListener('keydown', usunWybrane);
@@ -832,8 +947,12 @@
 
     /* ---------- API ---------- */
     return {
-      ustaw: function (html) { pole.innerHTML = html || ''; czyscWybranie(); },
-      pobierz: function () { return pole.innerHTML; },
+      ustaw: function (html) {
+        pole.innerHTML = html || '';
+        pole.querySelectorAll('.tre-blok').forEach(function (b) { b.setAttribute('contenteditable', 'false'); });
+        czyscWybranie();
+      },
+      pobierz: function () { zakonczEdycjeBloku(); return pole.innerHTML; },
       focus: function () { pole.focus(); }
     };
   }

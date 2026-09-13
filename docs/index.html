@@ -185,7 +185,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 
 /* --- jak działamy + CTA --- */
 .cta{flex:none;padding:26px clamp(12px,1.5vw,20px) 40px}
-.jak{padding:32px 34px;background:#fff;border:1px solid rgba(107,69,48,.25)}
+.jak{position:relative;padding:32px 34px;background:#fff;border:1px solid rgba(107,69,48,.25)}
+.jak .tre-przycisk-obiekt,.jak .tre-ksztalt,.jak .tre-blok,.jak img{max-width:100%}
 .jak h2{font-size:24px;color:var(--butelkowa);margin-bottom:4px}
 .jak .pod{font-size:15.5px;color:rgba(51,38,28,.7);margin-bottom:18px}
 .kroki{display:block}
@@ -282,7 +283,7 @@ html.dotyk .social{margin-top:14px}
 .tre-tabela td{border:1px solid rgba(107,69,48,.6);padding:8px 12px;vertical-align:top;background:rgba(251,247,240,.5)}
 .tre-tabela.tre-bez td{border:none;background:transparent}
 .tre-linia{border:none;border-top:2px solid var(--zloty);margin:14px 0}
-.tre-blok{border:1.5px solid rgba(196,165,130,.85);background:rgba(14,14,12,.35);padding:12px 16px;margin:8px 0}
+.tre-blok{border:1.5px solid rgba(196,165,130,.85);background:rgba(14,14,12,.35);padding:12px 16px;margin:8px 0;box-sizing:border-box;overflow:auto}
 .edtr-video{margin:10px 0}
 .edtr-video iframe{max-width:100%}
 .tre-ksztalt{display:inline-block;position:relative;vertical-align:middle;margin:4px 8px 4px 0}
@@ -434,15 +435,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.23</span>
+    <span>© Sygnatura 2026 · wersja 28.24</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=303"></script>
-<script src="assets/koszyk.js?v=303"></script>
-<script src="assets/config.js?v=303"></script>
-<script src="assets/api.js?v=303"></script>
-<script src="assets/main.js?v=303"></script>
+<script src="data/katalog.js?v=304"></script>
+<script src="assets/koszyk.js?v=304"></script>
+<script src="assets/config.js?v=304"></script>
+<script src="assets/api.js?v=304"></script>
+<script src="assets/main.js?v=304"></script>
 <script>
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość
