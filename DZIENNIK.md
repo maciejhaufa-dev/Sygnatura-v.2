@@ -996,6 +996,51 @@ Testy: HTML zbilansowany (wszystkie strony), node --check OK (skrypty admina te�
 pobierz=null bez zapisu → zapis → pobierz zwraca dane, demoDb spójne, walidacja złego zapisu;
 sync docs, Pages built | 2fcd044, fetch_page live: index.html renderuje domyślne treści
 (slajdy+karty+CTA), admin.html ma zakładkę STRONA GŁÓWNA jako pierwszą z formularzem.
+## Sesja 28 — panel admina v2: Podsumowanie + kafle slidera + EDYTOR TREŚCI (commit 2fe7805, wersja 28.19)
+
+Właściciel (pracujemy strona po stronie): strona główna OK, ale usunąć napis „STUDIO
+SYGNATURA" (h1); po zalogowaniu nagłówek panelu ma brzmieć PANEL ADMINISTRACYJNY; PIERWSZA
+zakładka = PODSUMOWANIE KWARTAŁU (zapytania, zamówienia, suma kwot, karta terminarza z
+ponumerowanymi placeholderami — dokładny podgląd później); zakładka STRONA GŁÓWNA ma mieć
+matrycę kafli slidera (miniatury w jednej linii, numeracja, EDYTUJ/USUŃ, zmiana kolejności
+Drag&Drop jak monitory w Windows, szary kafel „+ DODAJ"), nad linią: pole „Ustaw prędkość
+automatycznego przewijania (w sekundach)", wybór zdjęcia w tle kafla; pod kaflami okno edycji
+= EDYTOR TREŚCI (jeden rozbudowany silnik dla całego serwisu: tytuły/podtytuły/tekst/kolumny/
+tabele z i bez obramowania/przyciski z rozmiarem, tekstem, kolorami, czcionką, linkiem —
+jak MS Word/Canva); na dole edytora: ODRZUĆ ZMIANY (brązowa ramka, brązowy napis, tło strony)
+i ZAPISZ ZMIANY (brązowa ramka, złoty wyboldowany napis, tło zielone/butelkowe). Pomysł
+„pokaż slider" (wł/wył) odłożony — w pamięci.
+
+WYKONANE:
+- index.html: usunięty nagłówek „Studio Sygnatura"; slider renderuje KAFLĘ Z PANELU
+  (kolejność, tło: zdjęcie/gradient, treść HTML, checkbox karty produktów, autoplay w
+  sekundach, 0 = bez autoplay); kafel „Bestsellery" ma karty w odwrotnej kolejności;
+  migracja starego formatu (slajdy tag/tytul/opis/btn) po stronie klienta i admina.
+- admin.html: nagłówek h1 zmienia się po zalogowaniu na „Panel administracyjny"
+  (pokazPanel); NOWA PIERWSZA ZAKŁADKA PODSUMOWANIE: 01 zapytania (wynajem + wiadomości),
+  02 zamówienia, 03 suma kwot (kwoty.razem), 04 TERMINARZ — karta z 6 ponumerowanymi
+  placeholderami (widok miesiąca/kwartału, wolne/zajęte, rezerwacje, zapytania);
+  STRONA GŁÓWNA: pole autoplay (s), pasek kafli (miniatura 168px z numerem, EDYTUJ/USUŃ,
+  strzałki ‹ ›, Drag&Drop HTML5, szary kafel „+ DODAJ"), okno edycji kafla: select tła
+  (media/sklep/*, hero, forest, gradient) + wgranie własnego zdjęcia (dataURL) + podgląd,
+  checkbox kart produktów, EDYTOR TREŚCI, przyciski ODRZUĆ ZMIANY / ZAPISZ ZMIANY
+  (nowy kafel po odrzuceniu znika; istniejący wraca do wersji zapisanej).
+- assets/edytor.js: NOWY SILNIK „EDYTOR TREŚCI" (SYG.edytorTresci.stworz): Tytuł/Podtytuł/
+  Tekst, B/I/U, listy, cytat, link, obraz (plik/schowek), film YT, kolumny 2/3, tabela
+  z/bez obramowania, linia, czyszczenie formatu, PRZYCISK z oknem: tekst, link, rozmiar
+  S/M/L, kolor tła, kolor tekstu, czcionka (serif/sans/mono); CSS: .edtr-*, .tre-przycisk
+  (S/M/L), .tre-tabela(.tre-bez), .tre-kolumny, .kafel-mini/.kafle-pasek/.kafel-dodaj,
+  .podsum-karty/.term-placeholder, .btn-zapisz (butelkowe tło + złoty tekst + brązowa ramka)
+  i .btn-odrzuc (kremowe tło + brązowy tekst + brązowa ramka).
+- api.js: bez zmian (strona-glowna-zapisz/pobierz obsługują nowy format ogólnie).
+- Wersja 28.19, zasoby ?v=299.
+
+Testy: HTML zbilansowany (21 stron), node --check (wszystkie bloki skryptów admina i indexa
++ assety), Node API: zapis/odczyt nowego formatu (slider.autoplay=6, kafle, gradient), stary
+format zwracany surowo (migracja po stronie); sync docs, Pages built | 2fe7805, fetch_page
+live: index bez h1 „Studio Sygnatura" + slider 4 kafle (Bestsellery z odwróconymi kartami),
+admin: zakładki Podsumowanie|Strona główna|…, karty 01–04 z placeholderami terminarza,
+okno edycji kafla z tłem/kartami/EDYTOREM TREŚCI/ODRZUĆ/ZAPISZ.
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
