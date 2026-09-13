@@ -1210,6 +1210,25 @@ WYKONANE (wersja 28.24, ?v=304):
 Testy: node --check (edytor.js, skrypty index/admin, assety), HTML zbilansowany, grep:
 stare selektory wyrównania usunięte; sync docs, Pages built | c874e20, fetch_page live:
 index OK (slider + sekcja CTA renderują się; .jak kotwiczy obiekty).
+## Sesja 28 — FIX wielokrotnego zaznaczania obiektów (commit 3f7a24e, wersja 28.25)
+
+Właściciel powtórzył zastrzeżenia (wyrównanie kilku obiektów względem siebie, rozmiar bloku
+narożnikiem, treść pod sliderem). Po analizie znalazłem PRAWDZIWY BŁĄD: zaznaczanie Ctrl+klik
+przełączało obiekt DWUKROTNIE (raz w pointerdown, drugi raz w click), więc grupa nigdy nie
+powstawała — stąd „nie mogę zaznaczyć kilku obiektów aby je wyrównać/wyedytować".
+
+WYKONANE (wersja 28.25, ?v=305):
+- Usunięty podwójny toggle zaznaczania: zaznaczanie odbywa się TYLKO w pointerdown
+  (Ctrl+klik dodaje/usuwa z grupy, zwykły klik zaznacza pojedynczy obiekt); handler click
+  tylko blokuje nawigację/edycję. Po naprawie działają: grupa (Ctrl+klik), wspólne
+  przeciąganie, wyrównanie WZGLĘDEM SIEBIE (linia/kolumna), rozłożenie ⇶⇵, Backspace
+  usuwa grupę.
+- (Funkcje z 28.24 zostają bez zmian: wyrównanie względem siebie, bloki-prostokąty z
+  narożnikiem i edycją 2×klik, .jak position:relative kotwiczący treść pod sliderem.)
+
+Testy: node --check edytor.js + skrypty + assety, HTML zbilansowany; sync docs, Pages built |
+3f7a24e, fetch_page live ?v=305 OK. (curl z sandboxa nie sięga sieci — HTTP 000; weryfikacja
+przez fetch_page.)
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
