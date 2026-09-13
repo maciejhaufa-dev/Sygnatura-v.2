@@ -729,10 +729,11 @@ html.dotyk .menu-vert a::after{display:none}
 .edtr-tresc-jasna .pod{font-size:15.5px;color:rgba(51,38,28,.7);margin-bottom:18px}
 .edtr-tresc-jasna a{color:var(--butelkowa);border-bottom:1px solid var(--zloty)}
 .edtr-tresc-jasna a.sl-btn,.edtr-tresc-jasna a.tre-przycisk{border-bottom:none}
-.edtr-tresc-jasna .kroki{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0}
-.edtr-tresc-jasna .krok{border-left:2px solid var(--zloty);padding-left:14px}
+.edtr-tresc-jasna .kroki{display:block;margin:14px 0}
+.edtr-tresc-jasna .krok{border:1px solid rgba(107,69,48,.3);background:#FBF7F0;border-radius:8px;
+  padding:12px 16px;margin:0 0 10px}
 .edtr-tresc-jasna .krok .num{font-size:14px;font-weight:700;letter-spacing:.24em;color:var(--brunatny)}
-.edtr-tresc-jasna .krok b{font-size:16.5px}
+.edtr-tresc-jasna .krok b{font-size:16.5px;display:block;margin:2px 0 4px}
 .edtr-tresc-jasna .krok p{margin:4px 0 0}
 .edtr-tresc-jasna .cta-btn{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
 .edtr-tresc-jasna .cta-btn .btn{background:var(--zloty);color:var(--butelkowa);
@@ -745,3 +746,28 @@ html.dotyk .menu-vert a::after{display:none}
 .edtr-tresc-jasna .tre-blok{background:rgba(196,165,130,.12)}
 .edtr-tresc-jasna img{max-width:100%}
 .edtr-tresc-jasna .tre-kolumny,.edtr-tresc-jasna .tre-tabela{color:var(--ink)}
+
+/* ============ EDYTOR v5: paleta kolorów, zaznaczanie obiektów, kształty ============ */
+.edtr-bar{position:relative}
+.edtr-kolor{display:inline-flex;flex-direction:column;align-items:center;gap:2px;
+  border:1px solid rgba(107,69,48,.35);border-radius:6px;padding:3px 6px;background:#fff;cursor:pointer}
+.edtr-kolor span{font-size:11.5px;font-weight:700;color:var(--brunatny)}
+.edtr-kolor i{display:block;width:16px;height:3px;border-radius:2px;background:#6B4530}
+.edtr-paleta{position:absolute;background:#fff;border:1px solid rgba(107,69,48,.5);border-radius:8px;
+  padding:8px;z-index:80;box-shadow:0 8px 22px rgba(0,0,0,.3);min-width:186px}
+.edtr-paleta-kafle{display:grid;grid-template-columns:repeat(7,22px);gap:4px}
+.edtr-kwadrat{width:22px;height:22px;border:1px solid rgba(0,0,0,.22);border-radius:4px;cursor:pointer;padding:0}
+.edtr-kwadrat:hover{outline:2px solid var(--brunatny)}
+.edtr-paleta-dol{display:flex;align-items:center;gap:8px;margin-top:8px}
+.edtr-paleta-dol input[type=color]{width:34px;height:26px;border:1px solid rgba(107,69,48,.4);
+  border-radius:4px;padding:0;background:none}
+.edtr-ok{margin-left:auto;border:1px solid var(--butelkowa);background:var(--butelkowa);color:var(--zloty);
+  font-weight:700;letter-spacing:.08em;padding:6px 16px;border-radius:6px;cursor:pointer}
+.edtr-ok:hover{background:var(--zloty);color:var(--butelkowa)}
+.tre-wybrany{outline:2px dashed var(--zloty);outline-offset:3px}
+.tre-uchwyt{position:absolute;width:11px;height:11px;background:#fff;border:1.5px solid var(--brunatny);
+  border-radius:2px;cursor:nwse-resize;z-index:40;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.tre-ksztalt{display:inline-block;position:relative;vertical-align:middle;margin:4px 8px 4px 0}
+.tre-ksztalt-s{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  padding:2px 10px;font-size:15px;letter-spacing:.04em;box-sizing:border-box}
+.tre-ksztalt.tre-linia{height:0;margin:8px 8px 8px 0;background:none}

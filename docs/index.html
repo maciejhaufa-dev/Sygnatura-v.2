@@ -188,8 +188,9 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .jak{padding:32px 34px;background:#fff;border:1px solid rgba(107,69,48,.25)}
 .jak h2{font-size:24px;color:var(--butelkowa);margin-bottom:4px}
 .jak .pod{font-size:15.5px;color:rgba(51,38,28,.7);margin-bottom:18px}
-.kroki{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.krok{border-left:2px solid var(--zloty);padding-left:14px}
+.kroki{display:block}
+.krok{border:1px solid rgba(107,69,48,.3);background:#FBF7F0;border-radius:8px;
+  padding:14px 18px;margin:0 0 12px}
 .krok .num{font-size:14px;font-weight:700;letter-spacing:.24em;color:var(--brunatny)}
 .krok b{display:block;font-size:17.5px;color:var(--ink);margin:4px 0 4px}
 .krok p{font-size:15px;line-height:1.55;color:rgba(51,38,28,.8)}
@@ -242,7 +243,6 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   .head{padding:14px 18px 4px}
   .head-kontakt{justify-content:center;gap:10px}
   .head-gora{flex-wrap:wrap;padding:10px 12px}
-  .kroki{grid-template-columns:1fr}
   .szukaj{order:3;max-width:none;flex-basis:100%;margin-left:0}
   .head-przyciski{order:1;margin-left:auto;width:100%;justify-content:flex-end}
   .hp-etyk{display:none}
@@ -285,6 +285,10 @@ html.dotyk .social{margin-top:14px}
 .tre-blok{border:1.5px solid rgba(196,165,130,.85);background:rgba(14,14,12,.35);padding:12px 16px;margin:8px 0}
 .edtr-video{margin:10px 0}
 .edtr-video iframe{max-width:100%}
+.tre-ksztalt{display:inline-block;position:relative;vertical-align:middle;margin:4px 8px 4px 0}
+.tre-ksztalt-s{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  padding:2px 10px;box-sizing:border-box}
+.tre-ksztalt.tre-linia{height:0;margin:8px 8px 8px 0;background:none}
 </style>
 </head>
 <body data-strona="Strona główna">
@@ -430,15 +434,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.22</span>
+    <span>© Sygnatura 2026 · wersja 28.23</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=302"></script>
-<script src="assets/koszyk.js?v=302"></script>
-<script src="assets/config.js?v=302"></script>
-<script src="assets/api.js?v=302"></script>
-<script src="assets/main.js?v=302"></script>
+<script src="data/katalog.js?v=303"></script>
+<script src="assets/koszyk.js?v=303"></script>
+<script src="assets/config.js?v=303"></script>
+<script src="assets/api.js?v=303"></script>
+<script src="assets/main.js?v=303"></script>
 <script>
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość

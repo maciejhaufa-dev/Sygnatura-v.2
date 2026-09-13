@@ -1,5 +1,5 @@
 /* ============================================================
-   Studio Sygnatura — EDYTOR TREŚCI (edytor.js) v4
+   Studio Sygnatura — EDYTOR TREŚCI (edytor.js) v5
    Uniwersalny silnik edycji treści („EDYTOR TREŚCI") — jeden
    dla całego serwisu: kafle slidera, sekcje strony głównej,
    wpisy bloga, podstrony. Zachowuje się jak MS Word / Canva:
@@ -21,7 +21,16 @@
    • WYRÓWNIANIE OBIEKTÓW: do lewej / środka / prawej / góry /
      środka pionowo / dołu pola edycji.
    • CZCIONKA (FONT) i WIELKOŚĆ tekstu, KOLOR tekstu i KOLOR TŁA
-     tekstu (podświetlenie) — jak w Wordzie; STYL AKAPITU (paragraph)
+     tekstu (podświetlenie, paleta z przyciskiem OK) — jak w Wordzie;
+     STYL AKAPITU (paragraph); pasek POKAZUJE czcionkę i wielkość
+     zaznaczonego tekstu
+   • OBIEKTY (jak PowerPoint): klik = zaznaczenie, 2×klik = edycja,
+     Ctrl+klik = kilka obiektów naraz (wspólne przeciąganie, wyrównanie
+     grupy, Backspace usuwa zaznaczone); narożnik = zmiana rozmiaru
+     (kształty i obrazki); przycisk/kształt po edycji ZOSTAJE w miejscu,
+     w którym został wstawiony
+   • KSZTAŁTY: prostokąt, zaokrąglony prostokąt, elipsa, linia — z tekstem,
+     wypełnieniem i ramką
    • Separator, wyczyść formatowanie
 
    Użycie:
@@ -39,6 +48,12 @@
     georgia: 'Georgia,serif', times: "'Times New Roman',Times,serif",
     arial: 'Arial,Helvetica,sans-serif', verdana: 'Verdana,Geneva,sans-serif',
     impact: 'Impact,Charcoal,sans-serif'
+  };
+  var CZCIONKI_WG = {
+    'cormorant garamond': 'serif', 'playfair display': 'serif',
+    'georgia': 'georgia', 'times new roman': 'times', 'times': 'times',
+    'arial': 'arial', 'helvetica': 'arial', 'verdana': 'verdana', 'geneva': 'verdana',
+    'segoe ui': 'sans', 'courier new': 'mono', 'courier': 'mono', 'impact': 'impact'
   };
 
   function escA(t){ return String(t == null ? '' : t).replace(/[&"<>]/g, function(c){
@@ -119,7 +134,7 @@
       '<option value="sans"' + (init.czcionka === 'sans' ? ' selected' : '') + '>Bezszeryfowa (nowoczesna)</option>' +
       '<option value="mono"' + (init.czcionka === 'mono' ? ' selected' : '') + '>Maszyna (monospace)</option></select></div>' +
       '</div>' +
-      '<p class="mala">Wstawiony przycisk jest OBIEKTEM — przeciągnij go myszą w dowolne miejsce (jak obrazek), kliknij, aby edytować; Backspace usuwa go w całości. Przyciski wstawiane jeden po drugim stoją obok siebie.</p>',
+      '<p class="mala">Wstawiony przycisk jest OBIEKTEM: klik = zaznaczenie, 2×klik = edycja, przeciąganie myszą = przesunięcie (przycisk zostaje tam, gdzie go położysz), Ctrl+klik = kilka obiektów naraz, Backspace usuwa zaznaczone. Przyciski wstawiane jeden po drugim stoją obok siebie.</p>',
       function (okno) {
         var tekst = okno.querySelector('#eb-tekst').value.trim();
         var link = okno.querySelector('#eb-link').value.trim() || '#';
@@ -191,21 +206,60 @@
       bar.appendChild(s);
       return s;
     }
-    function Kol(znak, tytul, cmd) {
-      var l = document.createElement('span');
-      l.className = 'edtr-kolor'; l.title = tytul;
+    var zamknijWszystkiePalety = function () {};
+    function Paleta(znak, tytul, cmd) {
+      var przyc = document.createElement('span');
+      przyc.className = 'edtr-kolor'; przyc.title = tytul;
       var z = document.createElement('span');
       z.textContent = znak;
-      var i = document.createElement('input');
-      i.type = 'color'; i.value = '#6B4530';
-      l.appendChild(z); l.appendChild(i);
-      bar.appendChild(l);
-      i.addEventListener('input', function () {
-        pole.focus();
-        document.execCommand(cmd, false, i.value);
+      var i = document.createElement('i');
+      przyc.appendChild(z); przyc.appendChild(i);
+      bar.appendChild(przyc);
+      var pop = document.createElement('div');
+      pop.className = 'edtr-paleta';
+      var KOLORY = ['#33261C','#6B4530','#1F3A32','#C4A582','#E5D9C5','#FBF7F0','#8A2F1D',
+        '#B0413E','#C9A227','#2E6E4E','#3D5A80','#B0B0B0','#000000','#FFFFFF'];
+      var wybrany = cmd === 'foreColor' ? '#6B4530' : '#E5D9C5';
+      pop.innerHTML = '<div class="edtr-paleta-kafle">' + KOLORY.map(function (c) {
+        return '<button type="button" class="edtr-kwadrat" style="background:' + c + '" data-c="' + c + '"></button>';
+      }).join('') + '</div><div class="edtr-paleta-dol">' +
+        '<input type="color" value="' + wybrany + '"><button type="button" class="edtr-ok">OK</button></div>';
+      pop.style.display = 'none';
+      bar.appendChild(pop);
+      function pokazKolor(c) {
+        wybrany = c;
+        i.style.background = c;
+        var inw = pop.querySelector('input[type=color]');
+        if (inw) inw.value = c;
+      }
+      function zamknij() { pop.style.display = 'none'; }
+      function otworz() {
+        var czy = pop.style.display !== 'none';
+        zamknijWszystkiePalety();
+        if (czy) return;
+        var rp = przyc.getBoundingClientRect();
+        var rb = bar.getBoundingClientRect();
+        pop.style.left = Math.max(0, rp.left - rb.left) + 'px';
+        pop.style.top = (rp.bottom - rb.top + 6) + 'px';
+        pop.style.display = 'block';
+      }
+      przyc.addEventListener('click', function (e) { e.stopPropagation(); otworz(); });
+      pop.addEventListener('click', function (e) { e.stopPropagation(); });
+      pop.querySelectorAll('.edtr-kwadrat').forEach(function (kw) {
+        kw.addEventListener('click', function () { pokazKolor(kw.getAttribute('data-c')); });
       });
-      return l;
+      pop.querySelector('input[type=color]').addEventListener('input', function () { pokazKolor(this.value); });
+      pop.querySelector('.edtr-ok').addEventListener('click', function () {
+        pole.focus();
+        document.execCommand(cmd, false, wybrany);
+        zamknij();
+      });
+      var stara = zamknijWszystkiePalety;
+      zamknijWszystkiePalety = function () { stara(); zamknij(); };
+      pokazKolor(wybrany);
+      return { przyc: przyc, pasek: i };
     }
+    document.addEventListener('click', function () { zamknijWszystkiePalety(); });
     function owinSpan(styl) {
       var sel = window.getSelection();
       if (!sel || sel.isCollapsed) return false;
@@ -236,26 +290,26 @@
     B('Podtytuł', 'Podtytuł (nagłówek 3)', 'formatBlock', 'h3');
     B('Tekst', 'Zwykły akapit', 'formatBlock', 'p');
     Gr('|', 'Czcionka (FONT), wielkość, kolory');
-    Sel([{v:'',t:'Czcionka…'},{v:'serif',t:'Serif (styl studia)'},{v:'georgia',t:'Georgia'},
+    var selCzcionka = Sel([{v:'',t:'Czcionka…'},{v:'serif',t:'Serif (styl studia)'},{v:'georgia',t:'Georgia'},
       {v:'times',t:'Times New Roman'},{v:'arial',t:'Arial'},{v:'verdana',t:'Verdana'},
       {v:'sans',t:'Segoe UI'},{v:'mono',t:'Courier New'},{v:'impact',t:'Impact'}],
-      'Czcionka — zaznacz tekst i wybierz (FONT)', function (v) {
+      'Czcionka — zaznacz tekst i wybierz (FONT); pasek pokazuje czcionkę zaznaczonego tekstu', function (v) {
         if (!v) return;
         var css = FONTY[v] || v;
         if (!owinSpan('font-family:' + css)) document.execCommand('fontName', false, css);
       });
-    Sel([{v:'',t:'Rozmiar…'},{v:'10',t:'10 px'},{v:'12',t:'12 px'},{v:'14',t:'14 px'},{v:'16',t:'16 px'},
+    var selRozmiar = Sel([{v:'',t:'Rozmiar…'},{v:'10',t:'10 px'},{v:'12',t:'12 px'},{v:'14',t:'14 px'},{v:'16',t:'16 px'},
       {v:'18',t:'18 px'},{v:'20',t:'20 px'},{v:'24',t:'24 px'},{v:'28',t:'28 px'},{v:'32',t:'32 px'},
       {v:'36',t:'36 px'},{v:'48',t:'48 px'}],
-      'Wielkość tekstu — zaznacz tekst i wybierz', function (v) {
+      'Wielkość tekstu — zaznacz tekst i wybierz; pasek pokazuje wielkość zaznaczenia', function (v) {
         if (!v) return;
         if (!owinSpan('font-size:' + v + 'px')) {
           var m = { '10':'1','12':'2','14':'3','16':'4','18':'4','20':'5','24':'5','28':'6','32':'7','36':'7','48':'7' };
           document.execCommand('fontSize', false, m[v] || '4');
         }
       });
-    Kol('A', 'Kolor tekstu — zaznacz tekst i wybierz kolor', 'foreColor');
-    Kol('🖍', 'Kolor tła tekstu (podświetlenie) — zaznacz tekst i wybierz kolor', 'hiliteColor');
+    var paletaTekst = Paleta('A', 'Kolor tekstu — paleta kolorów z przyciskiem OK', 'foreColor');
+    var paletaTlo = Paleta('🖍', 'Kolor tła tekstu (podświetlenie) — paleta kolorów z przyciskiem OK', 'hiliteColor');
     Gr('|', 'Styl akapitu (paragraph)');
     Sel([{v:'',t:'Styl akapitu…'},{v:'p',t:'Akapit'},{v:'h2',t:'Tytuł'},{v:'h3',t:'Podtytuł'},
       {v:'blockquote',t:'Cytat'},{v:'div.sl-tag',t:'Etykieta (ramka)'},{v:'div.tre-blok',t:'Blok (ramka)'}],
@@ -289,6 +343,7 @@
     B('⎯ Przerwa', 'Pozioma linia', 'linia');
     Gr('|', 'Obiekty');
     B('✱ Przycisk', 'Wstaw przycisk (obiekt jak obrazek)', 'przycisk');
+    B('◆ Kształt', 'Wstaw kształt (prostokąt, elipsa, linia — obiekt z tekstem i kolorami)', 'ksztalt');
     B('⬅', 'Obiekt: do lewej krawędzi', 'obj-lewo');
     B('↔', 'Obiekt: do środka (poziomo)', 'obj-srodek');
     B('➡', 'Obiekt: do prawej krawędzi', 'obj-prawo');
@@ -407,13 +462,40 @@
       document.execCommand('insertHTML', false, '<hr class="tre-linia"><p><br></p>');
     });
 
-    /* ---------- zaznaczony obiekt ---------- */
+    /* ---------- zaznaczanie obiektów: klik = zaznacza, 2×klik = edycja ---------- */
+    var wybrane = [];
+    var uchwyt = null;
+    function obiektyEl(){
+      var lista = [];
+      pole.querySelectorAll('.tre-przycisk-obiekt, .tre-ksztalt, img').forEach(function (el) { lista.push(el); });
+      return lista;
+    }
+    function rysujUchwyt(){
+      if (uchwyt && uchwyt.parentNode) uchwyt.parentNode.removeChild(uchwyt);
+      uchwyt = null;
+      if (wybrane.length !== 1) return;
+      var ob = wybrane[0];
+      var czy = ob.tagName === 'IMG' || (ob.classList && ob.classList.contains('tre-ksztalt'));
+      if (!czy) return;
+      var pr = pole.getBoundingClientRect();
+      var r = ob.getBoundingClientRect();
+      uchwyt = document.createElement('span');
+      uchwyt.className = 'tre-uchwyt';
+      pole.appendChild(uchwyt);
+      uchwyt.style.left = Math.max(0, r.right - pr.left - 5) + 'px';
+      uchwyt.style.top = Math.max(0, r.bottom - pr.top - 5) + 'px';
+    }
+    function odswiezWybranie(){
+      obiektyEl().forEach(function (el) { el.classList.remove('tre-wybrany'); });
+      wybrane.forEach(function (el) { if (el && el.classList) el.classList.add('tre-wybrany'); });
+      rysujUchwyt();
+    }
+    function czyscWybranie(){
+      wybrane = [];
+      odswiezWybranie();
+    }
     function obiektZaznaczony(){
-      var sel = window.getSelection();
-      if (!sel || !sel.anchorNode) return null;
-      var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
-      if (!n || !n.closest) return null;
-      return n.closest('.tre-przycisk-obiekt, img');
+      return wybrane.length === 1 ? wybrane[0] : (wybrane[wybrane.length - 1] || null);
     }
 
     /* ---------- PRZYCISK: wstaw obok zaznaczonego obiektu ---------- */
@@ -422,37 +504,140 @@
         tlo:'#1F3A32', kolor:'#C4A582', czcionka:'serif' }, function (d) {
         var html = budujPrzycisk(d) + '&nbsp;';
         var ob = obiektZaznaczony();
+        var nowyEl = null;
         if (ob){
           /* przycisk obok istniejącego — stoją obok siebie w linii */
           ob.insertAdjacentHTML('afterend', html);
+          nowyEl = ob.nextElementSibling;
         } else {
           pole.focus();
           document.execCommand('insertHTML', false, html);
+        }
+        czyscWybranie();
+        if (nowyEl && nowyEl.classList && nowyEl.classList.contains('tre-przycisk-obiekt')){
+          wybrane = [nowyEl];
+          odswiezWybranie();
+        }
+      });
+    });
+
+    /* ---------- KSZTAŁTY (obiekty jak w PowerPoint) ---------- */
+    function budujKsztalt(d){
+      if (d.typ === 'linia'){
+        return '<span class="tre-ksztalt tre-linia" contenteditable="false" data-ks-typ="linia"' +
+          ' style="display:inline-block;width:' + d.szer + 'px;height:0;border-top:3px solid ' + escA(d.ramka) + '"></span>';
+      }
+      var promien = d.typ === 'elipsa' ? '50%' : (d.typ === 'zaokraglony' ? '14px' : '2px');
+      var tlo = d.przez ? 'transparent' : d.tlo;
+      var font = d.czcionka === 'sans' ? SANS : (d.czcionka === 'mono' ? MONO : SERIF);
+      var tekst = d.tekst ? '<span class="tre-ksztalt-t">' + escA(d.tekst) + '</span>' : '';
+      return '<span class="tre-ksztalt" contenteditable="false"' +
+        ' data-ks-typ="' + escA(d.typ) + '" data-ks-tekst="' + escA(d.tekst) + '"' +
+        ' data-ks-tlo="' + escA(d.tlo) + '" data-ks-przez="' + (d.przez ? '1' : '') + '"' +
+        ' data-ks-ramka="' + escA(d.ramka) + '" data-ks-czcionka="' + escA(d.czcionka) + '"' +
+        ' data-ks-kolor="' + escA(d.kolor) + '"' +
+        ' style="display:inline-block;width:' + d.szer + 'px;height:' + d.wys + 'px;background:' + tlo +
+        ';border:2px solid ' + escA(d.ramka) + ';border-radius:' + promien + ';vertical-align:middle">' +
+        '<span class="tre-ksztalt-s" style="font-family:' + font + ';color:' + escA(d.kolor) + '">' +
+        tekst + '</span></span>';
+    }
+    function czytajKsztalt(ob){
+      return {
+        typ: ob.getAttribute('data-ks-typ') || 'prostokat',
+        tekst: ob.getAttribute('data-ks-tekst') || '',
+        tlo: ob.getAttribute('data-ks-tlo') || '#1F3A32',
+        przez: ob.getAttribute('data-ks-przez') === '1',
+        ramka: ob.getAttribute('data-ks-ramka') || '#C4A582',
+        czcionka: ob.getAttribute('data-ks-czcionka') || 'serif',
+        kolor: ob.getAttribute('data-ks-kolor') || '#FBF7F0',
+        szer: 180, wys: 60
+      };
+    }
+    function oknoKsztaltu(init, cb){
+      var modalOkno = modal('Kształt',
+        '<div class="pole"><label>Rodzaj kształtu</label><select id="ek-typ">' +
+        '<option value="prostokat"' + (init.typ === 'prostokat' ? ' selected' : '') + '>Prostokąt</option>' +
+        '<option value="zaokraglony"' + (init.typ === 'zaokraglony' ? ' selected' : '') + '>Zaokrąglony prostokąt</option>' +
+        '<option value="elipsa"' + (init.typ === 'elipsa' ? ' selected' : '') + '>Elipsa / koło</option>' +
+        '<option value="linia"' + (init.typ === 'linia' ? ' selected' : '') + '>Linia pozioma</option></select></div>' +
+        '<div class="pole"><label>Tekst w kształcie (opcjonalnie)</label>' +
+        '<input type="text" id="ek-tekst" value="' + escA(init.tekst) + '"></div>' +
+        '<div class="pole" style="display:flex;gap:10px;flex-wrap:wrap">' +
+        '<div style="flex:1;min-width:120px"><label>Wypełnienie</label><input type="color" id="ek-tlo" value="' + escA(init.tlo) + '"></div>' +
+        '<div style="flex:1;min-width:120px"><label>Ramka</label><input type="color" id="ek-ramka" value="' + escA(init.ramka) + '"></div>' +
+        '<div style="flex:1;min-width:120px"><label>Kolor tekstu</label><input type="color" id="ek-kolor" value="' + escA(init.kolor) + '"></div></div>' +
+        '<div class="pole"><label style="cursor:pointer"><input type="checkbox" id="ek-przez" style="width:auto;margin-right:8px"' +
+        (init.przez ? ' checked' : '') + '> Przezroczyste wypełnienie</label></div>' +
+        '<div class="pole" style="display:flex;gap:10px">' +
+        '<div style="flex:1"><label>Szerokość</label><select id="ek-szer">' +
+        '<option value="100">Mała (S)</option><option value="180" selected>Średnia (M)</option>' +
+        '<option value="300">Duża (L)</option></select></div>' +
+        '<div style="flex:1"><label>Wysokość</label><select id="ek-wys">' +
+        '<option value="40">Mała (S)</option><option value="60" selected>Średnia (M)</option>' +
+        '<option value="100">Duża (L)</option></select></div></div>' +
+        '<p class="mala">Kształt jest OBIEKTEM: klik = zaznaczenie, 2×klik = edycja, przeciąganie myszą = przesunięcie, narożnik = zmiana rozmiaru, Ctrl+klik = kilka obiektów naraz, Backspace = usunięcie.</p>',
+        function (okno) {
+          var d = {
+            typ: okno.querySelector('#ek-typ').value,
+            tekst: okno.querySelector('#ek-tekst').value.trim(),
+            tlo: okno.querySelector('#ek-tlo').value,
+            przez: okno.querySelector('#ek-przez').checked,
+            ramka: okno.querySelector('#ek-ramka').value,
+            kolor: okno.querySelector('#ek-kolor').value,
+            czcionka: 'serif',
+            szer: parseInt(okno.querySelector('#ek-szer').value, 10),
+            wys: parseInt(okno.querySelector('#ek-wys').value, 10)
+          };
+          if (cb(d) === false) return false;
+        });
+      modalOkno.querySelector('#ek-przez').addEventListener('change', function(){
+        modalOkno.querySelector('#ek-tlo').disabled = this.checked;
+      });
+      if (init.przez) modalOkno.querySelector('#ek-tlo').disabled = true;
+      return modalOkno;
+    }
+    bar.querySelector('button[title^="Wstaw kształt"]').addEventListener('click', function () {
+      oknoKsztaltu({ typ:'prostokat', tekst:'', tlo:'#1F3A32', przez:false, ramka:'#C4A582',
+        czcionka:'serif', kolor:'#FBF7F0', szer:180, wys:60 }, function (d) {
+        var html = budujKsztalt(d) + '&nbsp;';
+        var ob = obiektZaznaczony();
+        var nowyEl = null;
+        if (ob){ ob.insertAdjacentHTML('afterend', html); nowyEl = ob.nextElementSibling; }
+        else { pole.focus(); document.execCommand('insertHTML', false, html); }
+        czyscWybranie();
+        if (nowyEl && nowyEl.classList && nowyEl.classList.contains('tre-ksztalt')){
+          wybrane = [nowyEl];
+          odswiezWybranie();
         }
       });
     });
 
     /* ---------- WYRÓWNANIE OBIEKTÓW (jak w edytorze graficznym) ---------- */
     function wyrownajObiekt(strona){
-      var ob = obiektZaznaczony();
-      if (!ob){ alert('Zaznacz najpierw obiekt (przycisk lub obrazek), klikając na niego.'); return; }
-      var pr = pole.getBoundingClientRect();
-      var or = ob.getBoundingClientRect();
-      if (ob.style.position !== 'absolute'){
-        ob.style.position = 'absolute';
-        ob.style.left = Math.max(0, (or.left - pr.left) / pr.width * 100) + '%';
-        ob.style.top = Math.max(0, (or.top - pr.top) / pr.height * 100) + '%';
-        ob.style.right = 'auto'; ob.style.bottom = 'auto';
-        ob.style.margin = '0'; ob.style.zIndex = 5;
-        or = ob.getBoundingClientRect();
+      if (!wybrane.length){
+        alert('Zaznacz najpierw obiekt(y): klik = jeden, Ctrl+klik = kilka naraz (jak w PowerPoint).');
+        return;
       }
-      var w = or.width, h = or.height;
-      if (strona === 'lewo'){ ob.style.left = '1.5%'; ob.style.right = 'auto'; ob.style.marginLeft = '0'; }
-      if (strona === 'prawo'){ ob.style.left = 'auto'; ob.style.right = '1.5%'; ob.style.marginLeft = '0'; }
-      if (strona === 'srodek'){ ob.style.left = '50%'; ob.style.right = 'auto'; ob.style.marginLeft = (-w / 2) + 'px'; }
-      if (strona === 'gora'){ ob.style.top = '1.5%'; ob.style.bottom = 'auto'; ob.style.marginTop = '0'; }
-      if (strona === 'dol'){ ob.style.top = 'auto'; ob.style.bottom = '1.5%'; ob.style.marginTop = '0'; }
-      if (strona === 'srodek-pion'){ ob.style.top = '50%'; ob.style.bottom = 'auto'; ob.style.marginTop = (-h / 2) + 'px'; }
+      var pr = pole.getBoundingClientRect();
+      wybrane.forEach(function (ob) {
+        var or = ob.getBoundingClientRect();
+        if (ob.style.position !== 'absolute'){
+          ob.style.position = 'absolute';
+          ob.style.left = Math.max(0, (or.left - pr.left) / pr.width * 100) + '%';
+          ob.style.top = Math.max(0, (or.top - pr.top) / pr.height * 100) + '%';
+          ob.style.right = 'auto'; ob.style.bottom = 'auto';
+          ob.style.margin = '0'; ob.style.zIndex = 5;
+          or = ob.getBoundingClientRect();
+        }
+        var w = or.width, h = or.height;
+        if (strona === 'lewo'){ ob.style.left = '1.5%'; ob.style.right = 'auto'; ob.style.marginLeft = '0'; }
+        if (strona === 'prawo'){ ob.style.left = 'auto'; ob.style.right = '1.5%'; ob.style.marginLeft = '0'; }
+        if (strona === 'srodek'){ ob.style.left = '50%'; ob.style.right = 'auto'; ob.style.marginLeft = (-w / 2) + 'px'; }
+        if (strona === 'gora'){ ob.style.top = '1.5%'; ob.style.bottom = 'auto'; ob.style.marginTop = '0'; }
+        if (strona === 'dol'){ ob.style.top = 'auto'; ob.style.bottom = '1.5%'; ob.style.marginTop = '0'; }
+        if (strona === 'srodek-pion'){ ob.style.top = '50%'; ob.style.bottom = 'auto'; ob.style.marginTop = (-h / 2) + 'px'; }
+      });
+      odswiezWybranie();
     }
     bar.querySelector('button[title="Obiekt: do lewej krawędzi"]').addEventListener('click', function(){ wyrownajObiekt('lewo'); });
     bar.querySelector('button[title="Obiekt: do środka (poziomo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek'); });
@@ -461,73 +646,193 @@
     bar.querySelector('button[title="Obiekt: do środka (pionowo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek-pion'); });
     bar.querySelector('button[title="Obiekt: do dołu"]').addEventListener('click', function(){ wyrownajObiekt('dol'); });
 
-    /* ---------- DRAG&DROP obiektów (jak „ramka dla obrazka" w MS Word) ---------- */
-    var drag = null, justDragged = false;
+    /* ---------- DRAG&DROP obiektów (pojedynczo i w grupie) + uchwyt rozmiaru ---------- */
+    var drag = null, justDragged = false, uchwytDrag = null;
     pole.addEventListener('pointerdown', function (e) {
       var t = e.target;
+      if (t === uchwyt && wybrane.length === 1 && e.button === 0){
+        e.preventDefault();
+        var ob = wybrane[0];
+        var pr = pole.getBoundingClientRect();
+        var r = ob.getBoundingClientRect();
+        if (ob.style.position !== 'absolute'){
+          ob.style.position = 'absolute';
+          ob.style.left = Math.max(0, (r.left - pr.left) / pr.width * 100) + '%';
+          ob.style.top = Math.max(0, (r.top - pr.top) / pr.height * 100) + '%';
+          ob.style.right = 'auto'; ob.style.bottom = 'auto';
+          ob.style.margin = '0'; ob.style.zIndex = 5;
+        }
+        uchwytDrag = { ob: ob, x0: e.clientX, y0: e.clientY, w0: r.width, h0: r.height };
+        return;
+      }
       if (!(t && t.closest) || e.button !== 0) return;
-      var ob = t.closest('.tre-przycisk-obiekt, img');
+      var ob = t.closest('.tre-przycisk-obiekt, .tre-ksztalt, img');
       if (!ob) return;
-      var or = ob.getBoundingClientRect();
-      drag = { ob: ob, offX: e.clientX - or.left, offY: e.clientY - or.top,
-               startX: e.clientX, startY: e.clientY, przes: false };
+      if (e.ctrlKey || e.metaKey){
+        var ix = wybrane.indexOf(ob);
+        if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob);
+      } else if (wybrane.indexOf(ob) < 0){
+        wybrane = [ob];
+      }
+      odswiezWybranie();
+      var pr = pole.getBoundingClientRect();
+      var start = wybrane.map(function (el) {
+        var r = el.getBoundingClientRect();
+        return { el: el, offX: e.clientX - r.left, offY: e.clientY - r.top,
+                 left0: r.left - pr.left, top0: r.top - pr.top, w0: r.width, h0: r.height };
+      });
+      drag = { start: start, startX: e.clientX, startY: e.clientY, przes: false };
       e.preventDefault();
       if (ob.setPointerCapture) try { ob.setPointerCapture(e.pointerId); } catch(_){}
     });
     pole.addEventListener('pointermove', function (e) {
+      if (uchwytDrag){
+        var nw = Math.max(24, uchwytDrag.w0 + (e.clientX - uchwytDrag.x0));
+        var nh = Math.max(14, uchwytDrag.h0 + (e.clientY - uchwytDrag.y0));
+        uchwytDrag.ob.style.width = nw + 'px';
+        uchwytDrag.ob.style.height = nh + 'px';
+        rysujUchwyt();
+        e.preventDefault();
+        return;
+      }
       if (!drag) return;
       var dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
       if (!drag.przes && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      var pr = pole.getBoundingClientRect();
       if (!drag.przes){
         drag.przes = true;
-        var pr0 = pole.getBoundingClientRect();
-        var or0 = drag.ob.getBoundingClientRect();
-        drag.ob.style.position = 'absolute';
-        drag.ob.style.left = Math.max(0, (or0.left - pr0.left) / pr0.width * 100) + '%';
-        drag.ob.style.top = Math.max(0, (or0.top - pr0.top) / pr0.height * 100) + '%';
-        drag.ob.style.right = 'auto'; drag.ob.style.bottom = 'auto';
-        drag.ob.style.margin = '0'; drag.ob.style.zIndex = 5;
+        drag.start.forEach(function (it) {
+          it.el.style.position = 'absolute';
+          it.el.style.left = Math.max(0, it.left0 / pr.width * 100) + '%';
+          it.el.style.top = Math.max(0, it.top0 / pr.height * 100) + '%';
+          it.el.style.right = 'auto'; it.el.style.bottom = 'auto';
+          it.el.style.margin = '0'; it.el.style.zIndex = 5;
+        });
       }
-      var pr = pole.getBoundingClientRect();
-      var or = drag.ob.getBoundingClientRect();
-      var l = e.clientX - pr.left - drag.offX;
-      var t2 = e.clientY - pr.top - drag.offY;
-      l = Math.min(Math.max(0, l), pr.width - or.width);
-      t2 = Math.min(Math.max(0, t2), pr.height - or.height);
-      drag.ob.style.left = (l / pr.width * 100) + '%';
-      drag.ob.style.top = (t2 / pr.height * 100) + '%';
+      drag.start.forEach(function (it) {
+        var l = Math.min(Math.max(0, it.left0 + dx), pr.width - it.w0);
+        var t2 = Math.min(Math.max(0, it.top0 + dy), pr.height - it.h0);
+        it.el.style.left = (l / pr.width * 100) + '%';
+        it.el.style.top = (t2 / pr.height * 100) + '%';
+      });
+      rysujUchwyt();
       e.preventDefault();
     });
     pole.addEventListener('pointerup', function () {
       if (drag && drag.przes) justDragged = true;
       drag = null;
+      uchwytDrag = null;
     });
-    pole.addEventListener('pointercancel', function () { drag = null; });
+    pole.addEventListener('pointercancel', function () { drag = null; uchwytDrag = null; });
 
-    /* ---------- klik w pole: obiekty i linki ---------- */
+    /* ---------- klik w pole: zaznaczanie obiektów i linki ---------- */
     pole.addEventListener('click', function (e) {
       if (justDragged){ justDragged = false; return; }
       var t = e.target;
+      if (t === uchwyt) return;
       if (t && t.closest){
-        var ob = t.closest('.tre-przycisk-obiekt');
+        var ob = t.closest('.tre-przycisk-obiekt, .tre-ksztalt, img');
         if (ob){
           e.preventDefault();
-          var init = czytajPrzycisk(ob);
-          oknoPrzycisku(init, function (d) {
-            var tmp = document.createElement('div');
-            tmp.innerHTML = budujPrzycisk(d);
-            ob.parentNode.replaceChild(tmp.firstChild, ob);
-          });
+          if (e.ctrlKey || e.metaKey){
+            var ix = wybrane.indexOf(ob);
+            if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob);
+          } else if (wybrane.indexOf(ob) < 0){
+            wybrane = [ob];
+          }
+          odswiezWybranie();
           return;
         }
         var a = t.closest('a');
         if (a) e.preventDefault(); /* linki w edytorze nie nawigują */
+        if (!e.ctrlKey && !e.metaKey) czyscWybranie();
       }
+    });
+    pole.addEventListener('dblclick', function (e) {
+      var t = e.target;
+      if (!(t && t.closest)) return;
+      var ob = t.closest('.tre-przycisk-obiekt');
+      if (ob){
+        e.preventDefault();
+        wybrane = [ob];
+        odswiezWybranie();
+        var init = czytajPrzycisk(ob);
+        oknoPrzycisku(init, function (d) {
+          var tmp = document.createElement('div');
+          tmp.innerHTML = budujPrzycisk(d);
+          var nowy = tmp.firstChild;
+          var st = ob.getAttribute('style');
+          if (st) nowy.setAttribute('style', st); /* przycisk ZOSTAJE tam, gdzie był */
+          var sel = window.getSelection();
+          if (sel) sel.removeAllRanges();
+          ob.parentNode.replaceChild(nowy, ob);
+          wybrane = [nowy];
+          odswiezWybranie();
+        });
+        return;
+      }
+      var ks = t.closest('.tre-ksztalt');
+      if (ks){
+        e.preventDefault();
+        wybrane = [ks];
+        odswiezWybranie();
+        var initK = czytajKsztalt(ks);
+        oknoKsztaltu(initK, function (d) {
+          var tmp = document.createElement('div');
+          tmp.innerHTML = budujKsztalt(d);
+          var nowy = tmp.firstChild;
+          var st = ks.getAttribute('style');
+          if (st) nowy.setAttribute('style', st);
+          var sel = window.getSelection();
+          if (sel) sel.removeAllRanges();
+          ks.parentNode.replaceChild(nowy, ks);
+          wybrane = [nowy];
+          odswiezWybranie();
+        });
+      }
+    });
+    function usunWybrane(e){
+      var tg = e.target;
+      if ((e.key === 'Delete' || e.key === 'Backspace') && wybrane.length){
+        var wPolu = tg === pole || (pole.contains(tg) &&
+          !(tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT'));
+        var naTle = tg === document.body || tg === document.documentElement;
+        if (wPolu || naTle){
+          e.preventDefault();
+          wybrane.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
+          czyscWybranie();
+        }
+      }
+      if (e.key === 'Escape' && wybrane.length) czyscWybranie();
+    }
+    pole.addEventListener('keydown', usunWybrane);
+    document.addEventListener('keydown', usunWybrane);
+
+    /* ---------- pasek pokazuje czcionkę i wielkość zaznaczonego tekstu ---------- */
+    document.addEventListener('selectionchange', function () {
+      var sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return;
+      var n = sel.anchorNode;
+      var el = n && n.nodeType === 1 ? n : (n && n.parentElement);
+      if (!el || !pole.contains(el)) return;
+      if (el.closest && el.closest('.tre-przycisk-obiekt, .tre-ksztalt')) return;
+      var cs = window.getComputedStyle(el);
+      var fam = String(cs.fontFamily || '').split(',')[0].replace(/['"]/g, '').trim().toLowerCase();
+      var klucz = CZCIONKI_WG[fam] || '';
+      selCzcionka.value = klucz;
+      if (paletaTekst) paletaTekst.pasek.style.background = cs.color || '#6B4530';
+      var px = Math.round(parseFloat(cs.fontSize) || 16);
+      var naj = '', najlepsza = 99;
+      ['10','12','14','16','18','20','24','28','32','36','48'].forEach(function (r) {
+        var od = Math.abs(parseInt(r, 10) - px);
+        if (od < najlepsza){ najlepsza = od; naj = r; }
+      });
+      selRozmiar.value = naj;
     });
 
     /* ---------- API ---------- */
     return {
-      ustaw: function (html) { pole.innerHTML = html || ''; },
+      ustaw: function (html) { pole.innerHTML = html || ''; czyscWybranie(); },
       pobierz: function () { return pole.innerHTML; },
       focus: function () { pole.focus(); }
     };
