@@ -1112,6 +1112,39 @@ sg-jak-*/sg-cta* usunięte; Node API: zapis/odczyt ctaTresc, stary format zwraca
 (migracja po stronie); sync docs, Pages built | 9b6ba03, fetch_page live: index (sekcja
 CTA z ctaTresc wygląda identycznie), admin (edytor „Treść pod sliderem" + ZAPISZ ZMIANY
 STRONY GŁÓWNEJ).
+## Sesja 28 — EDYTOR v4 + biblioteka zdjęć + ODRZUĆ ZMIANY STRONY GŁÓWNEJ (commit 0b4e670, wersja 28.22)
+
+Właściciel: (1) brak przycisku „ODRZUĆ ZMIANY STRONY GŁÓWNEJ" — skoro jest zapis, musi być
+i odrzucenie; (2) wgrywanie własnych zdjęć do poprawy — mają trafiać do folderu sieciowego pod
+NAZWĄ, bo z rozwijanej listy robią się „tasiemce" (dataURL) i nie da się tego zmienić;
+(3) w edytorze brak czcionek (FONT), wielkości tekstu, koloru czcionki i koloru tła/bloku
+(funkcje ze screena: paragraph i FONT).
+
+WYKONANE:
+- ODRZUĆ ZMIANY STRONY GŁÓWNEJ: brązowy przycisk obok „ZAPISZ ZMIANY STRONY GŁÓWNEJ" na dole
+  zakładki; po potwierdzeniu wraca wersja zapisana (slider + autoplay + treść pod sliderem),
+  znika wskaźnik niezapisanych zmian.
+- BIBLIOTEKA ZDJĘĆ (nazwa -> obraz): wgrywanie do biblioteki `syg-media-v1` pod KRÓTKĄ nazwą
+  (proponowana z nazwy pliku, bez spacji/ogonków — np. „kafla-tlo"); na liście rozwijanej tylko
+  nazwy „📁 … (własne zdjęcie)" — zero tasiemców; przyciski „✏ Zmień nazwę" (aktualizuje też
+  kafle) i „🗑 Usuń z biblioteki" (kafle dostają domyślne tło); stare zapisane dataURL w kafelkach
+  migrują automatycznie do biblioteki jako „wgrany-N"; slider na stronie głównej i miniatury
+  rozwiązują nazwy media: z biblioteki. W wersji docelowej (Apps Script) plik trafi do folderu
+  sieciowego assets/media/przeslane/ pod tą samą nazwą (opisane w panelu).
+- EDYTOR v4 — pasek jak z screena (FONT + paragraph): lista CZCIONEK (Serif studia, Georgia,
+  Times New Roman, Arial, Verdana, Segoe UI, Courier New, Impact), lista WIELKOŚCI 10–48 px,
+  próbnik KOLORU TEKSTU (A) i KOLORU TŁA tekstu/podświetlenia (🖍), lista STYLU AKAPITU
+  (paragraph: Akapit/Tytuł/Podtytuł/Cytat/Etykieta w ramce/Blok w ramce); blok z ramką ma teraz
+  okienko z kolorem tła i opcją „bez tła (sama ramka)". Kolory działają też przy pisaniu
+  (kursor w tekście); czcionka/wielkość owijają zaznaczenie w span ze stylem (fallback
+  execCommand).
+- Wersja 28.22, zasoby ?v=302.
+
+Testy: node --check (edytor.js, skrypty index/admin, assety), HTML zbilansowany, grep: stary
+mechanizm wgrywania usunięty; test Node biblioteki: czyszczenie nazw (moje-zdjecie-1-jpg),
+rozwiązywanie media:, migracja dataURL->wgrany-N + odczyt z powrotem; sync docs, Pages built |
+0b4e670, fetch_page live: admin (ODRZUĆ ZMIANY STRONY GŁÓWNEJ + panel biblioteki + Zmień
+nazwę/Usuń), index (slider i CTA bez zmian).
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
