@@ -1041,6 +1041,40 @@ format zwracany surowo (migracja po stronie); sync docs, Pages built | 2fe7805, 
 live: index bez h1 „Studio Sygnatura" + slider 4 kafle (Bestsellery z odwróconymi kartami),
 admin: zakładki Podsumowanie|Strona główna|…, karty 01–04 z placeholderami terminarza,
 okno edycji kafla z tłem/kartami/EDYTOREM TREŚCI/ODRZUĆ/ZAPISZ.
+## Sesja 28 — edytor kafla jako wizualny podgląd + koniec auto-zapisu (commit 990c601, wersja 28.20)
+
+Właściciel: (1) edytor kafla miał być WIZUALNY (jak screen/Canva), nie formularz; (2) BŁĄD:
+po przesunięciu kafla pojawiał się komunikat „zapisano stronę główną" — strona ma być
+zapisana DOPIERO po kliknięciu ZAPISZ ZMIANY STRONY GŁÓWNEJ; (3) w edytorze przyciski muszą
+być wstawiane JAK OBRAZKI (obiekty); (4) miniatury kafli nie pokazywały zdjęć (tylko
+prostokąty w kolorze tła; gradient jedyny widoczny), wybór HERO.jpg nie zmieniał podglądu.
+
+WYKONANE:
+- EDYTOR KAFFLA = WIZUALNY PODGLĄD (jak Canva): okno edycji to podgląd kafla w proporcjach
+  slidera (16/8.6) z tłem (zdjęcie/gradient + przyciemnienie jak na slajdzie), treść
+  edytowana NA ŻYWO na tym tle (style .edtr-tresc odwzorowują .sl-tresc: sl-tag, h2, p,
+  sl-btn). Pasek narzędzi nad podglądem (edytor.js przyjmuje własne pole: stworz(kontener,
+  pole)).
+- KONIEC AUTO-ZAPISU: przeciąganie, strzałki, usuwanie, dodawanie, zmiana tła, treść, autoplay
+  — wszystko trafia do ROBOCZEJ wersji (SG_DANE, wskaźnik „Masz niezapisane zmiany" z linkiem
+  do przycisku). Strona zapisuje się WYŁĄCZNIE przyciskiem „ZAPISZ ZMIANY STRONY GŁÓWNEJ"
+  (btn-zapisz) na dole zakładki; po zapisie komunikat „Strona główna zapisana." i zniknięcie
+  wskaźnika. Kafelkowe przyciski: ODRZUĆ ZMIANY (cofa kafel z kopii) i ZASTOSUJ DO PODGLĄDU
+  (wpisuje kafel do wersji roboczej — bez zapisu, z dopiskiem wyjaśniającym).
+- PRZYCISKI JAK OBIEKTY/OBRAZKI: wstawiany przycisk to atomowy obiekt (contenteditable=false,
+  .tre-przycisk-obiekt z data-atrybutami) — widać go od razu, KLIK otwiera okno edycji
+  (tekst, link, styl: złoty klasyczny sl-btn / własny z rozmiarem S/M/L, kolorem tła,
+  kolorem tekstu i czcionką), Backspace usuwa w całości; linki w edytorze nie nawigują.
+- MINIATURY: naprawiona przyczyna braku zdjęć — podwójne cudzysłowy w inline
+  style="background-image:url("…")" łamały atrybut (gradient działał, bo nie ma cudzysłowów).
+  kafelObrazCss i tła slidera na index.html używają teraz apostrofów url('…') + escape '.
+  Zmiana zdjęcia z listy aktualizuje NA ŻYWO: podgląd pod listą, tło edytora i miniaturę kafla.
+- Wersja 28.20, zasoby ?v=300.
+
+Testy: HTML zbilansowany, node --check (skrypty admina/indexa/assety), grep bez auto-zapisu
+(0 wystąpień sgZapiszWszystko w handlerach kafli), sync docs, Pages built | 990c601,
+fetch_page live: admin (wskaźnik niezapisanych zmian, edytor z podglądem, ZASTOSUJ DO
+PODGLĄDU/ODRZUĆ, ZAPISZ ZMIANY STRONY GŁÓWNEJ), index (slider 4 kafle z kartami).
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
