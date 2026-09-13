@@ -1145,6 +1145,42 @@ mechanizm wgrywania usunięty; test Node biblioteki: czyszczenie nazw (moje-zdje
 rozwiązywanie media:, migracja dataURL->wgrany-N + odczyt z powrotem; sync docs, Pages built |
 0b4e670, fetch_page live: admin (ODRZUĆ ZMIANY STRONY GŁÓWNEJ + panel biblioteki + Zmień
 nazwę/Usuń), index (slider i CTA bez zmian).
+## Sesja 28 — EDYTOR v5: zaznaczanie obiektów, kształty, paleta OK, karty kroków (commit 344dd4d, wersja 28.23)
+
+Właściciel: (1) klik przycisku ma ZAZNACZAĆ, edycja dopiero po 2×klik; (2) po zaznaczeniu
+tekstu pasek ma pokazywać jaką czcionką jest napisany; (3) po edycji przycisk przeskakuje na
+górę — musi zostać tam, gdzie był wstawiony; (4) wybór koloru bez przycisku OK; (5) bloki na
+stronie głównej raz działają jak kolumny, raz jak niezależne bloki — bez sensu; (6) brak
+zaznaczania KILKU obiektów naraz i ich wyrównywania jak w PowerPoint; (7) brak kształtów
+i ich zaznaczania/transformacji. „Napraw to szybko!"
+
+WYKONANE (wersja 28.23, ?v=303):
+- ZAZNACZANIE OBIEKTÓW (jak PowerPoint): klik = zaznaczenie (złota przerywana ramka),
+  2×klik = edycja (przycisk/kształt); Ctrl+klik = dodawanie/usuwanie z zaznaczenia;
+  Backspace/Delete usuwa zaznaczone, Escape odznacza; zaznaczone obiekty przeciąga się RAZEM
+  (wspólny drag), a strzałki wyrównują CAŁĄ grupę (lewo/środek/prawo/góra/środek pion/dół).
+- PRZYCISK/KSZTAŁT PO EDYCJI ZOSTAJE W MIEJSCU: przy podmianie po edycji kopiowany jest
+  style (pozycja left/top z drag&drop) + czyszczone zaznaczenie przed replaceChild.
+- PASEK POKAZUJE CZCIONKĘ I WIELKOŚĆ zaznaczonego tekstu (selectionchange + mapa
+  CZCIONKI_WG; kolory: pasek pod „A" przyjmuje kolor zaznaczenia).
+- PALETA KOLORÓW Z OK: zamiast gołego input[type=color] — paleta 14 kolorów + próbnik
+  własny + przycisk OK (kolor nakładany po zatwierdzeniu); Esc/klik obok zamyka.
+- BLOKI „JAK DZIAŁAMY" = ODDZIELONE KARTY: .kroki z siatki 3 kolumn na display:block,
+  każdy krok to osobna karta (ramka + jasne tło + zaokrąglenie), ułożone jedna pod drugą —
+  IDENTYCZNIE na stronie głównej i w podglądzie edytora (usunięte przełączanie
+  kolumny/karty w media query).
+- KSZTAŁTY: „◆ Kształt" — prostokąt / zaokrąglony / elipsa / linia pozioma, z tekstem,
+  wypełnieniem (lub przezroczystym), kolorem ramki i tekstu, rozmiarem S/M/L; kształt jest
+  OBIEKTEM (zaznaczanie, 2×klik edycja, drag&drop, wyrównywanie, grupy); ZMIANA ROZMIARU:
+  zaznaczony kształt/obrazek ma narożny uchwyt — przeciąganie zmienia rozmiar (kształty
+  i obrazki; przyciski mają stałe rozmiary S/M/L).
+- Style .tre-ksztalt dodane też do index.html (kształty renderują się na stronie klienta);
+  podpowiedzi w panelu opisują nowy tryb pracy z obiektami.
+
+Testy: node --check (edytor.js v5, skrypty index/admin, assety), HTML zbilansowany, grep:
+stary Kol usunięty, nowe elementy (dblclick/tre-ksztalt/edtr-paleta/tre-wybrany/tre-uchwyt/
+selectionchange) obecne; sync docs, Pages built | 344dd4d, fetch_page live: index OK (sekcja
+CTA renderuje kroki i przyciski).
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
