@@ -325,7 +325,6 @@ html.dotyk .social{margin-top:14px}
       <a class="head-przycisk" href="konto.html" title="Konto — logowanie" aria-label="Panel użytkownika"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg><span class="hp-etyk">Panel użytkownika</span></a>
     </div>
     </div>
-    <h1 class="strona-tytul">Studio Sygnatura</h1>
   </div>
 
   <main class="main">
@@ -411,38 +410,35 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.18</span>
+    <span>© Sygnatura 2026 · wersja 28.19</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=298"></script>
-<script src="assets/koszyk.js?v=298"></script>
-<script src="assets/config.js?v=298"></script>
-<script src="assets/api.js?v=298"></script>
-<script src="assets/main.js?v=298"></script>
+<script src="data/katalog.js?v=299"></script>
+<script src="assets/koszyk.js?v=299"></script>
+<script src="assets/config.js?v=299"></script>
+<script src="assets/api.js?v=299"></script>
+<script src="assets/main.js?v=299"></script>
 <script>
-/* ============ TREŚĆ STRONY GŁÓWNEJ (z panelu admina) ============
-   Slajdy, „Jak działamy" i przyciski renderują się z danych zapisanych
-   w panelu (zakładka STRONA GŁÓWNA). W trybie demo dane zapisują się
-   w tej przeglądarce; po wdrożeniu trafią z arkusza Google.
-   Slajdy „Nowości"/„Bestsellery" zawsze pokazują karty produktów
-   z katalogu (sklep). */
+/* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
+   Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość
+   autoplay renderują się z danych zapisanych w panelu (STRONA GŁÓWNA).
+   Brak zapisu = treści domyślne. Tryb demo: dane w tej przeglądarce. */
 (function(){
   var DOMYS = {
-    slajdy: [
-      { id:'nowosci', tag:'Nowości', tytul:'Najnowsze produkty z pracowni',
-        opis:'Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.',
-        btn:'Zobacz w sklepie →', link:'sklep.html' },
-      { id:'bestsellery', tag:'Bestsellery', tytul:'Najczęściej zamawiane',
-        opis:'Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.',
-        btn:'Zamów teraz →', link:'sklep.html' },
-      { id:'aktualnosci', tag:'Aktualności z pracowni', tytul:'Z pracowni prosto do Was',
-        opis:'Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.',
-        btn:'Zobacz realizacje →', link:'realizacje.html' },
-      { id:'sezonowa', tag:'Oferta sezonowa', tytul:'Sezon świąteczny — czas na szopkę',
-        opis:'Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.',
-        btn:'Sprawdź ofertę →', link:'sklep.html' }
-    ],
+    slider: {
+      autoplay: 4.5,
+      kafle: [
+        { id:'nowosci', obraz:'assets/media/sklep/szopka.jpg', karty:true,
+          tresc:'<p class="sl-tag">Nowości</p><h2>Najnowsze produkty z pracowni</h2><p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.</p><a class="sl-btn" href="sklep.html">Zobacz w sklepie →</a>' },
+        { id:'bestsellery', obraz:'assets/media/sklep/szyld.jpg', karty:'odwrotnie',
+          tresc:'<p class="sl-tag">Bestsellery</p><h2>Najczęściej zamawiane</h2><p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p><a class="sl-btn" href="sklep.html">Zamów teraz →</a>' },
+        { id:'aktualnosci', obraz:'gradient', karty:false,
+          tresc:'<p class="sl-tag">Aktualności z pracowni</p><h2>Z pracowni prosto do Was</h2><p>Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.</p><a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>' },
+        { id:'sezonowa', obraz:'assets/hero.jpg', karty:false,
+          tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="sklep.html">Sprawdź ofertę →</a>' }
+      ]
+    },
     jak: { tytul:'Jak działamy', pod:'Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.',
       kroki: [
         { t:'Wybierz i zamów online', o:'Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.' },
@@ -454,6 +450,23 @@ html.dotyk .social{margin-top:14px}
 
   function esc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  /* migracja starego formatu (slajdy tag/tytul/opis/btn) na kafle */
+  function migrujStare(dane){
+    if (dane && dane.slajdy && !dane.slider){
+      var obrazWg = { nowosci:'assets/media/sklep/szopka.jpg', bestellery:'assets/media/sklep/szyld.jpg',
+                      aktualnosci:'gradient', sezonowa:'assets/hero.jpg' };
+      dane = JSON.parse(JSON.stringify(dane));
+      dane.slider = { autoplay: 4.5, kafle: dane.slajdy.map(function(sl){
+        return { id: sl.id || 'k', obraz: obrazWg[sl.id] || 'assets/hero.jpg',
+                 karty: (sl.id === 'nowosci') ? true : (sl.id === 'bestsellery' ? 'odwrotnie' : false),
+                 tresc: '<p class="sl-tag">' + esc(sl.tag) + '</p><h2>' + esc(sl.tytul) + '</h2><p>' + esc(sl.opis) + '</p>' +
+                        '<a class="sl-btn" href="' + esc(sl.link || 'sklep.html') + '">' + esc(sl.btn || 'Zobacz →') + '</a>' };
+      }) };
+      delete dane.slajdy;
+    }
+    return dane;
+  }
 
   function karta(pr){
     var obraz = pr.obraz && /^https?:/.test(pr.obraz) ? pr.obraz : 'assets/media/sklep/' + pr.obraz;
@@ -467,44 +480,91 @@ html.dotyk .social{margin-top:14px}
     return '<span class="sl-karta sl-karta-pusta"><span><span class="nazwa">Wkrótce</span><br>' +
       '<span class="cena">nowe prace w drodze</span></span></span>';
   }
-  function wypelnij(id, lista){
-    var el = document.getElementById(id);
-    if (!el) return;
-    var html = lista.map(karta).join('');
-    for (var i = lista.length; i < 3; i++) html += placeholder();
-    el.innerHTML = html;
+
+  /* kafle -> slajdy */
+  function budujSlajdy(kafle){
+    var track = document.getElementById('sl-track');
+    if (!track) return;
+    var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
+    track.innerHTML = kafle.map(function(k){
+      var tlo = k.obraz === 'gradient'
+        ? 'background-image:linear-gradient(135deg,#1F3A32,#6B4530)'
+        : 'background-image:url(' + JSON.stringify(k.obraz || '') + ')';
+      return '<div class="sl-slide" data-sl="' + esc(k.id || '') + '">' +
+        '<div class="sl-bg" style="' + tlo + '"></div>' +
+        '<div class="sl-cien"></div>' +
+        '<div class="sl-tresc">' + (k.tresc || '') +
+        (k.karty ? '<div class="sl-karty"' + (k.karty === 'odwrotnie' ? ' data-odw="1"' : '') + '></div>' : '') +
+        '</div></div>';
+    }).join('');
+    track.querySelectorAll('.sl-karty').forEach(function(el){
+      var lista = el.hasAttribute('data-odw') ? kat.slice().reverse().slice(0, 3) : kat.slice(0, 3);
+      var html = lista.map(karta).join('');
+      for (var i = lista.length; i < 3; i++) html += placeholder();
+      el.innerHTML = html;
+    });
+  }
+
+  /* slider: autoplay w pętli, strzałki, kropki */
+  function uruchomSlider(autoplayS){
+    var slider = document.getElementById('slider');
+    var track = document.getElementById('sl-track');
+    var dotsWrap = document.getElementById('sl-dots');
+    if (!slider || !track) return;
+    dotsWrap.innerHTML = '';
+    var slides = track.children;
+    var n = slides.length, i = 0, timer = null;
+    if (n === 0) return;
+    var dots = [];
+    for (var k = 0; k < n; k++){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Slajd ' + (k + 1));
+      (function(idx){ b.addEventListener('click', function(){ idz(idx); restart(); }); })(k);
+      dotsWrap.appendChild(b); dots.push(b);
+    }
+    function idz(idx){
+      i = (idx + n) % n;
+      track.style.transform = 'translateX(-' + (i * 100) + '%)';
+      for (var k = 0; k < n; k++){
+        slides[k].classList.toggle('akt', k === i);
+        dots[k].classList.toggle('akt', k === i);
+      }
+    }
+    function nastepny(){ idz(i + 1); }
+    function restart(){
+      if (timer) clearInterval(timer);
+      if (autoplayS > 0) timer = setInterval(nastepny, Math.round(autoplayS * 1000));
+    }
+    slider.querySelector('.sl-nav.prev').addEventListener('click', function(){ idz(i - 1); restart(); });
+    slider.querySelector('.sl-nav.next').addEventListener('click', function(){ nastepny(); restart(); });
+    slider.addEventListener('mouseenter', function(){ if (timer) clearInterval(timer); });
+    slider.addEventListener('mouseleave', restart);
+    var x0 = null;
+    slider.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; if (timer) clearInterval(timer); }, { passive:true });
+    slider.addEventListener('touchend', function(e){
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) idz(dx < 0 ? i + 1 : i - 1);
+      x0 = null; restart();
+    });
+    idz(0); restart();
   }
 
   async function wczytaj(){
     var dane = DOMYS;
     try {
       var odp = await SYG.wezwij('strona-glowna-pobierz', {});
-      if (odp && odp.ok && odp.dane) dane = odp.dane;
+      if (odp && odp.ok && odp.dane) dane = migrujStare(odp.dane);
     } catch (e) { /* brak danych — zostają domyślne */ }
 
-    /* slajdy */
-    (dane.slajdy || DOMYS.slajdy).forEach(function(sl){
-      var slajd = document.querySelector('.sl-slide[data-sl="' + sl.id + '"]');
-      if (!slajd) return;
-      var tag = slajd.querySelector('.sl-tag');
-      var h2 = slajd.querySelector('h2');
-      var p = slajd.querySelector('.sl-tresc > p');
-      var btn = slajd.querySelector('.sl-btn');
-      if (tag && sl.tag) tag.textContent = sl.tag;
-      if (h2 && sl.tytul) h2.textContent = sl.tytul;
-      if (p && sl.opis) p.textContent = sl.opis;
-      if (btn){ btn.textContent = sl.btn || 'Zobacz →'; btn.setAttribute('href', sl.link || 'sklep.html'); }
-    });
+    var sliderDane = dane.slider || DOMYS.slider;
+    var kafle = sliderDane.kafle && sliderDane.kafle.length ? sliderDane.kafle : DOMYS.slider.kafle;
+    var autoplayS = Number(sliderDane.autoplay);
+    if (isNaN(autoplayS)) autoplayS = 4.5;
 
-    /* karty produktów w slajdach 1 i 2 */
-    var kat = (window.SYG_KATALOG || []).filter(function(p){ return p.dostepny; });
-    if (kat.length){
-      wypelnij('sl-nowosci', kat.slice(0, 3));
-      wypelnij('sl-top', kat.slice().reverse().slice(0, 3));
-    } else {
-      wypelnij('sl-nowosci', []);
-      wypelnij('sl-top', []);
-    }
+    budujSlajdy(kafle);
+    uruchomSlider(autoplayS);
 
     /* CTA „Jak działamy" */
     var jak = dane.jak || DOMYS.jak;
@@ -518,14 +578,12 @@ html.dotyk .social{margin-top:14px}
       for (var i = 0; i < kroki.length; i++){
         var kr = (jak.kroki && jak.kroki[i]);
         if (!kr) continue;
-        var b = kroki[i].querySelector('b');
+        var bb = kroki[i].querySelector('b');
         var pp = kroki[i].querySelector('p');
-        if (b) b.textContent = kr.t || '';
+        if (bb) bb.textContent = kr.t || '';
         if (pp) pp.textContent = kr.o || '';
       }
     }
-
-    /* przyciski CTA */
     var c1 = document.getElementById('cta-btn-1');
     var c2 = document.getElementById('cta-btn-2');
     if (c1) c1.textContent = dane.cta1 || DOMYS.cta1;
@@ -533,9 +591,7 @@ html.dotyk .social{margin-top:14px}
   }
   wczytaj();
 })();
-</script>
 
-<script>
 /* splash — TYLKO przy pierwszym wejściu na stronę na tym urządzeniu.
    Kolejne odświeżenia, kliknięcia w „Strona główna" i powroty z podstron
    NIE pokazują go ponownie (zapis w pamięci urządzenia). */
@@ -558,50 +614,5 @@ html.dotyk .social{margin-top:14px}
 })();
 </script>
 
-<script>
-(function(){
-  /* ===== slider: autoplay w pętli, strzałki, kropki ===== */
-  var slider=document.getElementById('slider');
-  var track=document.getElementById('sl-track');
-  var slides=track.children;
-  var dotsWrap=document.getElementById('sl-dots');
-  var n=slides.length, i=0, timer=null;
-  if(!slider||!track||n===0)return;
-  var dots=[];
-  for(var k=0;k<n;k++){
-    var b=document.createElement('button');
-    b.type='button';
-    b.setAttribute('aria-label','Slajd '+(k+1));
-    (function(idx){b.addEventListener('click',function(){idz(idx);restart();});})(k);
-    dotsWrap.appendChild(b);dots.push(b);
-  }
-  function idz(idx){
-    i=(idx+n)%n;
-    track.style.transform='translateX(-'+(i*100)+'%)';
-    for(var k=0;k<n;k++){
-      slides[k].classList.toggle('akt',k===i);
-      dots[k].classList.toggle('akt',k===i);
-    }
-  }
-  function nastepny(){idz(i+1);}
-  function restart(){
-    if(timer)clearInterval(timer);
-    timer=setInterval(nastepny,4500);
-  }
-  slider.querySelector('.sl-nav.prev').addEventListener('click',function(){idz(i-1);restart();});
-  slider.querySelector('.sl-nav.next').addEventListener('click',function(){nastepny();restart();});
-  slider.addEventListener('mouseenter',function(){if(timer)clearInterval(timer);});
-  slider.addEventListener('mouseleave',restart);
-  var x0=null;
-  slider.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;if(timer)clearInterval(timer);},{passive:true});
-  slider.addEventListener('touchend',function(e){
-    if(x0===null)return;
-    var dx=e.changedTouches[0].clientX-x0;
-    if(Math.abs(dx)>40){idz(dx<0?i+1:i-1);}
-    x0=null;restart();
-  });
-  idz(0);restart();
-})();
-</script>
 </body>
 </html>

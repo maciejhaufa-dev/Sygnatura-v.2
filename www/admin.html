@@ -8,14 +8,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=298">
+<link rel="stylesheet" href="assets/style.css?v=299">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
 
 <main class="wrap">
   <span class="tag">Panel administracyjny</span>
-  <h1>Logowanie do panelu</h1>
+  <h1 id="admin-tytul">Logowanie do panelu</h1>
 
   <!-- EKRAN LOGOWANIA: wymuszany po każdym zamknięciu strony (sesja przeglądarki) -->
   <div id="logowanie" class="forma" style="max-width:480px">
@@ -44,7 +44,8 @@
 
     <!-- ZAKŁADKI -->
     <div class="admin-tabs" id="admin-tabs">
-      <button class="admin-tab on" data-tab="strona-glowna" type="button">Strona główna</button>
+      <button class="admin-tab on" data-tab="podsumowanie" type="button">Podsumowanie</button>
+      <button class="admin-tab" data-tab="strona-glowna" type="button">Strona główna</button>
       <button class="admin-tab" data-tab="zamowienia" type="button">Zamówienia</button>
       <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
       <button class="admin-tab" data-tab="blog" type="button">Blog</button>
@@ -53,18 +54,77 @@
       <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
     </div>
 
+    <!-- PODSUMOWANIE (kwartał) -->
+    <section class="admin-sekcja" id="tab-podsumowanie">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podsumowanie kwartału</h2>
+      <p class="mala">Liczby z tej przeglądarki (tryb demo). Po wdrożeniu arkusza Google będą liczone
+      ze wszystkich zamówień i zapytań.</p>
+      <div class="podsum-karty">
+        <div class="podsum-karta"><span class="num">01</span><h3>Zapytania</h3>
+          <b id="ps-zapytania">0</b>
+          <p class="mala">wynajem + wiadomości z formularza</p></div>
+        <div class="podsum-karta"><span class="num">02</span><h3>Zamówienia</h3>
+          <b id="ps-zamowienia">0</b>
+          <p class="mala">złożone w sklepie i wynajmie</p></div>
+        <div class="podsum-karta"><span class="num">03</span><h3>Suma kwot zamówień</h3>
+          <b id="ps-suma">0 zł</b>
+          <p class="mala">kwoty szacunkowe z rachunków</p></div>
+        <div class="podsum-karta"><span class="num">04</span><h3>Terminarz</h3>
+          <div class="term-placeholder">
+            <div class="ph">1. widok miesiąca</div>
+            <div class="ph">2. widok kwartału</div>
+            <div class="ph">3. terminy wolne</div>
+            <div class="ph">4. terminy zajęte</div>
+            <div class="ph">5. rezerwacje potwierdzone</div>
+            <div class="ph">6. zapytania na dni</div>
+          </div>
+          <p class="mala">Podgląd terminarza dodamy w kolejnym kroku.</p></div>
+      </div>
+    </section>
+
     <!-- STRONA GŁÓWNA -->
-    <section class="admin-sekcja" id="tab-strona-glowna">
-      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Strona główna — treści</h2>
-      <p class="mala">Wszystko, co zapiszesz tutaj, od razu pokaże się klientom na stronie głównej:
-      slajdy u góry, sekcja „Jak działamy" i przyciski pod nią. W trybie demo dane zapisują się
-      w tej przeglądarce; po wdrożeniu trafią do arkusza Google.</p>
+    <section class="admin-sekcja" id="tab-strona-glowna" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Strona główna — slider i treści</h2>
+      <p class="mala">Kolejność kafli w panelu = kolejność przewijania slidera na stronie głównej
+      (przeciągnij kafel, aby zmienić kolejność — jak monitory w ustawieniach ekranu). Kliknij
+      EDYTUJ, aby otworzyć EDYTOR TREŚCI danego kafla. W trybie demo dane zapisują się w tej
+      przeglądarce; po wdrożeniu trafią do arkusza Google.</p>
       <div class="flash" id="sg-info" style="display:none"></div>
 
-      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Slajdy (kolejność na stronie)</h3>
-      <p class="mala">Slajd 1 „Nowości" i slajd 2 „Bestsellery" zawsze pokazują karty produktów
-      z katalogu sklepu (też edytowalnego w zakładce Produkty). Tło slajdów to zdjęcia stałe.</p>
-      <div id="sg-slajdy"></div>
+      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Slider</h3>
+      <div class="pole" style="max-width:300px">
+        <label>Ustaw prędkość automatycznego przewijania (w sekundach) — 0 = bez autoplay</label>
+        <input type="number" id="sg-autoplay" min="0" step="0.5">
+      </div>
+      <div class="kafle-pasek" id="sg-kafle"></div>
+      <p class="mala">Pod każdym kaflem: EDYTUJ / USUŃ oraz strzałki ‹ › (zmiana kolejności także przez przeciąganie).</p>
+
+      <div id="sg-edycja" style="display:none;border:1px solid rgba(107,69,48,.4);background:#fff;padding:16px 18px;margin:18px 0">
+        <h3 id="sg-edycja-tytul" style="font-size:16.5px;color:var(--butelkowa);margin:0 0 12px">Edycja kafla</h3>
+        <div class="forma" style="max-width:780px">
+          <div class="pole">
+            <label>Zdjęcie w tle kafla</label>
+            <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap">
+              <select id="sg-obraz" style="flex:1;min-width:240px"></select>
+              <button class="btn outline" type="button" id="sg-obraz-wgraj" style="flex:none">Wgraj własne zdjęcie…</button>
+            </div>
+            <input type="file" id="sg-obraz-plik" accept="image/*" style="display:none">
+            <div class="sg-obraz-podglad" id="sg-obraz-podglad">podgląd tła</div>
+          </div>
+          <div class="pole">
+            <label style="cursor:pointer"><input type="checkbox" id="sg-karty" style="width:auto;margin-right:8px">
+            Pokaż karty produktów ze sklepu pod treścią</label>
+          </div>
+          <div class="pole">
+            <label>Treść kafla — EDYTOR TREŚCI (tytuły, podtytuły, tekst, kolumny, tabele, przyciski, linki)</label>
+            <div id="sg-tresc-edytor"></div>
+          </div>
+          <div class="przyciski" style="justify-content:space-between;margin-top:14px">
+            <button class="btn-odrzuc" type="button" id="sg-odrzuc">ODRZUĆ ZMIANY</button>
+            <button class="btn-zapisz" type="button" id="sg-zapisz-kafel">ZAPISZ ZMIANY</button>
+          </div>
+        </div>
+      </div>
 
       <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Sekcja „Jak działamy" (pod sliderem)</h3>
       <div class="forma" style="max-width:640px">
@@ -347,12 +407,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=298"></script>
-<script src="assets/koszyk.js?v=298"></script>
-<script src="assets/api.js?v=298"></script>
-<script src="assets/editor.js?v=298"></script>
-<script src="data/katalog.js?v=298"></script>
-<script src="assets/main.js?v=298"></script>
+<script src="assets/config.js?v=299"></script>
+<script src="assets/koszyk.js?v=299"></script>
+<script src="assets/api.js?v=299"></script>
+<script src="assets/editor.js?v=299"></script>
+<script src="assets/edytor.js?v=299"></script>
+<script src="data/katalog.js?v=299"></script>
+<script src="assets/main.js?v=299"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -387,22 +448,36 @@
     });
   });
 
-  /* ============ strona główna ============ */
+  /* ============ PODSUMOWANIE (kwartał) ============ */
+  function ladujPodsumowanie(){
+    var zam = SYG.demoDb.zamowienia();
+    var zap = SYG.demoDb.wynajemZapytania();
+    var wiad = SYG.demoDb.wiadomosci();
+    document.getElementById('ps-zapytania').textContent = zap.length + wiad.length;
+    document.getElementById('ps-zamowienia').textContent = zam.length;
+    var suma = zam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
+    document.getElementById('ps-suma').textContent = SYG.zl(suma);
+  }
+
+  /* ============ STRONA GŁÓWNA: slider (kafle) + treści ============ */
+  var SG_DANE = null;   /* robocza kopia danych strony głównej */
+  var SG_EDYCJA = null; /* { id, kopia } — edytowany kafel */
+  var SG_EDYTOR = null; /* instancja EDYTORA TREŚCI */
+
   var SG_DOMYS = {
-    slajdy: [
-      { id:'nowosci', tag:'Nowości', tytul:'Najnowsze produkty z pracowni',
-        opis:'Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.',
-        btn:'Zobacz w sklepie →', link:'sklep.html' },
-      { id:'bestsellery', tag:'Bestsellery', tytul:'Najczęściej zamawiane',
-        opis:'Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.',
-        btn:'Zamów teraz →', link:'sklep.html' },
-      { id:'aktualnosci', tag:'Aktualności z pracowni', tytul:'Z pracowni prosto do Was',
-        opis:'Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.',
-        btn:'Zobacz realizacje →', link:'realizacje.html' },
-      { id:'sezonowa', tag:'Oferta sezonowa', tytul:'Sezon świąteczny — czas na szopkę',
-        opis:'Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.',
-        btn:'Sprawdź ofertę →', link:'sklep.html' }
-    ],
+    slider: {
+      autoplay: 4.5,
+      kafle: [
+        { id:'nowosci', obraz:'assets/media/sklep/szopka.jpg', karty:true,
+          tresc:'<p class="sl-tag">Nowości</p><h2>Najnowsze produkty z pracowni</h2><p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.</p><a class="sl-btn" href="sklep.html">Zobacz w sklepie →</a>' },
+        { id:'bestsellery', obraz:'assets/media/sklep/szyld.jpg', karty:true,
+          tresc:'<p class="sl-tag">Bestsellery</p><h2>Najczęściej zamawiane</h2><p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p><a class="sl-btn" href="sklep.html">Zamów teraz →</a>' },
+        { id:'aktualnosci', obraz:'gradient', karty:false,
+          tresc:'<p class="sl-tag">Aktualności z pracowni</p><h2>Z pracowni prosto do Was</h2><p>Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.</p><a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>' },
+        { id:'sezonowa', obraz:'assets/hero.jpg', karty:false,
+          tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="sklep.html">Sprawdź ofertę →</a>' }
+      ]
+    },
     jak: { tytul:'Jak działamy', pod:'Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.',
       kroki: [
         { t:'Wybierz i zamów online', o:'Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.' },
@@ -411,53 +486,53 @@
       ] },
     cta1: 'Zarezerwuj termin', cta2: 'Złóż zamówienie'
   };
+
+  var SG_OBRAZY = [
+    'assets/media/sklep/szopka.jpg', 'assets/media/sklep/szyld.jpg', 'assets/media/sklep/love.jpg',
+    'assets/media/sklep/ramka.jpg', 'assets/media/sklep/pers-winietki.jpg', 'assets/media/sklep/pers-litery.jpg',
+    'assets/media/sklep/pers-wkladka-tablica.jpg', 'assets/media/sklep/pers-plan-stolow.jpg',
+    'assets/media/sklep/pers-numery-stolow.jpg', 'assets/media/sklep/pers-kafelki-scrabble.jpg',
+    'assets/media/sklep/pers-grawer.jpg', 'assets/hero.jpg', 'assets/forest.jpg',
+    'gradient'
+  ];
+
   function sgEsc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
-  function ladujStronaGlowna(){
-    var dane = SYG.demoDb.stronaGlowna() || SG_DOMYS;
-    var slajdy = dane.slajdy || SG_DOMYS.slajdy;
-    var html = '';
-    slajdy.forEach(function(sl, i){
-      html += '<div class="forma" style="max-width:640px;margin-bottom:14px">' +
-        '<h4 style="font-size:15.5px;color:var(--butelkowa);margin:0 0 6px">Slajd ' + (i + 1) + '</h4>' +
-        '<div class="pole"><label>Znacznik (mały napis u góry)</label>' +
-        '<input type="text" data-sg-sl="' + sl.id + '" data-f="tag" value="' + sgEsc(sl.tag) + '"></div>' +
-        '<div class="pole"><label>Nagłówek</label>' +
-        '<input type="text" data-sg-sl="' + sl.id + '" data-f="tytul" value="' + sgEsc(sl.tytul) + '"></div>' +
-        '<div class="pole"><label>Opis</label>' +
-        '<textarea data-sg-sl="' + sl.id + '" data-f="opis" style="min-height:64px">' + sgEsc(sl.opis) + '</textarea></div>' +
-        '<div class="pole" style="display:flex;gap:10px">' +
-        '<div style="flex:2"><label>Tekst przycisku</label>' +
-        '<input type="text" data-sg-sl="' + sl.id + '" data-f="btn" value="' + sgEsc(sl.btn) + '"></div>' +
-        '<div style="flex:1"><label>Strona docelowa</label>' +
-        '<input type="text" data-sg-sl="' + sl.id + '" data-f="link" value="' + sgEsc(sl.link) + '"></div></div>' +
-        '</div>';
-    });
-    document.getElementById('sg-slajdy').innerHTML = html;
-    var jak = dane.jak || SG_DOMYS.jak;
-    document.getElementById('sg-jak-tytul').value = jak.tytul || '';
-    document.getElementById('sg-jak-pod').value = jak.pod || '';
-    for (var i = 0; i < 3; i++){
-      var kr = (jak.kroki && jak.kroki[i]) || { t:'', o:'' };
-      document.getElementById('sg-k' + (i + 1) + '-t').value = kr.t || '';
-      document.getElementById('sg-k' + (i + 1) + '-o').value = kr.o || '';
+  /* migracja starego formatu (slajdy tag/tytul/opis/btn) na kafle */
+  function sgMigrujStare(dane){
+    if (dane && dane.slajdy && !dane.slider){
+      var obrazWg = { nowosci:'assets/media/sklep/szopka.jpg', bestellery:'assets/media/sklep/szyld.jpg',
+                      aktualnosci:'gradient', sezonowa:'assets/hero.jpg' };
+      dane = JSON.parse(JSON.stringify(dane));
+      dane.slider = { autoplay: 4.5, kafle: dane.slajdy.map(function(sl){
+        return { id: sl.id || 'k', obraz: obrazWg[sl.id] || 'assets/hero.jpg',
+                 karty: sl.id === 'nowosci' || sl.id === 'bestsellery',
+                 tresc: '<p class="sl-tag">' + sgEsc(sl.tag) + '</p><h2>' + sgEsc(sl.tytul) + '</h2><p>' + sgEsc(sl.opis) + '</p>' +
+                        '<a class="sl-btn" href="' + sgEsc(sl.link || 'sklep.html') + '">' + sgEsc(sl.btn || 'Zobacz →') + '</a>' };
+      }) };
+      delete dane.slajdy;
     }
-    document.getElementById('sg-cta1').value = dane.cta1 || '';
-    document.getElementById('sg-cta2').value = dane.cta2 || '';
+    return dane;
   }
 
-  document.getElementById('sg-zapisz').addEventListener('click', async function(){
-    var slajdy = ['nowosci','bestsellery','aktualnosci','sezonowa'].map(function(id){
-      function q(f){
-        var el = document.querySelector('[data-sg-sl="' + id + '"][data-f="' + f + '"]');
-        return el ? el.value : '';
-      }
-      return { id: id, tag: q('tag').trim(), tytul: q('tytul').trim(),
-               opis: q('opis').trim(), btn: q('btn').trim(), link: q('link').trim() };
-    });
+  function sgKafle(){ return (SG_DANE && SG_DANE.slider && SG_DANE.slider.kafle) || []; }
+
+  function kafelObrazCss(obraz){
+    return obraz === 'gradient' ? 'linear-gradient(135deg,#1F3A32,#6B4530)' : 'url("' + obraz + '")';
+  }
+
+  function sgInfo(txt, zle){
+    var info = document.getElementById('sg-info');
+    info.style.display = 'block';
+    info.textContent = txt;
+    info.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    setTimeout(function(){ info.style.display = 'none'; }, 5000);
+  }
+
+  async function sgZapiszWszystko(){
     var dane = {
-      slajdy: slajdy,
+      slider: { autoplay: Number(document.getElementById('sg-autoplay').value) || 0, kafle: sgKafle() },
       jak: { tytul: document.getElementById('sg-jak-tytul').value.trim(),
              pod: document.getElementById('sg-jak-pod').value.trim(),
              kroki: [
@@ -468,18 +543,199 @@
       cta1: document.getElementById('sg-cta1').value.trim(),
       cta2: document.getElementById('sg-cta2').value.trim()
     };
-    var info = document.getElementById('sg-info');
     var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
-    info.style.display = 'block';
-    if (odp.ok){
-      info.textContent = 'Zapisano — strona główna zaktualizowana.';
-      info.style.background = 'var(--butelkowa)';
-    } else {
-      info.textContent = odp.blad || 'Nie udało się zapisać.';
-      info.style.background = '#8a2f1d';
+    if (odp.ok){ SG_DANE = dane; sgInfo('Zapisano — strona główna zaktualizowana.', false); }
+    else sgInfo(odp.blad || 'Nie udało się zapisać.', true);
+    return odp.ok;
+  }
+
+  /* ---------- rysowanie paska kafli ---------- */
+  function rysujKafle(){
+    var pasek = document.getElementById('sg-kafle');
+    var kafle = sgKafle();
+    var html = '';
+    kafle.forEach(function(k, i){
+      html += '<div class="kafel-mini" draggable="true" data-sg-kafel="' + sgEsc(k.id) + '">' +
+        '<div class="km-okno" style="background-image:' + kafelObrazCss(k.obraz) + '"><span class="km-nr">' + (i + 1) + '</span></div>' +
+        '<div class="km-guzy">' +
+          '<button type="button" class="km-edycja">Edytuj</button>' +
+          '<button type="button" class="km-usun">Usuń</button>' +
+          '<span class="km-strzalki">' +
+            '<button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>' +
+            '<button type="button" class="km-prawo" title="Przesuń w prawo">›</button>' +
+          '</span>' +
+        '</div></div>';
+    });
+    html += '<button type="button" class="kafel-dodaj" id="sg-dodaj-kafel"><span class="plus">+</span>' +
+      '<span class="podpis">Dodaj</span></button>';
+    pasek.innerHTML = html;
+
+    pasek.querySelectorAll('.kafel-mini').forEach(function(el, i){
+      var id = el.getAttribute('data-sg-kafel');
+      var kafel = kafle.find(function(k){ return String(k.id) === id; });
+      el.querySelector('.km-edycja').addEventListener('click', function(){ otworzEdycje(kafel, i); });
+      el.querySelector('.km-usun').addEventListener('click', function(){
+        if (!confirm('Usunąć kafel „' + ((kafel && kafel.tresc) || '').replace(/<[^>]+>/g, '').slice(0, 40) + '"?') ) return;
+        SG_DANE.slider.kafle = kafle.filter(function(k){ return String(k.id) !== id; });
+        if (SG_EDYCJA && SG_EDYCJA.id === id) pokazEdycje(false);
+        sgZapiszWszystko(); rysujKafle();
+      });
+      el.querySelector('.km-lewo').addEventListener('click', function(){
+        if (i === 0) return;
+        var t = kafle[i - 1]; kafle[i - 1] = kafle[i]; kafle[i] = t;
+        sgZapiszWszystko(); rysujKafle();
+      });
+      el.querySelector('.km-prawo').addEventListener('click', function(){
+        if (i === kafle.length - 1) return;
+        var t = kafle[i + 1]; kafle[i + 1] = kafle[i]; kafle[i] = t;
+        sgZapiszWszystko(); rysujKafle();
+      });
+      /* Drag & Drop — jak ustawianie monitorów */
+      el.addEventListener('dragstart', function(e){
+        e.dataTransfer.setData('text/plain', id);
+        e.dataTransfer.effectAllowed = 'move';
+        el.classList.add('drag-nad');
+      });
+      el.addEventListener('dragend', function(){ el.classList.remove('drag-nad'); });
+      el.addEventListener('dragover', function(e){
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        el.classList.add('drag-nad');
+      });
+      el.addEventListener('dragleave', function(){ el.classList.remove('drag-nad'); });
+      el.addEventListener('drop', function(e){
+        e.preventDefault();
+        el.classList.remove('drag-nad');
+        var zId = e.dataTransfer.getData('text/plain');
+        if (!zId || zId === id) return;
+        var lista = sgKafle();
+        var zi = lista.findIndex(function(k){ return String(k.id) === zId; });
+        var ci = lista.findIndex(function(k){ return String(k.id) === id; });
+        if (zi < 0 || ci < 0) return;
+        var przen = lista.splice(zi, 1)[0];
+        lista.splice(ci, 0, przen);
+        sgZapiszWszystko(); rysujKafle();
+      });
+    });
+    var dodaj = document.getElementById('sg-dodaj-kafel');
+    if (dodaj) dodaj.addEventListener('click', function(){
+      var nowyKafel = { id: 'k' + Date.now(), obraz: 'assets/hero.jpg', karty: false,
+        tresc: '<p class="sl-tag">Nowy kafel</p><h2>Tytuł kafla</h2><p>Opis — edytuj mnie w EDYTORZE TREŚCI.</p>' };
+      SG_DANE.slider.kafle.push(nowyKafel);
+      rysujKafle();
+      otworzEdycje(nowyKafel, sgKafle().length - 1, true);
+    });
+  }
+
+  /* ---------- okno edycji kafla ---------- */
+  function pokazEdycje(widoczna){
+    document.getElementById('sg-edycja').style.display = widoczna ? 'block' : 'none';
+    if (widoczna) document.getElementById('sg-edycja').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
+  function otworzEdycje(kafel, i, nowy){
+    SG_EDYCJA = { id: String(kafel.id), kopia: JSON.parse(JSON.stringify(kafel)), nowy: !!nowy };
+    document.getElementById('sg-edycja-tytul').textContent = 'Edycja kafla ' + (i + 1);
+    /* tło */
+    var sel = document.getElementById('sg-obraz');
+    var opcje = SG_OBRAZY.slice();
+    if (kafel.obraz && opcje.indexOf(kafel.obraz) < 0) opcje.push(kafel.obraz);
+    sel.innerHTML = opcje.map(function(o){
+      return '<option value="' + sgEsc(o) + '"' + (o === kafel.obraz ? ' selected' : '') + '>' +
+        (o === 'gradient' ? 'Gradient butelkowo-brązowy (bez zdjęcia)' : sgEsc(o)) + '</option>';
+    }).join('');
+    odswiezPodgladObrazu();
+    document.getElementById('sg-karty').checked = !!kafel.karty;
+    if (!SG_EDYTOR) SG_EDYTOR = SYG.edytorTresci.stworz(document.getElementById('sg-tresc-edytor'));
+    SG_EDYTOR.ustaw(kafel.tresc || '');
+    pokazEdycje(true);
+  }
+
+  function odswiezPodgladObrazu(){
+    var v = document.getElementById('sg-obraz').value;
+    var el = document.getElementById('sg-obraz-podglad');
+    el.style.backgroundImage = kafelObrazCss(v);
+    el.textContent = v === 'gradient' ? 'gradient' : '';
+  }
+
+  /* ODRZUĆ ZMIANY — wraca poprzednia wersja kafla (nowy kafel znika) */
+  document.getElementById('sg-odrzuc').addEventListener('click', function(){
+    if (!SG_EDYCJA) return;
+    var kafle = sgKafle();
+    var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+    if (SG_EDYCJA.nowy){
+      /* kafel dodany, ale nigdy nie zapisany — znika */
+      if (i >= 0) kafle.splice(i, 1);
+    } else if (i >= 0){
+      kafle[i] = SG_EDYCJA.kopia;
     }
-    setTimeout(function(){ info.style.display = 'none'; }, 5000);
+    SG_EDYCJA = null;
+    pokazEdycje(false);
+    rysujKafle();
+    sgInfo('Zmiany odrzucone.', false);
   });
+
+  /* ZAPISZ ZMIANY — kafel idzie do danych i zapisuje się całość */
+  document.getElementById('sg-zapisz-kafel').addEventListener('click', async function(){
+    if (!SG_EDYCJA) return;
+    var kafle = sgKafle();
+    var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+    if (i < 0){ sgInfo('Kafel nie istnieje (usunięty?).', true); return; }
+    kafle[i].obraz = document.getElementById('sg-obraz').value;
+    kafle[i].karty = document.getElementById('sg-karty').checked;
+    kafle[i].tresc = SG_EDYTOR ? SG_EDYTOR.pobierz() : kafle[i].tresc;
+    var ok = await sgZapiszWszystko();
+    if (ok){
+      SG_EDYCJA = null;
+      pokazEdycje(false);
+      rysujKafle();
+    }
+  });
+
+  /* wgranie własnego zdjęcia w tle */
+  document.getElementById('sg-obraz-wgraj').addEventListener('click', function(){
+    document.getElementById('sg-obraz-plik').click();
+  });
+  document.getElementById('sg-obraz-plik').addEventListener('change', function(){
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function(){
+      var sel = document.getElementById('sg-obraz');
+      var op = document.createElement('option');
+      op.value = fr.result;
+      op.textContent = 'Wgrany obraz (z tego komputera)';
+      sel.appendChild(op);
+      sel.value = fr.result;
+      odswiezPodgladObrazu();
+    };
+    fr.readAsDataURL(f);
+    this.value = '';
+  });
+  document.getElementById('sg-obraz').addEventListener('change', odswiezPodgladObrazu);
+
+  function ladujStronaGlowna(){
+    SG_DANE = sgMigrujStare(SYG.demoDb.stronaGlowna()) || SG_DOMYS;
+    if (!SG_DANE.slider) SG_DANE.slider = SG_DOMYS.slider;
+    if (!SG_DANE.jak) SG_DANE.jak = SG_DOMYS.jak;
+    document.getElementById('sg-autoplay').value =
+      (SG_DANE.slider.autoplay != null) ? SG_DANE.slider.autoplay : SG_DOMYS.slider.autoplay;
+    var jak = SG_DANE.jak;
+    document.getElementById('sg-jak-tytul').value = jak.tytul || '';
+    document.getElementById('sg-jak-pod').value = jak.pod || '';
+    for (var i = 0; i < 3; i++){
+      var kr = (jak.kroki && jak.kroki[i]) || { t:'', o:'' };
+      document.getElementById('sg-k' + (i + 1) + '-t').value = kr.t || '';
+      document.getElementById('sg-k' + (i + 1) + '-o').value = kr.o || '';
+    }
+    document.getElementById('sg-cta1').value = SG_DANE.cta1 || '';
+    document.getElementById('sg-cta2').value = SG_DANE.cta2 || '';
+    SG_EDYCJA = null;
+    pokazEdycje(false);
+    rysujKafle();
+  }
+
+  document.getElementById('sg-zapisz').addEventListener('click', sgZapiszWszystko);
 
   /* ============ zamówienia ============ */
   async function ladujZamowienia(){
@@ -901,6 +1157,8 @@
   function pokazPanel(){
     logowanie.style.display = 'none';
     panel.style.display = 'block';
+    document.getElementById('admin-tytul').textContent = 'Panel administracyjny';
+    ladujPodsumowanie();
     ladujStronaGlowna();
     ladujZamowienia();
     ladujWiadomosci();
@@ -961,6 +1219,7 @@
 
   document.getElementById('odswiez').addEventListener('click', function(){
     _katCache = null;
+    ladujPodsumowanie();
     ladujStronaGlowna();
     ladujZamowienia();
     ladujWiadomosci();
