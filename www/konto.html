@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=308">
+<link rel="stylesheet" href="assets/style.css?v=309">
 </head>
 <body data-strona="Konto">
 <div id="naglowek"></div>
@@ -46,6 +46,16 @@
           <a href="#" id="odzysk-link" style="color:var(--brunatny);border-bottom:1px solid var(--zloty)">Nie pamiętasz hasła?</a>
         </p>
       </form>
+    </div>
+
+    <!-- KONTO TESTOWE (tryb demo) -->
+    <div class="forma" style="max-width:560px;border:1px dashed rgba(107,69,48,.55);background:var(--krem-2)" id="demo-konto">
+      <h2 style="font-size:17px;color:var(--butelkowa);margin-bottom:4px">Konto testowe (tryb demo)</h2>
+      <p class="mala" style="margin-bottom:6px">E-mail: <b>klient@demo.pl</b> · Hasło: <b>demo1234</b></p>
+      <p class="mala">Konto ma już uzupełnione dane kontaktowe i korespondencyjne, zgody marketingowe
+      oraz <b>2 zamówienia w historii</b>. Trzecie zamówienie (starsze niż 12 miesięcy) jest
+      celowo ukryte — tak działa przechowywanie historii maks. 1 rok. Możesz też założyć
+      własne konto formularzem powyżej.</p>
     </div>
 
     <!-- REJESTRACJA -->
@@ -223,11 +233,11 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=308"></script>
-<script src="assets/koszyk.js?v=308"></script>
-<script src="assets/api.js?v=308"></script>
-<script src="data/katalog.js?v=308"></script>
-<script src="assets/main.js?v=308"></script>
+<script src="assets/config.js?v=309"></script>
+<script src="assets/koszyk.js?v=309"></script>
+<script src="assets/api.js?v=309"></script>
+<script src="data/katalog.js?v=309"></script>
+<script src="assets/main.js?v=309"></script>
 <script>
 (function(){
   var komunikat = document.getElementById('komunikat');
@@ -246,6 +256,11 @@
   podglad('pokaz-haslo', 'haslo');
   podglad('pokaz-rej', 'rej-haslo');
   podglad('pokaz-ph', 'ph-nowe');
+
+  if (!SYG.TRYB_DEMO){
+    var dk = document.getElementById('demo-konto');
+    if (dk) dk.style.display = 'none';
+  }
 
   var dalej = SYG.param('dalej') || '';
   if (dalej) pokaz('<h2>Aby złożyć zamówienie, zaloguj się lub utwórz konto</h2>' +

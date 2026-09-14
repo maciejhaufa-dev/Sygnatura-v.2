@@ -82,6 +82,38 @@
   }
   function rokTemuIso(){ return new Date(Date.now() - 365 * 24 * 3600 * 1000).toISOString(); }
 
+  /* konto testowe w trybie demo — przy pierwszym uruchomieniu */
+  function seedKonta(){
+    if (localStorage.getItem(KL.uzytkownicy) === null){
+      zapisz(KL.uzytkownicy, [{
+        email: 'klient@demo.pl', imie: 'Anna', nazwisko: 'Nowak', telefon: '600 100 200',
+        adres: { ulica: 'ul. Zielona 3', kod: '60-123', miasto: 'Poznań' },
+        zgody: { newsletter: true, telefon: false },
+        haslo: hashDemo('demo1234'), rejestracja: teraz()
+      }]);
+    }
+    if (localStorage.getItem(KL.zamowienia) === null){
+      const dni = 24 * 3600 * 1000;
+      zapisz(KL.zamowienia, [
+        { sygnatura: 'SYG-2026-015', data: new Date(Date.now() - 5 * dni).toISOString(),
+          klient: { imie: 'Anna Nowak', email: 'klient@demo.pl' }, typ: 'sklep',
+          pozycje: [{ id: 'szopka', nazwa: 'Szopka bożonarodzeniowa (warstwowa)', cena: 249, ile: 1 }],
+          pers: [], kwoty: { razem: 249, pers_rabat: 0, kod_rabat: 0, kaucja: 0, dostawa: 0 },
+          status: 'zapytanie', historia: [{ t: teraz(), s: 'zapytanie' }] },
+        { sygnatura: 'SYG-2026-006', data: new Date(Date.now() - 120 * dni).toISOString(),
+          klient: { imie: 'Anna Nowak', email: 'klient@demo.pl' }, typ: 'sklep',
+          pozycje: [{ id: 'szyld', nazwa: 'Szyld powitalny „Witajcie"', cena: 189, ile: 1 }],
+          pers: [], kwoty: { razem: 189, pers_rabat: 0, kod_rabat: 0, kaucja: 0, dostawa: 0 },
+          status: 'zrobione', historia: [{ t: teraz(), s: 'zapytanie' }] },
+        { sygnatura: 'SYG-2024-031', data: new Date(Date.now() - 730 * dni).toISOString(),
+          klient: { imie: 'Anna Nowak', email: 'klient@demo.pl' }, typ: 'sklep',
+          pozycje: [{ id: 'love', nazwa: 'Litery podświetlane LOVE', cena: 249, ile: 1 }],
+          pers: [], kwoty: { razem: 249, pers_rabat: 0, kod_rabat: 0, kaucja: 0, dostawa: 0 },
+          status: 'zrobione', historia: [{ t: teraz(), s: 'zapytanie' }] }
+      ]);
+    }
+  }
+
   /* ---------- BLOG: wpisy (realizacje) ---------- */
   function seedBlog() {
     const posts = [
@@ -457,6 +489,7 @@
     try {
       if (localStorage.getItem(KL.blog) === null) seedBlog();
       if (localStorage.getItem(KL.strony) === null) seedStrony();
+      seedKonta();
     } catch (e) { /* brak localStorage */ }
   }
 
