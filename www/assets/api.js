@@ -313,6 +313,7 @@
         lista.unshift({ sygnatura: sygnatura, data: teraz(), klient: klient, typ: d.typ || 'sklep',
           pozycje: d.pozycje || [], pers: d.pers || [], kwoty: d.kwoty || {}, pomysl: d.pomysl || '',
           pakiet: d.pakiet || null, termin: d.termin || null,
+          dostawa: d.dostawa || null, kod: d.kod || '',
           zgoda: d.zgoda || 0, produkt: d.produkt || '',
           wiadomosc: d.wiadomosc || '', status: 'zapytanie',
           historia: [{ t: teraz(), s: 'zapytanie' }] });

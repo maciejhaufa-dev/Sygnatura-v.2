@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=309">
+<link rel="stylesheet" href="assets/style.css?v=310">
 </head>
 <body data-strona="Konto">
 <div id="naglowek"></div>
@@ -189,7 +189,7 @@
     <p class="mala">Przechowujemy zamówienia przez maksymalnie 12 miesięcy.</p>
     <div class="tabela-wrap" style="margin-top:8px">
       <table class="tabela" id="hist-tabela">
-        <thead><tr><th>Sygnatura</th><th>Data</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
+        <thead><tr><th>Sygnatura</th><th>Data</th><th>Pozycje</th><th>Razem</th><th>Status</th><th>Szczegóły</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -233,11 +233,11 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=309"></script>
-<script src="assets/koszyk.js?v=309"></script>
-<script src="assets/api.js?v=309"></script>
-<script src="data/katalog.js?v=309"></script>
-<script src="assets/main.js?v=309"></script>
+<script src="assets/config.js?v=310"></script>
+<script src="assets/koszyk.js?v=310"></script>
+<script src="assets/api.js?v=310"></script>
+<script src="data/katalog.js?v=310"></script>
+<script src="assets/main.js?v=310"></script>
 <script>
 (function(){
   var komunikat = document.getElementById('komunikat');
@@ -305,12 +305,18 @@
   }
 
   /* historia zamówień (maks. 1 rok) */
+  var STAN_NAZWA = {
+    zapytanie: 'Zapytanie — czeka na potwierdzenie',
+    zrobione: 'Zrealizowane',
+    anulowane: 'Anulowane',
+    w_trakcie: 'W trakcie'
+  };
   async function ladujHistorie(){
     var odp = await SYG.wezwij('konto-zamowienia', {});
     var tbody = document.querySelector('#hist-tabela tbody');
     var lista = odp.zamowienia || [];
     document.getElementById('hist-pusta').style.display = lista.length ? 'none' : 'block';
-    tbody.innerHTML = lista.map(function(z){
+    tbody.innerHTML = lista.map(function(z, i){
       var pozycje = (z.pozycje || []).map(function(p){ return p.nazwa + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
       if (!pozycje && z.pers && z.pers.length) pozycje = z.pers.map(function(p){ return p.nazwa; }).join(', ');
       var razem = (z.kwoty && z.kwoty.razem != null) ? SYG.zl(z.kwoty.razem) : '—';
@@ -318,8 +324,68 @@
         '<td>' + String(z.data || '').slice(0, 10) + '</td>' +
         '<td>' + (pozycje || '—') + '</td>' +
         '<td>' + razem + '</td>' +
-        '<td>' + z.status + '</td></tr>';
+        '<td>' + (STAN_NAZWA[z.status] || z.status || '—') + '</td>' +
+        '<td><button type="button" class="btn outline" data-paragon="' + i + '" style="padding:7px 14px;font-size:13px">Paragon</button></td></tr>';
     }).join('');
+    tbody.querySelectorAll('[data-paragon]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        pokazParagon(lista[Number(btn.getAttribute('data-paragon'))]);
+      });
+    });
+  }
+
+  /* paragon — zestawienie zamówienia jak na rachunku */
+  function pokazParagon(z){
+    if (!z) return;
+    function w(etykieta, wartosc, minus){
+      return wartosc != null && wartosc !== '' && wartosc !== 0
+        ? '<div class="p-wiersz"><span>' + etykieta + '</span><b' + (minus ? ' style="color:#8a2f1d"' : '') + '>' + wartosc + '</b></div>'
+        : '';
+    }
+    var wiersze = '';
+    (z.pozycje || []).forEach(function(p, i){
+      var wart = (Number(p.cena) || 0) * (p.ile || 1);
+      wiersze += '<div class="p-wiersz"><span>' + (i + 1) + '. ' + p.nazwa + ' ×' + (p.ile || 1) + '</span><b>' + SYG.zl(wart) + '</b></div>';
+    });
+    (z.pers || []).forEach(function(p){
+      wiersze += '<div class="p-wiersz"><span>' + p.nazwa + ' <span class="mala">(personalizacja' + (p.opis ? ': ' + p.opis : '') + ')</span></span><b>' + SYG.zl(p.cena) + '</b></div>';
+    });
+    if (z.pomysl) wiersze += '<div class="p-wiersz"><span>Pomysł własny</span><b>wycena osobno</b></div>';
+    var kw = z.kwoty || {};
+    if (kw.pers_rabat) wiersze += w('Rabat na personalizację', '−' + SYG.zl(kw.pers_rabat), true);
+    if (kw.kod_rabat) wiersze += w('Kod rabatowy' + (z.kod ? ' ' + z.kod : ''), '−' + SYG.zl(kw.kod_rabat), true);
+    var dost = z.dostawa || {};
+    var dostNazwa = dost.metoda === 'odbior' ? 'Odbiór osobisty' :
+      (dost.metoda === 'paczkomat' ? 'Paczkomat InPost' + (dost.rozmiar ? ' (paczka ' + dost.rozmiar + ')' : '') :
+      (dost.metoda === 'kurier' ? 'Kurier' + (dost.rozmiar ? ' (paczka ' + dost.rozmiar + ')' : '') : ''));
+    if (dostNazwa) wiersze += w('Dostawa: ' + dostNazwa, kw.dostawa ? SYG.zl(kw.dostawa) : '0 zł');
+    if (dost.adres) wiersze += '<div class="p-wiersz"><span>Adres dostawy</span><b>' + dost.adres + '</b></div>';
+    if (dost.paczkomat) wiersze += '<div class="p-wiersz"><span>Paczkomat</span><b>' + dost.paczkomat + '</b></div>';
+    if (kw.kaucja) wiersze += w('Kaucja zwrotna', SYG.zl(kw.kaucja));
+    if (z.wiadomosc) wiersze += '<div class="p-wiersz"><span>Uwagi</span><b>' + z.wiadomosc + '</b></div>';
+    var klient = z.klient || {};
+    var klientHtml = klient.imie ? '<div class="p-wiersz"><span>Klient</span><b>' + klient.imie +
+      (klient.telefon ? ', tel. ' + klient.telefon : '') + '</b></div>' +
+      '<div class="p-wiersz"><span>E-mail</span><b>' + klient.email + '</b></div>' : '';
+
+    var tlo = document.createElement('div');
+    tlo.className = 'edtr-modal-tlo';
+    var okno = document.createElement('div');
+    okno.className = 'edtr-modal';
+    okno.style.maxWidth = '680px';
+    okno.innerHTML =
+      '<h3>' + z.sygnatura + ' <span class="mala">· ' + String(z.data || '').slice(0, 10) + '</span></h3>' +
+      '<div class="p-status">' + (STAN_NAZWA[z.status] || z.status || '') + '</div>' +
+      '<div class="paragon">' + wiersze +
+      '<div class="p-razem"><span>RAZEM</span><b>' + (kw.razem != null ? SYG.zl(kw.razem) : '—') + '</b></div>' +
+      '</div>' + klientHtml +
+      '<div class="przyciski" style="justify-content:flex-end;margin-top:14px">' +
+      '<button type="button" class="btn" id="paragon-zamknij">Zamknij</button></div>';
+    tlo.appendChild(okno);
+    document.body.appendChild(tlo);
+    function zamknij(){ if (tlo.parentNode) tlo.parentNode.removeChild(tlo); }
+    okno.querySelector('#paragon-zamknij').addEventListener('click', zamknij);
+    tlo.addEventListener('click', function(e){ if (e.target === tlo) zamknij(); });
   }
 
   /* logowanie */

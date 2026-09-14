@@ -801,4 +801,14 @@ html.dotyk .menu-vert a::after{display:none}
 .edtr-bez{border:1px solid rgba(107,69,48,.4);background:#FBF7F0;color:var(--brunatny);
   font-size:12px;padding:4px 8px;border-radius:6px;cursor:pointer}
 .edtr-bez:hover{background:var(--krem-2)}
+/* ============ PARAGON (szczegóły zamówienia w panelu klienta) ============ */
+.p-status{display:inline-block;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--butelkowa);border:1px solid rgba(107,69,48,.5);border-radius:6px;padding:4px 10px;
+  margin:0 0 10px;background:var(--krem-2)}
+.paragon .p-wiersz{display:flex;justify-content:space-between;gap:14px;padding:6px 0;
+  border-bottom:1px dashed rgba(107,69,48,.3);font-size:15px;color:rgba(51,38,28,.9)}
+.paragon .p-wiersz span{min-width:0}
+.paragon .p-razem{display:flex;justify-content:space-between;gap:14px;padding:10px 0 2px;
+  font-size:17px;color:var(--butelkowa)}
+.paragon + .p-wiersz{margin-top:10px}
 .tre-tabela td{vertical-align:top}
