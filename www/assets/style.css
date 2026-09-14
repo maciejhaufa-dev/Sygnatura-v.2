@@ -723,6 +723,10 @@ html.dotyk .menu-vert a::after{display:none}
 .edtr-tresc-jasna{position:relative;padding:26px 30px;color:var(--ink);font-family:var(--serif);
   font-size:17px;line-height:1.55;outline:none;cursor:text}
 .edtr-tresc-jasna:focus{outline:none}
+@supports not (aspect-ratio: 1/1){
+  .edtr-podglad{height:min(56vw,600px);min-height:340px}
+}
+.edtr-tresc-jasna h1{color:var(--butelkowa);font-size:28px;margin:8px 0 6px;text-shadow:none;font-weight:600}
 .edtr-tresc-jasna h2{color:var(--butelkowa);font-size:24px;margin:0 0 4px;text-shadow:none;font-weight:600}
 .edtr-tresc-jasna h3{color:var(--brunatny);font-size:20px;margin:8px 0 4px}
 .edtr-tresc-jasna p{color:rgba(51,38,28,.85);margin:6px 0}
@@ -741,6 +745,12 @@ html.dotyk .menu-vert a::after{display:none}
   padding:12px 24px;font-size:13.5px}
 .edtr-tresc-jasna .cta-btn .btn.outline{background:transparent;color:var(--butelkowa);
   border:1.5px solid var(--butelkowa)}
+.edtr-tresc-jasna ul,.edtr-tresc-jasna ol{color:rgba(51,38,28,.9);padding-left:24px;margin:6px 0}
+.edtr-tresc-jasna li{color:rgba(51,38,28,.9)}
+.edtr-tresc-jasna blockquote{border-left:3px solid var(--zloty);padding:6px 14px;margin:10px 0;
+  color:var(--brunatny);font-style:italic;background:rgba(196,165,130,.14)}
+.edtr-tresc-jasna .tre-tabela td{color:rgba(51,38,28,.9)}
+.edtr-tresc-jasna hr.tre-linia{border-color:var(--zloty)}
 .edtr-tresc-jasna .sl-tag{display:inline-block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;
   color:var(--brunatny);border:1px solid rgba(196,165,130,.8);padding:5px 12px;margin-bottom:12px;background:rgba(196,165,130,.12)}
 .edtr-tresc-jasna .tre-blok{background:rgba(196,165,130,.12)}

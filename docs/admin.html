@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=306">
+<link rel="stylesheet" href="assets/style.css?v=307">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -183,6 +183,22 @@
           <tbody></tbody>
         </table>
       </div>
+
+      <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Treść strony „Zamówienia" (Kreator zamówień)</h2>
+      <p class="mala">Edytujesz treść, którą klient widzi po wejściu w „Zamówienia" — ten sam
+      EDYTOR TREŚCI co pod sliderem strony głównej: tekst i akapity, kolumny, tabele, rysowanie
+      obiektów, grupowanie, warstwy, wyrównywanie. Przycisk to właściwość obiektu (checkbox + link).</p>
+      <div id="sz-tresc-edytor">
+        <div class="edtr-podglad edtr-podglad-jasny">
+          <div class="edtr-tresc edtr-tresc-jasna" id="sz-tresc-pole" contenteditable="true"></div>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
+        <button class="btn-odrzuc" type="button" id="sz-odrzuc">ODRZUĆ ZMIANY STRONY ZAMÓWIENIA</button>
+        <button class="btn-zapisz" type="button" id="sz-zapisz">ZAPISZ ZMIANY STRONY ZAMÓWIENIA</button>
+      </div>
+      <p class="mala" id="sz-brudny" style="display:none;color:#8a2f1d;font-weight:700">Masz niezapisane zmiany na stronie Zamówienia.</p>
+      <div class="flash" id="sz-info" style="display:none"></div>
     </section>
 
     <!-- WIADOMOŚCI -->
@@ -435,13 +451,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=306"></script>
-<script src="assets/koszyk.js?v=306"></script>
-<script src="assets/api.js?v=306"></script>
-<script src="assets/editor.js?v=306"></script>
-<script src="assets/edytor.js?v=306"></script>
-<script src="data/katalog.js?v=306"></script>
-<script src="assets/main.js?v=306"></script>
+<script src="assets/config.js?v=307"></script>
+<script src="assets/koszyk.js?v=307"></script>
+<script src="assets/api.js?v=307"></script>
+<script src="assets/editor.js?v=307"></script>
+<script src="assets/edytor.js?v=307"></script>
+<script src="data/katalog.js?v=307"></script>
+<script src="assets/main.js?v=307"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -925,6 +941,53 @@
     sgInfo('Wszystkie niezapisane zmiany strony głównej odrzucone.', false);
   });
 
+  /* ============ treść strony Zamówienia (EDYTOR TREŚCI) ============ */
+  var SZ_EDYTOR = null;
+  var SZ_DOMYS = '<span class="tag">Kreator zamówień</span>' +
+    '<h1>Zamówienia</h1>' +
+    '<p class="lead">Wybierz, czego potrzebujesz. Każdą ścieżkę prowadzimy krok po kroku — z podsumowaniem i jasnymi zasadami na końcu. Bez niespodzianek.</p>' +
+    '<div class="hub">' +
+    '<div class="hub-col"><div class="hub-head">Wynajem dekoracji</div><div class="hub-body">' +
+    '<p>Stwórz niepowtarzalny klimat swojego wydarzenia, dodając mu wyjątkowego wymiaru za pomocą naszych dekoracji. Wybierz jeden z dostępnych pakietów, sprawdź dostępność terminów i zarezerwuj. Możesz też dodać do wystroju personalizowane elementy i detale, które sprawią, że będą to niezapomniane chwile dla wszystkich.</p>' +
+    '</div><a class="btn" href="wynajem.html">Zarezerwuj termin</a></div>' +
+    '<div class="hub-col"><div class="hub-head">Personalizacja</div><div class="hub-body">' +
+    '<p>Pragniesz obdarować kogoś wyjątkowym prezentem, którego nigdy nie zapomni, a może szukasz miejsca, które zrealizuje Twoją wizję? Jeśli tak, to dobrze trafiłeś — w Sygnaturze specjalizujemy się w personalizowanych prezentach i dekoracjach, gdzie każdy detal pozwala poczuć się wyjątkowo i jest niepowtarzalny. Nie jesteśmy fabryką, tylko rodzinną manufakturą tworzącą unikaty — dzięki temu nasze wyroby są wyjątkowe.</p>' +
+    '</div><a class="btn" href="personalizacja.html">Zamów personalizację</a></div>' +
+    '<div class="hub-col"><div class="hub-head">Sklep</div><div class="hub-body">' +
+    '<p>Wiele z naszych prac zdobi prywatne domy i lokale eventowe. Wybierz coś dla siebie i stwórz niepowtarzalny klimat dla swojego wnętrza.</p>' +
+    '</div><a class="btn" href="sklep.html">Katalog produktów</a></div>' +
+    '</div>';
+  function szUstawBrudny(){ document.getElementById('sz-brudny').style.display = 'block'; }
+  function szCzyscBrudny(){ document.getElementById('sz-brudny').style.display = 'none'; }
+  function szInfo(txt, zle){
+    var info = document.getElementById('sz-info');
+    info.style.display = 'block';
+    info.textContent = txt;
+    info.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    setTimeout(function(){ info.style.display = 'none'; }, 5000);
+  }
+  function ladujStronaZamowienia(){
+    var dane = (SYG.demoDb && SYG.demoDb.stronaZamowienia) ? SYG.demoDb.stronaZamowienia() : null;
+    if (!SZ_EDYTOR) SZ_EDYTOR = SYG.edytorTresci.stworz(
+      document.getElementById('sz-tresc-edytor'), document.getElementById('sz-tresc-pole'));
+    SZ_EDYTOR.ustaw((dane && dane.tresc) || SZ_DOMYS);
+    szCzyscBrudny();
+  }
+  async function szZapisz(){
+    var odp = await SYG.wezwij('strona-zamowienia-zapisz', { klucz: klucz, dane: { tresc: SZ_EDYTOR.pobierz() } });
+    if (odp.ok){ szCzyscBrudny(); szInfo('Strona Zamówienia zapisana.', false); }
+    else szInfo(odp.blad || 'Nie udało się zapisać.', true);
+    return odp.ok;
+  }
+  function szOdrzuc(){
+    if (!confirm('Odrzucić wszystkie niezapisane zmiany strony Zamówienia? Wróci wersja zapisana.')) return;
+    ladujStronaZamowienia();
+    szInfo('Niezapisane zmiany strony Zamówienia odrzucone.', false);
+  }
+  document.getElementById('sz-zapisz').addEventListener('click', szZapisz);
+  document.getElementById('sz-odrzuc').addEventListener('click', szOdrzuc);
+  document.getElementById('sz-tresc-pole').addEventListener('input', szUstawBrudny);
+
   /* ============ zamówienia ============ */
   async function ladujZamowienia(){
     var odp = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
@@ -934,6 +997,7 @@
       return;
     }
     bled.style.display = 'none';
+    ladujStronaZamowienia();
     var lista = odp.zamowienia || [];
     var tbody = document.querySelector('#tabela-zamowien tbody');
     tbody.innerHTML = lista.map(function(z){

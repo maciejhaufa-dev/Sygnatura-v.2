@@ -200,6 +200,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
   padding:15px 32px;cursor:pointer;transition:all .25s;display:inline-block}
 .cta-btn .btn:hover{background:var(--zloty);color:var(--butelkowa)}
+.jak blockquote{border-left:3px solid var(--zloty);color:var(--brunatny);font-style:italic;
+  padding:2px 14px;margin:10px 0;background:rgba(196,165,130,.14)}
 .cta-btn .btn.outline{background:transparent;color:var(--butelkowa)}
 .cta-btn .btn.outline:hover{background:var(--brunatny);border-color:var(--brunatny);color:var(--krem)}
 
@@ -230,7 +232,13 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
   .sl-karta:nth-child(3){grid-column:span 2}
   .krok b{font-size:15px}
 }
+@supports not (aspect-ratio: 1/1){
+  .slider{height:min(54vw,600px)}
+}
 @media (max-width:760px){
+  @supports not (aspect-ratio: 1/1){
+    .slider{height:62vw;min-height:260px}
+  }
   .page{padding:10px}
   .srodek{flex-direction:column}
   .side{width:auto;padding:22px 18px}
@@ -441,15 +449,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.26</span>
+    <span>© Sygnatura 2026 · wersja 28.27</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=306"></script>
-<script src="assets/koszyk.js?v=306"></script>
-<script src="assets/config.js?v=306"></script>
-<script src="assets/api.js?v=306"></script>
-<script src="assets/main.js?v=306"></script>
+<script src="data/katalog.js?v=307"></script>
+<script src="assets/koszyk.js?v=307"></script>
+<script src="assets/config.js?v=307"></script>
+<script src="assets/api.js?v=307"></script>
+<script src="assets/main.js?v=307"></script>
 <script>
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość

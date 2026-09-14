@@ -912,6 +912,11 @@
       wstawKsztalt({ typ:'pole', tekst:'Tekst', tlo:'#FBF7F0', przez:true, ramka:'transparent', gr:1,
         kolor:'#33261C', czcionka:'sans', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:260, wys:56 });
+      /* od razu można pisać — tekst-placeholder jest zaznaczony */
+      setTimeout(function () {
+        var ob = wybrane[0];
+        if (ob && ob.classList && ob.classList.contains('tre-ksztalt')) edytujTekstObiektu(ob, true);
+      }, 80);
     });
     bar.querySelector('button[title="Prostokąt"]').addEventListener('click', function () {
       wstawKsztalt({ typ:'prostokat', tekst:'', tlo:'#1F3A32', przez:false, ramka:'#C4A582', gr:2,
@@ -976,7 +981,7 @@
     }
 
     /* ---------- edycja tekstu w kształcie (✏) ---------- */
-    function edytujTekstObiektu(ob){
+    function edytujTekstObiektu(ob, zaznaczWszystko){
       if (!ob || !ob.classList || !ob.classList.contains('tre-ksztalt')) {
         alert('Zaznacz kształt z tekstem (prostokąt, elipsa, pole tekstowe).'); return;
       }
@@ -990,7 +995,7 @@
       var sel = window.getSelection();
       var r = document.createRange();
       r.selectNodeContents(w);
-      r.collapse(false);
+      if (!zaznaczWszystko) r.collapse(false);
       sel.removeAllRanges();
       sel.addRange(r);
     }
