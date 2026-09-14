@@ -1229,6 +1229,50 @@ WYKONANE (wersja 28.25, ?v=305):
 Testy: node --check edytor.js + skrypty + assety, HTML zbilansowany; sync docs, Pages built |
 3f7a24e, fetch_page live ?v=305 OK. (curl z sandboxa nie sięga sieci — HTTP 000; weryfikacja
 przez fetch_page.)
+## Sesja 28 — EDYTOR v6 = mini-PowerPoint: rysowanie obiektów, grupowanie, warstwy, tabele (commit d13e832, wersja 28.26)
+
+Właściciel (notatki z telefonu + screen): zamiast dokładać „funkcje przycisków/bloków" —
+SEKCJA RYSOWANIA OBIEKTÓW jak w PowerPoint; przycisk = WŁAŚCIWOŚĆ elementu (checkbox +
+pole linku). Edytor ma odzwierciedlać PowerPoint: pełne opcje tekstu, akapitu, tabel
+i obiektów (zaznaczanie, wielokrotne zaznaczanie, grupowanie, obrót, warstwy, wyrównywanie
+względem siebie, równe odstępy, ikony funkcji w trybie edycji).
+
+WYKONANE (wersja 28.26, ?v=306; edytor.js przepisany do v6):
+- TEKST: czcionka rozszerzona o GOOGLE FONTS (Lato, Montserrat, Oswald, Playfair Display —
+  doładowane w index i admin), rozmiar, B/I/U + PRZEKREŚLENIE, kolor tekstu, kolor tła
+  tekstu z przyciskiem „⊘ Bez tła" (przezroczyste), ODSTĘP MIĘDZY ZNAKAMI (−1…8 px);
+  pasek pokazuje czcionkę/rozmiar/kolor zaznaczenia.
+- AKAPIT: listy punktowana i numerowana, justowanie (lewa/środek/prawa/wyjustowanie),
+  WYRÓWNANIE PIONOWE góra/środek/dół (komórki tabeli i kształty z tekstem), KIERUNEK
+  TEKSTU +90°/−90° (kształty), układ kolumnowy 1/2/3/4, cytat, etykieta.
+- TABELA: „▦ Tabela…" (wiersze × kolumny, z ramką lub bez), +Wiersz / +Kol. / −Wiersz /
+  −Kol., przełączanie obramowania (◫ Ramka).
+- RYSOWANIE OBIEKTÓW (zastąpiło przyciski/bloki/kształty): 🅃 pole tekstowe, ▭ prostokąt,
+  ▢ zaokrąglony, ◯ elipsa, ─ linia, ➜ strzałka, △ trójkąt. Obiekt: klik = zaznaczenie,
+  DRUGI pojedynczy klik = przełączenie trybu rozmiar ↔ OBRÓT (zielone kółko; Shift = co 15°,
+  jak Inkscape), 4 narożniki = rozmiar, przeciąganie = przesunięcie. 2×klik = OKNO
+  WŁAŚCIWOŚCI: wypełnienie (+ przezroczyste), ramka (kolor i grubość), kolor/czcionka/
+  rozmiar tekstu, wyrównanie pionowe, kierunek tekstu, wymiary px, checkbox „to jest
+  PRZYCISK (klikalny)" + pole LINKU (aktywne po zaznaczeniu) — przycisk renderuje się jako
+  <a class="tre-ksztalt-a">.
+- GRUPOWANIE: Ctrl+G (⊞) blokuje wzajemne położenie (wrapper .tre-grupa, dzieci w px),
+  Ctrl+Shift+G (⊟) rozgrupowuje; klik w grupę zaznacza całość (elementy zablokowane).
+- WARSTWY: ⤒ na wierzch / 🔼 do przodu / 🔽 do tyłu / ⤓ na spód (zIndex).
+- WYRÓWNANIE: jeden obiekt → krawędź/środek pola; kilka (Ctrl+klik) → WZGLĘDEM SIEBIE
+  (linia/kolumna); ⇶ ⇵ równe odstępy.
+- MINI-PASEK KONTEKSTOWY przy zaznaczeniu (ikony jak PowerPoint): ✏ tekst, 🎨 właściwości,
+  ⊞ ⊟ grupuj/rozgrupuj, warstwy, 🗑 usuń.
+- Zgodność wsteczna: stare przyciski-obiekty i bloki .tre-blok nadal działają (2×klik →
+  edycja); zapisane treści bez zmian. Kształty renderują się na stronie klienta
+  (clip-path dla trójkąta/strzałki, .tre-grupa, .tre-ksztalt-a w index.html).
+- Zgłaszanie zmian: każda operacja na obiektach (wstaw/przesuń/rozmiar/obrót/usuń/grupuj/
+  warstwy/tabele) wywołuje zdarzenie input na polu → wskaźnik „niezapisane zmiany" działa.
+- Fix pusha non-fast-forward po resecie sandboxa (historia lokalna 2284074 → rebase
+  checkout z ff73d49: www+docs na FETCH_HEAD 0770a17).
+
+Testy: node --check (edytor.js v6 + skrypty + assety), HTML zbilansowany, grep: stary
+przycisk-toolbar usunięty, nowe funkcje obecne (grupowanie/warstwy/tabele/przekreślenie/
+odstępy); sync docs; Pages built | d13e832; fetch_page live ?v=306 OK.
 NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
 strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
 maile, hasła/reset, logowania).
