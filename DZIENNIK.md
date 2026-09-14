@@ -1361,4 +1361,28 @@ WYKONANE (wersja 28.29, ?v=309):
 JAK WERYFIKOWAĆ: wejdź na konto.html → zaloguj klient@demo.pl / demo1234 → panel pokazuje
 dane Anny, 2 zamówienia w historii (trzecie starsze niż rok ukryte), kody rabatowe,
 zmianę hasła; nagłówek przełącza się na „Witaj, Anna".
+## Sesja 28 — PARAGON w historii, licznik sklepu od 1, czyszczenie koszyka po zamówieniu (commit 8116f6d, wersja 28.30)
+
+Właściciel: (1) nie mogę wejść w zamówienie i sprawdzić co było zamówione (zestawienie
+a la paragon); (2) sklep: licznik +/- domyślnie pokazuje 0 — „Dodaj do koszyka" nic nie
+robi, dopóki nie zwiększy się do 1; (3) po wykonaniu zamówienia na koszyku w nagłówku
+dalej wisi cyferka.
+
+WYKONANE (wersja 28.30, ?v=310):
+- PARAGON: historia zamówień w panelu ma kolumnę „Szczegóły" z przyciskiem „Paragon" —
+  otwiera okno (modal) z pełnym zestawieniem jak rachunek: pozycje (nazwa × ilość × cena =
+  wartość), personalizacje z opisem, pomysł własny, rabaty (−5% personalizacja, kod
+  rabatowy z nazwą kodu), dostawa (metoda + rozmiar paczki + adres/paczkomat + cena),
+  kaucja, uwagi, dane klienta, status (przetłumaczony), data i RAZEM. Statusy mają polskie
+  nazwy (zapytanie/zrobione/anulowane/w trakcie). Style .p-status/.paragon w style.css.
+  Żeby paragon miał dane dostawy i kodu, zamówienie ZAPISUJE teraz pola dostawa i kod
+  (api.js 'zamowienie' + podsumowanie wysyła k.dostawa i k.kod).
+- SKLEP: licznik startuje od 1 („Dodaj do koszyka" od razu dodaje sztukę); po dodaniu
+  wraca na 1; jeśli produkt już jest w koszyku, licznik pokazuje jego aktualną ilość.
+- KOSZYK PO ZAMÓWIENIU: po wysłaniu zamówienia (podsumowanie) koszyk jest CZYSZCZONY
+  (KOSZYK.wyczysc()) przed przejściem na dziekuje.html — cyferka na koszyku w nagłówku
+  i pasek koszyka znikają po powrocie na stronę główną.
+- Testy: node --check + HTML; test Node: zamówienie z dostawą (paczkomat M, POZ001P),
+  kodem POWITANIE5 i kod_rabat 25 zapisuje się i wraca w konto-zamowienia; pozycje z ilością
+  ×2; sync docs; Pages built | 8116f6d; fetch_page live konto.html (kolumna „Szczegóły").
 NASTĘPNY KROK: kolejne strony wg usera; docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
