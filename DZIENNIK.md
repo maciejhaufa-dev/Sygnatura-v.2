@@ -1339,4 +1339,26 @@ WYKONANE (wersja 28.28, ?v=308):
   rejestracja (bez hasła w odpowiedzi), duplikat odrzucony, złe/dobre hasło, zapis danych
   (telefon/miasto), zmiana hasła + logowanie nowym, historia bez wpisu 2-letniego, prune
   magazynu po zapisie; sync docs; Pages built | 8aa493a; fetch_page live konto.html OK.
+## Sesja 28 — KONTO TESTOWE trybu demo: klient@demo.pl / demo1234 (commit cdda3f1, wersja 28.29)
+
+Właściciel: „A gdzie dane do logowania przykładowego konta użytkownika? Jak mam
+zweryfikować czy wszystko działa jak powinno?" — brakowało gotowego konta do testów.
+
+WYKONANE (wersja 28.29, ?v=309):
+- seedKonta() w api.js (przy PIERWSZYM uruchomieniu, tylko gdy magazyny puste — nie
+  nadpisuje danych wpisanych przez użytkownika):
+  KONTO: klient@demo.pl / demo1234 (Anna Nowak, tel. 600 100 200, adres korespondencyjny
+  ul. Zielona 3, 60-123 Poznań, zgody: newsletter TAK / telefon NIE).
+  ZAMÓWIENIA: SYG-2026-015 (5 dni temu, „zapytanie", szopka 249 zł) i SYG-2026-006
+  (4 miesiące temu, „zrobione", szyld 189 zł) — WIDOCZNE w historii; SYG-2024-031
+  (2 lata temu) — celowo UKRYTE w panelu (reguła maks. 12 miesięcy), widoczne w adminie
+  i przycinane przy zapisie kolejnego zamówienia.
+- konto.html: box „Konto testowe (tryb demo)" z danymi logowania i wyjaśnieniem co
+  sprawdzić; ukrywany po wyłączeniu trybu demo (!SYG.TRYB_DEMO).
+- Testy Node: seed, logowanie demo1234, dane/adres/zgody, historia = 2 wpisy (bez
+  2-letniego), admin widzi 3, ponowne załadowanie api.js nie nadpisuje konta; HTML/JS OK;
+  sync docs; Pages built | cdda3f1; fetch_page live konto.html (box z danymi widoczny).
+JAK WERYFIKOWAĆ: wejdź na konto.html → zaloguj klient@demo.pl / demo1234 → panel pokazuje
+dane Anny, 2 zamówienia w historii (trzecie starsze niż rok ukryte), kody rabatowe,
+zmianę hasła; nagłówek przełącza się na „Witaj, Anna".
 NASTĘPNY KROK: kolejne strony wg usera; docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
