@@ -1303,5 +1303,40 @@ WYKONANE (wersja 28.27, ?v=307):
   built | 153d30a; fetch_page live: zamowienia.html (renderuje hub), admin (sekcja edycji
   treści Zamówienia z ODRZUĆ/ZAPISZ + wskaźnik niezapisanych zmian). Fix pusha non-fast-forward
   po resecie (checkout d7e0cc2 -- www docs na 5e0aad6).
-NASTĘPNY KROK: test na komputerze (zaznaczanie/obrót/grupowanie + edycja Zamówienia);
-potem kolejne strony wg usera; docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
+## Sesja 28 — KONTA UŻYTKOWNIKÓW: panel klienta, historia zamówień, kody rabatowe (commit 8aa493a, wersja 28.28)
+
+Właściciel: (1) panel użytkownika PO ZALOGOWANIU: dane kontaktowe i korespondencyjne,
+zgody marketingowe, historia zamówień (maks. 1 rok), informacje o promocjach i kodach
+rabatowych dla stałych klientów, zmiana hasła (automat), edycja danych — nic wielkiego;
+dane mają uzupełniać się w zamówieniu automatycznie po zalogowaniu. (2) Uzupełnienie
+danych w zamówieniu WYMAGA konta (sklep i personalizacja); wynajem — nie musi, ale tam też
+mogą być bonusy/zniżki.
+
+WYKONANE (wersja 28.28, ?v=308):
+- KONTA (api.js): magazyny 'syg-demo-uzytkownicy' + 'syg-uzytkownik-sesja-v1'; demoDb
+  .uzytkownicy()/.sesja()/.zalogowany(); akcje: konto-rejestracja (unikalny e-mail, min. 8
+  znaków, auto-logowanie, hasło hashowane hashDemo), konto-zaloguj, konto-wyloguj,
+  konto-pobierz, konto-zapisz (dane + adres korespondencyjny + zgody), konto-zmien-haslo
+  (weryfikacja starego), konto-zamowienia (tylko dla zalogowanego, tylko ≤ 1 rok).
+  Zamówienia w magazynie PRZYCINANE do 12 miesięcy przy każdym zapisie nowego.
+- konto.html PRZEBUDOWANE: gość = logowanie / REJESTRACJA / odzyskiwanie (symulacja e-maila);
+  po zalogowaniu PANEL: „Moje dane" (imię, nazwisko, e-mail readonly, telefon, adres
+  korespondencyjny: ulica/kod/miasto), „Zgody marketingowe" (newsletter e-mail, telefon/SMS),
+  „Historia zamówień" (tabela: sygnatura, data, pozycje, razem, status + komunikat „max 12
+  miesięcy"), „Promocje i kody rabatowe dla klientów" (lista z config: POWITANIE5 −5%
+  pierwsze zamówienie, STALY10 −10% od 3 zamówień, WYNAJEM5 −5% wynajem), „Zmiana hasła"
+  (automat — stare/nowe/powtórz), wyloguj. Parametr ?dalej= wraca po zalogowaniu do
+  zamówienia.
+- dane.html: krok „Dane" WYMAGA logowania (gość → konto.html?dalej=dane.html…); po
+  zalogowaniu pola imię/e-mail/telefon uzupełniają się Z KONTA automatycznie; pasek
+  „Zamówienie składasz jako … / Edytuj dane w panelu / Wyloguj". (Wynajem zostaje bez
+  wymogu logowania.)
+- KODY RABATOWE działają: config.js SYG.KODY_RABATOWE; koszyk.html — pole „Kod rabatowy"
+  (dodaj/usuń, wiersz −% w tabeli); podsumowanie.html — wiersz rabatu w rachunku + kwoty
+  .kod_rabat; WYNAJEM5 → komunikat „wpisz kod w uwagach zapytania o termin".
+- main.js: nagłówek pokazuje „Witaj, {imię}" (title = konto — e-mail) po zalogowaniu.
+- Testy: node --check (api/config/main/skrypty/assety), HTML zbilansowany; test Node kont:
+  rejestracja (bez hasła w odpowiedzi), duplikat odrzucony, złe/dobre hasło, zapis danych
+  (telefon/miasto), zmiana hasła + logowanie nowym, historia bez wpisu 2-letniego, prune
+  magazynu po zapisie; sync docs; Pages built | 8aa493a; fetch_page live konto.html OK.
+NASTĘPNY KROK: kolejne strony wg usera; docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
