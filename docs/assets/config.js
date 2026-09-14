@@ -19,6 +19,13 @@ window.SYG = {
   PERS_RABAT_PROG: 3,
   PERS_RABAT_PROC: 5,
 
+  // kody rabatowe dla klientów (promocje z panelu użytkownika)
+  KODY_RABATOWE: {
+    POWITANIE5: { proc: 5, opis: '5% na pierwsze zamówienie — dla nowych kont' },
+    STALY10:    { proc: 10, opis: '10% dla stałych klientów — od 3 zrealizowanych zamówień' },
+    WYNAJEM5:   { proc: 5, opis: '5% na pakiet wynajmu — wpisz kod w uwagach zapytania o termin' }
+  },
+
   // logowanie do panelu administracyjnego w trybie demo (admin.html).
   // Po wdrożeniu Google Apps Script logowanie sprawdza baza administratorów (arkusz),
   // a te dwa pola przestają działać — możesz je wtedy usunąć.

@@ -12,7 +12,8 @@
                zamowienia: 'syg-demo-zamowienia', licznik: 'syg-demo-licznik',
                produkty: 'syg-admin-produkty', dostawa: 'syg-admin-dostawa',
                blog: 'syg-demo-blog', strony: 'syg-demo-strony', dodane: 'syg-demo-dodane',
-               zapytaniaWynajem: 'syg-demo-wynajem-zapytania', stronaGlowna: 'syg-demo-strona-glowna', stronaZamowienia: 'syg-demo-strona-zamowienia' };
+               zapytaniaWynajem: 'syg-demo-wynajem-zapytania', stronaGlowna: 'syg-demo-strona-glowna', stronaZamowienia: 'syg-demo-strona-zamowienia',
+               uzytkownicy: 'syg-demo-uzytkownicy', sesja: 'syg-uzytkownik-sesja-v1' };
   function czytaj(klucz) {
     try { return JSON.parse(localStorage.getItem(klucz) || 'null'); } catch (e) { return null; }
   }
@@ -62,8 +63,24 @@
     zamowienia: function () { return czytaj(KL.zamowienia) || []; },
     wynajemZapytania: function () { return czytaj(KL.zapytaniaWynajem) || []; },
     stronaGlowna: function () { return czytaj(KL.stronaGlowna) || null; },
-    stronaZamowienia: function () { return czytaj(KL.stronaZamowienia) || null; }
+    stronaZamowienia: function () { return czytaj(KL.stronaZamowienia) || null; },
+    uzytkownicy: function () { return czytaj(KL.uzytkownicy) || []; },
+    sesja: function () { return czytaj(KL.sesja) || null; },
+    zalogowany: function () {
+      const s = czytaj(KL.sesja);
+      if (!s || !s.email) return null;
+      const u = (czytaj(KL.uzytkownicy) || []).find(function (x) { return x.email === s.email; });
+      return u ? bezHasla(u) : null;
+    }
   };
+
+  /* konto bez hasła (do wysyłki do strony) */
+  function bezHasla(u) {
+    return { email: u.email, imie: u.imie, nazwisko: u.nazwisko, telefon: u.telefon || '',
+      adres: u.adres || { ulica: '', kod: '', miasto: '' }, zgody: u.zgody || { newsletter: false, telefon: false },
+      rejestracja: u.rejestracja || '' };
+  }
+  function rokTemuIso(){ return new Date(Date.now() - 365 * 24 * 3600 * 1000).toISOString(); }
 
   /* ---------- BLOG: wpisy (realizacje) ---------- */
   function seedBlog() {
@@ -153,6 +170,88 @@
         return { ok: true };
       }
 
+      /* ============ KONTA UŻYTKOWNIKÓW (tryb demo: localStorage) ============ */
+      case 'konto-rejestracja': {
+        const email = String(d.email || '').trim().toLowerCase();
+        const haslo = String(d.haslo || '');
+        if (!d.imie || !email || !haslo) return { ok: false, blad: 'Uzupełnij imię, nazwisko, e-mail i hasło.' };
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, blad: 'Podaj poprawny adres e-mail.' };
+        if (haslo.length < 8) return { ok: false, blad: 'Hasło musi mieć co najmniej 8 znaków.' };
+        const lista = czytaj(KL.uzytkownicy) || [];
+        if (lista.find(function (x) { return x.email === email; })) return { ok: false, blad: 'Konto z tym adresem e-mail już istnieje — zaloguj się.' };
+        const u = { email: email, imie: String(d.imie).trim(), nazwisko: String(d.nazwisko || '').trim(),
+          telefon: '', adres: { ulica: '', kod: '', miasto: '' },
+          zgody: { newsletter: true, telefon: false }, haslo: hashDemo(haslo), rejestracja: teraz() };
+        lista.push(u);
+        zapisz(KL.uzytkownicy, lista);
+        zapisz(KL.sesja, { email: email });
+        return { ok: true, konto: bezHasla(u) };
+      }
+
+      case 'konto-zaloguj': {
+        const email = String(d.email || '').trim().toLowerCase();
+        const u = (czytaj(KL.uzytkownicy) || []).find(function (x) { return x.email === email; });
+        if (!u || u.haslo !== hashDemo(String(d.haslo || ''))) return { ok: false, blad: 'Nieprawidłowy e-mail lub hasło.' };
+        zapisz(KL.sesja, { email: email });
+        return { ok: true, konto: bezHasla(u) };
+      }
+
+      case 'konto-wyloguj': {
+        localStorage.removeItem(KL.sesja);
+        return { ok: true };
+      }
+
+      case 'konto-pobierz': {
+        const s = czytaj(KL.sesja);
+        if (!s || !s.email) return { ok: true, konto: null };
+        const u = (czytaj(KL.uzytkownicy) || []).find(function (x) { return x.email === s.email; });
+        return { ok: true, konto: u ? bezHasla(u) : null };
+      }
+
+      case 'konto-zapisz': {
+        const s = czytaj(KL.sesja);
+        if (!s || !s.email) return { ok: false, blad: 'Nie jesteś zalogowany.' };
+        const lista = czytaj(KL.uzytkownicy) || [];
+        const u = lista.find(function (x) { return x.email === s.email; });
+        if (!u) return { ok: false, blad: 'Nie znaleziono konta — zaloguj się ponownie.' };
+        const dane = d.dane || {};
+        if (!String(dane.imie || '').trim()) return { ok: false, blad: 'Imię nie może być puste.' };
+        u.imie = String(dane.imie).trim();
+        u.nazwisko = String(dane.nazwisko || '').trim();
+        u.telefon = String(dane.telefon || '').trim();
+        u.adres = { ulica: String((dane.adres && dane.adres.ulica) || '').trim(),
+          kod: String((dane.adres && dane.adres.kod) || '').trim(),
+          miasto: String((dane.adres && dane.adres.miasto) || '').trim() };
+        u.zgody = { newsletter: !!(dane.zgody && dane.zgody.newsletter),
+          telefon: !!(dane.zgody && dane.zgody.telefon) };
+        zapisz(KL.uzytkownicy, lista);
+        return { ok: true, konto: bezHasla(u) };
+      }
+
+      case 'konto-zmien-haslo': {
+        const s = czytaj(KL.sesja);
+        if (!s || !s.email) return { ok: false, blad: 'Nie jesteś zalogowany.' };
+        const lista = czytaj(KL.uzytkownicy) || [];
+        const u = lista.find(function (x) { return x.email === s.email; });
+        if (!u) return { ok: false, blad: 'Nie znaleziono konta — zaloguj się ponownie.' };
+        if (u.haslo !== hashDemo(String(d.stare || ''))) return { ok: false, blad: 'Obecne hasło jest nieprawidłowe.' };
+        const nowe = String(d.nowe || '');
+        if (nowe.length < 8) return { ok: false, blad: 'Nowe hasło musi mieć co najmniej 8 znaków.' };
+        u.haslo = hashDemo(nowe);
+        zapisz(KL.uzytkownicy, lista);
+        return { ok: true };
+      }
+
+      case 'konto-zamowienia': {
+        const s = czytaj(KL.sesja);
+        if (!s || !s.email) return { ok: true, zamowienia: [] };
+        const rok = rokTemuIso();
+        const lista = (czytaj(KL.zamowienia) || []).filter(function (z) {
+          return z.klient && String(z.klient.email || '').toLowerCase() === s.email && (!z.data || z.data >= rok);
+        });
+        return { ok: true, zamowienia: lista };
+      }
+
       case 'wynajem-zapytanie': {
         /* zapytanie o termin wynajmu — jak wiadomość z formularza kontaktowego.
            Termin NIE jest blokowany: rezerwację potwierdzamy po wpłacie. */
@@ -177,7 +276,8 @@
         licznik += 1;
         zapisz(KL.licznik, licznik);
         const sygnatura = 'SYG-' + new Date().getFullYear() + '-' + String(licznik).padStart(3, '0');
-        const lista = czytaj(KL.zamowienia) || [];
+        const rok = rokTemuIso();
+        const lista = (czytaj(KL.zamowienia) || []).filter(function (z) { return !z.data || z.data >= rok; });
         lista.unshift({ sygnatura: sygnatura, data: teraz(), klient: klient, typ: d.typ || 'sklep',
           pozycje: d.pozycje || [], pers: d.pers || [], kwoty: d.kwoty || {}, pomysl: d.pomysl || '',
           pakiet: d.pakiet || null, termin: d.termin || null,

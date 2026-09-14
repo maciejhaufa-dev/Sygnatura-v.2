@@ -77,6 +77,15 @@
   const SVG_FB = '<path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/>';
 
   function szkielet(aktywna) {
+    /* etykieta konta w nagłówku: imię zalogowanego użytkownika */
+    var kontoEtykieta = 'Panel użytkownika', kontoTytul = 'Konto — logowanie';
+    try {
+      var kuz = (SYG.demoDb && SYG.demoDb.zalogowany) ? SYG.demoDb.zalogowany() : null;
+      if (kuz && kuz.imie){
+        kontoEtykieta = 'Witaj, ' + kuz.imie;
+        kontoTytul = 'Konto — ' + kuz.email;
+      }
+    } catch (e) {}
     return '' +
       '<div class="srodek">' +
       /* A + C: logo i menu */
@@ -113,8 +122,8 @@
       '<div class="head-przyciski">' +
       '<a class="head-przycisk" href="koszyk.html" title="Koszyk" aria-label="Koszyk">' +
       '<span class="kropka"></span>' + ikonaSvg(SVG_KOSZYK) + '<span class="hp-etyk">Koszyk</span></a>' +
-      '<a class="head-przycisk" href="konto.html" title="Konto — logowanie" aria-label="Panel użytkownika">' +
-      ikonaSvg(SVG_PANEL) + '<span class="hp-etyk">Panel użytkownika</span></a>' +
+      '<a class="head-przycisk" href="konto.html" title="' + kontoTytul + '" aria-label="Panel użytkownika">' +
+      ikonaSvg(SVG_PANEL) + '<span class="hp-etyk">' + kontoEtykieta + '</span></a>' +
       '</div>' +
       '</div>' +
       '<h1 class="strona-tytul" id="strona-tytul"></h1>' +
@@ -129,7 +138,7 @@
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.27</span>';
+      '<span>© Sygnatura 2026 · wersja 28.28</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
