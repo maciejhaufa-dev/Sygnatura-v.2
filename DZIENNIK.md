@@ -1273,6 +1273,35 @@ WYKONANE (wersja 28.26, ?v=306; edytor.js przepisany do v6):
 Testy: node --check (edytor.js v6 + skrypty + assety), HTML zbilansowany, grep: stary
 przycisk-toolbar usunięty, nowe funkcje obecne (grupowanie/warstwy/tabele/przekreślenie/
 odstępy); sync docs; Pages built | d13e832; fetch_page live ?v=306 OK.
-NASTĘPNY KROK: akceptacja; potem BAZA GOOGLE SHEETS + skrypty Apps Script (akcje demo blog-*,
-strona-*, produkt-nowy, terminy-zajete, pakiet-dostepny dostają lustra serwerowe; zamówienia,
-maile, hasła/reset, logowania).
+## Sesja 28 — STRONA ZAMÓWIENIA edytowalna EDYTOREM TREŚCI + fixy telefonu (commit 153d30a, wersja 28.27)
+
+Właściciel (z telefonu): (1) na telefonie nie widać slidera / zniknął podgląd; (2) po
+wstawieniu pola tekstowego nie da się edytować tekstu; (3) tekst (np. Cytat) domyślnie
+niewidoczny — w kolorze tła; ma być brązowy wg księgi znaku; (4) KOLEJNA STRONA: Zamówienia —
+analogiczna edycja treści jak pole pod sliderem strony głównej (ten sam edytor).
+
+WYKONANE (wersja 28.27, ?v=307):
+- STRONA ZAMÓWIENIA W EDYTORZE: zakładka „Zamówienia" w panelu ma sekcję „Treść strony
+  Zamówienia (Kreator zamówień)" — ten sam EDYTOR TREŚCI na jasnym podglądzie, załadowany
+  aktualną treścią strony (tag/h1/lead + 3 kafle hub: Wynajem/Personalizacja/Sklep);
+  przyciski ODRZUĆ ZMIANY STRONY ZAMÓWIENIA / ZAPISZ ZMIANY STRONY ZAMÓWIENIA + wskaźnik
+  „Masz niezapisane zmiany na stronie Zamówienia". Nowe akcje api.js:
+  strona-zamowienia-pobierz/zapisz (klucz 'syg-demo-strona-zamowienia', {tresc}); demoDb
+  .stronaZamowienia(); zamowienia.html: <main id="zam-tresc-box"> + loader (zapisana treść
+  zastępuje domyślną) + pełne Google Fonts (Lato/Montserrat/Oswald/Playfair).
+- POLE TEKSTOWE: po wstawieniu od razu tryb pisania — placeholder „Tekst" zaznaczony,
+  pisanie od razu go zastępuje (na telefonie bez dblclik; 2×klik nadal otwiera właściwości).
+- KOLORY JASNEGO PODGLĄDU (fix niewidocznego tekstu): .edtr-tresc-jasna dostała h1, ul/ol/li,
+  blockquote (brązowy tekst + złoty pasek + delikatne tło) i tabelę — wcześniej cytaty/listy
+  dziedziczyły kremowy kolor z ciemnego podglądu i ginęły na białym tle. Cytat na stronie
+  (index .jak blockquote) wg księgi znaku.
+- SLIDER/PODGLĄD NA TELEFONIE: @supports not (aspect-ratio) — fallback wysokości .slider
+  (min(54vw,600px), mobilnie 62vw min 260px) i .edtr-podglad (min(56vw,600px) min 340px) —
+  starsze Safari bez aspect-ratio nie zwija już slidera/podglądu do zera.
+- Testy: node --check (api/edytor/skrypty/assety), HTML zbilansowany, test Node akcji
+  strona-zamowienia-* (pobierz null → zapis → odczyt tresc, demoDb OK); sync docs; Pages
+  built | 153d30a; fetch_page live: zamowienia.html (renderuje hub), admin (sekcja edycji
+  treści Zamówienia z ODRZUĆ/ZAPISZ + wskaźnik niezapisanych zmian). Fix pusha non-fast-forward
+  po resecie (checkout d7e0cc2 -- www docs na 5e0aad6).
+NASTĘPNY KROK: test na komputerze (zaznaczanie/obrót/grupowanie + edycja Zamówienia);
+potem kolejne strony wg usera; docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
