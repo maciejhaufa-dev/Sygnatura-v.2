@@ -7,8 +7,8 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=305">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=306">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -137,8 +137,8 @@
           </div>
           <div class="pole">
             <label>Treść kafla — EDYTOR TREŚCI (edytujesz kafla na żywo, na jego tle: tytuły,
-            podtytuły, tekst, kolumny, tabele, przyciski, kształty; obiekty: klik = zaznaczenie,
-            2×klik = edycja, Ctrl+klik = kilka naraz)</label>
+            podtytuły, tekst, kolumny, tabele, rysowanie obiektów (kształty, pola tekstowe, grupowanie, warstwy);
+            obiekty: klik = zaznaczenie, 2×klik = właściwości)</label>
             <div id="sg-tresc-edytor">
               <div class="edtr-podglad">
                 <div class="edtr-bg" id="sg-tresc-bg"></div>
@@ -157,11 +157,12 @@
 
       <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Treść pod sliderem („Jak działamy" i przyciski)</h3>
       <p class="mala">Edytujesz całą sekcję pod sliderem w EDYTORZE TREŚCI na jasnym podglądzie
-      (biały box jak na stronie): nagłówki, tekst, kolumny, tabele, przyciski. Obiekty
-      (przyciski, obrazki) przeciągniesz myszą w dowolne miejsce; klik = zaznaczenie, 2×klik = edycja
-      (blok: 2×klik edytuje tekst w środku), Ctrl+klik = kilka obiektów naraz — strzałki
-      wyrównują je WZGLĘDEM SIEBIE (linia/kolumna), ⇶ ⇵ rozkładają w równych odstępach,
-      narożny uchwyt zmienia rozmiar.</p>
+      (biały box jak na stronie) — edytor działa jak PowerPoint: sekcja „RYSOWANIE OBIEKTÓW"
+      (pole tekstowe, prostokąt, zaokrąglony, elipsa, linia, strzałka, trójkąt), klik =
+      zaznaczenie, drugi klik = tryb obrotu, narożniki = rozmiar, 2×klik = właściwości
+      (wypełnienie przezroczyste lub kolor, ramka, checkbox „to jest PRZYCISK" + pole linku),
+      Ctrl+klik = kilka obiektów, Ctrl+G = GRUPOWANIE (blokada wzajemnego położenia),
+      warstwy (na wierzch / na spód), wyrównywanie względem siebie i równe odstępy.</p>
       <div id="sg-cta-edytor">
         <div class="edtr-podglad edtr-podglad-jasny">
           <div class="edtr-tresc edtr-tresc-jasna" id="sg-cta-pole" contenteditable="true"></div>
@@ -434,13 +435,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=305"></script>
-<script src="assets/koszyk.js?v=305"></script>
-<script src="assets/api.js?v=305"></script>
-<script src="assets/editor.js?v=305"></script>
-<script src="assets/edytor.js?v=305"></script>
-<script src="data/katalog.js?v=305"></script>
-<script src="assets/main.js?v=305"></script>
+<script src="assets/config.js?v=306"></script>
+<script src="assets/koszyk.js?v=306"></script>
+<script src="assets/api.js?v=306"></script>
+<script src="assets/editor.js?v=306"></script>
+<script src="assets/edytor.js?v=306"></script>
+<script src="data/katalog.js?v=306"></script>
+<script src="assets/main.js?v=306"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');

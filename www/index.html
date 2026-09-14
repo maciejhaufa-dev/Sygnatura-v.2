@@ -8,7 +8,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
 <script>
 /* TRYB DOTYKOWY: telefon/tablet — także z włączoną „wersją na komputer".
    Wymuszamy wtedy układ dopasowany do treści z normalnym przewijaniem strony. */
@@ -290,6 +290,12 @@ html.dotyk .social{margin-top:14px}
 .tre-ksztalt-s{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
   padding:2px 10px;box-sizing:border-box}
 .tre-ksztalt.tre-linia{height:0;margin:8px 8px 8px 0;background:none}
+.tre-ksztalt.tre-trojkat{clip-path:polygon(50% 0,100% 100%,0 100%);border:none}
+.tre-ksztalt.tre-strzalka{clip-path:polygon(0 30%,72% 30%,72% 0,100% 50%,72% 100%,72% 70%,0 70%);border:none}
+.tre-ksztalt-a{text-decoration:none;color:inherit;cursor:pointer}
+.tre-grupa{position:absolute;z-index:5}
+.tre-grupa .tre-ksztalt,.tre-grupa .tre-przycisk-obiekt,.tre-grupa .tre-blok,.tre-grupa img{position:absolute}
+.tre-tabela td{vertical-align:top}
 </style>
 </head>
 <body data-strona="Strona główna">
@@ -435,15 +441,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.25</span>
+    <span>© Sygnatura 2026 · wersja 28.26</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=305"></script>
-<script src="assets/koszyk.js?v=305"></script>
-<script src="assets/config.js?v=305"></script>
-<script src="assets/api.js?v=305"></script>
-<script src="assets/main.js?v=305"></script>
+<script src="data/katalog.js?v=306"></script>
+<script src="assets/koszyk.js?v=306"></script>
+<script src="assets/config.js?v=306"></script>
+<script src="assets/api.js?v=306"></script>
+<script src="assets/main.js?v=306"></script>
 <script>
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość

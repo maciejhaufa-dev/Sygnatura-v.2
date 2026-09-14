@@ -765,11 +765,30 @@ html.dotyk .menu-vert a::after{display:none}
   font-weight:700;letter-spacing:.08em;padding:6px 16px;border-radius:6px;cursor:pointer}
 .edtr-ok:hover{background:var(--zloty);color:var(--butelkowa)}
 .tre-wybrany{outline:2px dashed var(--zloty);outline-offset:3px}
-.tre-uchwyt{position:absolute;width:11px;height:11px;background:#fff;border:1.5px solid var(--brunatny);
-  border-radius:2px;cursor:nwse-resize;z-index:40;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.tre-uchwyt{position:absolute;width:10px;height:10px;background:#fff;border:1.5px solid var(--brunatny);
+  border-radius:2px;z-index:70;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tre-uchwyt-obrot{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;
+  border:2px solid #7CB342;z-index:70;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .tre-ksztalt{display:inline-block;position:relative;vertical-align:middle;margin:4px 8px 4px 0}
 .tre-ksztalt-s{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
   padding:2px 10px;font-size:15px;letter-spacing:.04em;box-sizing:border-box}
 .tre-ksztalt.tre-linia{height:0;margin:8px 8px 8px 0;background:none}
 .tre-blok{box-sizing:border-box;overflow:auto}
 .tre-blok:focus{outline:none}
+
+/* ============ EDYTOR v6: rysowanie obiektów (PowerPoint) ============ */
+.tre-ksztalt.tre-trojkat{clip-path:polygon(50% 0,100% 100%,0 100%);border:none}
+.tre-ksztalt.tre-strzalka{clip-path:polygon(0 30%,72% 30%,72% 0,100% 50%,72% 100%,72% 70%,0 70%);border:none}
+.tre-ksztalt-a{text-decoration:none;color:inherit;cursor:pointer}
+.tre-grupa{position:absolute;z-index:5}
+.tre-grupa .tre-ksztalt,.tre-grupa .tre-przycisk-obiekt,.tre-grupa .tre-blok,.tre-grupa img{position:absolute}
+.edtr-kontekst{position:absolute;display:none;gap:2px;background:#fff;border:1px solid rgba(107,69,48,.5);
+  border-radius:8px;padding:3px 5px;box-shadow:0 6px 18px rgba(0,0,0,.28);z-index:60;
+  flex-wrap:wrap;max-width:min(430px,100%)}
+.edtr-kontekst button{border:1px solid rgba(107,69,48,.35);background:#fff;color:var(--brunatny);
+  border-radius:6px;font-size:13px;padding:3px 7px;cursor:pointer;line-height:1.2}
+.edtr-kontekst button:hover{background:var(--krem-2);border-color:var(--brunatny)}
+.edtr-bez{border:1px solid rgba(107,69,48,.4);background:#FBF7F0;color:var(--brunatny);
+  font-size:12px;padding:4px 8px;border-radius:6px;cursor:pointer}
+.edtr-bez:hover{background:var(--krem-2)}
+.tre-tabela td{vertical-align:top}
