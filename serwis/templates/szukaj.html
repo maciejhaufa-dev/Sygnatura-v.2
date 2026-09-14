@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szukaj — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=6">
+<style>
+.szuk-box{display:flex;align-items:stretch;max-width:560px;margin:10px 0 18px;border:1px solid rgba(107,69,48,.4);background:#fff}
+.szuk-box input{flex:1;border:none;background:transparent;padding:12px 14px;font-family:inherit;font-size:16px;color:var(--ink);outline:none;min-width:0}
+.szuk-box button{border:none;background:var(--butelkowa);color:var(--zloty);width:50px;cursor:pointer;font-family:inherit;font-size:17px}
+.szuk-box button:hover{background:var(--brunatny)}
+.wynik{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid rgba(107,69,48,.25);padding:14px 16px;margin-bottom:10px;transition:box-shadow .2s,transform .2s}
+.wynik:hover{box-shadow:0 10px 26px rgba(31,58,50,.14);transform:translateY(-2px)}
+.wynik .foto{width:72px;height:72px;flex:none;background:linear-gradient(135deg,var(--krem-2),var(--zloty-soft));display:grid;place-items:center;overflow:hidden;font-size:28px;color:var(--brunatny);font-weight:700}
+.wynik .foto img{width:100%;height:100%;object-fit:cover}
+.wynik .tresc{flex:1}
+.wynik .grupa{display:inline-block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--butelkowa);border:1px solid var(--zloty);padding:2px 8px;margin-bottom:5px}
+.wynik b{display:block;font-size:17.5px;color:var(--ink)}
+.wynik .opis{font-size:14px;color:rgba(51,38,28,.75);line-height:1.5;margin-top:3px}
+.wynik .meta{font-size:14px;font-weight:700;color:var(--brunatny);margin-top:4px}
+.ile-wynikow{color:rgba(51,38,28,.65);margin-bottom:12px}
+</style>
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  <h1>Szukaj</h1>
+  <form class="szuk-box" action="/szukaj/" method="get" role="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj">
+    <button type="submit" aria-label="Szukaj">⌕</button>
+  </form>
+
+  {% if q|length < 2 %}
+    <p class="sub">Wpisz co najmniej 2 znaki, aby przeszukać sklep, personalizacje, pakiety i realizacje.</p>
+  {% elif wyniki %}
+    <p class="ile-wynikow">Znaleziono {{ wyniki|length }} {{ 'wynik' if wyniki|length == 1 else ('wyniki' if wyniki|length < 5 else 'wyników') }} dla „{{ q }}”:</p>
+    {% for w in wyniki %}
+    <a class="wynik" href="{{ w['url'] }}">
+      <span class="foto">{% if w['obraz'] %}<img src="{{ w['obraz'] }}" alt="{{ w['tytul'] }}">{% else %}{{ w['tytul'][:1] }}{% endif %}</span>
+      <span class="tresc">
+        <span class="grupa">{{ w['grupa'] }}</span>
+        <b>{{ w['tytul'] }}</b>
+        {% if w['opis'] %}<span class="opis">{{ w['opis'][:140] }}{% if w['opis']|length > 140 %}…{% endif %}</span>{% endif %}
+        {% if w['meta'] %}<span class="meta">{{ w['meta'] }}</span>{% endif %}
+      </span>
+    </a>
+    {% endfor %}
+  {% else %}
+    <p class="sub">Nic nie znaleźliśmy dla „{{ q }}”. Spróbuj innego słowa kluczowego — albo napisz do nas przez <a href="/kontakt/" style="border-bottom:1px solid var(--zloty)">formularz kontaktowy</a> (pomożemy znaleźć lub zaprojektujemy na zamówienie).</p>
+  {% endif %}
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

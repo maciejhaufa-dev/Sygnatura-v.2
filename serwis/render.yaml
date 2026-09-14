@@ -1,0 +1,13 @@
+# Render Blueprint — deployment jednym kliknięciem (opcjonalnie)
+# UWAGA: darmowy plan Rendera ma DYSK EFEMERYCZNY — plik data/serwis.db
+# kasuje się przy każdym deployu. Na darmowy okres testowy lepszy jest
+# PythonAnywhere (trwały dysk). Render sensowny dopiero na planie płatnym
+# (~7 USD/mc, stały dysk) albo z bazą Turso/Supabase.
+services:
+  - type: web
+    name: sygnatura-serwis
+    runtime: python
+    plan: free
+    rootDir: serwis
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:10000

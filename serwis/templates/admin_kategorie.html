@@ -1,0 +1,35 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Kategorie — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Kategorie</h1>
+<p class="mala">Kategorie grupują produkty w katalogu. Kolejność = numer kolejnosc (mniejszy = wyżej).</p>
+<style>
+.wiersz{display:grid;grid-template-columns:44px 1fr 1fr 80px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(107,69,48,.15)}
+.wiersz input,.wiersz select{padding:7px;font-family:inherit;font-size:16px;border:1px solid rgba(107,69,48,.35);background:var(--krem);width:100%}
+.wiersz .idk{color:var(--brunatny);font-weight:700}
+.naglowek{display:grid;grid-template-columns:44px 1fr 1fr 80px auto;gap:8px;padding:8px 0;border-bottom:2px solid rgba(107,69,48,.4);font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--brunatny)}
+@media(max-width:640px){.wiersz,.naglowek{grid-template-columns:1fr}.naglowek{display:none}}
+</style>
+<div class="naglowek"><span>ID</span><span>Nazwa</span><span>Opis</span><span>Kolejność</span><span></span></div>
+{% for k in rows %}
+<form class="wiersz" method="post" action="{{ url_for('kategorie_edytuj', kid=k['id']) }}">
+  <span class="idk">{{ k['id'] }}</span>
+  <input type="text" name="nazwa" value="{{ k['nazwa'] }}">
+  <input type="text" name="opis" value="{{ k['opis'] or '' }}">
+  <input type="number" name="kolejnosc" value="{{ k['kolejnosc'] }}">
+  <span style="white-space:nowrap">
+    <button class="btn btn-ghost" type="submit" style="padding:6px 12px">Zapisz</button>
+    <button class="btn btn-niebez" type="submit" formaction="{{ url_for('kategorie_usun', kid=k['id']) }}">Usuń</button>
+  </span>
+</form>
+{% endfor %}
+
+<div class="forma">
+  <h3>Nowa kategoria</h3>
+  <form method="post" action="{{ url_for('kategorie_dodaj') }}">
+    <label>Nazwa</label><input type="text" name="nazwa" required>
+    <label>Opis (opcjonalnie)</label><input type="text" name="opis">
+    <p style="margin-top:12px"><button class="btn" type="submit">Dodaj kategorię</button></p>
+  </form>
+</div>
+{% endblock %}

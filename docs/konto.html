@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konto — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=310">
+</head>
+<body data-strona="Konto">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Panel klienta</span>
+  <div id="komunikat" style="display:none" class="sukces"></div>
+
+  <!-- ============ NIEZALOGOWANY ============ -->
+  <div id="blok-gosc">
+    <h1>Twoje konto</h1>
+    <p class="sub">Zaloguj się albo utwórz konto, aby zamawiać szybciej: Twoje dane uzupełnią się
+    w zamówieniu automatycznie, a Ty zobaczysz historię zamówień, zgody marketingowe i kody
+    rabatowe dla stałych klientów.</p>
+
+    <!-- LOGOWANIE -->
+    <div class="forma" style="max-width:560px" id="blok-logowanie">
+      <form id="forma" novalidate>
+        <div class="pole">
+          <label for="email">Adres e-mail *</label>
+          <input type="email" id="email" name="email" placeholder="adres@poczta.pl" autocomplete="email">
+        </div>
+        <div class="pole">
+          <label for="haslo">Hasło *</label>
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <input type="password" id="haslo" name="haslo" placeholder="••••••••" autocomplete="current-password" style="flex:1">
+            <button type="button" class="btn outline" id="pokaz-haslo" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+          </div>
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="submit">Zaloguj się</button>
+        </div>
+        <p style="font-size:14.5px;color:rgba(51,38,28,.75);margin-top:14px">
+          <a href="#" id="rej-link" style="color:var(--brunatny);border-bottom:1px solid var(--zloty)">Nie masz konta? Utwórz je tutaj →</a><br>
+          <a href="#" id="odzysk-link" style="color:var(--brunatny);border-bottom:1px solid var(--zloty)">Nie pamiętasz hasła?</a>
+        </p>
+      </form>
+    </div>
+
+    <!-- KONTO TESTOWE (tryb demo) -->
+    <div class="forma" style="max-width:560px;border:1px dashed rgba(107,69,48,.55);background:var(--krem-2)" id="demo-konto">
+      <h2 style="font-size:17px;color:var(--butelkowa);margin-bottom:4px">Konto testowe (tryb demo)</h2>
+      <p class="mala" style="margin-bottom:6px">E-mail: <b>klient@demo.pl</b> · Hasło: <b>demo1234</b></p>
+      <p class="mala">Konto ma już uzupełnione dane kontaktowe i korespondencyjne, zgody marketingowe
+      oraz <b>2 zamówienia w historii</b>. Trzecie zamówienie (starsze niż 12 miesięcy) jest
+      celowo ukryte — tak działa przechowywanie historii maks. 1 rok. Możesz też założyć
+      własne konto formularzem powyżej.</p>
+    </div>
+
+    <!-- REJESTRACJA -->
+    <div class="forma" style="max-width:560px;display:none" id="blok-rejestracja">
+      <h2>Utwórz konto</h2>
+      <p class="mala" style="margin-bottom:10px">Konto jest potrzebne, aby złożyć zamówienie
+      (sklep i personalizacja). Dane kontaktowe uzupełnią się w zamówieniu automatycznie —
+      możesz je potem edytować w panelu.</p>
+      <form id="forma-rej" novalidate>
+        <div class="pole">
+          <label for="rej-imie">Imię *</label>
+          <input type="text" id="rej-imie" autocomplete="given-name">
+        </div>
+        <div class="pole">
+          <label for="rej-nazwisko">Nazwisko *</label>
+          <input type="text" id="rej-nazwisko" autocomplete="family-name">
+        </div>
+        <div class="pole">
+          <label for="rej-email">Adres e-mail *</label>
+          <input type="email" id="rej-email" placeholder="adres@poczta.pl" autocomplete="email">
+        </div>
+        <div class="pole">
+          <label for="rej-haslo">Hasło (min. 8 znaków) *</label>
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <input type="password" id="rej-haslo" autocomplete="new-password" style="flex:1">
+            <button type="button" class="btn outline" id="pokaz-rej" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+          </div>
+        </div>
+        <div class="pole">
+          <label for="rej-haslo2">Powtórz hasło *</label>
+          <input type="password" id="rej-haslo2" autocomplete="new-password">
+        </div>
+        <p class="mala">Zakładając konto akceptujesz <a href="regulamin.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">regulamin serwisu</a>.</p>
+        <div class="przyciski">
+          <button class="btn" type="submit">Utwórz konto i zaloguj</button>
+          <button class="btn outline" type="button" id="rej-wroc">← Mam już konto</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ODZYSKIWANIE HASŁA -->
+    <div class="forma" style="max-width:560px;display:none" id="blok-odzysk">
+      <h2>Odzyskiwanie hasła</h2>
+      <p class="mala" style="margin-bottom:10px">Podaj adres e-mail, na który założono konto.
+      Wyślemy na niego automatyczny link do ustawienia nowego hasła.</p>
+      <form id="forma-odzysk" novalidate>
+        <div class="pole">
+          <label for="odzysk-email">Adres e-mail *</label>
+          <input type="email" id="odzysk-email" placeholder="adres@poczta.pl" autocomplete="email">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="submit">Wyślij link do zresetowania</button>
+          <button class="btn outline" type="button" id="odzysk-wroc">← Wróć do logowania</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ ZALOGOWANY — PANEL ============ -->
+  <div id="blok-panel" style="display:none">
+    <h1>Witaj, <span id="pa-imie"></span>!</h1>
+    <p class="sub" id="pa-email"></p>
+    <div class="przyciski" style="justify-content:flex-end">
+      <button class="btn outline" type="button" id="wyloguj">Wyloguj się</button>
+    </div>
+
+    <!-- MOJE DANE -->
+    <h2 style="font-size:21px;color:var(--butelkowa);margin:26px 0 6px">Moje dane</h2>
+    <div class="forma" style="max-width:640px">
+      <form id="forma-dane" novalidate>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-wrap:wrap" class="pole-dwa">
+          <div class="pole">
+            <label for="pd-imie">Imię *</label>
+            <input type="text" id="pd-imie" autocomplete="given-name">
+          </div>
+          <div class="pole">
+            <label for="pd-nazwisko">Nazwisko *</label>
+            <input type="text" id="pd-nazwisko" autocomplete="family-name">
+          </div>
+        </div>
+        <div class="pole">
+          <label for="pd-email">Adres e-mail (login — nie zmieniamy w tej wersji)</label>
+          <input type="email" id="pd-email" readonly>
+        </div>
+        <div class="pole">
+          <label for="pd-telefon">Telefon</label>
+          <input type="tel" id="pd-telefon" placeholder="np. 510 767 076" autocomplete="tel">
+        </div>
+        <h3 style="font-size:16.5px;color:var(--brunatny);margin:16px 0 4px">Adres korespondencyjny</h3>
+        <div class="pole">
+          <label for="pd-ulica">Ulica i numer</label>
+          <input type="text" id="pd-ulica" placeholder="np. ul. Kwiatowa 12" autocomplete="address-line1">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="pole-dwa">
+          <div class="pole">
+            <label for="pd-kod">Kod pocztowy</label>
+            <input type="text" id="pd-kod" placeholder="60-001" autocomplete="postal-code">
+          </div>
+          <div class="pole">
+            <label for="pd-miasto">Miejscowość</label>
+            <input type="text" id="pd-miasto" placeholder="Poznań" autocomplete="address-level2">
+          </div>
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="submit">Zapisz dane</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ZGODY MARKETINGOWE -->
+    <h2 style="font-size:21px;color:var(--butelkowa);margin:26px 0 6px">Zgody marketingowe</h2>
+    <div class="forma" style="max-width:640px">
+      <form id="forma-zgody" novalidate>
+        <label style="cursor:pointer;display:flex;gap:10px;align-items:flex-start;margin:8px 0">
+          <input type="checkbox" id="zg-news" style="width:auto;margin-top:4px">
+          <span><b>E-mail (newsletter):</b> informacje o nowościach, promocjach i kodach rabatowych dla klientów.</span>
+        </label>
+        <label style="cursor:pointer;display:flex;gap:10px;align-items:flex-start;margin:8px 0">
+          <input type="checkbox" id="zg-tel" style="width:auto;margin-top:4px">
+          <span><b>Telefon / SMS:</b> informacje o promocjach i przypomnienia o sezonowych ofertach.</span>
+        </label>
+        <p class="mala">Zgody możesz w każdej chwili wycofać — wystarczy odznaczyć i zapisać.</p>
+        <div class="przyciski">
+          <button class="btn" type="submit">Zapisz zgody</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- HISTORIA ZAMÓWIEŃ -->
+    <h2 style="font-size:21px;color:var(--butelkowa);margin:26px 0 6px">Historia zamówień</h2>
+    <p class="mala">Przechowujemy zamówienia przez maksymalnie 12 miesięcy.</p>
+    <div class="tabela-wrap" style="margin-top:8px">
+      <table class="tabela" id="hist-tabela">
+        <thead><tr><th>Sygnatura</th><th>Data</th><th>Pozycje</th><th>Razem</th><th>Status</th><th>Szczegóły</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="mala" id="hist-pusta" style="display:none">Nie masz jeszcze zamówień na koncie.</p>
+
+    <!-- PROMOCJE I KODY -->
+    <h2 style="font-size:21px;color:var(--butelkowa);margin:26px 0 6px">Promocje i kody rabatowe dla klientów</h2>
+    <div class="forma" style="max-width:640px" id="promocje-lista">
+      <p class="mala">Kody wpisujesz w koszyku. Aktualne promocje dla naszych klientów:</p>
+    </div>
+    <p class="mala">Nowe promocje ogłaszamy w panelu i newsletterze (jeśli masz zaznaczoną zgodę e-mail).</p>
+
+    <!-- ZMIANA HASŁA -->
+    <h2 style="font-size:21px;color:var(--butelkowa);margin:26px 0 6px">Zmiana hasła</h2>
+    <div class="forma" style="max-width:560px">
+      <form id="forma-haslo" novalidate>
+        <div class="pole">
+          <label for="ph-stare">Obecne hasło *</label>
+          <input type="password" id="ph-stare" autocomplete="current-password">
+        </div>
+        <div class="pole">
+          <label for="ph-nowe">Nowe hasło (min. 8 znaków) *</label>
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <input type="password" id="ph-nowe" autocomplete="new-password" style="flex:1">
+            <button type="button" class="btn outline" id="pokaz-ph" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+          </div>
+        </div>
+        <div class="pole">
+          <label for="ph-nowe2">Powtórz nowe hasło *</label>
+          <input type="password" id="ph-nowe2" autocomplete="new-password">
+        </div>
+        <p class="mala">Hasło zmieniamy automatycznie — od razu po zapisaniu działa nowe.
+        W wersji docelowej zmianę potwierdzimy dodatkowo e-mailem.</p>
+        <div class="przyciski">
+          <button class="btn" type="submit">Zmień hasło</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=310"></script>
+<script src="assets/koszyk.js?v=310"></script>
+<script src="assets/api.js?v=310"></script>
+<script src="data/katalog.js?v=310"></script>
+<script src="assets/main.js?v=310"></script>
+<script>
+(function(){
+  var komunikat = document.getElementById('komunikat');
+  function pokaz(msg, blad){
+    komunikat.style.display = 'block';
+    komunikat.style.background = blad ? '#8a2f1d' : '';
+    komunikat.innerHTML = msg;
+    komunikat.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  function podglad(btnId, inputId){
+    document.getElementById(btnId).addEventListener('click', function(){
+      var inp = document.getElementById(inputId);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+  }
+  podglad('pokaz-haslo', 'haslo');
+  podglad('pokaz-rej', 'rej-haslo');
+  podglad('pokaz-ph', 'ph-nowe');
+
+  if (!SYG.TRYB_DEMO){
+    var dk = document.getElementById('demo-konto');
+    if (dk) dk.style.display = 'none';
+  }
+
+  var dalej = SYG.param('dalej') || '';
+  if (dalej) pokaz('<h2>Aby złożyć zamówienie, zaloguj się lub utwórz konto</h2>' +
+    '<p>Po zalogowaniu wrócisz automatycznie do zamówienia.</p>');
+
+  /* widoki */
+  function pokazGoscia(){
+    document.getElementById('blok-gosc').style.display = 'block';
+    document.getElementById('blok-panel').style.display = 'none';
+  }
+  function pokazPanel(konto){
+    document.getElementById('blok-gosc').style.display = 'none';
+    document.getElementById('blok-panel').style.display = 'block';
+    if (!konto) return;
+    document.getElementById('pa-imie').textContent = konto.imie || '';
+    document.getElementById('pa-email').textContent = 'Konto: ' + konto.email +
+      (konto.rejestracja ? ' · od ' + konto.rejestracja.slice(0, 10) : '');
+    document.getElementById('pd-imie').value = konto.imie || '';
+    document.getElementById('pd-nazwisko').value = konto.nazwisko || '';
+    document.getElementById('pd-email').value = konto.email || '';
+    document.getElementById('pd-telefon').value = konto.telefon || '';
+    document.getElementById('pd-ulica').value = (konto.adres && konto.adres.ulica) || '';
+    document.getElementById('pd-kod').value = (konto.adres && konto.adres.kod) || '';
+    document.getElementById('pd-miasto').value = (konto.adres && konto.adres.miasto) || '';
+    document.getElementById('zg-news').checked = !!(konto.zgody && konto.zgody.newsletter);
+    document.getElementById('zg-tel').checked = !!(konto.zgody && konto.zgody.telefon);
+    ladujHistorie();
+    ladujPromocje();
+  }
+
+  /* promocje i kody rabatowe */
+  function ladujPromocje(){
+    var el = document.getElementById('promocje-lista');
+    var html = '<p class="mala">Kody wpisujesz w koszyku. Aktualne promocje dla naszych klientów:</p><ul style="padding-left:22px">';
+    Object.keys(SYG.KODY_RABATOWE || {}).forEach(function(k){
+      var r = SYG.KODY_RABATOWE[k];
+      html += '<li style="margin:8px 0"><b style="letter-spacing:.08em">' + k + '</b> — −' +
+        r.proc + '% · <span class="mala">' + r.opis + '</span></li>';
+    });
+    html += '</ul>';
+    el.innerHTML = html;
+  }
+
+  /* historia zamówień (maks. 1 rok) */
+  var STAN_NAZWA = {
+    zapytanie: 'Zapytanie — czeka na potwierdzenie',
+    zrobione: 'Zrealizowane',
+    anulowane: 'Anulowane',
+    w_trakcie: 'W trakcie'
+  };
+  async function ladujHistorie(){
+    var odp = await SYG.wezwij('konto-zamowienia', {});
+    var tbody = document.querySelector('#hist-tabela tbody');
+    var lista = odp.zamowienia || [];
+    document.getElementById('hist-pusta').style.display = lista.length ? 'none' : 'block';
+    tbody.innerHTML = lista.map(function(z, i){
+      var pozycje = (z.pozycje || []).map(function(p){ return p.nazwa + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
+      if (!pozycje && z.pers && z.pers.length) pozycje = z.pers.map(function(p){ return p.nazwa; }).join(', ');
+      var razem = (z.kwoty && z.kwoty.razem != null) ? SYG.zl(z.kwoty.razem) : '—';
+      return '<tr><td><b>' + z.sygnatura + '</b></td>' +
+        '<td>' + String(z.data || '').slice(0, 10) + '</td>' +
+        '<td>' + (pozycje || '—') + '</td>' +
+        '<td>' + razem + '</td>' +
+        '<td>' + (STAN_NAZWA[z.status] || z.status || '—') + '</td>' +
+        '<td><button type="button" class="btn outline" data-paragon="' + i + '" style="padding:7px 14px;font-size:13px">Paragon</button></td></tr>';
+    }).join('');
+    tbody.querySelectorAll('[data-paragon]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        pokazParagon(lista[Number(btn.getAttribute('data-paragon'))]);
+      });
+    });
+  }
+
+  /* paragon — zestawienie zamówienia jak na rachunku */
+  function pokazParagon(z){
+    if (!z) return;
+    function w(etykieta, wartosc, minus){
+      return wartosc != null && wartosc !== '' && wartosc !== 0
+        ? '<div class="p-wiersz"><span>' + etykieta + '</span><b' + (minus ? ' style="color:#8a2f1d"' : '') + '>' + wartosc + '</b></div>'
+        : '';
+    }
+    var wiersze = '';
+    (z.pozycje || []).forEach(function(p, i){
+      var wart = (Number(p.cena) || 0) * (p.ile || 1);
+      wiersze += '<div class="p-wiersz"><span>' + (i + 1) + '. ' + p.nazwa + ' ×' + (p.ile || 1) + '</span><b>' + SYG.zl(wart) + '</b></div>';
+    });
+    (z.pers || []).forEach(function(p){
+      wiersze += '<div class="p-wiersz"><span>' + p.nazwa + ' <span class="mala">(personalizacja' + (p.opis ? ': ' + p.opis : '') + ')</span></span><b>' + SYG.zl(p.cena) + '</b></div>';
+    });
+    if (z.pomysl) wiersze += '<div class="p-wiersz"><span>Pomysł własny</span><b>wycena osobno</b></div>';
+    var kw = z.kwoty || {};
+    if (kw.pers_rabat) wiersze += w('Rabat na personalizację', '−' + SYG.zl(kw.pers_rabat), true);
+    if (kw.kod_rabat) wiersze += w('Kod rabatowy' + (z.kod ? ' ' + z.kod : ''), '−' + SYG.zl(kw.kod_rabat), true);
+    var dost = z.dostawa || {};
+    var dostNazwa = dost.metoda === 'odbior' ? 'Odbiór osobisty' :
+      (dost.metoda === 'paczkomat' ? 'Paczkomat InPost' + (dost.rozmiar ? ' (paczka ' + dost.rozmiar + ')' : '') :
+      (dost.metoda === 'kurier' ? 'Kurier' + (dost.rozmiar ? ' (paczka ' + dost.rozmiar + ')' : '') : ''));
+    if (dostNazwa) wiersze += w('Dostawa: ' + dostNazwa, kw.dostawa ? SYG.zl(kw.dostawa) : '0 zł');
+    if (dost.adres) wiersze += '<div class="p-wiersz"><span>Adres dostawy</span><b>' + dost.adres + '</b></div>';
+    if (dost.paczkomat) wiersze += '<div class="p-wiersz"><span>Paczkomat</span><b>' + dost.paczkomat + '</b></div>';
+    if (kw.kaucja) wiersze += w('Kaucja zwrotna', SYG.zl(kw.kaucja));
+    if (z.wiadomosc) wiersze += '<div class="p-wiersz"><span>Uwagi</span><b>' + z.wiadomosc + '</b></div>';
+    var klient = z.klient || {};
+    var klientHtml = klient.imie ? '<div class="p-wiersz"><span>Klient</span><b>' + klient.imie +
+      (klient.telefon ? ', tel. ' + klient.telefon : '') + '</b></div>' +
+      '<div class="p-wiersz"><span>E-mail</span><b>' + klient.email + '</b></div>' : '';
+
+    var tlo = document.createElement('div');
+    tlo.className = 'edtr-modal-tlo';
+    var okno = document.createElement('div');
+    okno.className = 'edtr-modal';
+    okno.style.maxWidth = '680px';
+    okno.innerHTML =
+      '<h3>' + z.sygnatura + ' <span class="mala">· ' + String(z.data || '').slice(0, 10) + '</span></h3>' +
+      '<div class="p-status">' + (STAN_NAZWA[z.status] || z.status || '') + '</div>' +
+      '<div class="paragon">' + wiersze +
+      '<div class="p-razem"><span>RAZEM</span><b>' + (kw.razem != null ? SYG.zl(kw.razem) : '—') + '</b></div>' +
+      '</div>' + klientHtml +
+      '<div class="przyciski" style="justify-content:flex-end;margin-top:14px">' +
+      '<button type="button" class="btn" id="paragon-zamknij">Zamknij</button></div>';
+    tlo.appendChild(okno);
+    document.body.appendChild(tlo);
+    function zamknij(){ if (tlo.parentNode) tlo.parentNode.removeChild(tlo); }
+    okno.querySelector('#paragon-zamknij').addEventListener('click', zamknij);
+    tlo.addEventListener('click', function(e){ if (e.target === tlo) zamknij(); });
+  }
+
+  /* logowanie */
+  document.getElementById('forma').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var email = document.getElementById('email').value.trim();
+    var haslo = document.getElementById('haslo').value;
+    if (!email || !haslo){ pokaz('<h2>Uzupełnij pola</h2><p>Podaj adres e-mail i hasło, żeby się zalogować.</p>', true); return; }
+    var odp = await SYG.wezwij('konto-zaloguj', { email: email, haslo: haslo });
+    if (odp.ok){
+      if (dalej) window.location.href = dalej;
+      else pokazPanel(odp.konto);
+    } else {
+      pokaz('<h2>Nie udało się zalogować</h2><p>' + (odp.blad || 'Nieprawidłowy e-mail lub hasło.') + '</p>', true);
+    }
+  });
+
+  /* rejestracja */
+  document.getElementById('rej-link').addEventListener('click', function(e){
+    e.preventDefault();
+    document.getElementById('blok-logowanie').style.display = 'none';
+    document.getElementById('blok-odzysk').style.display = 'none';
+    document.getElementById('blok-rejestracja').style.display = 'block';
+  });
+  document.getElementById('rej-wroc').addEventListener('click', function(){
+    document.getElementById('blok-rejestracja').style.display = 'none';
+    document.getElementById('blok-logowanie').style.display = 'block';
+  });
+  document.getElementById('forma-rej').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var imie = document.getElementById('rej-imie').value.trim();
+    var nazwisko = document.getElementById('rej-nazwisko').value.trim();
+    var email = document.getElementById('rej-email').value.trim();
+    var h1 = document.getElementById('rej-haslo').value;
+    var h2 = document.getElementById('rej-haslo2').value;
+    if (!imie || !nazwisko || !email || !h1){
+      pokaz('<h2>Uzupełnij pola</h2><p>Imię, nazwisko, e-mail i hasło są wymagane.</p>', true); return;
+    }
+    if (h1.length < 8){ pokaz('<h2>Hasło za krótkie</h2><p>Hasło musi mieć co najmniej 8 znaków.</p>', true); return; }
+    if (h1 !== h2){ pokaz('<h2>Hasła się różnią</h2><p>Wpisz dwa razy to samo hasło.</p>', true); return; }
+    var odp = await SYG.wezwij('konto-rejestracja', { imie: imie, nazwisko: nazwisko, email: email, haslo: h1 });
+    if (odp.ok){
+      if (dalej) window.location.href = dalej;
+      else pokazPanel(odp.konto);
+    } else {
+      pokaz('<h2>Nie udało się utworzyć konta</h2><p>' + (odp.blad || 'Spróbuj ponownie.') + '</p>', true);
+    }
+  });
+
+  /* odzyskiwanie hasła — w demo symulacja wysyłki linku */
+  document.getElementById('odzysk-link').addEventListener('click', function(e){
+    e.preventDefault();
+    document.getElementById('blok-logowanie').style.display = 'none';
+    document.getElementById('blok-rejestracja').style.display = 'none';
+    document.getElementById('blok-odzysk').style.display = 'block';
+  });
+  document.getElementById('odzysk-wroc').addEventListener('click', function(){
+    document.getElementById('blok-odzysk').style.display = 'none';
+    document.getElementById('blok-logowanie').style.display = 'block';
+  });
+  document.getElementById('forma-odzysk').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var email = document.getElementById('odzysk-email').value.trim();
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+      pokaz('<h2>Podaj poprawny adres e-mail</h2>', true);
+      return;
+    }
+    pokaz('<h2>Link wysłany (symulacja trybu demo)</h2><p>Gdyby serwis działał na bazie klientów, na adres <b>' +
+      email + '</b> wyszedłby automatyczny e-mail z linkiem do ustawienia nowego hasła. ' +
+      'Ten automat uruchomi się razem z wdrożeniem Google Apps Script.</p>');
+  });
+
+  /* zapis danych kontaktowych */
+  document.getElementById('forma-dane').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var dane = {
+      imie: document.getElementById('pd-imie').value.trim(),
+      nazwisko: document.getElementById('pd-nazwisko').value.trim(),
+      telefon: document.getElementById('pd-telefon').value.trim(),
+      adres: { ulica: document.getElementById('pd-ulica').value.trim(),
+        kod: document.getElementById('pd-kod').value.trim(),
+        miasto: document.getElementById('pd-miasto').value.trim() },
+      zgody: { newsletter: document.getElementById('zg-news').checked,
+        telefon: document.getElementById('zg-tel').checked }
+    };
+    var odp = await SYG.wezwij('konto-zapisz', { dane: dane });
+    if (odp.ok) pokaz('<h2>Dane zapisane</h2><p>Twoje dane kontaktowe i korespondencyjne są aktualne.</p>');
+    else pokaz('<h2>Nie udało się zapisać</h2><p>' + (odp.blad || '') + '</p>', true);
+  });
+
+  /* zapis zgód marketingowych */
+  document.getElementById('forma-zgody').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var konto = SYG.demoDb.zalogowany();
+    if (!konto) return;
+    var dane = {
+      imie: konto.imie, nazwisko: konto.nazwisko, telefon: konto.telefon, adres: konto.adres,
+      zgody: { newsletter: document.getElementById('zg-news').checked,
+        telefon: document.getElementById('zg-tel').checked }
+    };
+    var odp = await SYG.wezwij('konto-zapisz', { dane: dane });
+    if (odp.ok) pokaz('<h2>Zgody zapisane</h2>');
+    else pokaz('<h2>Nie udało się zapisać</h2><p>' + (odp.blad || '') + '</p>', true);
+  });
+
+  /* zmiana hasła (automat) */
+  document.getElementById('forma-haslo').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var stare = document.getElementById('ph-stare').value;
+    var n1 = document.getElementById('ph-nowe').value;
+    var n2 = document.getElementById('ph-nowe2').value;
+    if (n1.length < 8){ pokaz('<h2>Hasło za krótkie</h2><p>Nowe hasło musi mieć co najmniej 8 znaków.</p>', true); return; }
+    if (n1 !== n2){ pokaz('<h2>Hasła się różnią</h2><p>Wpisz dwa razy to samo hasło.</p>', true); return; }
+    var odp = await SYG.wezwij('konto-zmien-haslo', { stare: stare, nowe: n1 });
+    if (odp.ok){
+      document.getElementById('ph-stare').value = '';
+      document.getElementById('ph-nowe').value = '';
+      document.getElementById('ph-nowe2').value = '';
+      pokaz('<h2>Hasło zmienione</h2><p>Od teraz logujesz się nowym hasłem.</p>');
+    } else {
+      pokaz('<h2>Nie udało się zmienić hasła</h2><p>' + (odp.blad || '') + '</p>', true);
+    }
+  });
+
+  /* wylogowanie */
+  document.getElementById('wyloguj').addEventListener('click', async function(){
+    await SYG.wezwij('konto-wyloguj', {});
+    window.location.href = 'konto.html';
+  });
+
+  /* start */
+  var konto = SYG.demoDb && SYG.demoDb.zalogowany ? SYG.demoDb.zalogowany() : null;
+  if (konto) pokazPanel(konto); else pokazGoscia();
+})();
+</script>
+</body>
+</html>

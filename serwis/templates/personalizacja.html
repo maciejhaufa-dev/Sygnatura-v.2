@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personalizacja — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  <a class="powrot" href="{{ nastepny }}">← wróć do rezerwacji</a>
+  <h1>Produkty spersonalizowane</h1>
+  <p class="sub">Wybierz produkty, które mają być wykonane pod Ciebie. W formularzu rezerwacji każdy z nich dostanie osobne pole opisu — co i jak ma być spersonalizowane.</p>
+
+  <div class="info">
+    <h2>Ważne zasady</h2>
+    <ul>
+      <li><b>Produkty spersonalizowane nie podlegają zwrotowi</b> — po imprezie zostają u Ciebie. Dla nas to jednorazówki wykonywane na zamówienie.</li>
+      <li><b>Płatne z góry</b> przy zamówieniu — osobno od najmu dekoracji.</li>
+      <li><b>Kaucja za wynajem obowiązuje zawsze</b> — personalizacja jej nie zastępuje.</li>
+      <li><b>Rabat −5%</b> na produkty spersonalizowane przy zamówieniu <b>min. 3 sztuk</b>.</li>
+    </ul>
+  </div>
+
+  <form id="wybor-form">
+    <div class="pers">
+      {% for p in pozycje %}
+      <label class="pers-it">
+        <input type="checkbox" value="{{ p.id }}" data-cena="{{ p.cena }}" data-nazwa="{{ p.nazwa }}"
+               {% if p.id|string in pers.split(',') %}checked{% endif %}>
+        <span>
+          <b>{{ p.nazwa }}</b>
+          <small>{{ p.opis or '' }}</small>
+          <span class="cena">{{ '%.0f'|format(p.cena) }} zł</span>
+          <span class="bez">· bezzwrotne</span>
+        </span>
+      </label>
+      {% endfor %}
+    </div>
+  </form>
+
+  <div class="wybor">
+    <div class="wrap">
+      <span class="n" id="wybor-n">0 wybranych</span>
+      <span class="suma" id="wybor-suma">0 zł</span>
+      <span class="rabat" id="wybor-rabat"></span>
+      <button class="btn" type="button" id="wybor-dodaj">Dodaj do rezerwacji</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var NEX = {{ nastepny|tojson }};
+  var cbs = document.querySelectorAll('.pers-it input');
+  function przelicz(){
+    var n = 0, suma = 0;
+    cbs.forEach(function(cb){ if (cb.checked){ n++; suma += parseFloat(cb.dataset.cena || 0); } });
+    var rabat = (n >= 3) ? Math.round(suma * 0.05) : 0;
+    document.getElementById('wybor-n').textContent = n + (n === 1 ? ' wybrany' : n < 5 ? ' wybrane' : ' wybranych');
+    document.getElementById('wybor-suma').textContent = (suma - rabat) + ' zł';
+    document.getElementById('wybor-rabat').textContent = rabat ? ('rabat −5%: −' + rabat + ' zł') : (n ? 'rabat −5% od 3 produktów' : '');
+  }
+  cbs.forEach(function(cb){ cb.addEventListener('change', przelicz); });
+  document.getElementById('wybor-dodaj').addEventListener('click', function(){
+    var ids = [];
+    cbs.forEach(function(cb){ if (cb.checked) ids.push(cb.value); });
+    // zamieniamy stary parametr pers (jeśli jest), zamiast doklejać drugi
+    var hash = '';
+    var u = NEX;
+    var h = u.indexOf('#');
+    if (h > -1){ hash = u.slice(h); u = u.slice(0, h); }
+    var base = u.split('?')[0];
+    var params = (u.split('?')[1] || '').split('&').filter(function(kv){
+      return kv && kv.split('=')[0] !== 'pers';
+    });
+    params.push('pers=' + ids.join(','));
+    window.location.href = base + '?' + params.join('&') + hash;
+  });
+  przelicz();
+})();
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

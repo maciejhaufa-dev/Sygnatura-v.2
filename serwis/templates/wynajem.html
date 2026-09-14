@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wynajem — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Wynajem dekoracji na Twoje wydarzenie</h1>
+    <p>Wybierz rodzaj wydarzenia, potem poziom pakietu i sprawdź wolne terminy. Dekoracje zakładamy dzień przed imprezą i ściągamy dzień po — najem trwa więc co najmniej 3 doby.</p>
+    <div class="cta">
+      <a class="btn" href="#wydarzenia">Wybierz wydarzenie</a>
+      <a class="btn btn-line" href="#jak">Jak to działa</a>
+    </div>
+  </div>
+</section>
+
+{% set pers_str = pers_ids|map('string')|join(',') %}
+{% set pers_nastepny = url_for('wynajem', pers=pers_str) %}
+{% set pers_bez = url_for('wynajem') %}
+<div class="wrap">{% include '_pers_bar.html' %}</div>
+
+<section class="sec" id="jak">
+  <div class="wrap">
+    <h2 class="center">Jak to działa</h2>
+    <div class="kroki">
+      <div class="krok"><span class="num">1</span><b>Wybierz wydarzenie</b><p>Komunia, wesele, impreza firmowa lub jubileusz — w trzech poziomach pakietu.</p></div>
+      <div class="krok"><span class="num">2</span><b>Sprawdź terminy</b><p>Kalendarz jest przy konkretnym pakiecie. Kliknij datę imprezy — domyślnie rezerwujemy też dzień przed (montaż) i dzień po (demontaż).</p></div>
+      <div class="krok"><span class="num">3</span><b>Wyślij zapytanie</b><p>Formularz z tematem „Rezerwacja terminu" — automatycznie dostajesz sygnaturę sprawy.</p></div>
+      <div class="krok"><span class="num">4</span><b>Wpłać kaucję</b><p>Zapłacone = zarezerwowane. Kaucja w 7 dni, potem termin blokujemy na sztywno.</p></div>
+      <div class="krok"><span class="num">5</span><b>Baw się!</b><p>Dowozimy, montujemy i odbieramy dekoracje. Ty zajmujesz się gośćmi.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="wydarzenia">
+  <div class="wrap">
+    <h2 class="center">Wybierz rodzaj wydarzenia</h2>
+    <p class="sub center">Pakiety są zbudowane pod wydarzenie, nie pod styl — na start wszystkie w jednej, spójnej stylistyce. W każdym pakiecie trzy poziomy: ESENCJA / MID / FULL.</p>
+    <div class="wyd">
+      {% for g in grupy %}
+      <a class="wyd-card" href="{{ url_for('wynajem_wydarzenie', ev=g.ev, pers=pers_str) }}">
+        <span class="ik">
+          {% if g.ev == 'komunijny' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 3v26"/><path d="M9 9h14"/><path d="M7 22h18"/></svg>
+          {% elif g.ev == 'weselny' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M15.5 8h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 15.5 8z"/><path d="M11 12h10l-1.5 6.5h-7z"/><path d="M14 18.5L12 21h8l-2-2.5"/></svg>
+          {% elif g.ev == 'firmowy' %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M5 28V10l11-6 11 6v18"/><path d="M10 28v-9h12v9"/><path d="M13 13h2M17 13h2M13 17h2M17 17h2"/></svg>
+          {% else %}<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M16 29V14"/><path d="M8 16h16"/><path d="M9 19h14"/><path d="M11 22h10"/><path d="M13 25h6"/></svg>{% endif %}
+        </span>
+        <h3>{{ g.nazwa }}</h3>
+        <p>{{ g.opis }}</p>
+        <span class="wiecej">{{ g.ile }} poziomy pakietu →</span>
+      </a>
+      {% endfor %}
+      <a class="wyd-card" href="{{ url_for('personalizacja', next=url_for('wynajem', pers=pers_str), pers=pers_str) }}">
+        <span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 26V12l10-7 10 7v14"/><path d="M11 26v-7h10v7"/><circle cx="16" cy="13.5" r="1.4"/></svg></span>
+        <h3>Dodaj produkty spersonalizowane</h3>
+        <p>Imiona, daty, sentencje — wykonywane na zamówienie. Jednorazówki: płatne z góry i nie podlegają zwrotowi (zostają u Ciebie).</p>
+        <span class="wiecej">Zobacz katalog personalizacji →</span>
+      </a>
+      <a class="wyd-card diy" href="{{ url_for('komponuje') }}">
+        <span class="ik"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h18v16H7z"/><path d="M11 13l3.5 3.5L21 10"/></svg></span>
+        <h3>Komponuję własny</h3>
+        <p>Składasz zestaw z katalogu — kalkulator liczy na żywo. Rabat −5% od 10 pozycji. Personalizacja płatna osobno.</p>
+        <span class="wiecej">Przejdź do katalogu →</span>
+      </a>
+    </div>
+    <p style="margin-top:22px;font-size:14.5px;color:rgba(51,38,28,.65)">
+      Najem trwa co najmniej 48–72 h: dekoracje zakładamy <b>dzień przed</b> imprezą i ściągamy <b>dzień po</b>.
+      Kaucja zwrotna 300 zł przy każdym pakiecie · „wysłano zapytanie" nie blokuje terminu — decyduje kolejność wpłat (kto pierwszy, ten lepszy; priorytet mają stali partnerzy).
+    </p>
+  </div>
+</section>
+
+<section class="sec" id="katalog">
+  <div class="wrap">
+    <h2 class="center">Katalog</h2>
+    <p class="sub center">Elementy wypożyczasz osobno — w sekcji „Komponuję własny" zbierzesz je w zestaw z kalkulatorem.</p>
+    <div class="kat">
+      {% for k in kategorie %}
+      {% if produkty_wg.get(k.id) %}
+      <h4>{{ k.nazwa }}</h4>
+      <div class="kat-grid">
+        {% for pr in produkty_wg[k.id] %}
+        <div class="kat-card">
+          <b>{{ pr.nazwa }}</b>
+          <p>{{ pr.opis or '' }}</p>
+          <span class="cena">od {{ '%.0f'|format(pr.cena_doba) }} zł / doba</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

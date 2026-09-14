@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zamów personalizację — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=6">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set etapy = ['Personalizacja','Dane','Podsumowanie'] %}{% set etap = 1 %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('zamowienia') }}">← wszystkie zamówienia</a>
+  <h1>Zamów personalizację</h1>
+  <p class="sub">Nie jesteśmy fabryką, tylko rodzinną manufakturą tworzącą unikaty. Wybierz, co mamy spersonalizować — każdy produkt opisz po swojemu (imiona, data, treść, dedykacja…). Produkty personalizowane są <b>płatne z góry i bezzwrotne</b>; rabat −5% od 3 produktów. <b>Wymagają zamówienia min. 2 tygodnie przed planowanym terminem realizacji.</b></p>
+
+  {% if bledy %}
+  <div class="bledy-box">
+    <ul>{% for b in bledy %}<li>{{ b }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('z_pers_samodzielna', w=w) if w else url_for('z_pers_samodzielna') }}" id="f-pers">
+    {% if w %}<input type="hidden" name="w" value="{{ w }}">{% endif %}
+    <div class="bledy-box" id="js-bledy" hidden><ul id="js-bledy-list"></ul></div>
+
+    <div class="pers z-3">
+      {% for pr in pozycje %}
+      <div class="pers-it z-pers-it">
+        <input type="checkbox" name="pers" value="{{ pr.id }}" id="pers-{{ pr.id }}" data-cena="{{ pr.cena }}"
+               {% if pr.id in wybrane %}checked{% endif %}>
+        <div class="z-pers-tresc">
+          <b>{{ pr.nazwa }}</b>
+          <small>{{ pr.opis or 'Co możemy zrobić: dodać napis, imiona, datę, przygotować wydruki, grawer…' }}</small>
+          <span class="cena">{{ '%.0f'|format(pr.cena) }} zł</span> <span class="bez">· bezzwrotne, płatne z góry</span>
+          <div class="z-pers-opis" {% if pr.id not in wybrane %}hidden{% endif %}>
+            <label for="pers_opis_{{ pr.id }}">Opisz, co i jak ma być spersonalizowane (np. imiona, data, treść napisu…)</label>
+            <textarea name="pers_opis_{{ pr.id }}" id="pers_opis_{{ pr.id }}" rows="2"
+                      placeholder="np. „Antoś i Marysia, 14.06.2026, napis: Niech Cię prowadzą gwiazdy…"">{{ opisy.get(pr.id, '') }}</textarea>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="pole" style="margin-top:18px">
+      <div class="projekt-cb">
+        <input type="checkbox" name="projekt_wlasny" id="projekt_wlasny" {% if projekt %}checked{% endif %}>
+        <label for="projekt_wlasny"><b>Mój własny projekt</b> — chcę zrealizować coś spoza asortymentu (zapytanie o wycenę zamiast zamówienia)</label>
+      </div>
+      <label for="pomysl">Opisz nam swój pomysł, a my zajmiemy się jego realizacją.</label>
+      <textarea id="pomysl" name="pomysl" rows="3" placeholder="Np. drewniana ramka z imionami chrzestnych, tablica z sentencją wg własnego tekstu, prezent na rocznicę…">{{ pomysl }}</textarea>
+    </div>
+
+    <div class="przyciski" style="justify-content:flex-end">
+      <button class="btn" type="submit" name="akcja" value="dalej">Dalej: Twoje dane →</button>
+    </div>
+  </form>
+</div>
+
+{# Popup: własny projekt bez wybranych produktów → zapytanie przez formularz kontaktowy #}
+<div class="modal" id="modal-projekt" hidden>
+  <div class="modal-karta" role="dialog" aria-modal="true" aria-labelledby="mp-tytul">
+    <h2 id="mp-tytul">Widzimy, że nie znalazłeś w naszym asortymencie tego, czego szukasz.</h2>
+    <p>Czy chciałbyś wysłać zapytanie dotyczące Twojego spersonalizowanego projektu?
+    Informację zwrotną dotyczącą wyceny prześlemy Ci w wiadomości zwrotnej w terminie <b>2 dni roboczych</b>.</p>
+    <div class="modal-przyciski">
+      <form method="post" action="{{ url_for('z_pers_samodzielna', w=w) if w else url_for('z_pers_samodzielna') }}" id="f-projekt">
+        {% if w %}<input type="hidden" name="w" value="{{ w }}">{% endif %}
+        <input type="hidden" name="projekt_wlasny" value="on">
+        <input type="hidden" name="pomysl" id="mp-pomysl">
+        <button class="btn" type="submit">Tak, chcę wysłać zapytanie →</button>
+      </form>
+      <button class="btn btn-line" type="button" id="mp-anuluj">Anuluj — wracam do katalogu</button>
+    </div>
+  </div>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var form = document.getElementById('f-pers');
+  var boxBledy = document.getElementById('js-bledy');
+  var lista = document.getElementById('js-bledy-list');
+  var modal = document.getElementById('modal-projekt');
+  var pomysl = document.getElementById('pomysl');
+  var cbProjekt = document.getElementById('projekt_wlasny');
+
+  document.querySelectorAll('.z-pers-it input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      var it = cb.closest('.pers-it');
+      var box = it.querySelector('.z-pers-opis');
+      var ta = box.querySelector('textarea');
+      box.hidden = !cb.checked;
+      ta.required = cb.checked;
+      ta.classList.remove('pole-blad');
+      if (cb.checked) ta.focus();
+    });
+  });
+
+  function ileZaznaczonych(){
+    return document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').length;
+  }
+
+  function pokazPopup(){
+    document.getElementById('mp-pomysl').value = pomysl.value.trim();
+    modal.hidden = false;
+    modal.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  function ukryjPopup(){
+    modal.hidden = true;
+    boxBledy.hidden = true;
+  }
+
+  // „Anuluj" w popupie = powrót do katalogu produktów personalizacji
+  var anuluj = document.getElementById('mp-anuluj');
+  if (anuluj) anuluj.addEventListener('click', function(){
+    cbProjekt.checked = false;
+    ukryjPopup();
+    pomysl.focus();
+  });
+
+  form.addEventListener('submit', function(ev){
+    var bledy = [];
+    var zaznaczone = ileZaznaczonych();
+    document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').forEach(function(cb){
+      var ta = cb.closest('.pers-it').querySelector('.z-pers-opis textarea');
+      if (!ta.value || ta.value.trim().length < 3){
+        bledy.push({ta: ta, nazwa: cb.closest('.pers-it').querySelector('b').textContent.trim()});
+      }
+    });
+    var tylkoPomysl = !zaznaczone && pomysl.value.trim().length >= 10;
+
+    // własny projekt bez produktu → popup z pytaniem o wysłanie zapytania (nie zamówienie)
+    if (!zaznaczone && cbProjekt.checked && tylkoPomysl){
+      ev.preventDefault();
+      boxBledy.hidden = true;
+      pokazPopup();
+      return;
+    }
+
+    if (!zaznaczone && !tylkoPomysl){
+      bledy.push({ta: pomysl, nazwa: 'opisz swój pomysł (min. 10 znaków) albo zaznacz produkt'});
+    }
+    if (bledy.length){
+      ev.preventDefault();
+      ukryjPopup();
+      lista.innerHTML = '';
+      bledy.forEach(function(b){
+        var li = document.createElement('li');
+        if (b.ta === pomysl){
+          li.textContent = 'Uzupełnij: ' + b.nazwa + '.';
+        } else {
+          li.textContent = 'Uzupełnij pole „' + b.nazwa + '" — co i jak ma być spersonalizowane.';
+        }
+        lista.appendChild(li);
+      });
+      boxBledy.hidden = false;
+      boxBledy.scrollIntoView({behavior: 'smooth', block: 'center'});
+      bledy[0].ta.focus();
+      bledy.forEach(function(b){ b.ta.classList.add('pole-blad'); });
+    }
+  });
+})();
+</script>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>
