@@ -118,7 +118,7 @@
   function seedBlog() {
     const posts = [
       {
-        id: 1, data: '2026-08-14', kategoria: 'Dekoracje świąteczne', tytul: 'Szopka warstwowa z podświetleniem',
+        id: 1, widoczny: true, data: '2026-08-14', kategoria: 'Dekoracje świąteczne', tytul: 'Szopka warstwowa z podświetleniem',
         zajawka: 'Nasz flagowy produkt: ręcznie cięte warstwy sklejki 20×20 cm, ciepłe światło LED 2700 K, rama z wpustami i listwą sosnową.',
         okladka: 'assets/media/sklep/szopka.jpg', video: '', galeria: [], tresc:
           '<h2>Od deski do podświetlonej szopki</h2>' +
@@ -127,7 +127,7 @@
         produkt: { sklep: true, id: 1, nazwa: 'Szopka bożonarodzeniowa (warstwowa)', cena: 249, gabaryt: '20×20×8 cm' }
       },
       {
-        id: 2, data: '2026-08-02', kategoria: 'Szyldy i tablice', tytul: 'Szyld powitalny „Witajcie"',
+        id: 2, widoczny: true, data: '2026-08-02', kategoria: 'Szyldy i tablice', tytul: 'Szyld powitalny „Witajcie"',
         zajawka: 'Drewniany szyld z grawerem — wita gości w domu, na weselu i w lokalu.',
         okladka: 'assets/media/sklep/szyld.jpg', video: '', galeria: [], tresc:
           '<h2>Pierwsze wrażenie robi szyld</h2>' +
@@ -135,7 +135,7 @@
         produkt: { sklep: true, id: 2, nazwa: 'Szyld powitalny „Witajcie"', cena: 189, gabaryt: '50×25×2 cm' }
       },
       {
-        id: 3, data: '2026-07-21', kategoria: 'Personalizacja', tytul: 'Ramka z sentencją — prezent, który zostaje',
+        id: 3, widoczny: true, data: '2026-07-21', kategoria: 'Personalizacja', tytul: 'Ramka z sentencją — prezent, który zostaje',
         zajawka: 'Ramka ze sklejki z wybraną sentencją, imionami i datą.',
         okladka: 'assets/media/sklep/ramka.jpg', video: '', galeria: [], tresc:
           '<h2>Sentencja, która nie wyjdzie z mody</h2>' +
@@ -369,13 +369,22 @@
           if (i >= 0) { lista[i] = Object.assign(lista[i], w); wpis = lista[i]; }
           else { wpis = Object.assign({ id: w.id }, w); lista.unshift(wpis); }
         } else {
-          wpis = Object.assign({ id: Date.now() % 1000000, data: new Date().toISOString().slice(0, 10) }, w);
+          wpis = Object.assign({ id: Date.now() % 1000000, data: new Date().toISOString().slice(0, 10), widoczny: true }, w);
           lista.unshift(wpis);
         }
         zapisz(KL.blog, lista);
         /* „dodaj do sklepu" — wpis staje się produktem (nowy albo aktualizacja istniejącego) */
         if (wpis.produkt && wpis.produkt.sklep) syncProdukt(wpis);
         return { ok: true, id: wpis.id };
+      }
+
+      case 'blog-widocznosc': {
+        const lista = blog();
+        const w = lista.find(function (x) { return Number(x.id) === Number(d.id); });
+        if (!w) return { ok: false, blad: 'Nie ma takiego wpisu.' };
+        w.widoczny = !!d.widoczny;
+        zapisz(KL.blog, lista);
+        return { ok: true };
       }
 
       case 'produkt-nowy': {

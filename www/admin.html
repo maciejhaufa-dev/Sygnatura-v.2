@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=310">
+<link rel="stylesheet" href="assets/style.css?v=311">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -48,7 +48,7 @@
       <button class="admin-tab" data-tab="strona-glowna" type="button">Strona główna</button>
       <button class="admin-tab" data-tab="zamowienia" type="button">Zamówienia</button>
       <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
-      <button class="admin-tab" data-tab="blog" type="button">Blog</button>
+      <button class="admin-tab" data-tab="blog" type="button">Nasze realizacje</button>
       <button class="admin-tab" data-tab="produkty" type="button">Produkty</button>
       <button class="admin-tab" data-tab="strony" type="button">Podstrony</button>
       <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
@@ -220,90 +220,102 @@
 
     <!-- BLOG -->
     <section class="admin-sekcja" id="tab-blog" style="display:none">
-      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Blog / realizacje</h2>
-      <p class="mala">Każdy wpis to realizacja na stronie: zdjęcia, opis wykonania, film. Wpis może
-      jednocześnie być produktem sklepu — zaznacz „dodaj do sklepu", a pozycja pojawi się w zakładce
-      Produkty (tam ustalisz cenę i widoczność). W trybie demo wpisy zapisują się w tej przeglądarce.</p>
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Nasze realizacje</h2>
+      <p class="mala">Po prawej lista wpisów (najnowsze na górze, najstarsze na dole) — kliknij wiersz,
+      aby zobaczyć podgląd po lewej. Checkbox „widoczny" pokazuje albo ukrywa wpis na stronie.
+      Wpis może jednocześnie być produktem sklepu — w trybie edycji zaznacz „Produkt w sklepie",
+      a pozycja pojawi się w zakładce Produkty. W trybie demo wpisy zapisują się w tej przeglądarce.</p>
       <div class="flash" id="blog-info" style="display:none"></div>
-      <div class="admin-dwie">
+      <div class="admin-dwie" style="grid-template-columns:1.55fr 1fr">
         <div>
-          <div class="przyciski" style="justify-content:flex-start">
-            <button class="btn" type="button" id="blog-nowy">+ Nowy wpis</button>
+          <div class="przyciski" id="blog-przyciski" style="justify-content:flex-start;margin-top:0">
+            <button class="btn" type="button" id="blog-nowy">+ Dodaj nowy wpis</button>
+            <button class="btn outline" type="button" id="blog-edytuj">Przejdź w tryb edycji</button>
           </div>
-          <div class="tabela-wrap" style="margin-top:10px">
-            <table class="tabela" id="tabela-blog">
-              <thead><tr><th>Data</th><th>Tytuł</th><th>Kategoria</th><th>Sklep</th><th></th></tr></thead>
-              <tbody></tbody>
-            </table>
+          <!-- PODGLĄD zaznaczonego wpisu -->
+          <div class="forma" id="blog-podglad" style="margin-top:10px"></div>
+          <!-- TRYB EDYCJI -->
+          <div class="forma" id="blog-form" style="display:none;margin-top:10px">
+            <h3 id="blog-form-tytul">Nowy wpis</h3>
+            <div class="pole" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
+              <b style="display:block;margin-bottom:8px;color:var(--butelkowa)">Opcje wpisu</b>
+              <label style="cursor:pointer;display:block;margin-bottom:6px">
+                <input type="checkbox" id="bf-widoczny"> Widoczny na stronie
+              </label>
+              <label style="cursor:pointer;display:block;font-weight:700">
+                <input type="checkbox" id="bf-sklep"> Produkt w sklepie (wpis z historią)
+              </label>
+              <div id="bf-produkt" style="display:none;margin-top:10px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-nazwa">Nazwa produktu</label>
+                    <input type="text" id="bf-p-nazwa">
+                  </div>
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-link">Połącz z produktem (albo nowy)</label>
+                    <select id="bf-p-link"><option value="">— nowy produkt —</option></select>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-cena">Cena (zł)</label>
+                    <input type="number" id="bf-p-cena" step="0.01" min="0">
+                  </div>
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-gabaryt">Gabaryt / rozmiar paczki</label>
+                    <input type="text" id="bf-p-gabaryt" placeholder="np. 20×20×8 cm">
+                  </div>
+                </div>
+                <p class="mala" style="margin-bottom:0">Cenę i widoczność produktu możesz potem dopracować w zakładce „Produkty".</p>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+                <div class="pole" style="margin:0">
+                  <label for="bf-kategoria">Kategoria</label>
+                  <input type="text" id="bf-kategoria" list="bf-kategorie" placeholder="np. Szyldy i tablice">
+                  <datalist id="bf-kategorie"></datalist>
+                </div>
+                <div class="pole" style="margin:0">
+                  <label for="bf-data">Data wpisu</label>
+                  <input type="date" id="bf-data">
+                </div>
+              </div>
+            </div>
+            <div class="pole">
+              <label for="bf-tytul">Tytuł wpisu *</label>
+              <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
+            </div>
+            <div class="pole">
+              <label for="bf-zajawka">Krótki opis (na kafelek)</label>
+              <textarea id="bf-zajawka" rows="2" placeholder="Dwa zdania, które zachęcą do kliknięcia…"></textarea>
+            </div>
+            <div class="pole">
+              <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
+              <div class="bf-mini" id="bf-mini"></div>
+              <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
+              <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
+            </div>
+            <div class="pole">
+              <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
+              <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
+            </div>
+            <div class="pole">
+              <label>Treść wpisu — zaznacz tekst i formatuj jak w edytorze forum</label>
+              <div class="editor" id="bf-tresc" style="min-height:180px"></div>
+              <input type="hidden" id="bf-zrodlo">
+            </div>
+            <div class="przyciski">
+              <button class="btn" type="button" id="blog-zapisz">Zapisz wpis</button>
+              <button class="btn outline" type="button" id="blog-anuluj">Anuluj</button>
+              <button class="btn niebez" type="button" id="blog-usun-wpis">Usuń wpis</button>
+            </div>
           </div>
         </div>
-        <div class="forma" id="blog-form" style="display:none">
-          <h3 id="blog-form-tytul">Nowy wpis</h3>
-          <div class="pole">
-            <label for="bf-tytul">Tytuł wpisu *</label>
-            <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="pole">
-              <label for="bf-kategoria">Kategoria</label>
-              <input type="text" id="bf-kategoria" list="bf-kategorie" placeholder="np. Szyldy i tablice">
-              <datalist id="bf-kategorie"></datalist>
-            </div>
-            <div class="pole">
-              <label for="bf-data">Data wpisu</label>
-              <input type="date" id="bf-data">
-            </div>
-          </div>
-          <div class="pole">
-            <label for="bf-zajawka">Krótki opis (na kafelek)</label>
-            <textarea id="bf-zajawka" rows="2" placeholder="Dwa zdania, które zachęcą do kliknięcia…"></textarea>
-          </div>
-          <div class="pole">
-            <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
-            <div class="bf-mini" id="bf-mini"></div>
-            <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
-            <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
-          </div>
-          <div class="pole">
-            <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
-            <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
-          </div>
-          <div class="pole">
-            <label>Treść wpisu — zaznacz tekst i formatuj jak w edytorze forum</label>
-            <div class="editor" id="bf-tresc" style="min-height:180px"></div>
-            <input type="hidden" id="bf-zrodlo">
-          </div>
-          <div class="pole" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
-            <label style="cursor:pointer;font-weight:700">
-              <input type="checkbox" id="bf-sklep"> Dodaj ten wpis do sklepu (produkt z historią)
-            </label>
-            <div id="bf-produkt" style="display:none;margin-top:10px">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                <div class="pole">
-                  <label for="bf-p-nazwa">Nazwa produktu</label>
-                  <input type="text" id="bf-p-nazwa">
-                </div>
-                <div class="pole">
-                  <label for="bf-p-link">Połącz z produktem (albo nowy)</label>
-                  <select id="bf-p-link"><option value="">— nowy produkt —</option></select>
-                </div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                <div class="pole">
-                  <label for="bf-p-cena">Cena (zł)</label>
-                  <input type="number" id="bf-p-cena" step="0.01" min="0">
-                </div>
-                <div class="pole">
-                  <label for="bf-p-gabaryt">Gabaryt / rozmiar paczki</label>
-                  <input type="text" id="bf-p-gabaryt" placeholder="np. 20×20×8 cm">
-                </div>
-              </div>
-              <p class="mala">Cenę i widoczność możesz potem dopracować w zakładce „Produkty".</p>
-            </div>
-          </div>
-          <div class="przyciski">
-            <button class="btn" type="button" id="blog-zapisz">Zapisz wpis</button>
-            <button class="btn outline" type="button" id="blog-anuluj">Anuluj</button>
+        <div>
+          <div class="tabela-wrap">
+            <table class="tabela" id="tabela-blog">
+              <thead><tr><th>Data</th><th>Tytuł</th><th>Widoczny</th></tr></thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -451,13 +463,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=310"></script>
-<script src="assets/koszyk.js?v=310"></script>
-<script src="assets/api.js?v=310"></script>
-<script src="assets/editor.js?v=310"></script>
-<script src="assets/edytor.js?v=310"></script>
-<script src="data/katalog.js?v=310"></script>
-<script src="assets/main.js?v=310"></script>
+<script src="assets/config.js?v=311"></script>
+<script src="assets/koszyk.js?v=311"></script>
+<script src="assets/api.js?v=311"></script>
+<script src="assets/editor.js?v=311"></script>
+<script src="assets/edytor.js?v=311"></script>
+<script src="data/katalog.js?v=311"></script>
+<script src="assets/main.js?v=311"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -1116,8 +1128,16 @@
 
   /* ============ BLOG ============ */
   var blogEdytor = SYG.edytor('bf-tresc', 'bf-zrodlo');
-  var edycjaWpis = null;
+  var wpisyBlog = [];
+  var wybranyId = null;
+  var trybEdycji = false;
+  var nowySzkic = false;
   var galeria = [];
+
+  function escB(s){
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
   function infoBlog(txt){
     var f = document.getElementById('blog-info');
@@ -1182,60 +1202,6 @@
     }).join('');
   }
 
-  async function ladujBlog(){
-    await wypelnijLinkProdukty();
-    var odp = await SYG.wezwij('blog-lista', {});
-    var wpisy = odp.ok ? (odp.wpisy || []) : [];
-    var tbody = document.querySelector('#tabela-blog tbody');
-    tbody.innerHTML = wpisy.map(function(w){
-      return '<tr>' +
-        '<td>' + (w.data || '').slice(0, 10) + '</td>' +
-        '<td><b>' + w.tytul + '</b><br><span class="mala">' + (w.galeria ? w.galeria.length + 1 : 1) + ' zdj.</span></td>' +
-        '<td>' + w.kategoria + '</td>' +
-        '<td>' + (w.produkt && w.produkt.sklep ? '<b style="color:var(--butelkowa)">✓ w sklepie</b>' : '—') + '</td>' +
-        '<td style="white-space:nowrap">' +
-        '<a class="btn outline" style="padding:6px 12px;font-size:13px" href="blog-wpis.html?id=' + w.id + '" target="_blank" rel="noopener">Podgląd</a> ' +
-        '<button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="' + w.id + '">Edytuj</button> ' +
-        '<button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="' + w.id + '">Usuń</button>' +
-        '</td></tr>';
-    }).join('') || '<tr><td colspan="5">Brak wpisów.</td></tr>';
-
-    tbody.querySelectorAll('button[data-edit]').forEach(function(b){
-      b.addEventListener('click', function(){
-        var w = wpisy.find(function(x){ return Number(x.id) === Number(b.getAttribute('data-edit')); });
-        if (!w) return;
-        edycjaWpis = w;
-        galeria = [].concat([w.okladka], (w.galeria || [])).filter(function(g, i, a){ return g && a.indexOf(g) === i; })
-          .map(function(g, i){ return { src: g, glowna: i === 0 }; });
-        document.getElementById('blog-form-tytul').textContent = 'Edycja wpisu #' + w.id;
-        document.getElementById('bf-tytul').value = w.tytul || '';
-        document.getElementById('bf-kategoria').value = w.kategoria || '';
-        document.getElementById('bf-data').value = w.data || '';
-        document.getElementById('bf-zajawka').value = w.zajawka || '';
-        document.getElementById('bf-video').value = w.video || '';
-        blogEdytor.ustaw(w.tresc || '');
-        var prod = w.produkt || {};
-        document.getElementById('bf-sklep').checked = !!prod.sklep;
-        document.getElementById('bf-produkt').style.display = prod.sklep ? 'block' : 'none';
-        document.getElementById('bf-p-nazwa').value = prod.nazwa || '';
-        document.getElementById('bf-p-link').value = prod.sklep && katProduktIstnieje(prod.id) ? String(prod.id) : '';
-        document.getElementById('bf-p-cena').value = prod.cena || '';
-        document.getElementById('bf-p-gabaryt').value = prod.gabaryt || '';
-        rysujMini();
-        document.getElementById('blog-form').style.display = 'block';
-        document.getElementById('blog-form').scrollIntoView({ behavior: 'smooth' });
-      });
-    });
-    tbody.querySelectorAll('button[data-usun]').forEach(function(b){
-      b.addEventListener('click', async function(){
-        if (!confirm('Usunąć wpis „' + (wpisy.find(function(x){ return Number(x.id) === Number(b.getAttribute('data-usun')); }) || {}).tytul + '"?')) return;
-        var odp2 = await SYG.wezwij('blog-usun', { id: Number(b.getAttribute('data-usun')) });
-        infoBlog(odp2.ok ? 'Wpis usunięty.' : (odp2.blad || 'Nie usunięto.'));
-        ladujBlog();
-      });
-    });
-  }
-
   var _katCache = null;
   async function katCache(){
     if (_katCache) return _katCache;
@@ -1246,54 +1212,220 @@
     return (_katCache || []).some(function(p){ return Number(p.id) === Number(id); });
   }
 
-  document.getElementById('blog-nowy').addEventListener('click', function(){
-    edycjaWpis = null;
-    galeria = [];
-    document.getElementById('blog-form-tytul').textContent = 'Nowy wpis';
-    ['bf-tytul','bf-kategoria','bf-zajawka','bf-video','bf-p-nazwa','bf-p-gabaryt'].forEach(function(id){ document.getElementById(id).value = ''; });
-    document.getElementById('bf-data').value = new Date().toISOString().slice(0, 10);
-    document.getElementById('bf-p-cena').value = '';
-    document.getElementById('bf-p-link').value = '';
-    document.getElementById('bf-sklep').checked = false;
-    document.getElementById('bf-produkt').style.display = 'none';
-    blogEdytor.ustaw('');
+  function wpisWybrany(){
+    return wpisyBlog.find(function(x){ return Number(x.id) === Number(wybranyId); }) || null;
+  }
+
+  async function ladujBlog(){
+    await wypelnijLinkProdukty();
+    var odp = await SYG.wezwij('blog-lista', {});
+    wpisyBlog = odp.ok ? (odp.wpisy || []) : [];
+    /* najnowsze na górze, najstarsze na dole */
+    wpisyBlog.sort(function(a, b){
+      var da = String(a.data || ''), db = String(b.data || '');
+      return db < da ? -1 : (db > da ? 1 : 0);
+    });
+    if (!wpisWybrany()) wybranyId = wpisyBlog.length ? wpisyBlog[0].id : null;
+    rysujListeBlog();
+    if (trybEdycji) wypelnijFormularz(wpisWybrany());
+    else pokazPodglad();
+  }
+
+  /* lista po prawej: data, tytuł, widoczny */
+  function rysujListeBlog(){
+    var tbody = document.querySelector('#tabela-blog tbody');
+    tbody.innerHTML = wpisyBlog.map(function(w){
+      var wid = w.widoczny !== false;
+      return '<tr data-wiersz="' + w.id + '"' + (Number(w.id) === Number(wybranyId) ? ' class="wybrany"' : '') + '>' +
+        '<td>' + escB(String(w.data || '').slice(0, 10)) + '</td>' +
+        '<td><b>' + escB(w.tytul) + '</b>' +
+        (w.produkt && w.produkt.sklep ? '<br><span class="mala" style="color:var(--butelkowa)">✓ produkt w sklepie</span>' : '') + '</td>' +
+        '<td><label style="cursor:pointer;font-size:14px;white-space:nowrap"><input type="checkbox" class="w-wid" data-id="' + w.id + '"' + (wid ? ' checked' : '') + '> widoczny</label></td></tr>';
+    }).join('') || '<tr><td colspan="3">Brak wpisów.</td></tr>';
+
+    tbody.querySelectorAll('tr[data-wiersz]').forEach(function(tr){
+      tr.addEventListener('click', function(){
+        var id = Number(tr.getAttribute('data-wiersz'));
+        if (Number(wybranyId) === id && !trybEdycji) return;
+        if (trybEdycji && !confirm('Porzucić niezapisane zmiany i przejść do innego wpisu?')) return;
+        wybranyId = id;
+        wyjdzZTrybuEdycji();
+        rysujListeBlog();
+        pokazPodglad();
+      });
+    });
+    tbody.querySelectorAll('.w-wid').forEach(function(ch){
+      ch.addEventListener('click', function(e){ e.stopPropagation(); });
+      ch.addEventListener('change', async function(){
+        var id = Number(ch.getAttribute('data-id'));
+        var odp = await SYG.wezwij('blog-widocznosc', { id: id, widoczny: ch.checked });
+        var w = wpisyBlog.find(function(x){ return Number(x.id) === id; });
+        if (odp.ok && w) w.widoczny = ch.checked;
+        infoBlog(odp.ok
+          ? 'Wpis „' + (w ? w.tytul : '') + '” jest teraz ' + (ch.checked ? 'WIDOCZNY na stronie.' : 'UKRYTY.')
+          : (odp.blad || 'Nie zapisano.'));
+        if (Number(wybranyId) === id && !trybEdycji) pokazPodglad();
+      });
+    });
+    document.getElementById('blog-edytuj').disabled = !wpisWybrany();
+  }
+
+  /* podgląd zaznaczonego wpisu — jak na stronie */
+  function pokazPodglad(){
+    var kont = document.getElementById('blog-podglad');
+    var w = wpisWybrany();
+    if (!w){
+      kont.innerHTML = '<p class="mala">Brak wpisów — kliknij „+ Dodaj nowy wpis", aby utworzyć pierwszy.</p>';
+      return;
+    }
+    var wid = w.widoczny !== false;
+    var wszystkie = [w.okladka].concat((w.galeria || []).filter(function(g){ return g && g !== w.okladka; }));
+    var mini = wszystkie.length > 1
+      ? '<div class="bf-podglad-mini">' + wszystkie.map(function(g){ return '<img src="' + escB(g) + '" alt="">'; }).join('') + '</div>'
+      : '';
+    kont.innerHTML =
+      (wid ? '' : '<div class="w-ukryty-ban">UKRYTY — niewidoczny na stronie „Nasze realizacje"</div>') +
+      '<span class="tag">' + escB(w.kategoria || 'Realizacje') + '</span>' +
+      '<h1 style="font-size:24px;margin:6px 0 2px">' + escB(w.tytul) + '</h1>' +
+      '<p class="sub">' + escB(String(w.data || '').slice(0, 10)) +
+      (w.produkt && w.produkt.sklep ? ' · <b style="color:var(--butelkowa)">✓ produkt w sklepie</b>' : '') + '</p>' +
+      (w.okladka ? '<figure class="wpis-okladka" style="margin:10px 0"><img src="' + escB(w.okladka) + '" alt="" style="max-width:100%;height:auto"></figure>' : '') +
+      mini +
+      (w.zajawka ? '<p><i>' + escB(w.zajawka) + '</i></p>' : '') +
+      '<div class="blog-tresc">' + (w.tresc || '<p class="mala">(brak treści)</p>') + '</div>' +
+      (w.video ? '<p class="mala">Film: <a href="' + escB(w.video) + '" target="_blank" rel="noopener">' + escB(w.video) + '</a></p>' : '') +
+      ((w.produkt && w.produkt.sklep)
+        ? '<p class="mala">Sklep: <b>' + escB(w.produkt.nazwa) + '</b> — ' + SYG.zl(w.produkt.cena) +
+          (w.produkt.gabaryt ? ' · ' + escB(w.produkt.gabaryt) : '') + '</p>' : '') +
+      '<p style="margin-top:10px"><a class="btn outline" style="padding:6px 12px;font-size:13px" href="blog-wpis.html?id=' + w.id + '" target="_blank" rel="noopener">Zobacz na stronie →</a></p>';
+  }
+
+  function wypelnijFormularz(w){
+    if (!w) return;
+    galeria = [].concat([w.okladka], (w.galeria || [])).filter(function(g, i, a){ return g && a.indexOf(g) === i; })
+      .map(function(g, i){ return { src: g, glowna: i === 0 }; });
+    document.getElementById('blog-form-tytul').textContent = nowySzkic ? 'Nowy wpis' : 'Edycja wpisu #' + w.id;
+    document.getElementById('bf-tytul').value = nowySzkic ? '' : (w.tytul || '');
+    document.getElementById('bf-kategoria').value = nowySzkic ? '' : (w.kategoria || '');
+    document.getElementById('bf-data').value = w.data || new Date().toISOString().slice(0, 10);
+    document.getElementById('bf-zajawka').value = nowySzkic ? '' : (w.zajawka || '');
+    document.getElementById('bf-video').value = w.video || '';
+    blogEdytor.ustaw(nowySzkic ? '' : (w.tresc || ''));
+    document.getElementById('bf-widoczny').checked = w.widoczny !== false;
+    var prod = w.produkt || {};
+    document.getElementById('bf-sklep').checked = !!prod.sklep;
+    document.getElementById('bf-produkt').style.display = prod.sklep ? 'block' : 'none';
+    document.getElementById('bf-p-nazwa').value = prod.nazwa || '';
+    document.getElementById('bf-p-link').value = prod.sklep && katProduktIstnieje(prod.id) ? String(prod.id) : '';
+    document.getElementById('bf-p-cena').value = prod.cena || '';
+    document.getElementById('bf-p-gabaryt').value = prod.gabaryt || '';
     rysujMini();
+  }
+
+  function wejdzWTrybEdycji(){
+    var w = wpisWybrany();
+    if (!w) return;
+    trybEdycji = true;
+    wypelnijFormularz(w);
+    document.getElementById('blog-podglad').style.display = 'none';
+    document.getElementById('blog-przyciski').style.display = 'none';
     document.getElementById('blog-form').style.display = 'block';
-    document.getElementById('blog-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function wyjdzZTrybuEdycji(){
+    trybEdycji = false;
+    nowySzkic = false;
+    document.getElementById('blog-form').style.display = 'none';
+    document.getElementById('blog-podglad').style.display = 'block';
+    document.getElementById('blog-przyciski').style.display = '';
+  }
+
+  /* „Dodaj nowy wpis" — od razu tworzy rekord w tabeli i otwiera edycję */
+  document.getElementById('blog-nowy').addEventListener('click', async function(){
+    var dzis = new Date().toISOString().slice(0, 10);
+    var odp = await SYG.wezwij('blog-zapisz', { wpis: {
+      id: null, tytul: '(Nowy wpis)', kategoria: 'Realizacje', data: dzis,
+      zajawka: '', okladka: 'assets/media/sklep/szopka.jpg', galeria: [], video: '',
+      tresc: '', produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' },
+      widoczny: false
+    } });
+    if (!odp.ok){ infoBlog(odp.blad || 'Nie utworzono wpisu.'); return; }
+    _katCache = null;
+    wybranyId = odp.id;
+    nowySzkic = true;
+    await ladujBlog();
+    infoBlog('Utworzono nowy wpis — uzupełnij go i zapisz.');
+    wejdzWTrybEdycji();
   });
 
-  document.getElementById('blog-anuluj').addEventListener('click', function(){
-    document.getElementById('blog-form').style.display = 'none';
+  document.getElementById('blog-edytuj').addEventListener('click', function(){
+    wejdzWTrybEdycji();
+  });
+
+  document.getElementById('blog-anuluj').addEventListener('click', async function(){
+    if (nowySzkic && wybranyId){
+      await SYG.wezwij('blog-usun', { id: wybranyId });
+      wybranyId = null;
+      infoBlog('Nowy wpis odrzucony.');
+    }
+    wyjdzZTrybuEdycji();
+    ladujBlog();
+  });
+
+  document.getElementById('blog-usun-wpis').addEventListener('click', async function(){
+    var w = wpisWybrany();
+    if (!w) return;
+    if (!confirm('Usunąć wpis „' + w.tytul + '"?')) return;
+    var odp = await SYG.wezwij('blog-usun', { id: w.id });
+    infoBlog(odp.ok ? 'Wpis usunięty.' : (odp.blad || 'Nie usunięto.'));
+    if (odp.ok){
+      wybranyId = null;
+      wyjdzZTrybuEdycji();
+      ladujBlog();
+    }
   });
 
   document.getElementById('blog-zapisz').addEventListener('click', async function(){
     var tytul = document.getElementById('bf-tytul').value.trim();
     if (!tytul){ alert('Podaj tytuł wpisu.'); return; }
+    var widoczny = document.getElementById('bf-widoczny').checked;
     var sklep = document.getElementById('bf-sklep').checked;
     var link = document.getElementById('bf-p-link').value;
     var kat = await katCache();
     var istniejacy = kat.find(function(p){ return Number(p.id) === Number(link); });
+    var w = wpisWybrany() || {};
+    var glowna = galeria.find(function(g){ return g.glowna; }) || galeria[0];
     var wpis = {
-      id: edycjaWpis ? edycjaWpis.id : null,
+      id: wybranyId,
       tytul: tytul,
+      widoczny: widoczny,
       kategoria: document.getElementById('bf-kategoria').value.trim() || 'Realizacje',
       data: document.getElementById('bf-data').value || new Date().toISOString().slice(0, 10),
       zajawka: document.getElementById('bf-zajawka').value.trim(),
-      okladka: galeria.length ? galeria[0].src : 'assets/media/sklep/szopka.jpg',
+      okladka: glowna ? glowna.src : 'assets/media/sklep/szopka.jpg',
       galeria: galeria.map(function(g){ return g.src; }),
       video: document.getElementById('bf-video').value.trim(),
       tresc: blogEdytor.pobierz(),
       produkt: {
         sklep: sklep,
-        id: istniejacy ? Number(link) : (edycjaWpis && edycjaWpis.produkt && edycjaWpis.produkt.id ? edycjaWpis.produkt.id : 0),
+        id: istniejacy ? Number(link) : (w.produkt && w.produkt.id ? w.produkt.id : 0),
         nazwa: document.getElementById('bf-p-nazwa').value.trim() || tytul,
         cena: Number(document.getElementById('bf-p-cena').value) || (istniejacy ? istniejacy.cena : 0),
         gabaryt: document.getElementById('bf-p-gabaryt').value.trim()
       }
     };
     var odp = await SYG.wezwij('blog-zapisz', { wpis: wpis });
-    infoBlog(odp.ok ? 'Wpis zapisany' + (sklep ? ' i dodany do sklepu.' : '.') : (odp.blad || 'Nie zapisano.'));
-    if (odp.ok){ _katCache = null; ladujBlog(); ladujProdukty(); }
+    if (odp.ok){
+      _katCache = null;
+      wybranyId = odp.id;
+      wyjdzZTrybuEdycji();
+      await ladujBlog();
+      ladujProdukty();
+      infoBlog('Wpis zapisany' + (sklep ? ' i dodany do sklepu.' : '.') +
+        (widoczny ? '' : ' (UKRYTY — zaznacz „widoczny", aby pokazać go na stronie.)'));
+    } else {
+      infoBlog(odp.blad || 'Nie zapisano.');
+    }
   });
 
   /* ============ PODSTRONY ============ */

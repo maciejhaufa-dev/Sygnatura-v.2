@@ -26,13 +26,19 @@
   async function lista(kontener) {
     const odp = await SYG.wezwij('blog-lista', {});
     const wpisy = (odp.ok && odp.wpisy) || [];
+    /* tylko widoczne, najnowsze na górze */
+    const widoczne = wpisy.filter(function (w) { return w.widoczny !== false; })
+      .sort(function (a, b) {
+        const da = String(a.data || ''), db = String(b.data || '');
+        return db < da ? -1 : (db > da ? 1 : 0);
+      });
     kontener.innerHTML = '';
-    if (!wpisy.length) {
+    if (!widoczne.length) {
       kontener.innerHTML = '<p class="mala" style="padding:14px 0">Nie ma jeszcze wpisów. Pierwsza realizacja pojawi się tu wkrótce.</p>';
       return;
     }
     const kategorie = [];
-    wpisy.forEach(function (w) { if (w.kategoria && kategorie.indexOf(w.kategoria) < 0) kategorie.push(w.kategoria); });
+    widoczne.forEach(function (w) { if (w.kategoria && kategorie.indexOf(w.kategoria) < 0) kategorie.push(w.kategoria); });
     const filtr = document.createElement('div');
     filtr.className = 'blog-filtr';
     let chips = '<button type="button" class="blog-chip on" data-kat="">Wszystkie</button>';
@@ -43,7 +49,7 @@
     siatka.className = 'blog-siatka';
     kontener.appendChild(siatka);
     function rysuj(kat) {
-      siatka.innerHTML = wpisy.filter(function (w) { return !kat || w.kategoria === kat; }).map(function (w) {
+      siatka.innerHTML = widoczne.filter(function (w) { return !kat || w.kategoria === kat; }).map(function (w) {
         return '<a class="blog-kafel" href="blog-wpis.html?id=' + w.id + '">' +
           '<img src="' + esc(w.okladka) + '" alt="' + esc(w.tytul) + '" loading="lazy">' +
           (w.produkt && w.produkt.sklep ? '<span class="blog-badge">dostępny w sklepie</span>' : '') +
@@ -102,6 +108,11 @@
       return;
     }
     const w = odp.wpis;
+    if (w.widoczny === false) {
+      kontener.innerHTML = '<div class="sukces"><h2>Ten wpis jest obecnie niedostępny</h2>' +
+        '<p><a class="btn" href="blog.html" style="margin-top:12px">← Wróć do realizacji</a></p></div>';
+      return;
+    }
     const lb = lightbox();
     const wszystkie = [w.okladka].concat((w.galeria || []).filter(function (g) { return g && g !== w.okladka; }));
 

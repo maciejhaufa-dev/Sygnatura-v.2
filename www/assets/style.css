@@ -484,6 +484,16 @@ html.dotyk .menu-vert a::after{display:none}
 @media(max-width:980px){.admin-dwie{grid-template-columns:1fr}}
 .admin-dwie .forma{margin-top:0;border:1px solid rgba(107,69,48,.3);padding:16px 18px;background:var(--krem)}
 .bf-mini{display:flex;gap:8px;flex-wrap:wrap}
+/* ============ BLOG w panelu: lista + podgląd ============ */
+#tabela-blog tr[data-wiersz]{cursor:pointer}
+#tabela-blog tr.wybrany td{background:#f1e6d2}
+#tabela-blog tr[data-wiersz]:hover td{background:#f7efe0}
+#tabela-blog tr.wybrany:hover td{background:#f1e6d2}
+.w-ukryty-ban{background:#8a2f1d;color:#fff;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+  border-radius:6px;padding:6px 12px;margin-bottom:10px}
+.bf-podglad-mini{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.bf-podglad-mini img{width:112px;height:84px;object-fit:cover;border:1px solid rgba(107,69,48,.35)}
+#blog-podglad .wpis-okladka img{cursor:default}
 .bf-mini-el{position:relative;border:1px solid rgba(107,69,48,.35);background:#fff;padding:4px;width:112px}
 .bf-mini-el img{width:100%;height:84px;object-fit:cover;display:block}
 .bf-mini-el label{display:flex;align-items:center;gap:4px;font-size:11.5px;margin-top:4px;cursor:pointer}
