@@ -1385,4 +1385,40 @@ WYKONANE (wersja 28.30, ?v=310):
 - Testy: node --check + HTML; test Node: zamówienie z dostawą (paczkomat M, POZ001P),
   kodem POWITANIE5 i kod_rabat 25 zapisuje się i wraca w konto-zamowienia; pozycje z ilością
   ×2; sync docs; Pages built | 8116f6d; fetch_page live konto.html (kolumna „Szczegóły").
-NASTĘPNY KROK: kolejne strony wg usera; docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
+## Sesja 28 — PANEL „NASZE REALIZACJE": podgląd + edycja + lista z widocznością (commit da19a1d, wersja 28.31)
+
+Właściciel: ramka do napisu „Cześć!" ukończona (zdjęcia miał podmienić — PRZEPADŁY przy
+resecie sandboxa, patrz UWAGA); edytor treści WSTRZYMANY — najważniejsza MECHANIKA:
+dodawanie wpisów na bloga (realizacje) i produktów do sklepu. W zakładce „nasze
+realizacje": lista wpisów tabelą (najnowsze na górze), podział na 2 kolumny — LEWA
+(szersza) podgląd zaznaczonego wpisu, PRAWA lista (data, nazwa, checkbox „widoczny");
+nad podglądem „dodaj nowy wpis" (tworzy rekord w tabeli) i „przejdź w tryb edycji";
+tryb edycji aktywuje POLE NA GÓRZE z „produkt w sklepie" + kategoriami/gabarytami jak teraz.
+
+WYKONANE (wersja 28.31, ?v=311):
+- Zakładka przemianowana Blog → „Nasze realizacje"; układ 2 kolumny (1.55fr/1fr):
+  LEWA: przyciski „+ Dodaj nowy wpis" i „Przejdź w tryb edycji" + podgląd wpisu jak na
+  stronie (tag, tytuł, data, okładka, miniatury, zajawka, treść, film, linia sklepu,
+  baner UKRYTY, link „Zobacz na stronie →"); PRAWA: tabela Data/Tytuł/Widoczny,
+  sortowanie od najnowszych, klik wiersza = wybór (z pytaniem o porzucenie zmian
+  w trybie edycji), checkbox przełącza widoczność przez nową akcję blog-widocznosc.
+- „Dodaj nowy wpis" tworzy OD RAZU rekord (ukryty szkic z dzisiejszą datą) i otwiera
+  edycję; „Anuluj" przy szkicu usuwa rekord; zapis pokazuje podgląd.
+- Tryb edycji: POLE „Opcje wpisu" NA GÓRZE (☑ Widoczny na stronie, ☑ Produkt w sklepie +
+  nazwa/link/cena/gabaryt jak dotąd, kategoria, data); dalej tytuł, zajawka, zdjęcia
+  (maks. 10), film YT, treść (prosty edytor); przyciski Zapisz/Anuluj/Usuń wpis.
+- Strona publiczna: blog.js filtruje ukryte (lista + blokada „Ten wpis jest obecnie
+  niedostępny") i sortuje od najnowszych; seed + nowe wpisy domyślnie widoczne.
+- Produkty: mechanika BEZ ZMIAN (działa): „Produkt w sklepie" tworzy/aktualizuje pozycję
+  w katalogu (syncProdukt), zakładka Produkty dodaje „bez historii" (produkt-nowy).
+- Fix przy okazji: zdjęcie główne z radia faktycznie trafia na okładkę (wcześniej zawsze
+  pierwsze z listy).
+- Testy Node (6/6): seedy widoczne + sort, domyślna widoczność, toggle ukrywa z publicznej,
+  szkic→zapis z produktem tworzy pozycję 159 zł ze storyId, produkt-nowy, usuwanie.
+  HTML/JS OK; sync docs; Pages built | da19a1d; fetch_page live admin (zakładka, przyciski,
+  opcje, tabela Data/Tytuł/Widoczny).
+UWAGA: reset sandboxa w tej turze — odtworzono stan (git reset do 7705e1d, drzewo czyste);
+załączone zdjęcia ramki (IMG_20260915_*) PRZEPADŁY (uploads/ poza repo) — właściciel ma
+je wysłać ponownie, wtedy podmienimy szyld.jpg.
+NASTĘPNY KROK: podmiama zdjęcia szyldu po ponownym otrzymaniu zdjęć; kolejne strony wg usera;
+docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
