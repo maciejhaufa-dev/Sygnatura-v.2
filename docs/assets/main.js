@@ -25,7 +25,14 @@
     if (dotyk) document.documentElement.classList.add('dotyk');
   })();
 
-  const MENU = [
+  /* TRYB STARTU: tylko portfolio + kontakt. Pełny serwis wraca po SYG.LAUNCH = false. */
+  const MENU = SYG.LAUNCH ? [
+    ['index.html', 'Strona główna'],
+    ['realizacje.html', 'Nasze realizacje'],
+    ['pracownia.html', 'Pracownia'],
+    ['jak-pracujemy.html', 'Jak zamówić'],
+    ['kontakt.html', 'Kontakt']
+  ] : [
     ['index.html', 'Strona główna'],
     ['zamowienia.html', 'Zamówienia'],
     ['pracownia.html', 'Pracownia'],
@@ -33,6 +40,11 @@
     ['wspolpraca.html', 'Współpraca'],
     ['kontakt.html', 'Kontakt']
   ];
+
+  function telHref(){
+    const cyfry = String(SYG.TEL || '').replace(/\D/g, '');
+    return 'tel:+' + (cyfry.length === 9 ? '48' + cyfry : cyfry);
+  }
 
   /* menu = pozycje stałe + podstrony zarządzane z panelu admina (zakładka „Podstrony").
      Podstrony „pracownia" NIE doklejamy — ma już własny przycisk w menu stałym (pracownia.html). */
@@ -86,6 +98,28 @@
         kontoTytul = 'Konto — ' + kuz.email;
       }
     } catch (e) {}
+    var headGora;
+    if (SYG.LAUNCH){
+      headGora = '<div class="head-gora"><div class="head-przyciski">' +
+        '<a class="head-przycisk" href="mailto:' + SYG.MAIL + '" title="Napisz do nas">' +
+        '<span class="hp-ico">✉</span><span class="hp-etyk">Napisz do nas</span></a>' +
+        '<a class="head-przycisk" href="' + telHref() + '" title="Zadzwoń">' +
+        '<span class="hp-ico">☎</span><span class="hp-etyk">' + SYG.TEL + '</span></a>' +
+        '</div></div>';
+    } else {
+      headGora = '<div class="head-gora">' +
+        '<form class="szukaj" action="szukaj.html" method="get" role="search">' +
+        '<input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">' +
+        '<button type="submit" aria-label="Szukaj">' + ikonaSvg(SVG_SZUKAJ) + '</button>' +
+        '</form>' +
+        '<div class="head-przyciski">' +
+        '<a class="head-przycisk" href="koszyk.html" title="Koszyk" aria-label="Koszyk">' +
+        '<span class="kropka"></span>' + ikonaSvg(SVG_KOSZYK) + '<span class="hp-etyk">Koszyk</span></a>' +
+        '<a class="head-przycisk" href="konto.html" title="' + kontoTytul + '" aria-label="Panel użytkownika">' +
+        ikonaSvg(SVG_PANEL) + '<span class="hp-etyk">' + kontoEtykieta + '</span></a>' +
+        '</div>' +
+        '</div>';
+    }
     return '' +
       '<div class="srodek">' +
       /* A + C: logo i menu */
@@ -103,7 +137,7 @@
       '<div class="head">' +
       '<div class="head-kontakt">' +
       '<span class="hk-lewa">' +
-      '<a href="tel:+48510767076">☎ ' + SYG.TEL + '</a>' +
+      '<a href="' + telHref() + '">☎ ' + SYG.TEL + '</a>' +
       '<span class="hk-sep">|</span>' +
       '<a href="mailto:' + SYG.MAIL + '">✉ ' + SYG.MAIL + '</a>' +
       '</span>' +
@@ -114,18 +148,7 @@
       '<a href="#" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_FB + '</svg></a>' +
       '</span>' +
       '</div>' +
-      '<div class="head-gora">' +
-      '<form class="szukaj" action="szukaj.html" method="get" role="search">' +
-      '<input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">' +
-      '<button type="submit" aria-label="Szukaj">' + ikonaSvg(SVG_SZUKAJ) + '</button>' +
-      '</form>' +
-      '<div class="head-przyciski">' +
-      '<a class="head-przycisk" href="koszyk.html" title="Koszyk" aria-label="Koszyk">' +
-      '<span class="kropka"></span>' + ikonaSvg(SVG_KOSZYK) + '<span class="hp-etyk">Koszyk</span></a>' +
-      '<a class="head-przycisk" href="konto.html" title="' + kontoTytul + '" aria-label="Panel użytkownika">' +
-      ikonaSvg(SVG_PANEL) + '<span class="hp-etyk">' + kontoEtykieta + '</span></a>' +
-      '</div>' +
-      '</div>' +
+      headGora +
       '<h1 class="strona-tytul" id="strona-tytul"></h1>' +
       '</div>' +
       '</div>' +
@@ -133,25 +156,48 @@
   }
 
   function stopka() {
+    if (SYG.LAUNCH){
+      return '<span><a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
+        '<a href="pracownia.html">Pracownia</a><span class="sep">·</span>' +
+        '<a href="jak-pracujemy.html">Jak zamówić</a><span class="sep">·</span>' +
+        '<a href="kontakt.html">Kontakt</a></span>' +
+        '<span>© Sygnatura 2026</span>';
+    }
     const czesci = ['<a href="regulamin.html">Regulamin</a>', '<a href="jak-pracujemy.html">Jak pracujemy</a>'];
     STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; }).forEach(function (s) {
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.31</span>';
+      '<span>© Sygnatura 2026 · wersja 28.32</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     const aktywna = document.body.getAttribute('data-strona') || '';
 
-    /* baner trybu demo — na samej górze */
-    if (SYG.TRYB_DEMO) {
+    /* baner trybu demo — na samej górze (w trybie startu ukryty) */
+    if (SYG.TRYB_DEMO && !SYG.LAUNCH) {
       const b = document.createElement('div');
       b.className = 'demo-banner';
       b.innerHTML = 'TRYB DEMO — dane zapisują się tylko w tej przeglądarce (do testów). ' +
         'Po wdrożeniu Google Apps Script banner zniknie sam.';
       document.body.insertBefore(b, document.body.firstChild);
     }
+
+    /* dane kontaktowe z configu — na wszystkich stronach (też głównej) */
+    document.querySelectorAll('[data-kontakt-mail]').forEach(function(a){
+      a.setAttribute('href', 'mailto:' + SYG.MAIL);
+      a.textContent = SYG.MAIL;
+    });
+    document.querySelectorAll('[data-kontakt-tel]').forEach(function(a){
+      a.setAttribute('href', telHref());
+      a.textContent = SYG.TEL;
+    });
+    document.querySelectorAll('[data-kontakt-mail-btn]').forEach(function(a){
+      a.setAttribute('href', 'mailto:' + SYG.MAIL);
+    });
+    document.querySelectorAll('[data-kontakt-tel-btn]').forEach(function(a){
+      a.setAttribute('href', telHref());
+    });
 
     /* szkielet budujemy TYLKO dla podstron (main.wrap).
        Strona główna ma własny układ — zostawiamy ją nietkniętą. */
@@ -182,6 +228,27 @@
     stopkaNode.innerHTML = stopka();
     shell.appendChild(stopkaNode);
     document.body.appendChild(shell);
+
+    /* TRYB STARTU: wybrane strony pokazują komunikat „w budowie" — oryginalna treść
+       zostaje w pliku (i w skryptach) i wróci po przestawieniu SYG.LAUNCH na false */
+    if (SYG.LAUNCH){
+      var BUDOWA = ['zamowienia.html','sklep.html','personalizacja.html','koszyk.html','dane.html',
+        'podsumowanie.html','dziekuje.html','wynajem.html','konto.html','wspolpraca.html','szukaj.html','regulamin.html'];
+      var plik = (window.location.pathname.split('/').pop() || 'index.html').split('?')[0].toLowerCase();
+      if (BUDOWA.indexOf(plik) >= 0){
+        document.body.classList.add('launch-budowa');
+        var box = document.createElement('div');
+        box.className = 'budowa-box';
+        box.innerHTML = '<span class="tag">Zapraszamy niebawem</span>' +
+          '<h2>Ta część strony jest w budowie</h2>' +
+          '<p>Dopracowujemy ją — tymczasem zobacz nasze realizacje albo skontaktuj się z nami bezpośrednio:</p>' +
+          '<div class="przyciski" style="justify-content:flex-start">' +
+          '<a class="btn" href="realizacje.html">Zobacz realizacje</a>' +
+          '<a class="btn outline" href="mailto:' + SYG.MAIL + '">✉ Napisz do nas</a>' +
+          '<a class="btn outline" href="' + telHref() + '">☎ ' + SYG.TEL + '</a></div>';
+        tresc.insertBefore(box, tresc.firstChild);
+      }
+    }
 
     window.KOSZYK.odswiez();
   });

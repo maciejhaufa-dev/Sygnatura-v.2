@@ -118,6 +118,13 @@ window.KOSZYK = (function () {
   }
 
   function odswiez() {
+    /* tryb startu: brak koszyka — pasek i kropka ukryte */
+    if (window.SYG && window.SYG.LAUNCH) {
+      const stary = document.getElementById('koszyk-bar-global');
+      if (stary) stary.remove();
+      if (document.body) document.body.classList.remove('ma-koszyk');
+      return;
+    }
     const k = pobierz();
     const n = liczbaSztuk() + k.pers.length;
 

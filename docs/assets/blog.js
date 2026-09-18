@@ -52,7 +52,7 @@
       siatka.innerHTML = widoczne.filter(function (w) { return !kat || w.kategoria === kat; }).map(function (w) {
         return '<a class="blog-kafel" href="blog-wpis.html?id=' + w.id + '">' +
           '<img src="' + esc(w.okladka) + '" alt="' + esc(w.tytul) + '" loading="lazy">' +
-          (w.produkt && w.produkt.sklep ? '<span class="blog-badge">dostępny w sklepie</span>' : '') +
+          (!SYG.LAUNCH && w.produkt && w.produkt.sklep ? '<span class="blog-badge">dostępny w sklepie</span>' : '') +
           '<span class="blog-kafel-tresc">' +
           '<span class="kat">' + esc(w.kategoria) + '</span>' +
           '<span class="nazwa">' + esc(w.tytul) + '</span>' +
@@ -134,9 +134,20 @@
     const film = vId ? '<div class="wpis-film"><div class="edytor-video"><iframe width="560" height="315" ' +
       'src="https://www.youtube.com/embed/' + vId + '" frameborder="0" allowfullscreen loading="lazy"></iframe></div></div>' : '';
 
-    /* blok produktu */
+    /* blok produktu — w trybie startu każda realizacja ma przycisk e-mail */
     let produktBlok = '';
-    if (w.produkt && w.produkt.sklep) {
+    if (SYG.LAUNCH) {
+      const telC = String(SYG.TEL || '').replace(/\D/g, '');
+      const temat = encodeURIComponent('Zapytanie: ' + (w.tytul || 'projekt'));
+      const trescMail = encodeURIComponent('Dzień dobry,\n\ninteresuje mnie projekt „' + (w.tytul || '') + '”. Proszę o wycenę i termin.\n\nPozdrawiam');
+      produktBlok = '<div class="wpis-produkt">' +
+        '<div><h2>Podoba Ci się ten projekt?</h2>' +
+        '<p class="mala" style="margin:6px 0 14px">Wykonamy taki sam — albo z Twoim napisem, imionami i datą. Napisz lub zadzwoń:</p>' +
+        '<div class="przyciski" style="flex-wrap:wrap">' +
+        '<a class="btn" href="mailto:' + SYG.MAIL + '?subject=' + temat + '&body=' + trescMail + '">ZAMÓW JUŻ DZIŚ!</a>' +
+        '<a class="btn outline" href="tel:+' + (telC.length === 9 ? '48' + telC : telC) + '">☎ ' + esc(SYG.TEL) + '</a>' +
+        '</div></div></div>';
+    } else if (w.produkt && w.produkt.sklep) {
       const pr = w.produkt;
       produktBlok = '<div class="wpis-produkt">' +
         '<div><h2>Podoba Ci się ten projekt?</h2>' +
@@ -153,7 +164,7 @@
       '<a class="powrot" href="blog.html">← wszystkie realizacje</a>' +
       '<span class="tag">' + esc(w.kategoria) + '</span>' +
       '<h1>' + esc(w.tytul) + '</h1>' +
-      '<p class="sub">' + dzien(w.data) + (w.produkt && w.produkt.sklep ? ' · dostępny w sklepie' : '') + '</p>' +
+      '<p class="sub">' + dzien(w.data) + (!SYG.LAUNCH && w.produkt && w.produkt.sklep ? ' · dostępny w sklepie' : '') + '</p>' +
       galeria + film + produktBlok +
       '<div class="blog-tresc">' + (w.tresc || '') + '</div>';
 

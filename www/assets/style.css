@@ -484,6 +484,18 @@ html.dotyk .menu-vert a::after{display:none}
 @media(max-width:980px){.admin-dwie{grid-template-columns:1fr}}
 .admin-dwie .forma{margin-top:0;border:1px solid rgba(107,69,48,.3);padding:16px 18px;background:var(--krem)}
 .bf-mini{display:flex;gap:8px;flex-wrap:wrap}
+/* ============ TRYB STARTU (LAUNCH) ============ */
+body.launch-budowa main.wrap > :not(.budowa-box){display:none}
+.budowa-box{border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:26px 28px;max-width:660px}
+.budowa-box h2{color:var(--butelkowa);margin:8px 0 6px;font-size:24px}
+.budowa-box p{font-size:16px;line-height:1.65}
+.head-przycisk .hp-ico{font-size:19px;line-height:1}
+.kontakt-karty{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+@media(max-width:640px){.kontakt-karty{grid-template-columns:1fr}}
+.kontakt-karta{border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:20px 18px;text-align:center}
+.kontakt-karta .kk-ico{font-size:30px}
+.kontakt-karta h2{font-size:19px;color:var(--butelkowa);margin:6px 0 4px}
+.kontakt-karta p{font-size:15px}
 /* ============ BLOG w panelu: lista + podgląd ============ */
 #tabela-blog tr[data-wiersz]{cursor:pointer}
 #tabela-blog tr.wybrany td{background:#f1e6d2}

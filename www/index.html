@@ -343,9 +343,9 @@ html.dotyk .social{margin-top:14px}
   <div class="head">
     <div class="head-kontakt">
       <span class="hk-lewa">
-        <a href="tel:+48510767076">☎ 510 767 076</a>
+        <a href="tel:+48510767076" data-kontakt-tel-btn>☎ 510 767 076</a>
         <span class="hk-sep">|</span>
-        <a href="mailto:kontakt@studiosygnatura.pl">✉ kontakt@studiosygnatura.pl</a>
+        <a href="mailto:kontakt@studiosygnatura.pl" data-kontakt-mail-btn>✉ kontakt@studiosygnatura.pl</a>
       </span>
       <span class="hk-prawa"><span class="hk-napis">Znajdź nas na:</span>
         <a href="#" aria-label="Pinterest" title="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>
@@ -355,13 +355,9 @@ html.dotyk .social{margin-top:14px}
       </span>
     </div>
     <div class="head-gora">
-    <form class="szukaj" action="szukaj.html" method="get" role="search">
-      <input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">
-      <button type="submit" aria-label="Szukaj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
-    </form>
     <div class="head-przyciski">
-      <a class="head-przycisk" href="koszyk.html" title="Koszyk" aria-label="Koszyk"><span class="kropka"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span class="hp-etyk">Koszyk</span></a>
-      <a class="head-przycisk" href="konto.html" title="Konto — logowanie" aria-label="Panel użytkownika"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg><span class="hp-etyk">Panel użytkownika</span></a>
+      <a class="head-przycisk" href="mailto:kontakt@studiosygnatura.pl" data-kontakt-mail-btn title="Napisz do nas"><span class="hp-ico">✉</span><span class="hp-etyk">Napisz do nas</span></a>
+      <a class="head-przycisk" href="tel:+48510767076" data-kontakt-tel-btn title="Zadzwoń"><span class="hp-ico">☎</span><span class="hp-etyk">Zadzwoń do nas</span></a>
     </div>
     </div>
   </div>
@@ -377,9 +373,9 @@ html.dotyk .social{margin-top:14px}
           <div class="sl-tresc">
             <span class="sl-tag">Nowości</span>
             <h2>Najnowsze produkty z pracowni</h2>
-            <p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.</p>
+            <p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszych realizacji.</p>
             <div class="sl-karty" id="sl-nowosci"></div>
-            <a class="sl-btn" href="sklep.html">Zobacz w sklepie →</a>
+            <a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>
           </div>
         </div>
 
@@ -392,7 +388,7 @@ html.dotyk .social{margin-top:14px}
             <h2>Najczęściej zamawiane</h2>
             <p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p>
             <div class="sl-karty" id="sl-top"></div>
-            <a class="sl-btn" href="sklep.html">Zamów teraz →</a>
+            <a class="sl-btn" href="kontakt.html">Zapytaj o wycenę →</a>
           </div>
         </div>
 
@@ -416,7 +412,7 @@ html.dotyk .social{margin-top:14px}
             <span class="sl-tag">Oferta sezonowa</span>
             <h2>Sezon świąteczny — czas na szopkę</h2>
             <p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p>
-            <a class="sl-btn" href="sklep.html">Sprawdź ofertę →</a>
+            <a class="sl-btn" href="kontakt.html">Zapytaj o szopkę →</a>
           </div>
         </div>
 
@@ -429,16 +425,16 @@ html.dotyk .social{margin-top:14px}
 
   <section class="cta" id="cta-sekcja">
     <div class="jak" id="cta-tresc-box">
-      <h2>Jak działamy</h2>
-      <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
+      <h2>Jak zamówić</h2>
+      <p class="pod">Trzy kroki do dekoracji z naszą sygnaturą — bez konta i bez kreatora.</p>
       <div class="kroki">
-        <div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>
-        <div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>
-        <div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>
+        <div class="krok"><span class="num">01</span><b>Wybierz projekt</b><p>Przejrzyj Nasze realizacje i wybierz coś dla siebie — każdą pracę wykonamy z Twoim napisem, imionami i datą.</p></div>
+        <div class="krok"><span class="num">02</span><b>Napisz lub zadzwoń</b><p>E-mail albo telefon — podaj, który projekt Cię interesuje i na kiedy go potrzebujesz.</p></div>
+        <div class="krok"><span class="num">03</span><b>Potwierdź i czekaj</b><p>W 1–2 dni robocze dostajesz wycenę i termin. Po przedpłacie bierzemy się do pracy.</p></div>
       </div>
       <div class="cta-btn">
-        <a class="btn" href="zamowienia.html" id="cta-btn-1">Zarezerwuj termin</a>
-        <a class="btn outline" href="zamowienia.html" id="cta-btn-2">Złóż zamówienie</a>
+        <a class="btn" href="realizacje.html">Zobacz realizacje</a>
+        <a class="btn outline" href="kontakt.html">Zapytaj o wycenę</a>
       </div>
     </div>
   </section>
@@ -448,16 +444,16 @@ html.dotyk .social{margin-top:14px}
   <div class="listwa-poziom" aria-hidden="true"></div>
 
   <footer class="foot">
-    <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026 · wersja 28.31</span>
+    <span><a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span><a href="pracownia.html">Pracownia</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak zamówić</a><span class="sep">·</span><a href="kontakt.html">Kontakt</a><span class="foot-podstrony"></span></span>
+    <span>© Sygnatura 2026</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=311"></script>
-<script src="assets/koszyk.js?v=311"></script>
-<script src="assets/config.js?v=311"></script>
-<script src="assets/api.js?v=311"></script>
-<script src="assets/main.js?v=311"></script>
+<script src="data/katalog.js?v=312"></script>
+<script src="assets/koszyk.js?v=312"></script>
+<script src="assets/config.js?v=312"></script>
+<script src="assets/api.js?v=312"></script>
+<script src="assets/main.js?v=312"></script>
 <script>
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość
@@ -469,22 +465,22 @@ html.dotyk .social{margin-top:14px}
       autoplay: 4.5,
       kafle: [
         { id:'nowosci', obraz:'assets/media/sklep/szopka.jpg', karty:true,
-          tresc:'<p class="sl-tag">Nowości</p><h2>Najnowsze produkty z pracowni</h2><p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.</p><a class="sl-btn" href="sklep.html">Zobacz w sklepie →</a>' },
+          tresc:'<p class="sl-tag">Nowości</p><h2>Najnowsze produkty z pracowni</h2><p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszych realizacji.</p><a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>' },
         { id:'bestsellery', obraz:'assets/media/sklep/szyld.jpg', karty:'odwrotnie',
-          tresc:'<p class="sl-tag">Bestsellery</p><h2>Najczęściej zamawiane</h2><p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p><a class="sl-btn" href="sklep.html">Zamów teraz →</a>' },
+          tresc:'<p class="sl-tag">Bestsellery</p><h2>Najczęściej zamawiane</h2><p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p><a class="sl-btn" href="kontakt.html">Zapytaj o wycenę →</a>' },
         { id:'aktualnosci', obraz:'gradient', karty:false,
           tresc:'<p class="sl-tag">Aktualności z pracowni</p><h2>Z pracowni prosto do Was</h2><p>Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.</p><a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>' },
         { id:'sezonowa', obraz:'assets/hero.jpg', karty:false,
-          tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="sklep.html">Sprawdź ofertę →</a>' }
+          tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="kontakt.html">Zapytaj o szopkę →</a>' }
       ]
     },
-    ctaTresc: '<h2>Jak działamy</h2><p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>' +
+    ctaTresc: '<h2>Jak zamówić</h2><p class="pod">Trzy kroki do dekoracji z naszą sygnaturą — bez konta i bez kreatora.</p>' +
       '<div class="kroki">' +
-      '<div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>' +
-      '<div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>' +
-      '<div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>' +
+      '<div class="krok"><span class="num">01</span><b>Wybierz projekt</b><p>Przejrzyj Nasze realizacje i wybierz coś dla siebie — każdą pracę wykonamy z Twoim napisem, imionami i datą.</p></div>' +
+      '<div class="krok"><span class="num">02</span><b>Napisz lub zadzwoń</b><p>E-mail albo telefon — podaj, który projekt Cię interesuje i na kiedy go potrzebujesz.</p></div>' +
+      '<div class="krok"><span class="num">03</span><b>Potwierdź i czekaj</b><p>W 1–2 dni robocze dostajesz wycenę i termin. Po przedpłacie bierzemy się do pracy.</p></div>' +
       '</div>' +
-      '<div class="cta-btn"><a class="btn" href="zamowienia.html">Zarezerwuj termin</a><a class="btn outline" href="zamowienia.html">Złóż zamówienie</a></div>'
+      '<div class="cta-btn"><a class="btn" href="realizacje.html">Zobacz realizacje</a><a class="btn outline" href="kontakt.html">Zapytaj o wycenę</a></div>'
   };
 
   function esc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){
@@ -524,6 +520,12 @@ html.dotyk .social{margin-top:14px}
     var obraz = pr.obraz && /^https?:/.test(pr.obraz) ? pr.obraz : 'assets/media/sklep/' + pr.obraz;
     var img = pr.obraz ? '<img src="' + obraz + '" alt="' + esc(pr.nazwa) + '">'
                        : '<span class="pusty">' + esc(pr.nazwa[0] || '') + '</span>';
+    if (window.SYG && window.SYG.LAUNCH){
+      var href = pr.storyId ? 'blog-wpis.html?id=' + pr.storyId : 'realizacje.html';
+      return '<a class="sl-karta" href="' + href + '">' + img +
+        '<span><span class="nazwa">' + esc(pr.nazwa) + '</span><br>' +
+        '<span class="cena">na zamówienie</span></span></a>';
+    }
     return '<a class="sl-karta" href="sklep.html">' + img +
       '<span><span class="nazwa">' + esc(pr.nazwa) + '</span><br>' +
       '<span class="cena">' + esc(pr.cena) + ' zł / szt.</span></span></a>';

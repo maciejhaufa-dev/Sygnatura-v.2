@@ -159,7 +159,9 @@
           '<li><b>Personalizowane prezenty</b> — grawerowane wkładki, winietki, ramki z sentencją.</li>' +
           '<li><b>Produkty do domu</b> — szopki warstwowe, szyldy powitalne, podświetlane litery.</li></ul>' +
           '<h2>Nasza zasada</h2>' +
-          '<p>Najpierw rozumiemy, po co dana rzecz powstaje — potem projektujemy, a na końcu tniemy, malujemy i podświetlamy.</p>'
+          '<p>Najpierw rozumiemy, po co dana rzecz powstaje — potem projektujemy, a na końcu tniemy, malujemy i podświetlamy.</p>' +
+          '<p><a href="realizacje.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">Zobacz nasze realizacje →</a> · ' +
+          '<a href="kontakt.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">Zapytaj o wycenę →</a></p>'
       }
     ]);
   }

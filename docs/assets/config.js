@@ -7,6 +7,11 @@ window.SYG = {
   // Gdy puste — serwis działa w TRYBIE DEMO: zapisuje tylko w tej przeglądarce.
   API: '',
 
+  // TRYB STARTU (launch): true = strona-portfolio (realizacje + kontakt e-mail/tel),
+  // podstrony sklepu/wynajmu/kont pokazują komunikat „w budowie". Po dopracowaniu
+  // sklepu i wynajmu przestaw na false — wróci pełny serwis (koszyk, konta, kreator).
+  LAUNCH: true,
+
   // dane firmy
   NAZWA: 'Studio Sygnatura',
   MAIL: 'kontakt@studiosygnatura.pl',
