@@ -1420,5 +1420,42 @@ WYKONANE (wersja 28.31, ?v=311):
 UWAGA: reset sandboxa w tej turze — odtworzono stan (git reset do 7705e1d, drzewo czyste);
 załączone zdjęcia ramki (IMG_20260915_*) PRZEPADŁY (uploads/ poza repo) — właściciel ma
 je wysłać ponownie, wtedy podmienimy szyld.jpg.
-NASTĘPNY KROK: podmiama zdjęcia szyldu po ponownym otrzymaniu zdjęć; kolejne strony wg usera;
-docelowo BAZA GOOGLE SHEETS + skrypty Apps Script.
+## Sesja 28 — TRYB STARTU: strona-portfolio na szybko (commit a0d2a3b, wersja 28.32)
+
+Właściciel: czas goni, „make it first, do it better later" — strona musi STAĆ (ludzie pytają
+gdzie nas znaleźć). Wynajem DEZAKTYWOWAĆ do czasu kompletnych pakietów; tylko ozdoby na
+zamówienie (święta idą). Portfolio + sprzedaż e-mail/tel, bez sklepu. Niedopracowane rzeczy
+= „strona w budowie / zapraszamy niebawem". Sesja zdjęciowa w niedzielę — folder zdjęć
+dostaniemy, ale baza (struktura) ma być gotowa wcześniej. Plan 3-częściowy dostarczony
+(minimum / po starcie / dopieszczenie) — user kazał DZIAŁAĆ bez odpowiadania na pytania.
+
+WYKONANE (wersja 28.32, ?v=312) — flaga SYG.LAUNCH=true (powrót pełnego serwisu = jedno
+przestawienie na false; oryginalne treści/skrypty nietknięte w plikach):
+- Menu startowe: Strona główna · Nasze realizacje · Pracownia · Jak zamówić · Kontakt.
+- Nagłówki (index + podstrony z main.js): przyciski „Napisz do nas / Zadzwoń" zamiast
+  szukaj/koszyk/konto; tel: i mailto: brane z configu (SYG.MAIL/SYG.TEL + wypełniacze
+  data-kontakt-* na wszystkich stronach).
+- 12 stron pokazuje „w budowie" (klasa launch-budowa + CSS chowa treść, box z linkami
+  do realizacji i kontaktu): zamowienia, sklep, personalizacja, koszyk, dane,
+  podsumowanie, dziekuje, wynajem, konto, wspolpraca, szukaj, regulamin.
+- Każda realizacja: „Podoba Ci się ten projekt? ZAMÓW JUŻ DZIŚ!" (mailto z tematem =
+  tytuł projektu + gotowa treść) + przycisk tel; bez dopisków „dostępny w sklepie".
+- Kontakt BEZ udawanego formularza (wiadomości donikąd!): karty e-mail/tel + dane.
+- jak-pracujemy → „Jak zamówić": 4 kroki mail/tel, wycena 1–2 dni, akcent świąteczny.
+- Start: slajdy bez sklepu (realizacje/kontakt), box „Jak zamówić", mini-karty linkują
+  do realizacji („na zamówienie"); stopki bez regulaminu i wersji; baner demo ukryty.
+- Pracownia (statyczna + seed — seed wygrywa u gości!): bez obietnicy wynajmu, CTA.
+- Admin: notka że w trybie startu strona pokazuje treści z plików.
+- Testy: HTML/JS OK; 11 asercji startu OK (menu, budowa x12, CTA, brak form/sklepu);
+  Pages built | a0d2a3b; fetch_page live: index (slajdy/CTA/mini-karty „na zamówienie"),
+  kontakt (karty), blog-wpis (CTA mailto z tematem), wynajem (box „w budowie" + treść
+  ukryta CSS — fetch pokazuje też display:none, dowód: admin fetch pokazuje ukryte
+  zakładki; klasa dodana przed boxem, więc reguła działa).
+UWAGA NA PRZYSZŁOŚĆ: (1) treści zarządzane z panelu (pracownia-seed, strona główna-DOMYS)
+nadpisują statyczny HTML u gości — edytować SEEDY/DOMYS, nie tylko HTML; (2) w LAUNCH
+stopka nie pokazuje wersji — weryfikować deploye przez ?v=; (3) reset sandboxa w tej turze
+(odzyskano: fetch + reset do b146b70, drzewo czyste).
+DO WZIĘCIA OD USERA: potwierdzenie że e-mail i tel PRAWDZIWE; zdjęcia z niedzieli;
+ponowne wysłanie zdjęć ramki „Cześć!" (przepadły przy resecie).
+NASTĘPNY KROK: wstawienie zdjęć z niedzieli + prawdziwych wpisów do portfolio; potem
+cz. 2 planu (baza Google Sheets, sekcja świąteczna, sklep, wynajem, wizytówka Google).
