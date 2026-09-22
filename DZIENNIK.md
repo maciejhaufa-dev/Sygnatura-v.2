@@ -1457,5 +1457,27 @@ stopka nie pokazuje wersji — weryfikować deploye przez ?v=; (3) reset sandbox
 (odzyskano: fetch + reset do b146b70, drzewo czyste).
 DO WZIĘCIA OD USERA: potwierdzenie że e-mail i tel PRAWDZIWE; zdjęcia z niedzieli;
 ponowne wysłanie zdjęć ramki „Cześć!" (przepadły przy resecie).
-NASTĘPNY KROK: wstawienie zdjęć z niedzieli + prawdziwych wpisów do portfolio; potem
-cz. 2 planu (baza Google Sheets, sekcja świąteczna, sklep, wynajem, wizytówka Google).
+## Sesja 28 — PRAWDZIWE ZDJĘCIA szopki i napisu „Cześć!" (commit c4860e1, wersja 28.33)
+
+Właściciel złożył szopkę (gotowa do produkcji) i — po dwóch wtopach z załącznikami
+ginącymi przy resetach — sam wrzucił zdjęcia do repo (main, commit 822fb7c, folder
+uploads/): 7 szopek (IMG_20260921_*) + 2 napisy w ramce (IMG_20260915_* — te same, które
+przepadły poprzednio). Główne szopki = ciemno, podświetlona od FRONTU (nie z ukosa).
+
+WYKONANE (wersja 28.33, ?v=313):
+- Przegląd arkuszem kontaktowym (montage 3×3): główna szopka = IMG_20260921_201247
+  (frontalna, podświetlona); galeria = 201258 (skos), 212158 (dzień, bez światła),
+  204039 (wieczór z serwetką), 212426 (tył skrzynki z klapką). Pominięte 2 dalsze
+  dubletowe (204030, 204541) — leżą w repo (main uploads/), dołożę na życzenie.
+- Napis „Cześć!": główne = IMG_20260915_181401 (frontalne), drugie = 181355 (skos).
+- Optymalizacja ImageMagick (-auto-orient, max 1600px, q82, strip): 30 MB → ~1,5 MB.
+- Podmiana w tych samych nazwach (szopka.jpg, szyld.jpg) = nowe foto od razu w sliderze,
+  mini-kartach, kafelkach realizacji i okładkach (też u gości ze starym seedem w localStorage);
+  nowe pliki szopka-2..5.jpg, szyld-2.jpg + galerie w seedBlog (#1: 4 zdj., #2: 1 zdj.).
+- Test: node --check + skrypt spr. istnienia każdego zdjęcia z seeda na dysku (8/8);
+  sync docs; Pages built | c4860e1; fetch_page live blog-wpis?id=1 (okładka + 5 miniatur + CTA).
+UWAGA: zdjęcia użytkownika lądują na main w uploads/ (osobna historia main — nasz branch
+bierze je przez git show do www/ w wersjach zoptymalizowanych; surowe oryginały zostają na main).
+DO WZIĘCIA OD USERA: potwierdzenie prawdziwości e-mail/tel; reszta zdjęć z sesji (niedziela).
+NASTĘPNY KROK: kolejne prawdziwe wpisy do portfolio; potem cz. 2 planu (baza Google Sheets,
+sekcja świąteczna, sklep, wynajem, wizytówka Google).
