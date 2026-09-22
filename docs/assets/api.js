@@ -117,7 +117,7 @@
   /* ---------- BLOG: wpisy (realizacje) ---------- */
   /* WERSJE seedów — podbij liczbę, aby odświeżyć treści startowe
      u WSZYSTKICH (wpisy panelu o innych id/slugach zostają nietknięte) */
-  const SEED_BLOG_W = 3;
+  const SEED_BLOG_W = 4;
   const SEED_STRON_W = 2;
 
   function seedBlog(odswiez) {
@@ -134,7 +134,7 @@
       {
         id: 2, widoczny: true, data: '2026-08-02', kategoria: 'Szyldy i tablice', tytul: 'Napis „Cześć!" w ramie z pleksi',
         zajawka: 'Frezowany drewniany napis na pleksi w podwójnej ramie — wita gości w domu i w lokalu.',
-        okladka: 'assets/media/sklep/szyld.jpg', video: '', galeria: ['assets/media/sklep/szyld-2.jpg', 'assets/media/sklep/szyld-3.jpg', 'assets/media/sklep/szyld-4.jpg', 'assets/media/sklep/szyld-5.jpg'], tresc:
+        okladka: 'assets/media/sklep/szyld.jpg', video: '', galeria: ['assets/media/sklep/szyld-2.jpg'], tresc:
           '<h2>Cześć na wejściu</h2>' +
           '<p>Napis frezujemy w drewnie i montujemy na przezroczystej pleksi na dystansach. Za nim ciemna rama, a całość zamyka jasna oprawa z frezowanym wzorem.</p>' +
           '<ul><li>Napis: frezowane drewno, dowolne słowo</li><li>Montaż: pleksi na dystansach — efekt lewitacji napisu</li><li>Oprawa: podwójna rama z frezem</li></ul>',
@@ -151,7 +151,7 @@
       {
         id: 4, widoczny: true, data: '2026-08-28', kategoria: 'Prezenty personalizowane', tytul: 'Rodzinka niedźwiadków — puzzle z imionami',
         zajawka: 'Drewniane puzzle rodzinne: misie z wygrawerowanymi imionami i czerwonym sercem.',
-        okladka: 'assets/media/sklep/niedzwiadki.jpg', video: '', galeria: [], tresc:
+        okladka: 'assets/media/sklep/niedzwiadki.jpg', video: '', galeria: ['assets/media/sklep/niedzwiadki-2.jpg', 'assets/media/sklep/niedzwiadki-3.jpg'], tresc:
           '<h2>Cała rodzina w jednym sercu</h2>' +
           '<p>Cztery misie — duzi i mali — składają się w jedną całość. Na każdym grawerujemy imię, a pośrodku malujemy serce.</p>' +
           '<ul><li>Materiał: lite drewno, ręczny szlif i olej</li><li>Grawer: imiona domowników na każdej figurce</li><li>Prezent: na rocznicę, Dzień Mamy i Taty, parapetówkę</li></ul>',
