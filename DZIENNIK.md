@@ -1524,7 +1524,22 @@ WYKONANE (wersja 28.35, ?v=315):
   panelu). Test Node: upgrade 2→3 (10 = 9 seed + 1 panelu, retitul, lustro/makrama, obce
   zachowane), 23/23 zdjęć na dysku.
 - Pages built | 342ce1c; fetch_page live realizacje (8 kafli, filtry, zero Scrabble).
-DO WZIĘCIA OD USERA: zdjęcia misiów u znajomych; korekty opisów; prawdziwe zdjęcia ramki
-i liter LOVE (albo wycofanie); reszta zdjęć z sesji.
+## Sesja 28 — MISIE Z NOWEGO ZBIORU + przycięcie szyldu i lustra (commit 10d35c1, wersja 28.36)
+
+Właściciel wrzucił 3 zdjęcia misiów spod domu znajomych (main d44d310, IMG_20260920_*):
+obecne testowe do wymiany — GŁÓWNE ma być zbliżenie (ładne). W szyldzie wyrzucić zdjęcia
+BEZ naturalnej drewnianej ramki. Lustro wykadrować, żeby nie było widać drzwi (zawiasów).
+
+WYKONANE (wersja 28.36, ?v=316):
+- Misie: główne = IMG_20260920_123916 (zbliżenie z imionami), galeria = 190322 + 190327
+  (półka u znajomych); testowe 055508 usunięte z wpisu. Opis generyczny („imiona
+  domowników") pasuje do obu egzemplarzy.
+- Szyld: zostają TYLKO 2 w drewnianej ramce (szyld.jpg + szyld-2); szyld-3/4 (detale bez
+  ramki) i szyld-5/WA0000 (sprzed oprawy w ramkę) USUNIĘTE z repo (git rm) i z seeda.
+- Lustro: crop prawej strony (1200→990px) — drzwi i zawiasy poza kadrem, samo lustro w ramie.
+- SEED_BLOG_W 3→4 (rozchodzi się samo). Test: 22/22 zdjęć na dysku, brak refów do
+  szyld-3/4/5. Pages built | 10d35c1; fetch_page live wpis #4 (okładka + 2 + CTA).
+DO WZIĘCIA OD USERA: korekty opisów; prawdziwe zdjęcia ramki i liter LOVE (albo wycofanie);
+reszta zdjęć z sesji.
 NASTĘPNY KROK: korekty + kolejne prace do portfolio; potem cz. 2 planu (baza Google Sheets,
 sekcja świąteczna, sklep, wynajem, wizytówka Google).
