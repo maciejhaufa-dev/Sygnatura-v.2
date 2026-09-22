@@ -1,0 +1,512 @@
+# DZIENNIK V4 — Studio Sygnatura
+
+**Data:** 31.08.2026 (chat v4, sesja 1) · **Repo:** Sygnatura-v.2 · **Folder roboczy:** `/v4/`
+
+> **Dla kolejnego chata:** przeczytaj najpierw TEN plik, potem `../PODSUMOWANIE-rozmowy-v1-v3.md` (kontekst historyczny), potem `../pracownia/` (dzienniki v1–v3). Historia pełnej rozmowy: `../Rozmowa Sygnatura v.1 - kontekst.docx`.
+
+---
+
+## 1. KOREKTY UŻYTKOWNIKA NA START V4 (nadpisują stare ustalenia!)
+
+1. **Metryczki NIE są flagowcem.**
+2. **Ceny są „z czapy"** — do ponownej weryfikacji z rynkiem (zadanie po stronie).
+3. **Fokus teraz:** realizacja zadań z listy. **Bieżące zadanie = strona internetowa** (wizytówka firmy).
+4. **Stan formalny:** domena wykupiona · poczta skonfigurowana · telefon wykupiony, **jeszcze NIEAKTYWNY** (nie publikować numeru!).
+5. ⚠️ **Adres e-mail:** w wiadomości użytkownik napisał `kontakt@stufiosygnstura.pl` (literówka). Przyjęto `kontakt@studiosygnatura.pl` zgodnie z ustaloną w v3 domeną. **DO POTWIERDZENIA.**
+6. **Nowa wersja strony = v4**, osobny folder `/v4/` w repo. `pracownia/www` (v3) to archiwum — nie ruszamy.
+7. **Zasada:** materiały robocze = zdjęcia w `../uploads/`, logo = `../pracownia/logo/WEKTORY3/`, księga znaku = `../pracownia/logo/` (HTML z sekcjami).
+
+---
+
+## 2. SPECYFIKACJA STRONY V4 (uzgodniona z użytkownikiem)
+
+> **Zmiany z sesji 3 (31.08.2026):**
+> 6. **Splash wydłużony do 4,8 s** z wyraźnie widoczną sekwencją: tło-las widoczny cały czas (welon 10%) → karta wyłania się 0,35 s → sygnet unosi się 0,95 s → litery spadają od 1,55 s (każda co 0,16 s, animacja 1 s) → ~2,3 s spokojnej pauzy → fade-out 0,9 s. (Wcześniej 3,0 s — użytkownik: „za krótki, nie widać tła, ładowania, pojawiania się napisów i logo".)
+> 7. **SYG = PEŁNY jaśniejszy brąz** (nie kreskowanie, nie obrys): #8B6D5D vs NATURA #6B4530 — jeden ton barwy, różnica minimalna, ale widoczna gołym okiem. Tunowalne: `LIGHT_FACTOR = 0.22` w build.py.
+> 8. **Hero = `IMG_20260829_230704.jpg` — DECYZJA UŻYTKOWNIKA** (numer podany wprost). Kadrowanie `55% 45%`.
+> 9. **Tło splasha = plik użytkownika** `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` — build.py **automatycznie go wykrywa** w `../uploads/` i konwertuje PNG→JPEG do `assets/forest.jpg`. Plik na razie **nie dotarł do sandboxa** (działa zamiennik); jak wyląduje w uploads — wystarczy `python3 build.py`.
+
+> **Zmiany z sesji 2 (31.08.2026, uwagi użytkownika po pierwszym teście):**
+> 1. **Splash „Ssssss"** — mechanizm sprite+calc zawiódł w przeglądarce (wszystkie litery pokazywały 1. literę). ROZWIĄZANE: litery jako osobne pliki PNG (`assets/letters/l0..l8.png`), kerning przez margin w em (font-size wrappera = wysokość litery). Zero calc na pozycjach.
+> 2. **Prostokąty OSTRE** — zero zaokrągleń (border-radius:0 na planszy, splash-card, przyciskach, stubach). „Prostokąt to prostokąt."
+> 3. **Hero = napis „Cześć" Z UKOSA, nie całe ujęcie z szafką.** W uploads są zdjęcia z serii 28–29.08 (2 sesje: poranna 05:55 i wieczorna 23:05). Domyślne hero: `IMG_20260829_230633.jpg` (tablica ujęta od krawędzi — z ukosa). **Wybór ujęcia: `hero-picker.html`** — 12 miniatur, klik = podgląd w kadrze hero; użytkownik podaje numer → podmieniamy `assets/hero.jpg` + `background-position`. (UWAGA: WA0000 to ujęcie „z szafką" — wykluczone z pickera.)
+> 4. **Plansza 1 kolumna na telefonie** — próg podniesiony: 2 kolumny tylko ≥1024 px; niżej 1 kolumna (wcześniej 860 px).
+> 5. **Napisy „Pasją / styl / tradycja" statyczne, widoczne od razu** — żadnych sekwencyjnych wyłonień/ukrywania treści. Animacje = spokojna harmonia: miękki opad liter w splashu (0.9 s, stagger 0.12 s, z widocznością — start opacity .25→1, translateY tylko .7 em) + subtelny „oddech" planszy (3 px / 8 s) + łagodne przejście po splashu. Wszystko wyłączane przy prefers-reduced-motion, treść zawsze widoczna (noscript też).
+
+### 2.1. Splash screen (3 sekundy, po wejściu w link)
+- **Tło:** zamglony starodrzew (zdjęcie użytkownika — patrz §5!), pod delikatnym welonem butelkowej zieleni **10%** (rgba(31,58,50,.10)) + lekka winieta.
+- **Centralnie wyłania się prostokąt:** kremowe tło, **wyraźna brązowa obwódka** 2 px (#6B4530), pojawia się ~0,25 s (scale+fade).
+- **Logo:** sygnet z księgi znaku — „S" z listkami w okręgu (`SYGNET_okrag.svg`), unosi się ~0,5 s.
+- **Pod spodem litery spadają pojedynczo** (stagger 0,07 s od ~0,8 s): napis **SYGNATURA** (litery z księgi znaku, kapitaliki). **„SYG" minimalnie, ale zauważalnie jaśniejsze** (opacity 0.6), **„NATURA" pełny brąz #6B4530**.
+- Po 3,0 s fade-out 0,65 s → odsłania się strona. Splash gra **przy każdym wejściu** (per spec; opcjonalnie sessionStorage — §7 p.9).
+
+### 2.2. Strona główna `index.html`
+- **Góra:** kremowy pasek z ikonami **koszyk · konto · hamburger** (placeholdery „wkrótce"), POD nim menu na tle **butelkowej zieleni #1F3A32** ze **złotymi (#C4A582) wyboldowanymi napisami**: Start · Rzemiosło · Metryczki · Numery i szyldy · Wynajem · Współpraca · Dla firm · Kontakt. (Tylko Start i Kontakt mają cel; reszta `#` — do podpięcia podstron.)
+- **Hero:** realne zdjęcie „Cześć" z ukosa, bez ramki — **za delikatnym kremowym woalem** (gradient rgba krem 0,80–0,86), wypełnia całą stronę (`min-height:100svh`, cover, center 42%). Obróbka łagodzi refleksy i brud ściany.
+- **Plansza centralna** (prostokątna, półprzezroczysta kremowa, backdrop-blur 7 px, cienka brązowa obwódka) — **2 kolumny**:
+  - **LEWA:** sygnet + pod nim logotyp **na szerokość logo** (zachowane proporcje księgi; SUM_AR = 10,19661) z podziałem intensywności Syg/Natura jw.
+  - **PRAWA:** napisy wyłaniające się w **odstępach sekundowych** (3,5 / 4,5 / 5,5 s): **„Pasją" / „styl" / „tradycja"** — złote, ozdobna (kursywa szeryfowa) czcionka w rustykalnym klimacie. Potem **zdanie powitalne** (6,3 s) zachęcające do wejścia w świat i sprawdzenia oferty, a pod nim **dwa przyciski obok siebie na szerokość kolumny** (6,9 s): **[Zadaj pytanie]** → formularz kontaktowy (`kontakt.html`, stub z mailto), **[Nasze realizacje]** → zakładka sklepu (`sklep.html`, stub).
+- **Footer** (butelkowa zieleń 94%, na dole pod hero): LEWO ikony social mediów + „Śledź nasze działania" · ŚRODEK „© Studio Sygnatura" + mały przycisk **„Regulamin serwisu"** · PRAWO **Kontakt / FAQ**.
+- **Responsywność:** breakpointy 920 / 860 / 520 px; hamburger rozwija menu (mobile); jednostki `svh` z fallbackiem `vh`; `viewport-fit=cover`; obsługa `prefers-reduced-motion`.
+- **DRAFT tekstów do akceptacji:** zdanie powitalne — „Zajrzyj do naszego świata, w którym drewno, światło i detal opowiadają Twoją historię — i zobacz, co możemy dla Ciebie stworzyć."
+- **Uwaga typograficzna:** użytkownik zapisał napis jako „SYGnatura" (splash) / „Sygnatura" (hero), mieszana wielkość. **Przyjęto kapitaliki z księgi znaku (SYGNATURA)** + podział kolorów Syg/Natura — DO POTWIERDZENIA.
+
+---
+
+## 3. TECHNIKA
+
+- **Build:** `/v4/build.py` — `python3 build.py` generuje `index.html`, `kontakt.html`, `sklep.html`, `hero-picker.html` (kolorowanie zdjęć, litery logotypu, miniatury pickera). Wymaga: pillow (instalacja w sandboxie: `pip install --break-system-packages pillow`).
+- **Logotyp:** litery wycinane z `pracownia/logo/WEKTORY3/LOGOTYP_3000px_BW.png` (dokładne litery z księgi znaku) do **osobnych PNG** `assets/letters/l0..l8.png`, kolor #6B4530. Kerning (przerwy w em = oryginalne odstępy z księgi): `[0.332, 0.322, 0.502, 0.417, 0.241, 0.414, 0.536, 0.370]`. RATIO (sygnet/litera) = 5.0847. Skalowanie: font-size wrappera = `calc(var(--sygW)/RATIO)`, litery `height:1em; width:auto` — proporcje księgi znaku zawsze zachowane, zero sprite/calc na pozycjach (koniec błędu „Ssssss").
+- **Czcionki:** **systemowe szeryfowe** (sandbox nie ma internetu → brak Google Fonts). Stack zaczyna się od `"Playfair Display","Cormorant Garamond"` — gdy będzie sieć, wystarczy dodać `<link>` Google Fonts (latin-ext) i nic więcej się nie zmienia.
+- **Ikony:** inline SVG (koszyk, konto, hamburger, IG, FB, Pinterest).
+- **Podgląd:** `python3 -m http.server 8080 --bind 0.0.0.0` w katalogu `/v4` (live preview sesji).
+- **Walidacja w sesji:** tag balance ✓, brak tokenów @@ ✓, JS `node --check` ✓, 9+9 liter ✓, wszystkie zasoby HTTP 200 ✓.
+
+### Kolory (z księgi znaku / ustaleń v3)
+| Rola | Kolor |
+|---|---|
+| butelkowa zieleń | `#1F3A32` |
+| brąz | `#6B4530` |
+| złoto/kraft | `#C4A582` |
+| krem | `#FBF7F0` |
+
+---
+
+## 4. STRUKTURA `/v4/`
+
+```
+v4/
+├── build.py            # generator całej strony (uruchamiaj po każdej zmianie)
+├── index.html          # strona główna: splash + hero + menu + footer (zbudowana)
+├── kontakt.html        # stub formularza (mailto)
+├── sklep.html          # stub sklepu/realizacji
+├── hero-picker.html    # wybór zdjęcia hero (12 miniatur, klik = podgląd w kadrze)
+├── DZIENNIK-V4.md      # ten plik
+└── assets/
+    ├── forest.jpg      # tło splasha — zamglony starodrzew (OBECNIE ZAMENNIK — patrz §5)
+    ├── hero.jpg        # hero: IMG_20260829_230633.jpg (domyślne; picker = wybór innego)
+    ├── sygnet.svg      # S z listkami w okręgu (kopia z WEKTORY3)
+    ├── favicon.svg     # to samo co sygnet
+    ├── letters/        # l0..l8.png — litery logotypu SYGNATURA (brąz #6B4530)
+    └── thumbs/         # t1..t12.jpg — miniatury kandydatów hero (dla pickera)
+```
+
+**Podmiana hero:** ustaw `DEFAULT_HERO` w `build.py` (lista `HERO_CANDIDATES`, numer = picker) → `python3 build.py`. Kadrowanie: `.hero{background:...url('assets/hero.jpg') 62% 42%/cover...}` — dla innych ujęć może wymagać innej pozycji.
+
+---
+
+## 5. ZDJĘCIA — WAŻNE INFORMACJE
+
+1. **LAS (splash):** docelowy plik użytkownika = `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` (ma leżeć w `../uploads/`). Build wykrywa go automatycznie i konwertuje do `assets/forest.jpg` — jak tylko pojawi się w repo, uruchom `python3 build.py`. **Na dziś działa zamiennik** (wygenerowany, wyraźniejsze drzewa).
+2. **HERO — DECYZJA:** `IMG_20260829_230704.jpg` (użytkownik podał numer wprost, 31.08). Kadrowanie CSS: `55% 45%`. Poprzednie: 230633 (domyślne v2). `IMG-20260826-WA0000.jpg` = ujęcie „z szafką" — **wykluczone**. `hero-picker.html` zostaje jako narzędzie (miniatury 1–12).
+3. Zdjęcia `IMG_20260828_*` / `IMG_20260829_*` to najpewniej tablica/napis + prawdopodobnie mozaika „scrabble" — bez pewności; picker rozstrzyga.
+4. Zrzuty ekranów Pinterest i pozostałe pliki w `../uploads/` — materiały z v3.
+
+---
+
+## 6. NIEDOKOŃCZONE WĄTKI Z V3 (otwarte, nie przepadły)
+
+- **Podświetlane szyldy na wynajem** (reakcja na neonsens.pl, 360 zł/doba): użytkownik chce premium „light up signs", ~500 zł/doba, drewniane multitechniczne — wiadomość urwana w v3, pomysł żywy.
+- **Mozaika drewniana „scrabble"** (imiona frezowane CNC + zdjęcia + napisy „Miłość, radość, wdzięczność") — „to też może być hit produktowy".
+- Metryczka/numer/szopka/konfigurator — wg dzienników v3, ale **priorytety i ceny do rewizji** (korekty z §1).
+
+---
+
+## 7. TODO / DO USTALENIA
+
+1. ☐ **Las** — użytkownik podeśle oryginalny plik → nadpisz `assets/forest.jpg`.
+2. ☐ **Hero** — użytkownik wybiera ujęcie w `hero-picker.html` (1–12) → ustaw `DEFAULT_HERO` + ewentualnie `background-position`.
+3. ☐ **E-mail** — potwierdzić `kontakt@studiosygnatura.pl` (literówka w wiadomości).
+4. ☐ **Menu** — podpiąć docelowe podstrony (Rzemiosło, Metryczki, Numery i szyldy, Wynajem, Współpraca, Dla firm).
+5. ☐ **Przyciski** — „Zadaj pytanie" → docelowo formularz z klauzulą PKE (Formspree?), „Nasze realizacje" → sklep.
+6. ☐ **Social media** — podać URL-e IG/FB/Pinterest.
+7. ☐ **Koszyk / Konto / Regulamin / FAQ** — placeholdery do uzupełnienia.
+8. ☐ **Telefon** — opublikować dopiero po aktywacji numeru.
+9. ☐ **Splash** — czy grać przy każdym wejściu (obecnie TAK, per spec), czy raz na sesję (sessionStorage).
+10. ☐ **Czcionki webowe** — Playfair Display + Cormorant Garamond (latin-ext) po uzyskaniu sieci.
+11. ☐ **Ceny produktów** — pełna rewizja („z czapy").
+12. ☐ **Wątki z §6** — szyldy świetlne na wynajem, mozaika scrabble.
+
+---
+
+## 8. ZASADY WSPÓŁPRACY (utrwalone)
+
+- Wizualizacje AI = **koncepty**, nie pliki produkcyjne. Pliki produkcyjne = czyste wektory, zero tekstu/opisów/komentarzy.
+- Zmiany strony: edytuj `build.py` → `python3 build.py` → odśwież podgląd.
+- Po każdej sesji aktualizuj ten dziennik (statusy, decyzje, nowe ustalenia).
+- Pilnuj rozmiaru workspace (limit ~128 MB) — sprzątaj odrzucone warianty.
+- Użytkownik testuje na **telefonie (iPhone)** — responsywność i Safari to priorytet testów.
+
+---
+
+## 10. DEPLOY (stan na 31.08.2026, sesja 4)
+
+- **GitHub Pages:** strona skopiowana do **`/docs`** w repo (gałąź `arena/01a056f0-sygnatura-v-2`, pushnięta). Docelowy adres po włączeniu: `https://maciejhaufa-dev.github.io/Sygnatura-v.2/`. **Włączenie wymaga 1 kliknięcia użytkownika** (Settings → Pages → branch `arena/01a056f0-sygnatura-v-2` → `/docs`) — bot Arena nie ma uprawnień do API Pages (403: createRepository, create-pages-site). Instrukcja: `v4/PAGES-instrukcja.md`.
+- **Po każdej zmianie strony:** `python3 build.py` → zaktualizuj `docs/` (index/kontakt/sklep/404 + assets/) → commit + push → Pages przebuduje się samo.
+- **Podgląd roboczy:** `python3 serve.py 8080` (serwer **no-cache** — naprawia problem „nie odświeża się": wcześniej telefon dostawał 304 Not Modified). Publiczny adres podglądu sesji: `https://8080-iltxoxwpsn9ujvnw2mcr6.e2b.app/`. Meta `Cache-Control: no-store` dodane też do samych HTML.
+- Przypomnienie: w tym repo **pracujemy tylko na gałęzi `arena/01a056f0-sygnatura-v-2`** (zasada sesji).
+
+## 11. STATUS (po sesji 6, 31.08.2026 — po teście użytkownika)
+
+- [x] **Błąd splashu znaleziony i naprawiony:** inline style liter były łączone bez średnika (`margin-left:...emanimation-delay:...` → nieważna deklaracja) — dlatego animowała TYLKO 1. litera (jej style = sam delay, ważny), a pozostałe miały i brak odstępów, i brak opóźnienia. Fix: `";".join(style)`. Dodatkowo `.fall{opacity:0; ... forwards}` — litery niewidoczne do swojej kolejki, spływają jedna po drugiej (delay 1,55 s + 0,16 s × i).
+- [x] **Słowa „Pasją / styl / tradycja" — sekwencyjne wyłanianie od lewej do prawej:** animacja wipe (`clip-path: inset(0 100% 0 0) → inset(0)`) z opóźnieniami 4,6 / 5,1 / 5,6 s (start po splashu), potem welcome 6,3 s i przyciski 6,8 s (rise). Treść hidden (opacity 0) tylko do swojej kolejki.
+- [x] **„Cześć" widoczne nad planszą:** przebudowa hero — zamiast tła pod planszą jest **pas zdjęcia u góry** (`.hero-photo`, pełna szerokość, wysokość clamp(220px,34vh,400px); mobile clamp(190px,30vh,300px)), tło `center 30% / 100% auto` = pełna szerokość zdjęcia bez przycinania po bokach (napis w regionie x~25–60%, y~18–45% zdjęcia — analiza komponentów). Plansza (prostokąt z treścią) siedzi POD pasem — „pod tym napisem na prostokącie to co ustaliliśmy" ✓. Lekki kremowy welon na pasie (0.30–0.44), napis czytelny.
+- [x] Header z absolute → **sticky** w normalnym przepływie (menu naturalnie nad pasem zdjęcia), usunięte animacje veil-in header/footer.
+- [x] docs/ zsynchronizowany i pushnięty.
+
+### LEKCJE
+- Sklejanie stylów inline: ZAWSZE separator `;` między deklaracjami.
+- Pełnoekranowe `cover` na poziomym zdjęciu na pionowym telefonie pokazuje tylko ~35% szerokości — jeśli ma być widoczny cały napis, używaj `100% auto` (pełna szerokość) albo kadruj do kwadratu.
+- Testy użytkownika na telefonie > testy w sandboxie (nie mamy przeglądarki headless).
+
+## 12. STATUS (po sesji 5, 31.08.2026)
+
+- [x] **Animacje naprawione:** usunięta reguła `prefers-reduced-motion`, która wyłączała animacje na telefonach z ustawieniem „ogranicz ruch" (stąd „mignie i już jest"). JS chowa splash zawsze po 4,8 s. UWAGA: jedyne, czego nie da się obejść z CSS, to systemowe „Usuń animacje" w Androidzie (skala animatora 0) — wtedy animacje nie zagrają nigdzie.
+- [x] **Litery pełne (koniec kreskowania):** źródłem kreskowania był `LOGOTYP_3000px_BW.png` z WEKTORY3 — to wersja z kreskowaniem 75% z decyzji v3. `build.py` wypełnia teraz kreski do pełnych liter (dylatacja+erozja, `_solidify`), dziury liter (A, R) zachowane (zweryfikowane: l4/l7/l8 mają enklawy).
+- [x] **Tło splasha = plik użytkownika:** `Green and White Atmospheric Forest Presentation_20260831_103357_0000.png` był w `uploads/` na gałęzi **main** na GitHubie (commit użytkownika b07db61), nie na gałęzi sesji. Pobrany przez `git show origin/main:...` do lokalnych uploads → build.py sam go wykrył i skonwertował do `assets/forest.jpg` (1920×1080).
+- [x] `docs/` przebudowany i pushnięty → GitHub Pages aktualizuje się samo (~1–2 min).
+
+### LEKCJE NA PRZYSZŁOŚĆ
+- Sprawdzać `origin/main` po nowe pliki użytkownika (`git fetch` + `git ls-tree`), nie tylko lokalne uploads — użytkownik wrzuca pliki też na main przez www.
+- Nie zakładać ustawień telefonu użytkownika (reduced-motion) — spec mówi „animacje mają być".
+- WEKTORY3/LOGOTYP = kreskowanie 75% (historyczne); strona używa wypełnionych liter z build.py.
+
+## 12. STATUS (po sesji 4, 31.08.2026)
+
+- [x] Serwer podglądu z no-cache (fix 304/„nie odświeża się") + meta no-store w HTML
+- [x] `docs/` z kompletną stroną wypchnięty na gałąź sesji
+- [x] Instrukcja Pages: `v4/PAGES-instrukcja.md`
+- [ ] **Czeka:** użytkownik włącza Pages (1 klik) → test na telefonie → dalsze uwagi
+
+## 13. STATUS (po sesji 7, 31.08.2026 — korekta hero po teście)
+
+- [x] **Splash: użytkownik potwierdził — „wyszedł teraz idealnie".** NIE ruszać (litery spadają jedna po drugiej z odstępami, 4,8 s).
+- [x] **Hero wraca do zdjęcia na cały ekran (żądanie: „przywrócić Cześć na całej stronie"):**
+  - Desktop (≥1024 px): `.hero{min-height:calc(100svh - 111px)}` ze zdjęciem jako tło `center 50%/cover` + delikatny kremowy welon (0.14→0.42 ku dołowi). Plansza NIE jest już centrowana pionowo — `margin-top:auto` kotwiczy ją **na dole kadru** (dolna ćwiartka), a „Cześć" (region x 25–60%, y 18–45% zdjęcia) jest odsłonięte nad nią.
+  - Reguły pomocnicze: niskie ekrany desktopowe `(max-height:860px)` — kadr wyżej (p=48%) + ciaśniejsza plansza (sygnet ≤116px, padding 22/32), żeby „Cześć" zawsze mieściło się nad planszą; bardzo szerokie `(min-aspect-ratio:21/10)` — kadr p=30%.
+  - Telefon (≤1023 px): zdjęcie **pełnej szerokości u góry** (`.hero-photo`, aspect-ratio liczony z hero.jpg = 1920/1440, tło `top center/100% auto` — „Cześć" w całości, bez przycinania boków), plansza dociśnięta do **dołu ekranu** (`margin-top:auto`, min-height:calc(100svh - 57px)).
+  - Picker hero: podgląd kadru zaktualizowany (cover center 50% / mobile top 100% auto).
+- [x] **Bez gradientu foto→krem (na razie):** użytkownik powiedział „najpierw spróbuj przywrócić Cześć na całej stronie i tylko przesuń ten prostokąt"; alternatywa (gradient dołu zdjęcia w krem) zostaje jako plan B, jeśli twarda krawędź zdjęcia na telefonie będzie mu przeszkadzać.
+- [x] `docs/` zsynchronizowany i pushnięty.
+
+### LEKCJE
+- „Dalej wypełnia cały ekran" = wróć do pełnoekranowego tła hero (pas z sesji 6 był mylący dla użytkownika).
+- Geometrycznie: `cover` na poziomym 4:3 zdjęciu na pionowym telefonie NIGDY nie pokaże całego napisu x 25–60% (okno ma tylko ~35% szerokości) — telefon musi zostać przy `100% auto` u góry, a plansza na dole ekranu.
+
+## 14. STATUS (po sesji 7b, 31.08.2026 — gradient w hero)
+
+- [x] **Hero z gradientem (plan B przyjęty):** zdjęcie „Cześć" dalej wypełnia cały ekran i jest odsłonięte u góry, ale jego **dół rozpływa się gradientem w gładki krem** — na kremie siedzi plansza z logo (nadal zakotwiczona na dole kadru, `margin-top:auto`).
+  - Desktop: gradient 5-stopniowy — 10% welonu do ~42% wysokości, potem 32%→78%→98%→**100% kremu przy ~79%** (twarda krawędź zdjęcia znika, przejście płynne, „Cześć" czytelne u góry).
+  - Telefon: pas zdjęcia pełnej szerokości z identycznym rozmyciem dołu (10% do 40%, potem 45%→92%→100% przy 94%) — dół pasa gładko przechodzi w kremowy obszar planszy.
+  - Picker hero: podgląd kadru zaktualizowany o ten sam gradient.
+- [x] UWAGA TECHNICZNA: po edycji fuzzy build.py miał zdublowany ogon (pętla stubów poza main() → NameError) — naprawione przez przycięcie do pojedynczego `if __name__ == '__main__': main()`. Po każdej edycji build.py sprawdzać `tail` pliku + czysty przebieg `python3 build.py`.
+- [x] `docs/` zsynchronizowany i pushnięty.
+
+### LEKCJE
+- Po każdej edycji build.py: `tail v4/build.py` + pełny build + walidacja wygenerowanego HTML (gradienty, splash, tagi) — fuzzy edit potrafi nadpisać nie tam, gdzie trzeba.
+
+## 15. STATUS (po sesji 8, 31.08.2026 — nowe tło hero od użytkownika)
+
+- [x] **Nowe tło hero = plik użytkownika `TŁO NA HERO.png`** (3696×2613, 316 DPI; pobrany z origin/main — user znów wrzucił na GitHub, nie do sandboxa). Obróbka: BEZ korekt kolorów (`process_bg` — tylko konwersja RGB→JPEG, max 2880 px, q86) — „wypełnia całą stronę tak jak jest".
+  - Analiza kompozycji (PIL): pusta beżowa ściana x 0–46% i y 55–100%; tablica z „CZEŚĆ" x 46–96%, y 8–55% (napis x 56–93%, y 17–39%). Tło strony: `cover`, `center 40%` (desktop — pełna szerokość, tablica w kadrze), `80% 30%` na telefonie (kadr na napis), ultrawide `center 15%`.
+- [x] **Logo po lewej, wyłania się z dołu** (obok „Cześć"): sygnet (rise 3,9 s) + litery SYGNATURA spadają jedna po drugiej (softfall od 3,95 s, co 0,12 s — szybciej niż splash) + podpis „drewno · światło · detal" (5,05 s).
+- [x] **Panel kremowy wjeżdża od dołu** (3,7 s): jaśniejszy krem #FFFDF8, ramka brązowa 2 px jak w splashu, mocny cień, ostre rogi. W środku: złote **PASJA – STYL – TRADYCJA** obok siebie (czcionka kaligraficzna **Great Vibes** z Google Fonts, wipe L→P 4,3/4,6/4,9 s), tekst „Kosmos pełen jest szlachetnych minerałów… dom staje się domem." (5,2 s), **4 przyciski** butelkowa zieleń + złoty tekst: Sprawdź, jak pracujemy → warsztat.html · Poznaj nasze prace → galeria.html · Znajdź coś dla siebie → sklep.html · Napisz do nas → kontakt.html (5,5–5,86 s).
+- [x] **Nowe podstrony:** `warsztat.html`, `galeria.html` (stuby jak kontakt/sklep); menu: Rzemiosło → warsztat.html, dodana pozycja Galeria.
+- [x] **Splash skrócony o ~1 s:** 4,8 s → **3,8 s** (karta 0,3 s, sygnet 0,75 s, litery od 1,25 s co 0,13 s, fade 0,8 s, usunięcie +700 ms).
+- [x] **Czcionki webowe włączone** (Google Fonts: Great Vibes + Cormorant Garamond, latin-ext, display=swap; fallback cursive/serif) — sandbox nie potrzebuje sieci, czcionki ładuje przeglądarka użytkownika.
+- [x] `docs/` zsynchronizowany (warsztat, galeria, nowe hero.jpg) i pushnięty.
+
+### LEKCJE
+- Pliki użytkownika regularnie trafiają na **origin/main** (TŁO NA HERO.png, las) — sprawdzać `git ls-tree origin/main` przy każdej nowej wzmiance o załączniku.
+- Po edycji sekcji CSS w build.py sprawdzać, czy `edit_file` faktycznie trafił (grep po klasie) — fuzzy match potrafi chybić przy dłuższych blokach.
+- Kadrowanie `cover`: dla ekranów szerszych niż 1,414 (proporcje zdjęcia) pełna szerokość jest w kadrze — tablica „Cześć" zawsze widoczna; na pionowym telefonie okno ~33% szerokości → pozycja `80% 30%` celuje w napis.
+
+## 16. STATUS (po sesji 8b, 31.08.2026 — poprawki hero po teście)
+
+- [x] **Menu NAD zdjęciem** (zdjęcie nie jest już „ucinane" pod spodem): header zmieniony z sticky na `absolute` (top, z-index 40) — hero zaczyna się od samej góry ekranu, zdjęcie biegnie za menu.
+- [x] **Tło = pełna szerokość zdjęcia (`background-size:100% auto`)**, kadr pionowy `center 22%` — koniec z cover (ucinał boki na szerokich ekranach i górę/dół na wąskich). Panel/logo nie zasłaniają napisu: na niskich ekranach (≤860 px wys.) kadr `center 28%` + ciaśniejszy panel; ultrawide `center 18%` + ciaśniejszy panel; telefon: pas zdjęcia pod nagłówkiem `background-position:0 112px`.
+- [x] **Panel po PRAWEJ, rozciągnięty poziomo:** `position:absolute; bottom; right` — szerokość `min(1140px, 100% - 8vw)`, **4 przyciski obok siebie** (`grid repeat(4,1fr)`; <1024: 2×2; <520: 1 kolumna).
+- [x] **Słowa „Pasja – Styl – Tradycja" normalną czcionką** (serif Cormorant Garamond 600, złote, wipe L→P zachowany) — usunięty Great Vibes ze wszystkich szablonów. Pisownia: Pasja / Styl / Tradycja (jak w wiadomości użytkownika).
+- [x] **Logo wyżej i większe:** `top:clamp(96px,15%,170px); left:clamp(24px,4vw,72px)` — na wysokości napisu „Cześć"; sygnet `clamp(110px,13vw,176px)` z cieniem drop-shadow; telefon: `top:120px` (na pasie zdjęcia), sygnet `clamp(46px,13vw,64px)` w rzędzie z napisem.
+- [x] **Retusz zdjęcia (`process_bg`):** GaussianBlur 1.1 (chowa rysy/odciski palców) + kompresja świateł powyżej 200 (gain 0.45 — refleksy przygaszone; efekt: piksele >220 spadły do 0,1%). Kolory poza tym nietknięte. Tunowalne: `blur`, `hi_knee`, `hi_gain`.
+- [x] `docs/` zsynchronizowany i pushnięty.
+
+### LEKCJE
+- Pillow ZNIKA z sandboxa po resecie środowiska (nie tylko procesy) — przed każdym buildem sprawdzać `python3 -c "import PIL"`, reinstalować `pip3 install --break-system-packages pillow`.
+- Serwer podglądu też nie przeżywa resetu — po starcie sesji restartować `python3 v4/serve.py 8080` (cwd = v4!).
+- `cover` z tym zdjęciem = zły wybór: napis „Cześć" (x 46–96% W) nigdy nie zmieści się w oknie pionowego telefonu; `100% auto` + pozycja pionowa daje pełną kontrolę.
+
+## 17. STATUS (po sesji 10, 31.08.2026 — podstrona WYNAJEM)
+
+- [x] **Nowa podstrona `wynajem.html`** (generowana przez build.py, szablon WYNAJEM + funkcje calendar_html/catalog_html/packages_html):
+  - **Kalendarz dostępności:** 6 miesięcy sezonu 2026/27 (X–III), weekendy wyróżnione, stany: wolny / „zapytanie w toku" (złota obwódka) / zarezerwowany (brąz + przekreślenie). Dane w `RENTAL_BOOKED` / `RENTAL_ASK` (PRZYKŁADOWE — użytkownik podmieni na realne). Legenda + nota „kalendarz informacyjny, termin rezerwuje zaliczka".
+  - **Katalog 13 produktów** (ikony SVG, opis, cena za dobę): szyld powitalny, tablica rozpiska stołów, numery stołów, serwetniki, lampki, lampiony, litery MAŁE/DUŻE, tablice info (toaleta·parking·palarnia), skrzynka na życzenia, mozaika „scrabble", świeczniki, winietki+plan dnia.
+  - **3 zestawy:** MINI (od 199 zł/doba, do 50 gości) · STANDARD (od 399 zł, badge „najczęściej wybierany") · PREMIUM (od 699 zł, montaż+demontaż). Każdy z listą — zestawy zawierają CAŁĄ listę użytkownika + moje propozycje (skrzynka na życzenia, scrabble, świeczniki, winietki, konsultacja aranżacji). Kaucja zwrotna 300 zł.
+  - **Sekcja współpracy (#partnerzy)** dla dekoratorek i sal: −20% rabat, priorytet terminów, dostawa+montaż, materiały do ofert; CTA mailto.
+  - Kroki „Jak to działa" (1–5), hero z CTA, footer, burger JS. Sticky header na podstronach (`.page .site-head{position:sticky}`), scroll-margin na anchorach.
+- [x] Menu (index + wynajem): Wynajem → wynajem.html, Współpraca → wynajem.html#partnerzy.
+- [x] docs/ zsynchronizowany i pushnięty.
+- [ ] **Czeka:** opinia użytkownika (układ, ceny-z-czapy do rewizji, treść pakietów), potem realne terminy do kalendarza.
+
+### LEKCJE
+- Walidacja przez `html.count('cal-card')` łapie też reguły CSS — liczyć klasy tylko w części BODY (split '</style>').
+
+## 18. STATUS (po sesji 10b, 31.08.2026 — wynajem: terminarz i pakiety wg v3)
+
+- [x] **Kalendarz z v3 przywrócony:** zamiast statycznej siatki 6 miesięcy — **interaktywny terminarz per pakiet** (port `assets/kalendarz.js` z pracownia/www/site): nawigacja miesiącami ‹ ›, dni przeszłe zablokowane, zajęte brązowe+przekreślone, wybór daty → wypełnia formularz (rez-data/rez-pakiet) i scrolluje do niego. Dane: `RENTAL_ZAJETE` w build.py (per pakiet, demo z v3 — do podmiany na realne).
+- [x] **Pakiety wg stylistyki (6):** Klasyczny 270 zł (biel i złoto) · Leśny 285 zł (zieleń, mech) · Rustykalny 150 zł (juta) · Komunijny 150 zł (jasne drewno) · Firmowy 320 zł (logo, oznakowanie) · **Zestaw własny** à la carte (od 15 zł, rabat −10% od 5 pozycji). Uwaga: w v3 treści kart były przesunięte o jedną pozycję względem id (bug) — tu sparowane poprawnie wg nazw id.
+- [x] **Formularz zapytania** (#rezerwacja): termin+pakiet (readonly, z terminarza), imię, e-mail, telefon, okazja, uwagi; submit buduje mailto z tematem i treścią (data+pakiet+dane) i pokazuje potwierdzenie.
+- [x] **Katalog rozszerzony do 16 pozycji** — doszły elementy z v3: Panel z cytatem 149 zł, Ramka rzeźbiona 169 zł, Grawer okolicznościowy 89 zł.
+- [x] Sekcje #jak i #partnerzy bez zmian; hero CTA → #pakiety / #katalog; docs/ zsynchronizowany i pushnięty.
+- [ ] **Czeka:** realne terminy do RENTAL_ZAJETE + akceptacja cen/treści pakietów.
+
+### LEKCJE
+- Ekstrakcja kart z v3 przez split po data-pkg myli kolejność (h3 z sąsiedniej karty) — mapować wg id pakietu, nie po kolejności h3.
+
+## 19. STATUS (1.09.2026 — wynajem: pakiety wg wydarzeń + własny kompozytor + wspólny kalendarz)
+
+- [x] **Wspólny kalendarz (jedna pula towaru):** usunięte terminarze per pakiet; jeden #kalendarz z nawigacją ‹ ›, zajęte = brązowe z przekreśleniem, klik daty → formularz (termin). `RENTAL_ZAJETE` = płaska lista dat (demo — do podmiany). Decyzja usera: dopóki brak towaru na równoległe wydarzenia, jedna data blokuje WSZYSTKO; rozdzielimy, gdy urośnie asortyment.
+- [x] **Pakiety wg TYPU WYDARZENIA (nie stylistyki):** 4 grupy × 3 poziomy: KOMUNIJNY (esencja/mid/full wg usera), WESELNY (opcje i.w.), FIRMOWY, JUBILEUSZOWY/urodzinowy. Na start jedna stylistyka (biel i złoto) — style dorobimy z asortymentem. MID wyróżniony ramką.
+- [x] **„Komponuję własny" = kompozytor:** checkboxy w kartach katalogu + kalkulator na żywo: suma, licznik, rabat −5% DOPIERO od 10 pozycji (user: bez −10% i bez gratis personalizacji), lista wybranych produktów, podsumowanie sticky, przycisk „Wyślij zapytanie". Personalizacja płatna osobno wg pozycji.
+- [x] **Formularz:** przycisk pakietu wpisuje nazwę pakietu; data z kalendarza; mailto z tematem + pełną treścią (pakiet/termin/dane/wybrany zestaw z sumą i rabatem).
+- [x] **Filtry katalogu:** dropdowny kategoria (6) + okazja (4) — data-kat/data-ok na kartach.
+- [x] **Testy jsdom:** kalendarz (3 busy we wrześniu), kalkulator (4 poz. = 153 zł; 10 poz. = 402 zł po −5%), lista wybranych, filtry (światło = 3 karty, komunijny = 12), mailto (treść z zestawem).
+- [x] docs/ zsynchronizowany i pushnięty.
+- [ ] **Czeka:** realne terminy do RENTAL_ZAJETE; decyzja o zbieraniu rezerwacji (Google Sheets API vs baza) — patrz notatka niżej.
+
+### LEKCJE / NOTATKI
+- **Zbieranie rezerwacji (pytanie usera):** na statycznym GitHub Pages NIE ma backendu ani bazy. Sensowne opcje: (1) **Google Sheets + Apps Script** jako mini-API (POST formularza → dopisanie wiersza; darmowe, user zna arkusze) — najszybsze do startu; (2) **Formspree/Netlify Forms** — gotowe, limit darmowy; (3) własna baza dopiero przy hostingu z backendem (np. Netlify Functions + Supabase). Rekomendacja: Sheets API.
+- jsdom nie implementuje `scrollIntoView` i nawigacji `mailto:` — testować te ścieżki osobno (string mailto), reszta testowalna.
+- v3: bug przesunięcia kart pakietów względem id (już nieistotny — pakiety przebudowane).
+
+## 20. STATUS (1.09.2026 — przełom: własny serwis z bazą, koniec "strony bez backendu")
+
+- [x] **Decyzja architektoniczna (user):** potrzebny PRAWDZIWY system, nie statyczna strona. Wybór: **Flask (Python) + SQLite** — zero kosztów, działa lokalnie na komputerze usera (localhost), HTML/CSS w zwykłych plikach do edycji dla żony; bez WordPress/WooCommerce. Docelowo: hosting Pythonowy (PythonAnywhere darmowy / Render / VPS), GitHub Pages zostaje wizytówką.
+- [x] **serwis/ zbudowany i przetestowany:** db.py (schemat + seed: 6 kategorii, 16 produktów, 12 pakietów, 4 zgłoszenia demo z markerem jednorazowym), core.py (statusy, sygnatury SYG-ROK-NNN, mailer SMTP + outbox, webhook Sheets, 4 autorespondery), app.py (trasy, panel, API), templates (wynajem/formularz/dziękuję/404 + 8 ekranów admina), README.md (instrukcja lokalna).
+- [x] **Workflow wg specyfikacji usera:** kalendarz PER PAKIET (osobne, z nawigacją ‹ ›, statusy: zapytanie=złota obwódka i NIE blokuje / płatność w toku=żółty i wstrzymuje / zarezerwowany=brąz+przekreślenie i blokuje na sztywno; minione zablokowane); przycisk „Zarezerwuj termin" → formularz z tematem „Rezerwacja terminu" (rozwijana lista), checkbox „Nadaj nową sygnaturę" / „Mam sygnaturę sprawy" (odblokowuje pole), pole na indywidualną wiadomość, e-mail kontaktowy; przyciski „Zmień termin" (powrót do kalendarza) / „Wyślij zapytanie".
+- [x] **Po wysłaniu:** mail na kontakt@studiosygnatura.pl + zapytanie do API Google Sheets (webhook, na razie bez URL) + autoresponder do klienta z podsumowaniem (sygnatura, treść pytania, procedura, dokumenty; kaucja 7 dni, zapłacone=zarezerwowane).
+- [x] **Panel admina /admin/ (hasło startowe sygnatura-2026):** pulpit, rezerwacje (filtr statusów, szczegóły, historia), kategorie CRUD, produkty CRUD, pakiety CRUD z checkboxem **dostępny/niedostępny na stronie** (ukrywa pakiet z kalendarzem — test: znika natychmiast), maile (outbox + ponowna wysyłka), ustawienia (kontakt, SMTP, hasło, sheets_url, dokumenty do autorespondera).
+- [x] **Zmiana statusu w adminie:** zapytanie→płatność w toku (autoresponder „kaucja w drodze")→zarezerwowany (autoresponder potwierdzający)→odrzucono (mail z powodem); każda zmiana w historii + push do Sheets (gdy podpięty).
+- [x] **Testy:** pełny cykl klienta (formularz→303→dziękuję→status w kalendarzu), sygnatura istniejąca vs nowa, outbox (maile do studia + klienta), blokada terminu (span vs link), CRUD kategorii/produktów/pakietów, logowanie. Baza wyczyszczona z danych testowych (tylko 4 SYG-DEMO-* + marker .zainicjowano).
+- [x] .gitignore: serwis/data/ (baza, sekrety, dokumenty poza gitem). Commit 558bc1f push OK.
+- [ ] **Następne kroki:** 1) Google Sheets Apps Script (webhook + arkusz z datą/godziną/statusem), 2) SMTP (dane poczty usera), 3) test usera na localhost (pip install flask; python app.py; http://127.0.0.1:8000), 4) hosting.
+
+### LEKCJE
+- sqlite3.Row nie ma .get() — w core.py używać indeksowania [] albo dyktów.
+- redirect po POST: używać 303 (curl -L ponawia POST na 302 i dostaje 405 — artefakt narzędzia, ale 303 jest też poprawniejsze).
+- Demo-seed tylko raz na maszynę: marker na dysku (data/.zainicjowano), bo flaga w DB wraca po skasowaniu bazy.
+- Flask debug auto-reload: przy edycji db.py ponownie odpala inicjuj() — marker chroni przed duplikatami demo.
+- Formularze NIE w <tr> (HTML je wyrzuca) — lista grid z form per wiersz.
+
+## 21. STATUS (1.09.2026 — wdrożenie: pytania o chmurę, OVH, GitHub Pages; responsywność)
+
+- [x] **Wyjaśnione i zapisane w serwis/WDROZENIE.md:** GitHub Pages NIE uruchomi Flaska/bazy (tylko statyka — zostaje jako wizytówka); dysk Google/Sheets to nie baza (Sheets = lustro przez webhook); OVH: hosting współdzielony = PHP (Flask nie wejdzie), OVH **Cloud Web ma Pythona** (43,99 zł netto/mc, runtime zarządzany), OVH **VPS** = rekomendowany dom produkcyjny; „baza w chmurze" = SQLite na zawsze włączonym serwerze.
+- [x] **Plan:** teraz test na telefonie (podgląd sandboxa) → PythonAnywhere FREE (trwały dysk, SQLite przeżywa, bez karty) → produkcja OVH VPS + domena studiosygnatura.pl + DNS A + nginx/certbot + systemd + backup cron. Alternatywa: Render (render.yaml gotowy, ale free = dysk efemeryczny — baza ginie przy deployu).
+- [x] **Pliki wdrożeniowe:** serwis/requirements.txt (flask, gunicorn), serwis/render.yaml (blueprint z ostrzeżeniem), serwis/WDROZENIE.md (instrukcje: PythonAnywhere z WSGI, VPS z systemd/nginx/certbot, DNS OVH, backup).
+- [x] **Responsywność (test usera na telefonie):** tabele admina w przewijalnych kontenerach .t-scroll (min-width 640px na mobile), strona wynajmu (pak 1 kolumna, przyciski pełnej szerokości, brand w nowej linii), formularz (przyciski kolumną, „Wyślij" na górze przez column-reverse).
+- [ ] **Czeka:** założenie konta PythonAnywhere przez usera + git clone (kroki w WDROZENIE.md), SMTP, Google Sheets, potem OVH VPS.
+
+### LEKCJE
+- Sandbox po resecie: ginie pip (flask!), procesy i LOKALNA historia gita; zmienia się też E2B_SANDBOX_ID → adres podglądu się zmienia (sprawdzać env, nie zapamiętywać URL-a).
+- curl z wnętrza sandboxa nie sięga własnego proxy e2b (SSL error) — podglądu nie da się zweryfikować curl-em; weryfikować lokalnie 127.0.0.1.
+- Procedura po resecie: reset --mixed FETCH_HEAD (zachowuje robocze pliki) → status → commit tylko diffu sesji.
+
+## 22. STATUS (1.09.2026 — wynajem: pakiety bez kalendarzy, najem od–do, kompozytor własnego zestawu)
+
+- [x] **Nowa struktura nawigacji (3 poziomy wg uwag usera):** `/wynajem/` = WYBÓR TYPU WYDARZENIA bez kalendarzy (4 karty + karta „Komponuję własny") → `/wynajem/<ev>/` = 3 poziomy ESENCJA/MID/FULL bez kalendarzy → `/wynajem/pakiet/<id>/` = kalendarz TEGO pakietu + „Zarezerwuj termin". Stary adres `/wynajem/<id>/rezerwuj` → 301 na nowy.
+- [x] **Najem OD–DO (48–72 h):** formularz ma datę imprezy + „termin od (montaż)" + „termin do (demontaż)"; klik daty imprezy w kalendarzu domyślnie ustawia dzień przed i dzień po (min. 3 doby); JS przelicza dni na żywo; najem 1-dobowy = wyjątek wymagający uzasadnienia w wiadomości (walidacja serwera: dni==1 i tresc<20 znaków → błąd); zakres blokowany w całości (konflikt dzień po dniu, blokują: zarezerwowany/płatność w toku; „zapytanie" NIE blokuje, ale dodaje ostrzeżenie do maila Studia).
+- [x] **Baza:** rezerwacje + kolumny data_od/data_do/dni/pozycje (migracja ALTER TABLE dla starych baz; stare rekordy → 3-dniowe ±1); demo zaktualizowane na 3-dniowe.
+- [x] **„Komponuję własny" wrócił:** `/wynajem/komponuje/` — interaktywny katalog (checkboxy), kalkulator na żywo (suma/doba, licznik, rabat −5% od 10 pozycji, lista wybranych, suma × dni), mini-kalendarz zajętości CAŁEJ puli (klik dnia = data imprezy), formularz z zakresem od–do i sygnaturami; pozycje lecą do bazy (JSON) i do maili (skład + suma + szacunkowo za dni).
+- [x] **Maile:** wszystkie (klient: zapytanie/kaucja/potwierdzenie/odrzucenie; studio) pokazują „Termin najmu: od–do (impreza: X, N dn.)"; zestaw własny z sekcją SKŁAD ZESTAWU i wyliczeniem. Sheets payload + od/do/dni/pozycje.
+- [x] **Admin:** lista pokazuje zakres od–do + dni; szczegóły: najem od–do, data imprezy, skład zestawu własnego z sumą i rabatem.
+- [x] **Testy:** struktura 3 poziomów (0 kalendarzy na liście/poziomach), formularz z domyślnym ±1, 3-dniowa rezerwacja 303→dziekuje, 1 doba bez uzasadnienia → błąd, konflikt zakresu → błąd, kompozytor z pozycjami → zapis+mail ze składem, bez pozycji → błąd, kalendarz blokuje cały zakres (11–13.12 = 3×st-zapytanie), node --check JS OK. Baza wyczyszczona (tylko SYG-DEMO-*).
+- [x] Commit i push.
+- [ ] **Czeka:** test usera (lokalnie + telefon), potem PythonAnywhere/SMTP/Sheets wg WDROZENIE.md.
+
+### LEKCJE
+- Podmiana dużego bloku tras w app.py nadpisała trasę `dziekuje` (BuildError przy redirect) — po edycjach sprawdzać grep-em listę endpointów.
+- curl z `-X POST` + `-L` potrafi ponowić POST po 303 (405) — testować 303 bez -L i osobno GET celu.
+
+## 23. STATUS (1.09.2026 — personalizacja oddzielona od najmu + podsumowanie kwot)
+
+- [x] **Personalizacja = osobna podstrona** `/personalizacja/`: katalog jednorazówek (9 produktów: wkładki, winietki, kafelki scrabble, litery przestrzenne, numery z imionami, grawer, panel z cytatem, ramka) z zasadami: **płatne z góry, NIE podlegają zwrotowi** (zostają u klienta), kaucja za wynajem obowiązuje zawsze, rabat −5% od 3 szt.; wybór wraca do formularza (parametr next+pers).
+- [x] **Pakiety oczyszczone** z pozycji personalizowanych (migracja DB + seed): usunięte „wkładki personalizowane w cenie", panel z cytatem, ramka, grawer, litery z treścią; mozaika scrabble = „literki do ułożenia". Katalog najmu też oczyszczony: usunięte panel/ramka/grawer (→ personalizacje), poprawione opisy szyldu/liter/winietek (treść = personalizacja).
+- [x] **Opcja „Dodaj produkty spersonalizowane" w każdej warstwie:** karta na /wynajem/, przycisk na /wynajem/<ev>/, przycisk przy pakiecie; w formularzach (pakiet + kompozytor) sekcja z wybranymi produktami i **osobnym polem opisu dla każdego** (pers_opis_N, wymagane).
+- [x] **Podsumowanie kwot przed wysłaniem:** formularz pakietu (najem = cena_liczba × doby, kaucja 300 zł, personalizacja z rabatem, RAZEM — liczone w JS na żywo) + kompozytor (suma/doba, za dni, kaucja, personalizacja, RAZEM); notka o **protokole zdawczo-odbiorczym** (doby od przekazania do odbioru, płatność za każdą rozpoczętą dobę) w formularzu i mailach.
+- [x] **Backend:** kolumny pakiety.cena_liczba, rezerwacje.personalizacje (migracje); api_rezerwuj parsuje pers+opisy (walidacja: brak opisu → błąd z zachowaniem selekcji), liczy kwoty, zapisuje i wysyła w mailach (klient+studio): sekcje PRODUKTY SPERSONALIZOWANE i PODSUMOWANIE KWOT + punkty 5-6 procedury (personalizacja bezzwrotna, protokół).
+- [x] **Admin:** zakładka Personalizacje (CRUD + dostępny), szczegóły rezerwacji pokazują personalizacje z opisami i sumą/rabatem; dziekuje.html wspomina o personalizacjach.
+- [x] **Testy:** rezerwacja z 3 pers (mail: suma 137 zł → rabat 7 → 130; najem 597 = 199×3; RAZEM 1027), brak opisu → redirect z pers, 2 pers bez rabatu, preselekcja komponuje (pozycje+pers), JS OK na 6 stronach, admin 200. Baza wyczyszczona (4 demo).
+- [x] Commit i push.
+- [ ] **Czeka:** ceny personalizacji do weryfikacji (robocze), test usera, potem wdrożenie wg WDROZENIE.md.
+
+### LEKCJE
+- INSERT z 19 placeholderami na 18 kolumn — liczyć kolumny po dodaniu pola (SQLite: „N values for M columns").
+- Regex podmieniający pierwszy `return` w funkcji łapie early-return `return ''` zamiast docelowego — po masowej podmianie weryfikować grep-em.
+
+## 24. STATUS (07.09.2026 — warstwy szopki: czysta konwersja SVG → PNG 1:1)
+
+- [x] `v4/tools/warstwy_png.py` — konwersja każdej warstwy z `uploads/Szopka 3D.svg` do PNG:
+  2400×2400 px = 200×200 mm (12 px/mm), czarne linie na białym, wspólny układ 1:1.
+  Pominięte: wypełnienia (podkłady robocze arkusza 754×378, skala 0,26458333), prowadnice Inkscape (28), ukrytych brak.
+- [x] Wynik: `pracownia/szopka/WARSTWY-PNG/` — 6 plików nazwanych po ZAWARTOŚCI (numeracja usera ≠ etykiety L0–L5!):
+  L0=niebo-rama, L1=pasterze-i-2-owce, L2=święta-rodzina-2-owce-2-anioły,
+  L3=owca-koza-2-płoty-zarys-szopki, L4=krowa-osioł-zarys-szopki-chmury, L5=rozgwieżdżone-niebo.
+- [x] Renderer linii: suma quadów segmentów + trójkąty mitrów (miterlimit 4), szerokość × skala transformu (jak Inkscape).
+- [x] Usunięte nietrafione rendery: `GRAWERY/` (cięcia postaci — błędna interpretacja warstw), stary `L0..L5.png`.
+- [x] Weryfikacja: niezależny test odległościowy (FP=0), porównanie bbox per element, podgląd ASCII warstw.
+- [ ] **Czeka:** ewentualna aktualizacja SVG przez usera → ponownie `python3 v4/tools/warstwy_png.py`.
+
+### LEKCJE
+- Nie interpretować zawartości warstw SVG („stajnia"/„pasterze" z poprzednich opisów = błędne). Czysta konwersja 1:1.
+- Etykiety warstw w pliku ≠ numeracja w głowie usera — nazywać pliki po zawartości, numery zachować z pliku.
+
+## 25. STATUS (07.09.2026 — plan minimum: wizytówka/portfolio)
+
+- [x] Dziennik zbiorczy `DZIENNIK.md` w korzeniu repo (odtworzenie sesji po resecie).
+- [x] Serwis: trasy `/realizacje/` + `/realizacje/<id>/` i `/kontakt/` (formularz z PKE art. 398).
+- [x] Baza: tabele `realizacje` i `wiadomosci` (seed 3 realizacji ze zdjęciami z uploads).
+- [x] Admin: CRUD realizacji z uploadem zdjęć (data/uploads, /media/) + skrzynka wiadomości ze statusami.
+- [x] Szablony: realizacje.html, realizacja_szczegoly.html, kontakt.html, admin_realizacje.html, admin_wiadomosci.html + admin_wiadomosc.html.
+- [x] Nav v4 w serwisie: „Galeria" → „Realizacje" (podmiany w wczytaj_v4: galeria.html→/realizacje/, kontakt.html→/kontakt/).
+- [x] Testy: formularz (walidacja 4 błędów, poprawny POST → baza + 2 maile, honeypot bez zapisu), admin CRUD realizacji z uploadem (303), wiadomości (statusy), /realizacje/<id>/ 200 + 404, index z podmienionymi linkami, sanity 6 tras 200. Baza wyczyszczona po testach.
+
+## 26. STATUS (07.09.2026 — naprawa logowania do panelu: token bez ciasteczek)
+
+- [x] **Diagnoza z logów:** u usera w podglądzie hasło było POPRAWNE (302), ale przeglądarka
+  nie odsyłała ciasteczka sesji (panel działa w iframe — cookies blokowane) → `/admin/` od razu
+  wracał na login. Efekt: „wpisuję hasło i nic się nie dzieje".
+- [x] **Fix:** logowanie wydaje token (tabela `admin_tokens`, 12 h ważności), redirect
+  `/admin/?klucz=...`; `admin_required` honoruje token z adresu/formularza/nagłówka;
+  wrapper `url_for` w app.py + global Jinja dokleja `klucz` do WSZYSTKICH linków panelu;
+  wylogowanie usuwa token z bazy. Złe/brakujące tokeny → login.
+- [x] Login page: checkbox **„Pokaż hasło"** + podpowiedź hasła startowego; lepszy komunikat błędu.
+- [x] Testy (curl, BEZ ciasteczek): złe hasło → komunikat; dobre → 303 z kluczem; panel i 9 zakładek
+  200 z samym kluczem; POST formularza z kluczem → 303 z kluczem w redirect; zły token → login;
+  wylogowanie unieważnia token (panel → 303); sprzątanie po testach.
+- [x] Commit i push.
+
+### LEKCJE
+- Podgląd e2b = iframe na innym originie → przeglądarki (szczególnie telefoniczne) blokują
+  ciasteczka sesji. Logowanie musi działać bez cookies (token w adresie) — dotyczy też
+  przyszłych wdrożeń testowych w ramkach.
+
+## 27. STATUS (07.09.2026 — przygotowanie wdrożenia w sieci)
+
+- [x] **app.py:** `baza_mod.inicjuj()` przy imporcie modułu — baza tworzy się też pod WSGI/gunicorn
+  (PythonAnywhere), nie tylko przy `python app.py`.
+- [x] **`serwis/PYTHONANYWHERE-KROK-PO-KROKU.md`** — instrukcja dla usera: konto FREE, git clone
+  + checkout gałęzi, WSGI (gotowy snippet), Reload, test, zmiana hasła, SMTP, backup, aktualizacje.
+- [x] **WDROZENIE.md** — Etap 1 skrócony do wskaźnika na nową instrukcję.
+- [x] Podgląd e2b jako doraźny adres publiczny: `https://8000-<E2B_SANDBOX_ID>.e2b.app/`
+  (na żywo tylko podczas sesji).
+- [ ] **Czeka na usera:** założenie konta PythonAnywhere (login usera do wklejenia w WSGI).
+
+## 28. STATUS (07.09.2026 — rozdzielenie silnika od szaty graficznej)
+
+- [x] **`serwis/static/style.css`** — JEDEN wspólny arkusz dla wszystkich podstron publicznych
+  (scalony z 6 szablonów: kolory firmowe, menu, hero, karty pakietów/wydarzeń, kalendarz,
+  kompozytor, personalizacja, formularze, przyciski, stopka, media queries — bez duplikatów).
+- [x] **`serwis/static/app.js`** — wspólne skrypty (rok w stopce, szkielet menu mobilnego);
+  podpięty w 6 szablonach. Skrypty z danymi bazy (kalkulatory) zostają w HTML strony (Jinja).
+- [x] Trasa `/static/<path>` w app.py; 6 szablonów: bloki <style> → link do arkusza.
+- [x] README: tabela podziału silnik↔szata (co edytuje żona: style.css/templates/app.js, co panel).
+- [x] PYTHONANYWHERE-KROK-PO-KROKU.md: edycja wyglądu przez zakładkę Files + Reload
+  (+ ostrzeżenie, że edycje na PA nie wracają do repo — synchronizować).
+- [x] Testy: style.css/app.js 200, 10 tras 200, zero inline <style> na 6 stronach.
+- [ ] **Czeka:** aktualizacja na PA (git pull + Reload) — user potwierdzi działanie.
+
+### LEKCJE
+- Jeden wspólny arkusz zamiast kopiowanych bloków = jedna zmiana kolorystyki wszędzie.
+- JS zależny od danych z bazy musi zostać w szablonie (zmienne Jinja) — reszta do static/.
+
+## 29. STATUS (07.09.2026 — punkt pracy: czyszczenie krzaków + start bazy/Sheets)
+
+**Gdzie skończyliśmy:** szata graficzna rozdzielona (static/style.css + app.js), serwis na PythonAnywhere
+u usera, logowanie panelu działa bez cookies. User zgłosił błędy (menu różne na każdej stronie,
+klik „Start"/logo → 404, filtry realizacji martwe).
+
+- [x] **Menu ujednolicone:** `templates/_nav.html` (jeden partial: Start/Realizacje/Wynajem/Personalizacja/Kontakt
+  + aktywna pozycja po request.path) — wstawiony do 8 szablonów publicznych; menu v4 (build.py+index.html)
+  skrócone do tych samych pozycji (usunięte „wkrótce"/stuby); logo/Start prowadzą na `/` (był 404 przez index.html);
+  stopki /kontakt.html → /kontakt/; martwy filtr kategorii usunięty z /realizacje/; logo na hero jest linkiem.
+- [x] **Google Sheets:** tabela `sheets_log`; `core.push_do_sheets` z logiem (ok/błąd + odpowiedź) i typem
+  (rezerwacja/zmiana-statusu/test); przycisk **„Testuj webhook"** w Ustawieniach (endpoint test-sheets);
+  tabela „Ostatnie próby wysyłki" w Ustawieniach; skrypt `serwis/sheets/webhook.gs` (Apps Script,
+  setup + doPost, gotowy do wklejenia) + `serwis/sheets/README.md` (instrukcja 5-minutowa).
+- [x] **Komunikaty w panelu bez ciasteczek:** `redirect_msg()` — wiadomości lecą w adresie (?msg=...),
+  admin_base pokazuje request.args.msg — flash() ginął w iframe (bez cookies), teraz działa.
+- [x] Testy: menu spójne na 6 stronach, brand→/ na 8 stronach, test webhooka (bez URL → msg; zły URL →
+  log „Connection refused"), 10 zakładek admina 200, 8 tras publicznych 200.
+- [ ] **Po commicie:** user robi `git pull` + Reload na PythonAnywhere i podpina arkusz wg sheets/README.md.
+
+### LEKCJE
+- Podmiany w `wczytaj_v4` muszą obejmować też `index.html` → `/` (menu v4 linkuje do index.html = 404).
+- Menu rozjechało się, bo nowe szablony (realizacje/kontakt) dostały inne menu niż reszta — jedno
+  źródło menu (partial + automatyczne .akt po request.path), nie kopie.
+
+## 30. STATUS (07.09.2026 — SMTP, autorespondery w panelu, rozliczenia w arkuszu)
+
+- [x] **Autorespondery edytowalne w panelu:** tabela `szablony_maili` (8 szablonów: zapytanie,
+  rezerwacja-terminu, zamowienie, kaucja, potwierdzenie, odrzucono, kontakt, test), zakładka
+  **Autorespondery** w adminie (temat+treść+aktywny per szablon), zmienne %(sygnatura)s itd.
+  (19 zmiennych, w tym %(kwoty)s i %(kwoty_lacznie)s); silnik `core.render_szablon/wyslij_szablon`.
+- [x] **Wybór szablonu po temacie formularza:** „Rezerwacja terminu" → rezerwacja-terminu;
+  zgłoszenie z personalizacjami → zamowienie (potwierdzenie jak z Allegro); reszta → zapytanie.
+  Zmiany statusów: płatność w toku → kaucja, zarezerwowany → potwierdzenie, odrzucono → odrzucono
+  (z powodem). Formularz kontaktowy → szablon kontakt.
+- [x] **Test SMTP w panelu:** Ustawienia → „Wyślij e-mail testowy" (adres + przycisk);
+  bez SMTP komunikat „SMTP nie skonfigurowany — kopia maila jest w panelu (Maile)".
+- [x] **Rozliczenia:** kolumna `rezerwacje.rozliczenie` (maz/zona/wspolne, edycja w szczegółach
+  rezerwacji + push do arkusza typ=rozliczenie), kolumna `rezerwacje.kwoty` (JSON kwot z chwili
+  zgłoszenia — do maili, arkusza i kwartałów); payload sheets: rozliczenie + kwoty_lacznie/
+  najem/pers/kaucja; webhook.gs v2: kolumny Rozliczenie+Kwoty i AUTOMATYCZNA zakładka
+  „Podsumowanie kwartałów" (rok, kwartał, Mąż/Żona/Wspólne/Razem — wg daty imprezy).
+- [x] Testy: szablony GET/POST 200/303, test SMTP → komunikat, rozliczenie 303 + zapis w bazie,
+  e2e rezerwacja (temat „Rezerwacja terminu") → autoresponder z szablonu (temat i treść OK),
+  kwoty w bazie, payload sheets z rozliczeniem i kwotami. Baza wyczyszczona.
+- [x] Commit i push.
+- [ ] **Czeka:** user konfiguruje SMTP (instrukcja w rozmowie) i podpina arkusz (sheets/README.md).
+
+### LEKCJE
+- Po dodaniu kolumny do INSERT liczyć placeholdery na nowo (znów 20/19 — ten sam błąd co w 13c).
+- Sandbox potrafi zresetować się W TRAKCIE sesji (proces + data/) — po każdym takim zdarzeniu:
+  pip install, restart serwisu, baza się odtwarza (demo), testy od nowa.
+
+## 31. STATUS (07.09.2026 — naprawa stylów na podstronach bez style.css)
+
+- [x] **Błąd:** realizacje/kontakt/realizacja_szczegoly/dziekuje/404 NIE miały podpiętego /static/style.css
+  (styl menu .site-head/.nav był usunięty z ich inline CSS przy ujednolicaniu) → menu rozjeżdżone.
+- [x] Fix: link do style.css w 5 szablonach; dziekuje.html dostało też wspólne menu (_nav + flex).
+- [x] Test: css:1 + nav:1 na 8 podstronach (200).
+- [ ] User: git pull + Reload na PythonAnywhere i sprawdzenie menu.
+- [ ] SMTP: darmowe PA blokuje połączenia SMTP poza Gmailem (błąd połączenia mimo dobrych danych OVH);
+  opcje: Gmail (test), plan Hacker, VPS OVH (produkcja). Maile sprawdza się w panelu (Maile → Stan),
+  nie przez GitHub Pages (statyczny hosting nie wysyła ani nie sprawdza poczty).
+
+## 32. STATUS (07.09.2026 — wymuszenie świeżego CSS + instrukcja czyszczenia cache)
+
+- [x] /static/* serwowane z Cache-Control: no-cache (max_age=0) — telefon nie trzyma starego CSS;
+  linki w 11 szablonach: style.css?v=3, app.js?v=3.
+- [x] Test: nagłówek no-cache, v3 na 4 sprawdzonych podstronach, 200.
+- [ ] User: git pull + Reload; przy dalszym rozjechaniu — wyczyścić cache telefonu (incognito).
+- [ ] Maile: GitHub Pages NIE wysyła/sprawdza poczty — tylko panel (Maile → Stan) + webmail.ovh.pl.
+
+---
+
+## 2026-09-08 — LANDING v5 (układ kwaterowy, decyzja użytkownika)
+
+Nowa forma strony głównej (zastępuje splash+hero+litery z v4):
+- **Układ 4 części:** czarny pasek górny (tel. 510 767 076 + kontakt@studiosygnatura.pl) → lewa górna ćwiartka (kwadrat z sygnetem + sygNATURA, pod spodem pionowe menu: Strona główna / Zamówienia / Pracownia / Nasze realizacje / Współpraca / Kontakt, pod menu social media IG/FB/Pinterest) → wąski pasek obok logo (wyszukiwarka po słowach kluczowych + ikony koszyka i panelu klienta) → prawa dolna ćwiartka = SLIDER 4 slajdów (Nowości / Najczęściej zamawiane / Aktualności — ostatnia realizacja / Oferta sezonowa) z autoplay 5 s w pętli, strzałkami ‹›, kropkami i swipe na dotyku → sekcja „Jak działamy" (3 kroki) + CTA „Zarezerwuj termin" / „Złóż zamówienie" → stopka: Regulamin · Jak pracujemy · © Sygnatura 2026.
+- Slider zasilany Z BAZY przez Flask (`app.py index()` → `wczytaj_v4('index.html', nowosci=, top=, realizacja=)`): nowości = 3 najnowsze produkty sklepu, bestsellery = licznik zamówień z rezerwacji (fallback: pierwsze z katalogu), aktualności = ostatnia realizacja. Szablon ma treści zastępcze (Jinja `{% if %}`), więc działa też bez kontekstu.
+- Nowa trasa `/szukaj/` + `templates/szukaj.html`: przeszukuje sklep_produkty, personalizacje, pakiety, realizacje (LIKE na nazwa/opis), min. 2 znaki, wyniki pogrupowane z miniaturkami.
+- ⚠️ **build.py NIE regeneruje już strony głównej** — index.html jest utrzymywany ręcznie (v5). Uruchomienie build.py nadpisałoby starym layoutem (ostrzeżenie dodane na górze skryptu).
+- Koszyk/panel klienta = na razie ikony-linki (koszyk → /zamowienia/sklep/, panel → /zamowienia/); pełne konta klientów wymagałyby bazy użytkowników — do decyzji.
+- Kopię Pages (docs/index.html) zsynchronizować na końcu (wymaga statycznych ścieżek assets i wygenerowania slajdów bez Jinja).
+
+## 2026-09-08 (popr. 2) — breakpointy landing + koszyk sklepu
+- Układ kwaterowy utrzymany do 760 px (poprzednio <980 px zwijał się na telefonach w „wersji na komputer" ~980 px). Nowe zakresy: 761–1100 px = kwatery ciaśniejsze; <760 px = kolumna mobilna.
+- Sklep: licznik = ilość do dodania, przycisk „Dodaj do koszyka" przenosi do koszyka (hidden ile_<id>) i zeruje licznik; dymek „N w koszyku" pod produktem. Więcej w DZIENNIK.md sesja 21.
+
+## 2026-09-09 — system lekki: linki zewnętrzne do zdjęć + kompresja assets
+- Obrazy w całym serwisie (sklep, realizacje, slider landingu, wyszukiwarka) akceptują pełne URL-e (Dysk Google) — filtr `obrazek` w app.py; lokalne nazwy działają jak dotąd.
+- v4/assets: hero 52 kB, forest 176 kB, hero-alt 177 kB (skompresowane). Więcej: DZIENNIK.md sesja 22.

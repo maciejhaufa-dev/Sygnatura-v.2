@@ -1,0 +1,45 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Produkty — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Produkty</h1>
+<p class="mala">Produkty widoczne są w katalogu na stronie wynajmu (tylko te z zaznaczonym „Dostępny").</p>
+<style>
+.wiersz{display:grid;grid-template-columns:44px 1.2fr 1fr 90px 90px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(107,69,48,.15)}
+.wiersz input,.wiersz select{padding:7px;font-family:inherit;font-size:16px;border:1px solid rgba(107,69,48,.35);background:var(--krem);width:100%}
+.wiersz .idk{color:var(--brunatny);font-weight:700}
+.wiersz label{margin:0;display:flex;align-items:center;gap:6px;font-size:14px;text-transform:none;letter-spacing:0}
+.naglowek{display:grid;grid-template-columns:44px 1.2fr 1fr 90px 90px auto;gap:8px;padding:8px 0;border-bottom:2px solid rgba(107,69,48,.4);font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--brunatny)}
+@media(max-width:760px){.wiersz,.naglowek{grid-template-columns:1fr}.naglowek{display:none}}
+</style>
+<div class="naglowek"><span>ID</span><span>Nazwa</span><span>Kategoria</span><span>Cena/doba</span><span>Dostępny</span><span></span></div>
+{% for p in rows %}
+<form class="wiersz" method="post" action="{{ url_for('produkty_edytuj', pid=p['id']) }}">
+  <span class="idk">{{ p['id'] }}</span>
+  <input type="text" name="nazwa" value="{{ p['nazwa'] }}">
+  <select name="kategoria_id">
+    {% for k in kat %}<option value="{{ k['id'] }}" {% if k['id']==p['kategoria_id'] %}selected{% endif %}>{{ k['nazwa'] }}</option>{% endfor %}
+  </select>
+  <input type="number" name="cena_doba" step="0.01" value="{{ p['cena_doba'] }}">
+  <label><input type="checkbox" name="dostepny" {% if p['dostepny'] %}checked{% endif %}> tak</label>
+  <span style="white-space:nowrap">
+    <button class="btn btn-ghost" type="submit" style="padding:6px 12px">Zapisz</button>
+    <button class="btn btn-niebez" type="submit" formaction="{{ url_for('produkty_usun', pid=p['id']) }}">Usuń</button>
+  </span>
+</form>
+{% endfor %}
+
+<div class="forma">
+  <h3>Nowy produkt</h3>
+  <form method="post" action="{{ url_for('produkty_dodaj') }}">
+    <label>Nazwa</label><input type="text" name="nazwa" required>
+    <label>Kategoria</label>
+    <select name="kategoria_id">
+      {% for k in kat %}<option value="{{ k['id'] }}">{{ k['nazwa'] }}</option>{% endfor %}
+    </select>
+    <label>Opis (widoczny w katalogu)</label><textarea name="opis"></textarea>
+    <label>Cena za dobę (zł)</label><input type="number" name="cena_doba" step="0.01" value="0">
+    <div class="rzad" style="margin-top:12px"><label><input type="checkbox" name="dostepny" checked> Dostępny (widoczny na stronie)</label></div>
+    <p><button class="btn" type="submit">Dodaj produkt</button></p>
+  </form>
+</div>
+{% endblock %}

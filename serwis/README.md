@@ -1,0 +1,134 @@
+# Serwis Studio Sygnatura (Flask + SQLite)
+
+Kompletny serwis z panelem administracyjnym: wynajem dekoracji, kalendarze per pakiet,
+zgłoszenia z sygnaturami, statusy, autorespondery, katalog i zarządzanie treścią.
+**Bez WordPressa, bez WooCommerce, bez kosztów** — czysty Python + HTML/CSS.
+
+## Podział: silnik (Python) ↔ szata graficzna (HTML/CSS/JS)
+
+Cały serwis jest tak rozdzielony, że **wygląd strony edytuje się bez znajomości Pythona**:
+
+| Co | Gdzie | Kto/co |
+|---|---|---|
+| **Logika** (trasy, baza, maile, kalendarze) | `app.py`, `db.py`, `core.py` | bot / programista |
+| **Wygląd wszystkich podstron** | **`static/style.css`** (jeden wspólny arkusz: kolory, czcionki, menu, przyciski, karty, kalendarz) | żona — zmiana tutaj działa na całej stronie |
+| **Wspólne skrypty JS** | `static/app.js` (menu, stopka — szkiclet na wspólne funkcje) | żona |
+| **Każda podstrona osobno** | `templates/*.html` (wynajem, pakiet, formularz, komponuje, personalizacja, realizacje, kontakt…) | żona — każdą stronę definiuje osobny plik HTML |
+| **Treści** (produkty, ceny, realizacje, wiadomości) | panel admina `/admin/` | żona — formularze w panelu |
+
+W szablonach HTML używa się `{{ zmienna }}` (Jinja2) tylko tam, gdzie wstawiane są dane z bazy
+(np. `{{ p.cena }}`). Strukturę i wygląd edytuje się jak zwykły HTML/CSS.
+Skrypty z danymi strony (np. kalkulator kwot z ceną pakietu) zostają w pliku HTML danej strony —
+bo ceny pochodzą z bazy i wstawia je silnik. Wszystko, co wspólne, trzymaj w `static/`.
+
+## Uruchomienie lokalne (na Twoim komputerze)
+
+Potrzebny jest Python 3 (dowolna wersja 3.9+). W terminalu:
+
+```bash
+cd serwis
+pip install flask        # tylko raz
+python app.py
+```
+
+Otwórz w przeglądarce:
+
+| Adres | Co to jest |
+|---|---|
+| http://127.0.0.1:8000 | **strona główna (wizytówka)** — hero, pasja/styl/tradycja |
+| http://127.0.0.1:8000/realizacje/ | **portfolio** — karty realizacji z bazy (zdjęcia, opisy) |
+| http://127.0.0.1:8000/kontakt/ | **kontakt** — formularz (wiadomość → baza + e-mail; zgoda PKE art. 398) |
+| http://127.0.0.1:8000/wynajem/ | **wynajem z kalendarzami per pakiet** |
+| http://127.0.0.1:8000/personalizacja/ | produkty spersonalizowane (jednorazówki) |
+| http://127.0.0.1:8000/admin/ | **panel administracyjny** |
+
+**Hasło startowe do panelu: `sygnatura-2026`** — zmień od razu w zakładce *Ustawienia*.
+
+**Logowanie działa też bez ciasteczek:** po zalogowaniu panel dostaje token w adresie (`/admin/?klucz=...`),
+który dokleja się do wszystkich linków panelu. Dzięki temu panel działa także w podglądach w ramce
+(iframe), na telefonach i w przeglądarkach blokujących ciasteczka. Token wygasa po 12 h;
+wylogowanie natychmiast go unieważnia. Na formularzu logowania jest checkbox **„Pokaż hasło"**.
+
+## Plan minimum: wizytówka / portfolio (sesja 14)
+
+Strona, którą można pokazać znajomym już teraz:
+- **Strona główna** `/` — statyczna v4 (hero, splash, 4 przyciski), serwowana przez serwis.
+- **Realizacje** `/realizacje/` — karty z bazy `realizacje` (tytuł, kategoria, opis, zdjęcie, kolejność,
+  widoczna/ukryta). W panelu: zakładka **Realizacje** — dodawanie/edycja/usuwanie + upload zdjęć
+  (JPG/PNG/WEBP, maks. 8 MB, katalog `data/uploads`, serwowane przez `/media/...`).
+  Startowo 3 przykładowe wpisy ze zdjęciami z `uploads/` (opisy robocze — podmień w panelu).
+- **Kontakt** `/kontakt/` — formularz (imię, e-mail, telefon opcjonalny, wiadomość, **wymagana zgoda
+  na kontakt — PKE art. 398**; pułapka antyspamowa). Wysłanie = wpis w bazie `wiadomosci`
+  + 2 e-maile (do Studia + autoresponder do klienta). W panelu: zakładka **Wiadomości**
+  (statusy: nowa / przeczytana / odpowiedziano). Bez skonfigurowanego SMTP maile lądują w zakładce *Maile*.
+- Menu statycznych stron v4 w serwisie prowadzi na trasy dynamiczne („Galeria" → Realizacje, Kontakt → formularz) —
+  podmiany w funkcji `wczytaj_v4()` w `app.py`.
+
+Sklep i rejestr najmu dołożymy później (tabele kategorie/produkty już są gotowe).
+
+## Co potrafi serwis (workflow wynajmu)
+
+1. Klient wchodzi na `/wynajem/`, wybiera pakiet (komunijny / weselny / firmowy / jubileuszowy × ESENCJA/MID/FULL), każdy pakiet ma **własny kalendarz**.
+2. Klika **„Zarezerwuj termin"** → formularz kontaktowy z tematem **„Rezerwacja terminu"** (rozwijana lista).
+3. W formularzu: checkbox **„Nadaj nową sygnaturę"** lub **„Mam sygnaturę sprawy"** (odblokowuje pole na numer), miejsce na indywidualną wiadomość, e-mail kontaktowy klienta.
+   Każdy **produkt spersonalizowany** (dodawany na podstronie /personalizacja/) dostaje w formularzu osobne pole opisu — co i jak ma być spersonalizowane. Personalizacja = jednorazówki: **płatne z góry, nie podlegają zwrotowi** (zostają u klienta); rabat −5% od 3 sztuk. Formularz pokazuje **podsumowanie kwot** (najem × doby + kaucja 300 zł + personalizacja) przed wysłaniem.
+4. Przyciski: **„Zmień termin"** (powrót do kalendarza) lub **„Wyślij zapytanie"**. Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do odbioru — płatność za każdą rozpoczętą dobę.
+5. Po wysłaniu:
+   - zgłoszenie trafia do bazy z sygnaturą (np. SYG-2026-001),
+   - e-mail leci do `kontakt@studiosygnatura.pl`,
+   - zapytanie leci do API Google Sheets (jak podepniemy URL — na razie wyłączone),
+   - **autoresponder** do klienta z podsumowaniem: treść pytania, procedura, dokumenty (kaucja w 7 dni; zapłacone = zarezerwowane).
+6. W kalendarzu termin dostaje status **„wysłano zapytanie"** — nie blokuje terminu, informuje innych, że ktoś pytał (kto pierwszy, ten lepszy; priorytet stali partnerzy).
+7. W panelu admina zmieniasz status: **zapytanie → płatność w toku → zarezerwowany / odrzucono**.
+   - „płatność w toku" → termin wstrzymany w kalendarzu (inny kolor) + autoresponder „kaucja w drodze",
+   - „zarezerwowany" → termin zablokowany na sztywno + autoresponder potwierdzający,
+   - „odrzucono" → termin zwolniony + mail z powodem.
+
+## Panel administracyjny — zakładki
+
+| Zakładka | Do czego służy |
+|---|---|
+| **Pulpit** | liczniki statusów, najbliższe terminy, ostatnie maile |
+| **Realizacje** | portfolio: dodawanie/edycja/usuwanie + upload zdjęć (strona /realizacje/) |
+| **Wiadomości** | skrzynka formularza kontaktowego (statusy: nowa / przeczytana / odpowiedziano) |
+| **Rezerwacje** | lista zgłoszeń, filtry statusów, szczegóły, historia zmian |
+| **Kategorie** | dodawanie / edycja / usuwanie kategorii katalogu |
+| **Produkty** | dodawanie / edycja / usuwanie produktów (nazwa, opis, cena/doba, dostępny) |
+| **Pakiety** | pakiety wynajmu + checkbox **„Dostępny na stronie"** (odznacz = pakiet znika ze strony, np. gdy wszystkie terminy zajęte) |
+| **Maile** | skrzynka nadawcza serwisu — kopia każdego maila + przycisk „Wyślij ponownie" |
+| **Ustawienia** | e-mail kontaktowy, SMTP, hasło panelu, Google Sheets, dokumenty do autorespondera |
+
+## Struktura plików (gdzie co edytować)
+
+```
+serwis/
+├── app.py            # trasy, formularze, logika (Python — do zmian logiki)
+├── db.py             # baza danych + dane startowe (kategorie, produkty, pakiety)
+├── core.py           # statusy, sygnatury, treści e-maili, Google Sheets
+├── templates/        # SZABLONY HTML (Jinja2) — tu edytujesz wygląd stron
+│   ├── wynajem.html       # strona wynajmu z kalendarzami
+│   ├── formularz.html     # formularz rezerwacji (checkboxy sygnatur)
+│   ├── dziekuje.html      # strona po wysłaniu
+│   ├── admin_*.html       # ekrany panelu administracyjnego
+│   └── 404.html
+├── data/             # NIE W COMMICIE: serwis.db (baza), secret.txt, dokumenty/
+│   └── serwis.db     # cała baza SQLite (usunięcie pliku = reset do danych startowych)
+└── static/           # (na przyszłość) style.css, grafiki
+```
+
+**Zasada:** HTML i CSS edytujesz w `templates/` (zwykły HTML + `{{ zmienne }}`),
+bez Pythona. Python tylko tam, gdzie jest logika — wszystko opisane komentarzami po polsku.
+Zmiany w szablonach widać od razu (tryb debug przeładowuje automatycznie).
+
+## Co jeszcze do skonfigurowania (krok po kroku)
+
+1. **Prawdziwe hasło** panelu — Ustawienia.
+2. **SMTP** — dane poczty, żeby maile faktycznie wychodziły. Bez SMTP wszystko działa, a maile lądują w zakładce *Maile* (podgląd).
+3. **Google Sheets** — skrypt Apps Script (webhook). Zgłoszenia i zmiany statusów będą dopisywać wiersze w arkuszu. Zrobimy to w kolejnym kroku.
+4. **Dane demo** — w bazie są 4 zgłoszenia SYG-DEMO-*; usuń je w zakładce Rezerwacje. Aby zacząć całkiem czysto: zatrzymaj serwis, usuń `data/serwis.db`, uruchom ponownie — baza odtworzy kategorie, produkty i pakiety, a demo NIE wróci (demo ładuje się tylko przy pierwszym w historii utworzeniu bazy).
+
+## Docelowo (hosting)
+
+Ten sam kod działa na każdym hostingu z Pythonem: **PythonAnywhere (darmowy)**, Render,
+albo tani VPS (~30 zł/mies.). GitHub Pages zostaje jako wizytówka statyczna, a ten serwis
+to właściwy system z bazą — na hostingu podpięcie domeny studiosygnatura.pl.

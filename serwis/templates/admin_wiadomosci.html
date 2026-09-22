@@ -1,0 +1,32 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Wiadomości — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Wiadomości z formularza kontaktowego</h1>
+<p class="mala">Każda wiadomość ze strony <a href="{{ url_for('kontakt_form') }}">/kontakt/</a> ląduje tutaj
+oraz w zakładce <a href="{{ url_for('admin_maile') }}">Maile</a> (kopia e-maila).</p>
+{% if rows %}
+<div class="t-scroll">
+<table class="tabela">
+  <tr><th>ID</th><th>Data</th><th>Imię</th><th>E-mail</th><th>Temat</th><th>Wiadomość (skrót)</th><th>Status</th></tr>
+  {% for w in rows %}
+  <tr>
+    <td>{{ w['id'] }}</td>
+    <td style="white-space:nowrap">{{ w['data'] }}</td>
+    <td>{{ w['imie'] }}</td>
+    <td>{{ w['email'] }}</td>
+    <td>{{ w['temat'] }}</td>
+    <td>{{ w['tresc'][:90] }}{% if w['tresc']|length > 90 %}…{% endif %}</td>
+    <td>
+      {% if w['status']=='nowa' %}<b style="color:#8c2f2f">nowa</b>
+      {% elif w['status']=='przeczytana' %}przeczytana
+      {% else %}<span style="color:var(--butelkowa)">odpowiedziano</span>{% endif %}
+    </td>
+    <td><a class="btn btn-ghost" href="{{ url_for('admin_wiadomosc', wid=w['id']) }}" style="padding:4px 12px">Otwórz</a></td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% else %}
+<div class="uwaga">Brak wiadomości. Gdy ktoś napisze przez formularz na stronie — pojawi się tutaj.</div>
+{% endif %}
+{% endblock %}

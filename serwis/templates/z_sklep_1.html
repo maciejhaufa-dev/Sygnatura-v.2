@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Katalog produktów — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=7">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set etapy = ['Katalog','Personalizacja','Dane','Podsumowanie'] %}{% set etap = 1 %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('zamowienia') }}">← wszystkie zamówienia</a>
+  <h1>Katalog produktów</h1>
+  <p class="sub">Wiele z naszych prac zdobi prywatne domy i lokale eventowe. Wybierz coś dla siebie i stwórz niepowtarzalny klimat dla swojego wnętrza. Produkty płatne z góry — dane do przelewu dostaniesz w e-mailu z potwierdzeniem.</p>
+
+  <div class="pers-bar">
+    <span class="ik">✍️</span>
+    <span class="tekst"><b>Chcesz dodać osobisty akcent?</b> Każdy produkt możesz w kolejnym kroku <b>spersonalizować</b> — grawer, imiona, data, dedykacja. Krok personalizacji można też pominąć.</span>
+  </div>
+
+  {% if bledy %}
+  <div class="bledy-box">
+    <ul>{% for b in bledy %}<li>{{ b }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+  <div class="bledy-box" id="js-bledy" hidden><ul id="js-bledy-list"></ul></div>
+
+  <form method="post" action="{{ url_for('z_sklep_katalog', w=w) if w else url_for('z_sklep_katalog') }}" id="f-sklep">
+    {% if w %}<input type="hidden" name="w" value="{{ w }}">{% endif %}
+
+    <div class="sklep-grid">
+      {% for pr in produkty %}
+      <div class="sklep-karta" data-id="{{ pr.id }}" data-cena="{{ pr.cena }}">
+        <div class="sklep-foto">
+          {% if pr.obraz %}
+          <img src="{{ pr.obraz|obrazek('sklep') }}" alt="{{ pr.nazwa }}" loading="lazy">
+          {% else %}
+          <span class="sklep-init">{{ pr.nazwa[:1] }}</span>
+          {% endif %}
+        </div>
+        <div class="sklep-tresc">
+          <b class="sklep-nazwa">{{ pr.nazwa }}</b>
+          <small class="sklep-opis">{{ pr.opis }}</small>
+          <div class="sklep-cena">{{ '%.0f'|format(pr.cena) }} zł <span>/ szt.</span></div>
+          <div class="licznik">
+            <button type="button" class="licz-btn" data-akcja="mniej" aria-label="Zmniejsz ilość: {{ pr.nazwa }}">−</button>
+            <input type="number" class="licz-q" min="0" max="99" value="0" aria-label="Ilość do dodania: {{ pr.nazwa }}">
+            <button type="button" class="licz-btn" data-akcja="wiecej" aria-label="Zwiększ ilość: {{ pr.nazwa }}">+</button>
+          </div>
+          <button type="button" class="btn dodaj-btn">Dodaj do koszyka</button>
+          <input type="hidden" name="ile_{{ pr.id }}" value="{{ ilosci.get(pr.id, 0) }}">
+          <div class="koszyk-dymek" hidden><b>0</b> w koszyku</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="koszyk-bar" id="koszyk-bar">
+      <div class="koszyk-info">
+        <b>Twój koszyk</b>
+        <span id="koszyk-opis">pusty — wybierz produkty z katalogu</span>
+      </div>
+      <button class="btn" type="submit" id="koszyk-dalej">Dalej: personalizacja →</button>
+    </div>
+  </form>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js?v=5"></script>
+<script>
+(function(){
+  var form = document.getElementById('f-sklep');
+  var boxBledy = document.getElementById('js-bledy');
+  var lista = document.getElementById('js-bledy-list');
+  var bar = document.getElementById('koszyk-bar');
+  var opis = document.getElementById('koszyk-opis');
+
+  /* Koszyk = ukryte pola ile_<id>. Widoczny licznik (q) to tylko „ilość do dodania"
+     — przycisk NIE zmienia licznika, tylko przenosi q do koszyka i zeruje q. */
+  function liczKoszyk(){
+    var szt = 0, kwota = 0;
+    document.querySelectorAll('.sklep-karta').forEach(function(k){
+      var h = k.querySelector('input[type=hidden]');
+      var ile = parseInt(h.value, 10) || 0;
+      if (ile > 0) {
+        szt += ile;
+        kwota += ile * parseFloat(k.dataset.cena || 0);
+      }
+      var dymek = k.querySelector('.koszyk-dymek');
+      dymek.querySelector('b').textContent = ile;
+      dymek.hidden = ile === 0;
+    });
+    if (szt > 0) {
+      opis.textContent = szt + ' szt. · ' + kwota + ' zł (płatne z góry)';
+      bar.classList.add('pelny');
+    } else {
+      opis.textContent = 'pusty — wybierz produkty z katalogu';
+      bar.classList.remove('pelny');
+    }
+    return szt;
+  }
+
+  document.querySelectorAll('.sklep-karta').forEach(function(k){
+    var q = k.querySelector('.licz-q');
+    var h = k.querySelector('input[type=hidden]');
+    k.querySelectorAll('.licz-btn').forEach(function(b){
+      b.addEventListener('click', function(){
+        var v = parseInt(q.value, 10) || 0;
+        if (b.dataset.akcja === 'mniej') v = Math.max(0, v - 1);
+        else v = Math.min(99, v + 1);
+        q.value = v;
+      });
+    });
+    k.querySelector('.dodaj-btn').addEventListener('click', function(){
+      var v = parseInt(q.value, 10) || 0;
+      var m = parseInt(h.value, 10) || 0;
+      h.value = Math.min(99, m + v);
+      q.value = 0;
+      liczKoszyk();
+    });
+  });
+
+  form.addEventListener('submit', function(ev){
+    var szt = liczKoszyk();
+    lista.innerHTML = '';
+    if (szt === 0) {
+      var li = document.createElement('li');
+      li.textContent = 'Koszyk jest pusty — ustaw ilość i kliknij „Dodaj do koszyka".';
+      lista.appendChild(li);
+      boxBledy.hidden = false;
+      boxBledy.scrollIntoView({behavior: 'smooth', block: 'center'});
+      ev.preventDefault();
+      return;
+    }
+    boxBledy.hidden = true;
+  });
+
+  liczKoszyk();
+})();
+</script>
+</body>
+</html>

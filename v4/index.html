@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio Sygnatura — dekoracje, personalizacja, sklep z duszą</title>
+<meta name="description" content="Studio Sygnatura — rodzinna manufaktura. Wynajem dekoracji na wydarzenia, personalizowane prezenty i sklep z dekoracjami z drewna i światła.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C; --czern:#0E0E0C;
+  --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+
+/* ============ GÓRNY CZARNY PASEK: telefon + e-mail ============ */
+.topbar{background:var(--czern);color:rgba(251,247,240,.92);font-size:13.5px;letter-spacing:.04em}
+.topbar .wrap{max-width:1500px;margin:0 auto;padding:8px clamp(14px,3vw,36px);
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar a{display:inline-flex;align-items:center;gap:8px;transition:color .2s}
+.topbar a:hover{color:var(--zloty)}
+.topbar svg{width:15px;height:15px;flex:none}
+.topbar .top-note{color:rgba(196,165,130,.85);font-style:italic}
+
+/* ============ SIATKA KWATEROWA ============ */
+.page{display:grid;grid-template-columns:minmax(250px,290px) 1fr;
+  grid-template-areas:"side head" "side main" "side cta" "foot foot";
+  max-width:1500px;margin:0 auto;min-height:100vh}
+
+/* --- lewa górna ćwiartka: logo + menu + social --- */
+.side{grid-area:side;background:linear-gradient(180deg,var(--butelkowa) 0%,#17302A 100%);
+  color:var(--krem);display:flex;flex-direction:column;padding:30px 26px 26px;position:sticky;top:0;
+  height:100vh;min-height:560px}
+.brand-blok{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.brand-kwadrat{width:128px;height:128px;background:var(--krem);border:1px solid var(--zloty);
+  display:grid;place-items:center;box-shadow:0 16px 40px rgba(0,0,0,.35);animation:kwadrat 6s ease-in-out infinite}
+.brand-kwadrat img{width:82px;height:82px;filter:drop-shadow(0 6px 14px rgba(107,69,48,.35))}
+@keyframes kwadrat{0%,100%{box-shadow:0 16px 40px rgba(0,0,0,.35)}50%{box-shadow:0 16px 52px rgba(196,165,130,.38)}}
+.brand-nazwa{font-size:30px;font-weight:700;letter-spacing:.1em;color:var(--zloty);line-height:1}
+.brand-nazwa em{font-style:normal;color:var(--krem)}
+.brand-tag{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.55)}
+
+/* menu pionowe — jedno pod drugim */
+.menu-vert{display:flex;flex-direction:column;gap:2px;margin-top:26px;flex:1}
+.menu-vert a{position:relative;color:var(--krem);font-size:15.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;padding:12px 14px;border:1px solid transparent;transition:all .25s}
+.menu-vert a::after{content:"";position:absolute;left:14px;bottom:6px;width:0;height:1px;
+  background:var(--zloty);transition:width .3s}
+.menu-vert a:hover{color:var(--zloty);border-color:rgba(196,165,130,.35);background:rgba(196,165,130,.08)}
+.menu-vert a:hover::after{width:34px}
+.menu-vert a.on{color:var(--zloty);border-color:rgba(196,165,130,.55);background:rgba(196,165,130,.14)}
+.menu-vert a.on::after{width:34px}
+
+/* social media pod menu */
+.social{display:flex;gap:10px;margin-top:18px;justify-content:center}
+.social a{width:40px;height:40px;border:1px solid rgba(196,165,130,.5);display:grid;place-items:center;
+  color:var(--zloty);transition:all .25s}
+.social a:hover{background:var(--zloty);color:var(--butelkowa)}
+.social svg{width:19px;height:19px}
+.side .side-stopka{font-size:11.5px;color:rgba(251,247,240,.45);text-align:center;letter-spacing:.06em}
+
+/* --- nagłówek głównej kolumny: wyszukiwarka + koszyk/panel --- */
+.head{grid-area:head;display:flex;align-items:center;gap:16px;
+  padding:20px clamp(18px,3vw,40px) 6px;background:var(--krem)}
+.szukaj{display:flex;align-items:stretch;flex:1;max-width:520px;border:1px solid rgba(107,69,48,.4);
+  background:#fff;transition:border-color .25s,box-shadow .25s}
+.szukaj:focus-within{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(31,58,50,.12)}
+.szukaj input{flex:1;border:none;background:transparent;padding:11px 14px;font-family:inherit;
+  font-size:16px;color:var(--ink);outline:none;min-width:0}
+.szukaj button{border:none;background:var(--butelkowa);color:var(--zloty);width:46px;cursor:pointer;
+  display:grid;place-items:center;transition:background .25s}
+.szukaj button:hover{background:var(--brunatny)}
+.szukaj svg{width:18px;height:18px}
+.head-ikony{display:flex;gap:10px;margin-left:auto}
+.head-ikony a{position:relative;width:46px;height:46px;border:1px solid rgba(107,69,48,.4);background:#fff;
+  display:grid;place-items:center;color:var(--brunatny);transition:all .25s}
+.head-ikony a:hover{border-color:var(--butelkowa);color:var(--butelkowa);background:var(--krem-2)}
+.head-ikony svg{width:20px;height:20px}
+.head-ikony .kropka{position:absolute;top:-6px;right:-6px;width:10px;height:10px;border-radius:50%;
+  background:var(--zloty);border:2px solid var(--krem)}
+
+/* --- okno główne: slider --- */
+.main{grid-area:main;padding:8px clamp(18px,3vw,40px) 0}
+.slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
+  background:var(--butelkowa);aspect-ratio:16/8.6;max-height:600px}
+.sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
+.sl-slide{flex:0 0 100%;position:relative;display:flex;align-items:flex-end;overflow:hidden}
+.sl-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.sl-slide.akt .sl-bg{animation:kenburns 14s ease-in-out infinite alternate}
+@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.08)}}
+.sl-cien{position:absolute;inset:0;background:linear-gradient(200deg,rgba(14,14,12,.25) 0%,rgba(14,14,12,.78) 72%)}
+.sl-tresc{position:relative;z-index:2;width:100%;padding:clamp(20px,4vw,46px);color:var(--krem)}
+.sl-tag{display:inline-block;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);
+  border:1px solid rgba(196,165,130,.7);padding:5px 12px;margin-bottom:12px;background:rgba(14,14,12,.35)}
+.sl-tresc h2{font-size:clamp(26px,3.6vw,46px);font-weight:600;line-height:1.08;text-shadow:0 3px 18px rgba(0,0,0,.5)}
+.sl-tresc p{font-size:clamp(15px,1.4vw,17.5px);line-height:1.55;max-width:640px;margin-top:10px;
+  color:rgba(251,247,240,.92)}
+.sl-btn{display:inline-block;margin-top:18px;background:var(--zloty);color:var(--butelkowa);
+  font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:12px 26px;
+  transition:all .25s;border:1.5px solid var(--zloty)}
+.sl-btn:hover{background:transparent;color:var(--zloty)}
+
+/* mini-karty produktów w slajdach */
+.sl-karty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;max-width:760px}
+.sl-karta{display:flex;gap:12px;align-items:center;background:rgba(251,247,240,.95);color:var(--ink);
+  padding:10px 12px;transition:transform .25s,box-shadow .25s}
+.sl-karta:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.sl-karta img{width:56px;height:56px;object-fit:cover;flex:none}
+.sl-karta .nazwa{font-size:14.5px;font-weight:700;line-height:1.2}
+.sl-karta .cena{font-size:13px;color:var(--brunatny);font-weight:700;margin-top:2px}
+.sl-karta .pusty{width:56px;height:56px;flex:none;background:linear-gradient(135deg,var(--krem-2),var(--zloty-soft));
+  display:grid;place-items:center;font-size:24px;color:var(--brunatny)}
+
+/* strzałki i kropki slidera */
+.sl-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:46px;height:46px;
+  border-radius:50%;border:1px solid rgba(196,165,130,.8);background:rgba(14,14,12,.45);color:var(--zloty);
+  font-family:inherit;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;
+  transition:all .25s;padding-bottom:4px}
+.sl-nav:hover{background:var(--zloty);color:var(--butelkowa)}
+.sl-nav.prev{left:14px}.sl-nav.next{right:14px}
+.sl-dots{position:absolute;bottom:16px;left:0;right:0;z-index:5;display:flex;gap:8px;justify-content:center}
+.sl-dots button{width:9px;height:9px;border-radius:10px;border:none;background:rgba(251,247,240,.45);
+  cursor:pointer;padding:0;transition:all .3s}
+.sl-dots button.akt{width:30px;background:var(--zloty)}
+
+/* --- jak działamy + CTA --- */
+.cta{grid-area:cta;padding:26px clamp(18px,3vw,40px) 40px}
+.jak{padding:26px 28px;background:#fff;border:1px solid rgba(107,69,48,.25)}
+.jak h2{font-size:22px;color:var(--butelkowa);margin-bottom:4px}
+.jak .pod{font-size:14.5px;color:rgba(51,38,28,.7);margin-bottom:18px}
+.kroki{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.krok{border-left:2px solid var(--zloty);padding-left:14px}
+.krok .num{font-size:13px;font-weight:700;letter-spacing:.24em;color:var(--brunatny)}
+.krok b{display:block;font-size:16.5px;color:var(--ink);margin:4px 0 4px}
+.krok p{font-size:14px;line-height:1.55;color:rgba(51,38,28,.8)}
+.cta-btn{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px}
+.cta-btn .btn{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa);
+  font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  padding:14px 30px;cursor:pointer;transition:all .25s;display:inline-block}
+.cta-btn .btn:hover{background:var(--zloty);color:var(--butelkowa)}
+.cta-btn .btn.outline{background:transparent;color:var(--butelkowa)}
+.cta-btn .btn.outline:hover{background:var(--brunatny);border-color:var(--brunatny);color:var(--krem)}
+
+/* --- stopka --- */
+.foot{grid-area:foot;background:var(--butelkowa);color:var(--krem);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px clamp(18px,3vw,40px);font-size:14.5px}
+.foot a{color:var(--zloty);border-bottom:1px solid transparent;transition:border-color .25s}
+.foot a:hover{border-color:var(--zloty)}
+.foot .sep{opacity:.4;margin:0 10px}
+
+/* ============ RESPONSYWNOŚĆ ============ */
+/* średnie ekrany (też tryb „wersja na komputer" na telefonie, ~980 px):
+   układ KWATEROWY ZOSTAJE — tylko ciaśniejsza lewa kolumna */
+@media (max-width:1100px) and (min-width:761px){
+  .page{grid-template-columns:minmax(200px,230px) 1fr}
+  .side{padding:20px 16px}
+  .brand-kwadrat{width:96px;height:96px}
+  .brand-kwadrat img{width:62px;height:62px}
+  .brand-nazwa{font-size:24px}
+  .brand-tag{font-size:9.5px;letter-spacing:.24em}
+  .menu-vert a{font-size:14px;padding:10px 12px}
+  .social a{width:36px;height:36px}
+  .top-note{display:none}
+  .head{padding:16px 18px 4px}
+  .sl-karty{grid-template-columns:1fr 1fr;max-width:none}
+  .sl-karta:nth-child(3){grid-column:span 2}
+  .krok b{font-size:15px}
+}
+
+/* telefony w widoku mobilnym: układ jeden pod drugim */
+@media (max-width:760px){
+  .page{grid-template-columns:1fr;grid-template-areas:"head" "side" "main" "cta" "foot"}
+  .side{position:static;height:auto;min-height:0;padding:22px 18px}
+  .brand-kwadrat{width:96px;height:96px}
+  .brand-kwadrat img{width:62px;height:62px}
+  .menu-vert{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:18px}
+  .menu-vert a{padding:9px 12px;font-size:14px}
+  .menu-vert a::after{display:none}
+  .social{margin-top:14px}
+  .slider{aspect-ratio:16/10;max-height:none}
+  .head{padding:14px 18px 4px}
+  .kroki{grid-template-columns:1fr}
+  .topbar .wrap{justify-content:center;text-align:center}
+  .top-note{display:none}
+  .head{flex-wrap:wrap}
+  .szukaj{order:3;max-width:none;flex-basis:100%}
+  .head-ikony{margin-left:0}
+  .sl-karty{grid-template-columns:1fr}
+  .sl-karta:nth-child(3){grid-column:auto}
+  .sl-karta img{width:46px;height:46px}
+  .sl-nav{width:38px;height:38px;font-size:20px}
+  .slider{aspect-ratio:4/3.4}
+}
+</style>
+</head>
+<body>
+
+<!-- czarny pasek: kontakt -->
+<div class="topbar">
+  <div class="wrap">
+    <span>
+      <a href="tel:+48510767076"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 2z"/></svg>
+      510 767 076</a>
+      <span class="sep" style="opacity:.35;margin:0 10px">|</span>
+      <a href="mailto:kontakt@studiosygnatura.pl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+      kontakt@studiosygnatura.pl</a>
+    </span>
+    <span class="top-note">odpowiadamy w 1–2 dni robocze</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- LEWA GÓRNA ĆWIARTKA: logo, menu, social -->
+  <aside class="side">
+    <div class="brand-blok">
+      <div class="brand-kwadrat"><img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura — litera S z gałązką w okręgu"></div>
+      <div class="brand-nazwa">syg<em>NATURA</em></div>
+      <div class="brand-tag">drewno · światło · detal</div>
+    </div>
+
+    <nav class="menu-vert" aria-label="Menu główne">
+      <a href="/" class="on">Strona główna</a>
+      <a href="/zamowienia/">Zamówienia</a>
+      <a href="/pracownia/">Pracownia</a>
+      <a href="/realizacje/">Nasze realizacje</a>
+      <a href="/wspolpraca/">Współpraca</a>
+      <a href="/kontakt/">Kontakt</a>
+    </nav>
+
+    <div class="social">
+      <a href="#" aria-label="Instagram" title="Instagram — wkrótce"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" aria-label="Facebook" title="Facebook — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg></a>
+      <a href="#" aria-label="Pinterest" title="Pinterest — wkrótce"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg></a>
+    </div>
+    <div class="side-stopka">pracownia: woj. mazowieckie</div>
+  </aside>
+
+  <!-- WĄSKI PASEK: wyszukiwarka + koszyk/panel -->
+  <div class="head">
+    <form class="szukaj" action="/szukaj/" method="get" role="search">
+      <input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">
+      <button type="submit" aria-label="Szukaj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+    </form>
+    <div class="head-ikony">
+      <a href="/zamowienia/sklep/" title="Koszyk — wybierz produkty ze sklepu" aria-label="Koszyk"><span class="kropka"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></a>
+      <a href="/zamowienia/" title="Twoje zamówienia" aria-label="Panel klienta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg></a>
+    </div>
+  </div>
+
+  <!-- PRAWA DOLNA ĆWIARTKA: slider -->
+  <main class="main">
+    <div class="slider" id="slider" aria-label="Najważniejsze informacje — przewijane slajdy">
+      <div class="sl-track" id="sl-track">
+
+        <!-- 1. NOWOŚCI -->
+        <div class="sl-slide">
+          <div class="sl-bg" style="background-image:url('/static/media/sklep/szopka.jpg')"></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Nowości</span>
+            <h2>Najnowsze produkty z pracowni</h2>
+            <p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.</p>
+            <div class="sl-karty">
+              {% if nowosci %}{% for r in nowosci[:3] %}
+              <a class="sl-karta" href="/zamowienia/sklep/">
+                {% if r['obraz'] %}<img src="{{ r['obraz']|obrazek('sklep') }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
+                <span><span class="nazwa">{{ r['nazwa'] }}</span><br><span class="cena">{{ '%.0f'|format(r['cena']) }} zł / szt.</span></span>
+              </a>
+              {% endfor %}{% else %}
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/szopka.jpg" alt="Szopka bożonarodzeniowa"><span><span class="nazwa">Szopka bożonarodzeniowa (warstwowa)</span><br><span class="cena">249 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/szyld.jpg" alt="Szyld powitalny"><span><span class="nazwa">Szyld powitalny „Witajcie"</span><br><span class="cena">189 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/love.jpg" alt="Litery LOVE"><span><span class="nazwa">Litery podświetlane LOVE</span><br><span class="cena">249 zł / szt.</span></span></a>
+              {% endif %}
+            </div>
+            <a class="sl-btn" href="/zamowienia/sklep/">Zobacz w sklepie →</a>
+          </div>
+        </div>
+
+        <!-- 2. NAJCZĘŚCIEJ ZAMAWIANE -->
+        <div class="sl-slide">
+          <div class="sl-bg" style="background-image:url('/static/media/sklep/szyld.jpg')"></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Bestsellery</span>
+            <h2>Najczęściej zamawiane</h2>
+            <p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p>
+            <div class="sl-karty">
+              {% if top %}{% for r in top[:3] %}
+              <a class="sl-karta" href="/zamowienia/sklep/">
+                {% if r['obraz'] %}<img src="{{ r['obraz']|obrazek('sklep') }}" alt="{{ r['nazwa'] }}">{% else %}<span class="pusty">{{ r['nazwa'][:1] }}</span>{% endif %}
+                <span><span class="nazwa">{{ r['nazwa'] }}</span><br><span class="cena">{{ '%.0f'|format(r['cena']) }} zł / szt.</span></span>
+              </a>
+              {% endfor %}{% else %}
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/ramka.jpg" alt="Ramka z sentencją"><span><span class="nazwa">Ramka z sentencją</span><br><span class="cena">89 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/szopka.jpg" alt="Szopka bożonarodzeniowa"><span><span class="nazwa">Szopka bożonarodzeniowa (warstwowa)</span><br><span class="cena">249 zł / szt.</span></span></a>
+              <a class="sl-karta" href="/zamowienia/sklep/"><img src="/static/media/sklep/love.jpg" alt="Litery LOVE"><span><span class="nazwa">Litery podświetlane LOVE</span><br><span class="cena">249 zł / szt.</span></span></a>
+              {% endif %}
+            </div>
+            <a class="sl-btn" href="/zamowienia/sklep/">Zamów teraz →</a>
+          </div>
+        </div>
+
+        <!-- 3. AKTUALNOŚCI (ostatnia realizacja) -->
+        <div class="sl-slide">
+          <div class="sl-bg" {% if realizacja and realizacja['zdjecie'] %}style="background-image:url('/media/{{ realizacja['zdjecie'] }}')"{% else %}style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"{% endif %}></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Aktualności z pracowni</span>
+            {% if realizacja %}
+            <h2>{{ realizacja['tytul'] }}</h2>
+            <p>{{ (realizacja['opis'] or 'Zajrzyj do naszych realizacji — pokazujemy, z czego i jak powstają nasze rzeczy.')[:150] }}{% if realizacja['opis'] and realizacja['opis']|length > 150 %}…{% endif %}</p>
+            <a class="sl-btn" href="/realizacje/{{ realizacja['id'] }}/">Czytaj wpis →</a>
+            {% else %}
+            <h2>Z pracowni prosto do Was</h2>
+            <p>Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.</p>
+            <a class="sl-btn" href="/realizacje/">Zobacz realizacje →</a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 4. OFERTA SEZONOWA -->
+        <div class="sl-slide">
+          <div class="sl-bg" style="background-image:url('assets/hero.jpg')"></div>
+          <div class="sl-cien"></div>
+          <div class="sl-tresc">
+            <span class="sl-tag">Oferta sezonowa</span>
+            <h2>Sezon świąteczny — czas na szopkę</h2>
+            <p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p>
+            <a class="sl-btn" href="/zamowienia/sklep/">Sprawdź ofertę →</a>
+          </div>
+        </div>
+
+      </div>
+      <button class="sl-nav prev" type="button" aria-label="Poprzedni slajd">‹</button>
+      <button class="sl-nav next" type="button" aria-label="Następny slajd">›</button>
+      <div class="sl-dots" id="sl-dots"></div>
+    </div>
+  </main>
+
+  <!-- JAK DZIAŁAMY + CTA -->
+  <section class="cta">
+    <div class="jak">
+      <h2>Jak działamy</h2>
+      <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
+      <div class="kroki">
+        <div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>
+        <div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>
+        <div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>
+      </div>
+      <div class="cta-btn">
+        <a class="btn" href="/zamowienia/wynajem/">Zarezerwuj termin</a>
+        <a class="btn outline" href="/zamowienia/">Złóż zamówienie</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STOPKA -->
+  <footer class="foot">
+    <span><a href="/regulamin/">Regulamin</a><span class="sep">·</span><a href="/jak-pracujemy/">Jak pracujemy</a></span>
+    <span>© Sygnatura 2026</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  /* ===== slider: autoplay w pętli, strzałki, kropki ===== */
+  var slider=document.getElementById('slider');
+  var track=document.getElementById('sl-track');
+  var slides=track.children;
+  var dotsWrap=document.getElementById('sl-dots');
+  var n=slides.length, i=0, timer=null, pauza=false;
+  if(!slider||!track||n===0)return;
+  var dots=[];
+  for(var k=0;k<n;k++){
+    var b=document.createElement('button');
+    b.type='button';
+    b.setAttribute('aria-label','Slajd '+(k+1));
+    (function(idx){b.addEventListener('click',function(){idz(idx);restart();});})(k);
+    dotsWrap.appendChild(b);dots.push(b);
+  }
+  function idz(idx){
+    i=(idx+n)%n;
+    track.style.transform='translateX(-'+(i*100)+'%)';
+    for(var k=0;k<n;k++){
+      slides[k].classList.toggle('akt',k===i);
+      dots[k].classList.toggle('akt',k===i);
+    }
+  }
+  function nastepny(){idz(i+1);}
+  function restart(){
+    if(timer)clearInterval(timer);
+    timer=setInterval(nastepny,5000);
+  }
+  slider.querySelector('.sl-nav.prev').addEventListener('click',function(){idz(i-1);restart();});
+  slider.querySelector('.sl-nav.next').addEventListener('click',function(){nastepny();restart();});
+  /* pauza po najechaniu */
+  slider.addEventListener('mouseenter',function(){if(timer)clearInterval(timer);});
+  slider.addEventListener('mouseleave',restart);
+  /* proste przesunięcie palcem na dotyku */
+  var x0=null;
+  slider.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;if(timer)clearInterval(timer);},{passive:true});
+  slider.addEventListener('touchend',function(e){
+    if(x0===null)return;
+    var dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>40){idz(dx<0?i+1:i-1);}
+    x0=null;restart();
+  });
+  idz(0);restart();
+})();
+</script>
+</body>
+</html>

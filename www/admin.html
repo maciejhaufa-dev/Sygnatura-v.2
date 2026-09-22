@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=315">
+</head>
+<body data-strona="">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Panel administracyjny</span>
+  <h1 id="admin-tytul">Logowanie do panelu</h1>
+
+  <!-- EKRAN LOGOWANIA: wymuszany po każdym zamknięciu strony (sesja przeglądarki) -->
+  <div id="logowanie" class="forma" style="max-width:480px">
+    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia, wiadomości, blog i ustawienia strony.</p>
+    <div class="flash" id="logowanie-blad" style="display:none;background:#8a2f1d"></div>
+    <div class="pole">
+      <label for="admin-login">Login *</label>
+      <input type="text" id="admin-login" autocomplete="username">
+    </div>
+    <div class="pole">
+      <label for="admin-haslo">Hasło *</label>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input type="password" id="admin-haslo" autocomplete="current-password" style="flex:1">
+        <button type="button" class="btn outline" id="pokaz-admin-haslo" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+      </div>
+    </div>
+    <div class="przyciski">
+      <button class="btn" type="button" id="zaloguj">Zaloguj się</button>
+    </div>
+  </div>
+
+  <!-- PANEL: widoczny po zalogowaniu -->
+  <div id="panel" style="display:none">
+    <p class="sub" id="tryb-info"></p>
+    <div class="flash" id="bled" style="display:none"></div>
+
+    <!-- ZAKŁADKI -->
+    <div class="admin-tabs" id="admin-tabs">
+      <button class="admin-tab on" data-tab="podsumowanie" type="button">Podsumowanie</button>
+      <button class="admin-tab" data-tab="strona-glowna" type="button">Strona główna</button>
+      <button class="admin-tab" data-tab="zamowienia" type="button">Zamówienia</button>
+      <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
+      <button class="admin-tab" data-tab="blog" type="button">Nasze realizacje</button>
+      <button class="admin-tab" data-tab="produkty" type="button">Produkty</button>
+      <button class="admin-tab" data-tab="strony" type="button">Podstrony</button>
+      <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
+    </div>
+
+    <!-- PODSUMOWANIE (kwartał) -->
+    <section class="admin-sekcja" id="tab-podsumowanie">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podsumowanie kwartału</h2>
+      <p class="mala">Liczby z tej przeglądarki (tryb demo). Po wdrożeniu arkusza Google będą liczone
+      ze wszystkich zamówień i zapytań.</p>
+      <div class="podsum-karty">
+        <div class="podsum-karta"><span class="num">01</span><h3>Zapytania</h3>
+          <b id="ps-zapytania">0</b>
+          <p class="mala">wynajem + wiadomości z formularza</p></div>
+        <div class="podsum-karta"><span class="num">02</span><h3>Zamówienia</h3>
+          <b id="ps-zamowienia">0</b>
+          <p class="mala">złożone w sklepie i wynajmie</p></div>
+        <div class="podsum-karta"><span class="num">03</span><h3>Suma kwot zamówień</h3>
+          <b id="ps-suma">0 zł</b>
+          <p class="mala">kwoty szacunkowe z rachunków</p></div>
+        <div class="podsum-karta"><span class="num">04</span><h3>Terminarz</h3>
+          <div class="term-placeholder">
+            <div class="ph">1. widok miesiąca</div>
+            <div class="ph">2. widok kwartału</div>
+            <div class="ph">3. terminy wolne</div>
+            <div class="ph">4. terminy zajęte</div>
+            <div class="ph">5. rezerwacje potwierdzone</div>
+            <div class="ph">6. zapytania na dni</div>
+          </div>
+          <p class="mala">Podgląd terminarza dodamy w kolejnym kroku.</p></div>
+      </div>
+    </section>
+
+    <!-- STRONA GŁÓWNA -->
+    <section class="admin-sekcja" id="tab-strona-glowna" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Strona główna — slider i treści</h2>
+      <p class="mala">Kolejność kafli w panelu = kolejność przewijania slidera na stronie głównej
+      (przeciągnij kafel, aby zmienić kolejność — jak monitory w ustawieniach ekranu). Kliknij
+      EDYTUJ, aby otworzyć EDYTOR TREŚCI danego kafla. W trybie demo dane zapisują się w tej
+      przeglądarce; po wdrożeniu trafią do arkusza Google.</p>
+      <div class="flash" id="sg-info" style="display:none"></div>
+      <div class="flash" id="sg-brudny" style="display:none;background:#8a5a1d">
+        Masz <b>niezapisane zmiany</b> — strona główna zostanie zapisana dopiero po kliknięciu
+        <a href="#sg-zapisz" style="color:#fff;border-bottom:1px solid #fff">ZAPISZ ZMIANY STRONY GŁÓWNEJ</a>
+        na dole zakładki.
+      </div>
+
+      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Slider</h3>
+      <div class="pole" style="max-width:300px">
+        <label>Ustaw prędkość automatycznego przewijania (w sekundach) — 0 = bez autoplay</label>
+        <input type="number" id="sg-autoplay" min="0" step="0.5">
+      </div>
+      <div class="kafle-pasek" id="sg-kafle"></div>
+      <p class="mala">Pod każdym kaflem: EDYTUJ / USUŃ oraz strzałki ‹ › (zmiana kolejności także przez przeciąganie).</p>
+
+      <div id="sg-edycja" style="display:none;border:1px solid rgba(107,69,48,.4);background:#fff;padding:16px 18px;margin:18px 0">
+        <h3 id="sg-edycja-tytul" style="font-size:16.5px;color:var(--butelkowa);margin:0 0 12px">Edycja kafla</h3>
+        <div class="forma" style="max-width:780px">
+          <div class="pole">
+            <label>Zdjęcie w tle kafla</label>
+            <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap">
+              <select id="sg-obraz" style="flex:1;min-width:240px"></select>
+              <button class="btn outline" type="button" id="sg-obraz-wgraj" style="flex:none">Wgraj własne zdjęcie…</button>
+            </div>
+            <div id="sg-obraz-wgraj-box" style="display:none;border:1px dashed rgba(107,69,48,.55);background:#FBF7F0;padding:10px 12px;margin-top:8px">
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:220px"><label style="font-size:13.5px;color:var(--brunatny);display:block;margin-bottom:4px">Nazwa zdjęcia (w wersji docelowej: folder sieciowy assets/media/przeslane/)</label>
+                <input type="text" id="sg-obraz-nazwa" placeholder="np. kafla-tlo"></div>
+                <div><label style="font-size:13.5px;color:var(--brunatny);display:block;margin-bottom:4px">Plik ze zdjęciem</label>
+                <input type="file" id="sg-obraz-plik" accept="image/*"></div>
+                <button class="btn" type="button" id="sg-obraz-zapisz">Zapisz do biblioteki</button>
+              </div>
+              <p class="mala" style="margin:6px 0 0">Zdjęcie zapisuje się w bibliotece pod KRÓTKĄ nazwą — na liście
+              nie będzie już długich „tasiemców". W wersji demo biblioteka jest w tej przeglądarce;
+              po wdrożeniu Google Apps Script plik trafi do folderu sieciowego <b>assets/media/przeslane/</b> pod tą samą nazwą.</p>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn outline" type="button" id="sg-obraz-zmien" style="display:none">✏ Zmień nazwę</button>
+              <button class="btn outline" type="button" id="sg-obraz-usun" style="display:none">🗑 Usuń z biblioteki</button>
+            </div>
+            <div class="sg-obraz-podglad" id="sg-obraz-podglad">podgląd tła</div>
+          </div>
+          <div class="pole">
+            <label style="cursor:pointer"><input type="checkbox" id="sg-karty" style="width:auto;margin-right:8px">
+            Pokaż karty produktów ze sklepu pod treścią</label>
+          </div>
+          <div class="pole">
+            <label>Treść kafla — EDYTOR TREŚCI (edytujesz kafla na żywo, na jego tle: tytuły,
+            podtytuły, tekst, kolumny, tabele, rysowanie obiektów (kształty, pola tekstowe, grupowanie, warstwy);
+            obiekty: klik = zaznaczenie, 2×klik = właściwości)</label>
+            <div id="sg-tresc-edytor">
+              <div class="edtr-podglad">
+                <div class="edtr-bg" id="sg-tresc-bg"></div>
+                <div class="edtr-tresc" id="sg-tresc-pole" contenteditable="true"></div>
+              </div>
+            </div>
+          </div>
+          <p class="mala" style="margin-top:10px">Zmiany w kaflu trafiają do podglądu poniżej.
+          Strona główna zostaje ZAPISANA dopiero po kliknięciu „ZAPISZ ZMIANY STRONY GŁÓWNEJ" na dole zakładki.</p>
+          <div class="przyciski" style="justify-content:space-between;margin-top:10px">
+            <button class="btn-odrzuc" type="button" id="sg-odrzuc">ODRZUĆ ZMIANY</button>
+            <button class="btn-zapisz" type="button" id="sg-zapisz-kafel">ZASTOSUJ DO PODGLĄDU</button>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Treść pod sliderem („Jak działamy" i przyciski)</h3>
+      <p class="mala">Edytujesz całą sekcję pod sliderem w EDYTORZE TREŚCI na jasnym podglądzie
+      (biały box jak na stronie) — edytor działa jak PowerPoint: sekcja „RYSOWANIE OBIEKTÓW"
+      (pole tekstowe, prostokąt, zaokrąglony, elipsa, linia, strzałka, trójkąt), klik =
+      zaznaczenie, drugi klik = tryb obrotu, narożniki = rozmiar, 2×klik = właściwości
+      (wypełnienie przezroczyste lub kolor, ramka, checkbox „to jest PRZYCISK" + pole linku),
+      Ctrl+klik = kilka obiektów, Ctrl+G = GRUPOWANIE (blokada wzajemnego położenia),
+      warstwy (na wierzch / na spód), wyrównywanie względem siebie i równe odstępy.</p>
+      <div id="sg-cta-edytor">
+        <div class="edtr-podglad edtr-podglad-jasny">
+          <div class="edtr-tresc edtr-tresc-jasna" id="sg-cta-pole" contenteditable="true"></div>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
+        <button class="btn-odrzuc" type="button" id="sg-odrzuc-strona">ODRZUĆ ZMIANY STRONY GŁÓWNEJ</button>
+        <button class="btn-zapisz" type="button" id="sg-zapisz">ZAPISZ ZMIANY STRONY GŁÓWNEJ</button>
+      </div>
+    </section>
+
+    <!-- ZAMÓWIENIA -->
+    <section class="admin-sekcja" id="tab-zamowienia" style="display:none">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
+        <table class="tabela" id="tabela-zamowien">
+          <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Treść strony „Zamówienia" (Kreator zamówień)</h2>
+      <p class="mala">Edytujesz treść, którą klient widzi po wejściu w „Zamówienia" — ten sam
+      EDYTOR TREŚCI co pod sliderem strony głównej: tekst i akapity, kolumny, tabele, rysowanie
+      obiektów, grupowanie, warstwy, wyrównywanie. Przycisk to właściwość obiektu (checkbox + link).</p>
+      <div id="sz-tresc-edytor">
+        <div class="edtr-podglad edtr-podglad-jasny">
+          <div class="edtr-tresc edtr-tresc-jasna" id="sz-tresc-pole" contenteditable="true"></div>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
+        <button class="btn-odrzuc" type="button" id="sz-odrzuc">ODRZUĆ ZMIANY STRONY ZAMÓWIENIA</button>
+        <button class="btn-zapisz" type="button" id="sz-zapisz">ZAPISZ ZMIANY STRONY ZAMÓWIENIA</button>
+      </div>
+      <p class="mala" id="sz-brudny" style="display:none;color:#8a2f1d;font-weight:700">Masz niezapisane zmiany na stronie Zamówienia.</p>
+      <div class="flash" id="sz-info" style="display:none"></div>
+    </section>
+
+    <!-- WIADOMOŚCI -->
+    <section class="admin-sekcja" id="tab-wiadomosci" style="display:none">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Wiadomości z formularza</h2>
+        <table class="tabela" id="tabela-wiadomosci">
+          <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Zapytania o termin wynajmu</h2>
+        <p class="mala" style="margin-bottom:8px">Wybrany termin NIE jest blokowany — rezerwację potwierdzamy po wpłacie.</p>
+        <table class="tabela" id="tabela-wynajem-zapytania">
+          <thead><tr><th>Data</th><th>Od</th><th>Wydarzenie</th><th>Pakiet</th><th>Termin</th><th>Personalizacja</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOG -->
+    <section class="admin-sekcja" id="tab-blog" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Nasze realizacje</h2>
+      <p class="mala">Po prawej lista wpisów (najnowsze na górze, najstarsze na dole) — kliknij wiersz,
+      aby zobaczyć podgląd po lewej. Checkbox „widoczny" pokazuje albo ukrywa wpis na stronie.
+      Wpis może jednocześnie być produktem sklepu — w trybie edycji zaznacz „Produkt w sklepie",
+      a pozycja pojawi się w zakładce Produkty. W trybie demo wpisy zapisują się w tej przeglądarce.</p>
+      <div class="flash" id="blog-info" style="display:none"></div>
+      <div class="admin-dwie" style="grid-template-columns:1.55fr 1fr">
+        <div>
+          <div class="przyciski" id="blog-przyciski" style="justify-content:flex-start;margin-top:0">
+            <button class="btn" type="button" id="blog-nowy">+ Dodaj nowy wpis</button>
+            <button class="btn outline" type="button" id="blog-edytuj">Przejdź w tryb edycji</button>
+          </div>
+          <!-- PODGLĄD zaznaczonego wpisu -->
+          <div class="forma" id="blog-podglad" style="margin-top:10px"></div>
+          <!-- TRYB EDYCJI -->
+          <div class="forma" id="blog-form" style="display:none;margin-top:10px">
+            <h3 id="blog-form-tytul">Nowy wpis</h3>
+            <div class="pole" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
+              <b style="display:block;margin-bottom:8px;color:var(--butelkowa)">Opcje wpisu</b>
+              <label style="cursor:pointer;display:block;margin-bottom:6px">
+                <input type="checkbox" id="bf-widoczny"> Widoczny na stronie
+              </label>
+              <label style="cursor:pointer;display:block;font-weight:700">
+                <input type="checkbox" id="bf-sklep"> Produkt w sklepie (wpis z historią)
+              </label>
+              <div id="bf-produkt" style="display:none;margin-top:10px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-nazwa">Nazwa produktu</label>
+                    <input type="text" id="bf-p-nazwa">
+                  </div>
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-link">Połącz z produktem (albo nowy)</label>
+                    <select id="bf-p-link"><option value="">— nowy produkt —</option></select>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-cena">Cena (zł)</label>
+                    <input type="number" id="bf-p-cena" step="0.01" min="0">
+                  </div>
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-gabaryt">Gabaryt / rozmiar paczki</label>
+                    <input type="text" id="bf-p-gabaryt" placeholder="np. 20×20×8 cm">
+                  </div>
+                </div>
+                <p class="mala" style="margin-bottom:0">Cenę i widoczność produktu możesz potem dopracować w zakładce „Produkty".</p>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+                <div class="pole" style="margin:0">
+                  <label for="bf-kategoria">Kategoria</label>
+                  <input type="text" id="bf-kategoria" list="bf-kategorie" placeholder="np. Szyldy i tablice">
+                  <datalist id="bf-kategorie"></datalist>
+                </div>
+                <div class="pole" style="margin:0">
+                  <label for="bf-data">Data wpisu</label>
+                  <input type="date" id="bf-data">
+                </div>
+              </div>
+            </div>
+            <div class="pole">
+              <label for="bf-tytul">Tytuł wpisu *</label>
+              <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
+            </div>
+            <div class="pole">
+              <label for="bf-zajawka">Krótki opis (na kafelek)</label>
+              <textarea id="bf-zajawka" rows="2" placeholder="Dwa zdania, które zachęcą do kliknięcia…"></textarea>
+            </div>
+            <div class="pole">
+              <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
+              <div class="bf-mini" id="bf-mini"></div>
+              <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
+              <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
+            </div>
+            <div class="pole">
+              <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
+              <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
+            </div>
+            <div class="pole">
+              <label>Treść wpisu — zaznacz tekst i formatuj jak w edytorze forum</label>
+              <div class="editor" id="bf-tresc" style="min-height:180px"></div>
+              <input type="hidden" id="bf-zrodlo">
+            </div>
+            <div class="przyciski">
+              <button class="btn" type="button" id="blog-zapisz">Zapisz wpis</button>
+              <button class="btn outline" type="button" id="blog-anuluj">Anuluj</button>
+              <button class="btn niebez" type="button" id="blog-usun-wpis">Usuń wpis</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="tabela-wrap">
+            <table class="tabela" id="tabela-blog">
+              <thead><tr><th>Data</th><th>Tytuł</th><th>Widoczny</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUKTY -->
+    <section class="admin-sekcja" id="tab-produkty" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
+      <p class="mala">Zmień cenę albo ukryj/pokaż produkt w sklepie. Produkty z wpisów bloga mają tu
+      dopisany link „historia →". Możesz też dodać produkt „bez historii" (np. papierowe winietki).
+      W trybie demo zmiany zapisują się w tej przeglądarce.</p>
+      <div class="flash" id="produkty-info" style="display:none"></div>
+      <div class="tabela-wrap">
+        <table class="tabela" id="tabela-produkty">
+          <thead><tr><th>Produkt</th><th>Cena (zł)</th><th>W sklepie</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="forma" id="produkt-nowy-form" style="max-width:720px;margin-top:16px;display:none">
+        <h3>Nowy produkt (bez historii)</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="pole">
+            <label for="pn-nazwa">Nazwa *</label>
+            <input type="text" id="pn-nazwa" placeholder="np. Winietki papierowe — komplet 20 szt.">
+          </div>
+          <div class="pole">
+            <label for="pn-cena">Cena (zł)</label>
+            <input type="number" id="pn-cena" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="pole">
+          <label for="pn-opis">Krótki opis</label>
+          <input type="text" id="pn-opis">
+        </div>
+        <div class="pole">
+          <label for="pn-obraz">Zdjęcie (plik)</label>
+          <input type="file" id="pn-obraz" accept="image/*">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="pn-zapisz">Dodaj produkt</button>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:flex-start">
+        <button class="btn outline" type="button" id="produkt-nowy">+ Produkt bez historii</button>
+      </div>
+    </section>
+
+    <!-- PODSTRONY -->
+    <section class="admin-sekcja" id="tab-strony" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podstrony</h2>
+      <p class="mala">Edytujesz treść PRACOWNI (prosty edytor — jak sformatujesz, tak się wyświetli)
+      i dodajesz nowe podstrony z przyciskiem w MENU. Strony-szkielety (Zamówienia, Sklep, Koszyk,
+      Kontakt, Regulamin…) mają własne układy i nie są tutaj — w tej wersji edytujemy treść
+      tekstową wybranych podstron i listę menu.</p>
+      <div class="flash" id="strony-info" style="display:none"></div>
+      <div class="admin-dwie">
+        <div>
+          <div class="przyciski" style="justify-content:flex-start">
+            <button class="btn" type="button" id="strona-nowa">+ Nowa podstrona</button>
+          </div>
+          <div class="tabela-wrap" style="margin-top:10px">
+            <table class="tabela" id="tabela-stron">
+              <thead><tr><th>Tytuł</th><th>W menu</th><th>Kolejność</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="forma" id="strona-form" style="display:none">
+          <h3 id="strona-form-tytul">Nowa podstrona</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="pole">
+              <label for="sf-slug">Identyfikator (slug)</label>
+              <input type="text" id="sf-slug" placeholder="np. o-nas">
+            </div>
+            <div class="pole">
+              <label for="sf-kol">Kolejność w menu</label>
+              <input type="number" id="sf-kol" min="1" value="10">
+            </div>
+          </div>
+          <div class="pole">
+            <label for="sf-tytul">Tytuł (widoczny w MENU i nagłówku)</label>
+            <input type="text" id="sf-tytul">
+          </div>
+          <div class="pole">
+            <label style="cursor:pointer"><input type="checkbox" id="sf-menu" checked> Pokaż w menu</label>
+          </div>
+          <div class="pole">
+            <label>Treść — jak sformatujesz, tak się wyświetli na stronie</label>
+            <div class="editor" id="sf-tresc" style="min-height:180px"></div>
+            <input type="hidden" id="sf-zrodlo">
+          </div>
+          <div class="przyciski">
+            <button class="btn" type="button" id="strona-zapisz">Zapisz podstronę</button>
+            <button class="btn outline" type="button" id="strona-anuluj">Anuluj</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- USTAWIENIA -->
+    <section class="admin-sekcja" id="tab-ustawienia" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Cennik dostawy</h2>
+      <p class="mala">Stawki za wysyłkę wg rozmiarów paczek — używane w formularzu zamówienia
+      (InPost paczkomat i kurier). W trybie demo zapisują się w tej przeglądarce; po wdrożeniu
+      trafią do arkusza Google.</p>
+      <div class="flash" id="ustawienia-info" style="display:none"></div>
+      <div class="forma" style="max-width:520px">
+        <div class="pole">
+          <label>Paczkomat InPost — paczka S (zł)</label>
+          <input type="number" id="u-paczkomat-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka M (zł)</label>
+          <input type="number" id="u-paczkomat-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka L (zł)</label>
+          <input type="number" id="u-paczkomat-l" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka S (zł)</label>
+          <input type="number" id="u-kurier-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka M (zł)</label>
+          <input type="number" id="u-kurier-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka L (zł)</label>
+          <input type="number" id="u-kurier-l" step="0.01" min="0">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="zapisz-dostawe">Zapisz cennik</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="przyciski">
+      <button class="btn outline" type="button" id="odswiez">Odśwież</button>
+      <a class="btn" href="admin.html">Wyczyść filtr</a>
+      <button class="btn niebez" type="button" id="wyloguj">Wyloguj</button>
+    </div>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=315"></script>
+<script src="assets/koszyk.js?v=315"></script>
+<script src="assets/api.js?v=315"></script>
+<script src="assets/editor.js?v=315"></script>
+<script src="assets/edytor.js?v=315"></script>
+<script src="data/katalog.js?v=315"></script>
+<script src="assets/main.js?v=315"></script>
+<script>
+(function(){
+  var klucz = SYG.param('klucz');
+  var info = document.getElementById('tryb-info');
+  var bled = document.getElementById('bled');
+  var logowanie = document.getElementById('logowanie');
+  var panel = document.getElementById('panel');
+  var logowanieBlad = document.getElementById('logowanie-blad');
+
+  if (SYG.TRYB_DEMO){
+    info.innerHTML = 'TRYB DEMO: zmiany zapisują się w tej przeglądarce (testy). ' +
+      'Po wdrożeniu Google Apps Script panel czyta i zapisuje dane w arkuszu — logowanie sprawdza baza administratorów.' +
+      (window.SYG && window.SYG.LAUNCH ? ' TRYB STARTU: strona pokazuje treści z plików — wpisy i zmiany z panelu zobaczą tylko użytkownicy TEJ przeglądarki.' : '');
+  } else {
+    info.textContent = 'Połączono z arkuszem Google.';
+  }
+
+  var STAN_NAZWA = {
+    zapytanie: 'zapytanie',
+    platnosc_w_toku: 'płatność w toku',
+    zarezerwowany: 'zarezerwowany',
+    odrzucono: 'odrzucono'
+  };
+
+  /* ============ zakładki ============ */
+  var tabs = document.querySelectorAll('.admin-tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      t.classList.add('on');
+      document.querySelectorAll('.admin-sekcja').forEach(function(s){ s.style.display = 'none'; });
+      document.getElementById('tab-' + t.getAttribute('data-tab')).style.display = 'block';
+    });
+  });
+
+  /* ============ PODSUMOWANIE (kwartał) ============ */
+  function ladujPodsumowanie(){
+    var zam = SYG.demoDb.zamowienia();
+    var zap = SYG.demoDb.wynajemZapytania();
+    var wiad = SYG.demoDb.wiadomosci();
+    document.getElementById('ps-zapytania').textContent = zap.length + wiad.length;
+    document.getElementById('ps-zamowienia').textContent = zam.length;
+    var suma = zam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
+    document.getElementById('ps-suma').textContent = SYG.zl(suma);
+  }
+
+  /* ============ STRONA GŁÓWNA: slider (kafle) + treści ============ */
+  var SG_DANE = null;   /* robocza kopia danych strony głównej (zapis TYLKO przyciskiem) */
+  var SG_EDYCJA = null; /* { id, kopia, nowy } — edytowany kafel */
+  var SG_EDYTOR = null;     /* instancja EDYTORA TREŚCI (kafel) */
+  var SG_EDYTOR_CTA = null; /* instancja EDYTORA TREŚCI (treść pod sliderem) */
+  var SG_BRUDNY = false;/* czy są niezapisane zmiany */
+
+  function ustawBrudny(){
+    SG_BRUDNY = true;
+    var b = document.getElementById('sg-brudny');
+    if (b) b.style.display = 'block';
+  }
+  function wyczyscBrudny(){
+    SG_BRUDNY = false;
+    var b = document.getElementById('sg-brudny');
+    if (b) b.style.display = 'none';
+  }
+
+  var SG_DOMYS = {
+    slider: {
+      autoplay: 4.5,
+      kafle: [
+        { id:'nowosci', obraz:'assets/media/sklep/szopka.jpg', karty:true,
+          tresc:'<p class="sl-tag">Nowości</p><h2>Najnowsze produkty z pracowni</h2><p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszego katalogu.</p><a class="sl-btn" href="sklep.html">Zobacz w sklepie →</a>' },
+        { id:'bestsellery', obraz:'assets/media/sklep/szyld.jpg', karty:true,
+          tresc:'<p class="sl-tag">Bestsellery</p><h2>Najczęściej zamawiane</h2><p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p><a class="sl-btn" href="sklep.html">Zamów teraz →</a>' },
+        { id:'aktualnosci', obraz:'gradient', karty:false,
+          tresc:'<p class="sl-tag">Aktualności z pracowni</p><h2>Z pracowni prosto do Was</h2><p>Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.</p><a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>' },
+        { id:'sezonowa', obraz:'assets/hero.jpg', karty:false,
+          tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="sklep.html">Sprawdź ofertę →</a>' }
+      ]
+    },
+    ctaTresc: '<h2>Jak działamy</h2><p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>' +
+      '<div class="kroki">' +
+      '<div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>' +
+      '<div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>' +
+      '<div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>' +
+      '</div>' +
+      '<div class="cta-btn"><a class="btn" href="zamowienia.html">Zarezerwuj termin</a><a class="btn outline" href="zamowienia.html">Złóż zamówienie</a></div>'
+  };
+
+  var SG_OBRAZY = [
+    'assets/media/sklep/szopka.jpg', 'assets/media/sklep/szyld.jpg', 'assets/media/sklep/love.jpg',
+    'assets/media/sklep/ramka.jpg', 'assets/media/sklep/pers-winietki.jpg', 'assets/media/sklep/pers-litery.jpg',
+    'assets/media/sklep/pers-wkladka-tablica.jpg', 'assets/media/sklep/pers-plan-stolow.jpg',
+    'assets/media/sklep/pers-numery-stolow.jpg', 'assets/media/sklep/pers-kafelki-krzyzowka.jpg',
+    'assets/media/sklep/pers-grawer.jpg', 'assets/hero.jpg', 'assets/forest.jpg',
+    'gradient'
+  ];
+
+  function sgEsc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  /* ---------- biblioteka własnych zdjęć (nazwa -> dataURL) ----------
+     W wersji demo biblioteka siedzi w tej przeglądarce (localStorage);
+     po wdrożeniu Google Apps Script pliki trafią do folderu sieciowego
+     assets/media/przeslane/ pod tymi samymi nazwami. */
+  var SG_MEDIA_KLUCZ = 'syg-media-v1';
+  function sgMediaBiblioteka(){
+    try { return JSON.parse(localStorage.getItem(SG_MEDIA_KLUCZ) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function sgMediaZapisz(bib){ localStorage.setItem(SG_MEDIA_KLUCZ, JSON.stringify(bib)); }
+  function sgMediaRozwiaz(o){
+    if (String(o).indexOf('media:') === 0){
+      var d = sgMediaBiblioteka()[o.slice(6)];
+      return d || 'assets/hero.jpg';
+    }
+    return o;
+  }
+  function sgMediaNazwa(z){
+    var n = String(z || '').toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/gi, '-')
+      .replace(/^-+|-+$/g, '').slice(0, 40);
+    return n || 'obraz';
+  }
+  /* stare dataURL („tasiemce") w kafelkach -> wpisy w bibliotece z nazwą */
+  function sgNaprawObrazy(dane){
+    if (!dane || !dane.slider) return dane;
+    var bib = sgMediaBiblioteka();
+    var zmiana = false;
+    dane.slider.kafle.forEach(function (k, i) {
+      if (k.obraz && String(k.obraz).indexOf('data:image') === 0){
+        var baza = sgMediaNazwa('wgrany-' + (i + 1));
+        var n = baza, j = 2;
+        while (bib[n]) n = baza + '-' + (j++);
+        bib[n] = k.obraz;
+        k.obraz = 'media:' + n;
+        zmiana = true;
+      }
+    });
+    if (zmiana) sgMediaZapisz(bib);
+    return dane;
+  }
+  /* rozwijana lista zdjęć: stałe ścieżki + własne z biblioteki (same nazwy) */
+  function sgObrazOpcje(wybor){
+    var sel = document.getElementById('sg-obraz');
+    var bib = sgMediaBiblioteka();
+    var opcje = SG_OBRAZY.slice();
+    if (wybor && opcje.indexOf(wybor) < 0 && String(wybor).indexOf('media:') !== 0) opcje.push(wybor);
+    var html = opcje.map(function (o) {
+      return '<option value="' + sgEsc(o) + '"' + (o === wybor ? ' selected' : '') + '>' +
+        (o === 'gradient' ? 'Gradient butelkowo-brązowy (bez zdjęcia)' : sgEsc(o)) + '</option>';
+    }).join('');
+    html += Object.keys(bib).sort().map(function (nazwa) {
+      var val = 'media:' + nazwa;
+      return '<option value="' + sgEsc(val) + '"' + (val === wybor ? ' selected' : '') +
+        '>📁 ' + sgEsc(nazwa) + ' (własne zdjęcie)</option>';
+    }).join('');
+    sel.innerHTML = html;
+    sgObrazGuziki();
+  }
+  function sgObrazGuziki(){
+    var wlasne = String(document.getElementById('sg-obraz').value).indexOf('media:') === 0;
+    document.getElementById('sg-obraz-zmien').style.display = wlasne ? '' : 'none';
+    document.getElementById('sg-obraz-usun').style.display = wlasne ? '' : 'none';
+  }
+
+  /* migracja starego formatu (slajdy tag/tytul/opis/btn i jak/cta) na kafle + ctaTresc */
+  function sgMigrujStare(dane){
+    var kopia = null;
+    if (dane && dane.slajdy && !dane.slider){
+      var obrazWg = { nowosci:'assets/media/sklep/szopka.jpg', bestellery:'assets/media/sklep/szyld.jpg',
+                      aktualnosci:'gradient', sezonowa:'assets/hero.jpg' };
+      kopia = JSON.parse(JSON.stringify(dane));
+      dane = kopia;
+      dane.slider = { autoplay: 4.5, kafle: dane.slajdy.map(function(sl){
+        return { id: sl.id || 'k', obraz: obrazWg[sl.id] || 'assets/hero.jpg',
+                 karty: sl.id === 'nowosci' || sl.id === 'bestsellery',
+                 tresc: '<p class="sl-tag">' + sgEsc(sl.tag) + '</p><h2>' + sgEsc(sl.tytul) + '</h2><p>' + sgEsc(sl.opis) + '</p>' +
+                        '<a class="sl-btn" href="' + sgEsc(sl.link || 'sklep.html') + '">' + sgEsc(sl.btn || 'Zobacz →') + '</a>' };
+      }) };
+      delete dane.slajdy;
+    }
+    if (dane && dane.jak && !dane.ctaTresc){
+      if (!kopia){ kopia = JSON.parse(JSON.stringify(dane)); dane = kopia; }
+      var jak = dane.jak || {};
+      var h = '<h2>' + sgEsc(jak.tytul) + '</h2><p class="pod">' + sgEsc(jak.pod) + '</p><div class="kroki">';
+      (jak.kroki || []).forEach(function(kr, i){
+        h += '<div class="krok"><span class="num">0' + (i + 1) + '</span><b>' + sgEsc(kr.t) + '</b><p>' + sgEsc(kr.o) + '</p></div>';
+      });
+      h += '</div><div class="cta-btn"><a class="btn" href="zamowienia.html">' + sgEsc(dane.cta1) +
+           '</a><a class="btn outline" href="zamowienia.html">' + sgEsc(dane.cta2) + '</a></div>';
+      dane.ctaTresc = h;
+    }
+    return dane;
+  }
+
+  function sgKafle(){ return (SG_DANE && SG_DANE.slider && SG_DANE.slider.kafle) || []; }
+
+  function kafelObrazCss(obraz){
+    /* pojedyncze apostrofy: podwójne łamały atrybut style="background-image:url(...)" */
+    obraz = sgMediaRozwiaz(obraz);
+    return obraz === 'gradient' ? 'linear-gradient(135deg,#1F3A32,#6B4530)'
+      : "url('" + String(obraz || '').replace(/'/g, '%27') + "')";
+  }
+
+  function sgInfo(txt, zle){
+    var info = document.getElementById('sg-info');
+    info.style.display = 'block';
+    info.textContent = txt;
+    info.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    setTimeout(function(){ info.style.display = 'none'; }, 5000);
+  }
+
+  async function sgZapiszWszystko(){
+    var dane = {
+      slider: { autoplay: Number(document.getElementById('sg-autoplay').value) || 0, kafle: sgKafle() },
+      ctaTresc: SG_EDYTOR_CTA ? SG_EDYTOR_CTA.pobierz() : (SG_DANE ? SG_DANE.ctaTresc : '')
+    };
+    var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
+    if (odp.ok){ SG_DANE = dane; wyczyscBrudny(); sgInfo('Strona główna zapisana.', false); }
+    else sgInfo(odp.blad || 'Nie udało się zapisać.', true);
+    return odp.ok;
+  }
+
+  /* ---------- rysowanie paska kafli ---------- */
+  function rysujKafle(){
+    var pasek = document.getElementById('sg-kafle');
+    var kafle = sgKafle();
+    var html = '';
+    kafle.forEach(function(k, i){
+      html += '<div class="kafel-mini" draggable="true" data-sg-kafel="' + sgEsc(k.id) + '">' +
+        '<div class="km-okno" style="background-image:' + kafelObrazCss(k.obraz) + '"><span class="km-nr">' + (i + 1) + '</span></div>' +
+        '<div class="km-guzy">' +
+          '<button type="button" class="km-edycja">Edytuj</button>' +
+          '<button type="button" class="km-usun">Usuń</button>' +
+          '<span class="km-strzalki">' +
+            '<button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>' +
+            '<button type="button" class="km-prawo" title="Przesuń w prawo">›</button>' +
+          '</span>' +
+        '</div></div>';
+    });
+    html += '<button type="button" class="kafel-dodaj" id="sg-dodaj-kafel"><span class="plus">+</span>' +
+      '<span class="podpis">Dodaj</span></button>';
+    pasek.innerHTML = html;
+
+    pasek.querySelectorAll('.kafel-mini').forEach(function(el, i){
+      var id = el.getAttribute('data-sg-kafel');
+      var kafel = kafle.find(function(k){ return String(k.id) === id; });
+      el.querySelector('.km-edycja').addEventListener('click', function(){ otworzEdycje(kafel, i); });
+      el.querySelector('.km-usun').addEventListener('click', function(){
+        if (!confirm('Usunąć kafel „' + ((kafel && kafel.tresc) || '').replace(/<[^>]+>/g, '').slice(0, 40) + '"?') ) return;
+        SG_DANE.slider.kafle = kafle.filter(function(k){ return String(k.id) !== id; });
+        if (SG_EDYCJA && SG_EDYCJA.id === id) pokazEdycje(false);
+        ustawBrudny(); rysujKafle();
+      });
+      el.querySelector('.km-lewo').addEventListener('click', function(){
+        if (i === 0) return;
+        var t = kafle[i - 1]; kafle[i - 1] = kafle[i]; kafle[i] = t;
+        ustawBrudny(); rysujKafle();
+      });
+      el.querySelector('.km-prawo').addEventListener('click', function(){
+        if (i === kafle.length - 1) return;
+        var t = kafle[i + 1]; kafle[i + 1] = kafle[i]; kafle[i] = t;
+        ustawBrudny(); rysujKafle();
+      });
+      /* Drag & Drop — jak ustawianie monitorów */
+      el.addEventListener('dragstart', function(e){
+        e.dataTransfer.setData('text/plain', id);
+        e.dataTransfer.effectAllowed = 'move';
+        el.classList.add('drag-nad');
+      });
+      el.addEventListener('dragend', function(){ el.classList.remove('drag-nad'); });
+      el.addEventListener('dragover', function(e){
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        el.classList.add('drag-nad');
+      });
+      el.addEventListener('dragleave', function(){ el.classList.remove('drag-nad'); });
+      el.addEventListener('drop', function(e){
+        e.preventDefault();
+        el.classList.remove('drag-nad');
+        var zId = e.dataTransfer.getData('text/plain');
+        if (!zId || zId === id) return;
+        var lista = sgKafle();
+        var zi = lista.findIndex(function(k){ return String(k.id) === zId; });
+        var ci = lista.findIndex(function(k){ return String(k.id) === id; });
+        if (zi < 0 || ci < 0) return;
+        var przen = lista.splice(zi, 1)[0];
+        lista.splice(ci, 0, przen);
+        ustawBrudny(); rysujKafle();
+      });
+    });
+    var dodaj = document.getElementById('sg-dodaj-kafel');
+    if (dodaj) dodaj.addEventListener('click', function(){
+      var nowyKafel = { id: 'k' + Date.now(), obraz: 'assets/hero.jpg', karty: false,
+        tresc: '<p class="sl-tag">Nowy kafel</p><h2>Tytuł kafla</h2><p>Opis — edytuj mnie w EDYTORZE TREŚCI.</p>' };
+      SG_DANE.slider.kafle.push(nowyKafel);
+      ustawBrudny();
+      rysujKafle();
+      otworzEdycje(nowyKafel, sgKafle().length - 1, true);
+    });
+  }
+
+  /* ---------- okno edycji kafla ---------- */
+  function pokazEdycje(widoczna){
+    document.getElementById('sg-edycja').style.display = widoczna ? 'block' : 'none';
+    if (widoczna) document.getElementById('sg-edycja').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
+  function otworzEdycje(kafel, i, nowy){
+    SG_EDYCJA = { id: String(kafel.id), kopia: JSON.parse(JSON.stringify(kafel)), nowy: !!nowy };
+    document.getElementById('sg-edycja-tytul').textContent = 'Edycja kafla ' + (i + 1);
+    /* tło */
+    sgObrazOpcje(kafel.obraz);
+    odswiezPodgladObrazu();
+    document.getElementById('sg-karty').checked = !!kafel.karty;
+    if (!SG_EDYTOR) SG_EDYTOR = SYG.edytorTresci.stworz(
+      document.getElementById('sg-tresc-edytor'), document.getElementById('sg-tresc-pole'));
+    SG_EDYTOR.ustaw(kafel.tresc || '');
+    odswiezTloEdytora();
+    pokazEdycje(true);
+  }
+
+  function odswiezPodgladObrazu(){
+    var v = document.getElementById('sg-obraz').value;
+    var el = document.getElementById('sg-obraz-podglad');
+    el.style.backgroundImage = kafelObrazCss(v);
+    el.textContent = v === 'gradient' ? 'gradient' : '';
+  }
+  function odswiezTloEdytora(){
+    var v = document.getElementById('sg-obraz').value;
+    var bg = document.getElementById('sg-tresc-bg');
+    if (bg) bg.style.backgroundImage = kafelObrazCss(v);
+  }
+
+  /* ODRZUĆ ZMIANY — wraca poprzednia wersja kafla (nowy kafel znika) */
+  document.getElementById('sg-odrzuc').addEventListener('click', function(){
+    if (!SG_EDYCJA) return;
+    var kafle = sgKafle();
+    var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+    if (SG_EDYCJA.nowy){
+      /* kafel dodany, ale nigdy nie zapisany — znika */
+      if (i >= 0) kafle.splice(i, 1);
+    } else if (i >= 0){
+      kafle[i] = SG_EDYCJA.kopia;
+    }
+    SG_EDYCJA = null;
+    ustawBrudny();
+    pokazEdycje(false);
+    rysujKafle();
+    sgInfo('Zmiany odrzucone.', false);
+  });
+
+  /* ZASTOSUJ DO PODGLĄDU — kafel trafia do roboczej wersji (bez zapisu strony) */
+  document.getElementById('sg-zapisz-kafel').addEventListener('click', function(){
+    if (!SG_EDYCJA) return;
+    var kafle = sgKafle();
+    var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+    if (i < 0){ sgInfo('Kafel nie istnieje (usunięty?).', true); return; }
+    kafle[i].obraz = document.getElementById('sg-obraz').value;
+    kafle[i].karty = document.getElementById('sg-karty').checked;
+    kafle[i].tresc = SG_EDYTOR ? SG_EDYTOR.pobierz() : kafle[i].tresc;
+    SG_EDYCJA = null;
+    ustawBrudny();
+    pokazEdycje(false);
+    rysujKafle();
+  });
+
+  /* ---------- biblioteka własnych zdjęć: panel wgrywania ---------- */
+  document.getElementById('sg-obraz-wgraj').addEventListener('click', function(){
+    var box = document.getElementById('sg-obraz-wgraj-box');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('sg-obraz-plik').addEventListener('change', function(){
+    var f = this.files && this.files[0];
+    if (!f) return;
+    /* proponowana nazwa = nazwa pliku bez rozszerzenia */
+    document.getElementById('sg-obraz-nazwa').value =
+      sgMediaNazwa(String(f.name).replace(/\.[^.]+$/, ''));
+  });
+  document.getElementById('sg-obraz-zapisz').addEventListener('click', function(){
+    var f = document.getElementById('sg-obraz-plik').files &&
+            document.getElementById('sg-obraz-plik').files[0];
+    var nazwa = sgMediaNazwa(document.getElementById('sg-obraz-nazwa').value);
+    if (!f){ alert('Najpierw wybierz plik ze zdjęciem.'); return; }
+    var bib = sgMediaBiblioteka();
+    if (bib[nazwa] && !confirm('Zdjęcie „' + nazwa + '" już jest w bibliotece. Nadpisać?')) return;
+    var fr = new FileReader();
+    fr.onload = function(){
+      bib[nazwa] = fr.result;
+      sgMediaZapisz(bib);
+      sgObrazOpcje('media:' + nazwa);
+      odswiezPodgladObrazu();
+      odswiezTloEdytora();
+      if (SG_EDYCJA){
+        var kafle = sgKafle();
+        var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+        if (i >= 0){ kafle[i].obraz = 'media:' + nazwa; ustawBrudny(); rysujKafle(); }
+      }
+      document.getElementById('sg-obraz-wgraj-box').style.display = 'none';
+      sgInfo('Zdjęcie zapisane w bibliotece jako „' + nazwa + '".', false);
+    };
+    fr.readAsDataURL(f);
+  });
+  document.getElementById('sg-obraz-zmien').addEventListener('click', function(){
+    var val = document.getElementById('sg-obraz').value;
+    if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby zmienić nazwę.'); return; }
+    var stara = val.slice(6);
+    var nowa = sgMediaNazwa(prompt('Nowa nazwa zdjęcia:', stara) || '');
+    if (!nowa || nowa === stara) return;
+    var bib = sgMediaBiblioteka();
+    if (bib[nowa] && !confirm('Zdjęcie „' + nowa + '" już jest w bibliotece. Nadpisać?')) return;
+    bib[nowa] = bib[stara];
+    delete bib[stara];
+    sgMediaZapisz(bib);
+    var nowaRef = 'media:' + nowa;
+    sgKafle().forEach(function(k){ if (k.obraz === val) k.obraz = nowaRef; });
+    if (SG_EDYCJA && SG_EDYCJA.kopia && SG_EDYCJA.kopia.obraz === val) SG_EDYCJA.kopia.obraz = nowaRef;
+    ustawBrudny();
+    sgObrazOpcje(nowaRef);
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    rysujKafle();
+    sgInfo('Nazwa zmieniona na „' + nowa + '".', false);
+  });
+  document.getElementById('sg-obraz-usun').addEventListener('click', function(){
+    var val = document.getElementById('sg-obraz').value;
+    if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby je usunąć.'); return; }
+    var nazwa = val.slice(6);
+    if (!confirm('Usunąć zdjęcie „' + nazwa + '" z biblioteki? Kafle, które go używają, dostaną domyślne tło.')) return;
+    var bib = sgMediaBiblioteka();
+    delete bib[nazwa];
+    sgMediaZapisz(bib);
+    sgKafle().forEach(function(k){ if (k.obraz === val) k.obraz = 'assets/hero.jpg'; });
+    ustawBrudny();
+    sgObrazOpcje('assets/hero.jpg');
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    rysujKafle();
+    sgInfo('Zdjęcie „' + nazwa + '" usunięte z biblioteki.', false);
+  });
+  document.getElementById('sg-obraz').addEventListener('change', function(){
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    sgObrazGuziki();
+    if (SG_EDYCJA){
+      var kafle = sgKafle();
+      var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (i >= 0){
+        kafle[i].obraz = document.getElementById('sg-obraz').value;
+        ustawBrudny();
+        rysujKafle();
+      }
+    }
+  });
+
+  function ladujStronaGlowna(){
+    SG_DANE = sgNaprawObrazy(sgMigrujStare(SYG.demoDb.stronaGlowna()) || SG_DOMYS);
+    if (!SG_DANE.slider) SG_DANE.slider = SG_DOMYS.slider;
+    if (SG_DANE.ctaTresc == null) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
+    document.getElementById('sg-autoplay').value =
+      (SG_DANE.slider.autoplay != null) ? SG_DANE.slider.autoplay : SG_DOMYS.slider.autoplay;
+    if (!SG_EDYTOR_CTA) SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
+      document.getElementById('sg-cta-edytor'), document.getElementById('sg-cta-pole'));
+    SG_EDYTOR_CTA.ustaw(SG_DANE.ctaTresc || SG_DOMYS.ctaTresc);
+    SG_EDYCJA = null;
+    pokazEdycje(false);
+    rysujKafle();
+    wyczyscBrudny();
+  }
+
+  ['sg-autoplay'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', ustawBrudny);
+  });
+  var ctaPole = document.getElementById('sg-cta-pole');
+  if (ctaPole) ctaPole.addEventListener('input', ustawBrudny);
+
+  document.getElementById('sg-zapisz').addEventListener('click', sgZapiszWszystko);
+
+  /* ODRZUĆ ZMIANY STRONY GŁÓWNEJ — wraca wersja zapisana */
+  document.getElementById('sg-odrzuc-strona').addEventListener('click', function(){
+    if (!confirm('Odrzucić WSZYSTKIE niezapisane zmiany strony głównej (slider i treść pod sliderem)? Wróci wersja zapisana.')) return;
+    ladujStronaGlowna();
+    sgInfo('Wszystkie niezapisane zmiany strony głównej odrzucone.', false);
+  });
+
+  /* ============ treść strony Zamówienia (EDYTOR TREŚCI) ============ */
+  var SZ_EDYTOR = null;
+  var SZ_DOMYS = '<span class="tag">Kreator zamówień</span>' +
+    '<h1>Zamówienia</h1>' +
+    '<p class="lead">Wybierz, czego potrzebujesz. Każdą ścieżkę prowadzimy krok po kroku — z podsumowaniem i jasnymi zasadami na końcu. Bez niespodzianek.</p>' +
+    '<div class="hub">' +
+    '<div class="hub-col"><div class="hub-head">Wynajem dekoracji</div><div class="hub-body">' +
+    '<p>Stwórz niepowtarzalny klimat swojego wydarzenia, dodając mu wyjątkowego wymiaru za pomocą naszych dekoracji. Wybierz jeden z dostępnych pakietów, sprawdź dostępność terminów i zarezerwuj. Możesz też dodać do wystroju personalizowane elementy i detale, które sprawią, że będą to niezapomniane chwile dla wszystkich.</p>' +
+    '</div><a class="btn" href="wynajem.html">Zarezerwuj termin</a></div>' +
+    '<div class="hub-col"><div class="hub-head">Personalizacja</div><div class="hub-body">' +
+    '<p>Pragniesz obdarować kogoś wyjątkowym prezentem, którego nigdy nie zapomni, a może szukasz miejsca, które zrealizuje Twoją wizję? Jeśli tak, to dobrze trafiłeś — w Sygnaturze specjalizujemy się w personalizowanych prezentach i dekoracjach, gdzie każdy detal pozwala poczuć się wyjątkowo i jest niepowtarzalny. Nie jesteśmy fabryką, tylko rodzinną manufakturą tworzącą unikaty — dzięki temu nasze wyroby są wyjątkowe.</p>' +
+    '</div><a class="btn" href="personalizacja.html">Zamów personalizację</a></div>' +
+    '<div class="hub-col"><div class="hub-head">Sklep</div><div class="hub-body">' +
+    '<p>Wiele z naszych prac zdobi prywatne domy i lokale eventowe. Wybierz coś dla siebie i stwórz niepowtarzalny klimat dla swojego wnętrza.</p>' +
+    '</div><a class="btn" href="sklep.html">Katalog produktów</a></div>' +
+    '</div>';
+  function szUstawBrudny(){ document.getElementById('sz-brudny').style.display = 'block'; }
+  function szCzyscBrudny(){ document.getElementById('sz-brudny').style.display = 'none'; }
+  function szInfo(txt, zle){
+    var info = document.getElementById('sz-info');
+    info.style.display = 'block';
+    info.textContent = txt;
+    info.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    setTimeout(function(){ info.style.display = 'none'; }, 5000);
+  }
+  function ladujStronaZamowienia(){
+    var dane = (SYG.demoDb && SYG.demoDb.stronaZamowienia) ? SYG.demoDb.stronaZamowienia() : null;
+    if (!SZ_EDYTOR) SZ_EDYTOR = SYG.edytorTresci.stworz(
+      document.getElementById('sz-tresc-edytor'), document.getElementById('sz-tresc-pole'));
+    SZ_EDYTOR.ustaw((dane && dane.tresc) || SZ_DOMYS);
+    szCzyscBrudny();
+  }
+  async function szZapisz(){
+    var odp = await SYG.wezwij('strona-zamowienia-zapisz', { klucz: klucz, dane: { tresc: SZ_EDYTOR.pobierz() } });
+    if (odp.ok){ szCzyscBrudny(); szInfo('Strona Zamówienia zapisana.', false); }
+    else szInfo(odp.blad || 'Nie udało się zapisać.', true);
+    return odp.ok;
+  }
+  function szOdrzuc(){
+    if (!confirm('Odrzucić wszystkie niezapisane zmiany strony Zamówienia? Wróci wersja zapisana.')) return;
+    ladujStronaZamowienia();
+    szInfo('Niezapisane zmiany strony Zamówienia odrzucone.', false);
+  }
+  document.getElementById('sz-zapisz').addEventListener('click', szZapisz);
+  document.getElementById('sz-odrzuc').addEventListener('click', szOdrzuc);
+  document.getElementById('sz-tresc-pole').addEventListener('input', szUstawBrudny);
+
+  /* ============ zamówienia ============ */
+  async function ladujZamowienia(){
+    var odp = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
+    if (!odp.ok){
+      bled.textContent = odp.blad || 'Brak dostępu (zły klucz?).';
+      bled.style.display = 'block';
+      return;
+    }
+    bled.style.display = 'none';
+    ladujStronaZamowienia();
+    var lista = odp.zamowienia || [];
+    var tbody = document.querySelector('#tabela-zamowien tbody');
+    tbody.innerHTML = lista.map(function(z){
+      var pozycje = (z.pozycje || []).map(function(p){ return p.nazwa + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
+      var razem = (z.kwoty && z.kwoty.razem) ? SYG.zl(z.kwoty.razem) : '—';
+      var opcje = Object.keys(STAN_NAZWA).map(function(s){
+        return '<option value="' + s + '"' + (z.status === s ? ' selected' : '') + '>' + STAN_NAZWA[s] + '</option>';
+      }).join('');
+      return '<tr><td><b>' + z.sygnatura + '</b></td>' +
+        '<td>' + (z.data || '').slice(0, 10) + '</td>' +
+        '<td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email + '</span></td>' +
+        '<td>' + pozycje + '</td>' +
+        '<td>' + razem + '</td>' +
+        '<td><select data-syg="' + z.sygnatura + '">' + opcje + '</select></td></tr>';
+    }).join('') || '<tr><td colspan="6">Brak zamówień.</td></tr>';
+
+    tbody.querySelectorAll('select').forEach(function(sel){
+      sel.addEventListener('change', async function(){
+        var odp2 = await SYG.wezwij('zamowienie-status', { klucz: klucz, sygnatura: sel.getAttribute('data-syg'), status: sel.value });
+        if (!odp2.ok) alert(odp2.blad || 'Nie zapisano.');
+      });
+    });
+  }
+
+  /* ============ wiadomości ============ */
+  function ladujWiadomosci(){
+    var wbody = document.querySelector('#tabela-wiadomosci tbody');
+    var zbody = document.querySelector('#tabela-wynajem-zapytania tbody');
+    if (SYG.TRYB_DEMO){
+      var wiadomosci = SYG.demoDb.wiadomosci();
+      wbody.innerHTML = wiadomosci.map(function(w){
+        return '<tr><td>' + (w.data || '').slice(0, 10) + '</td><td>' + w.imie + '<br><span class="mala">' + w.email + '</span></td>' +
+          '<td>' + w.temat + '</td><td>' + w.tresc + '</td></tr>';
+      }).join('') || '<tr><td colspan="4">Brak wiadomości.</td></tr>';
+      var zap = SYG.demoDb.wynajemZapytania();
+      zbody.innerHTML = zap.map(function(z){
+        var persTxt = (z.pers || []).map(function(p){ return p.nazwa + (p.opis ? ': ' + p.opis.slice(0,60) : ''); }).join('; ') || '—';
+        var evMap = { weselny: 'Wesele', komunijny: 'Komunia / chrzest', firmowy: 'Event firmowy', jubileuszowy: 'Jubileusz / urodziny' };
+        return '<tr><td>' + (z.data || '').slice(0, 10) + '</td><td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email +
+          (z.klient.telefon ? ' · ' + z.klient.telefon : '') + '</span></td>' +
+          '<td>' + (evMap[z.ev] || z.ev || '—') + '</td>' +
+          '<td><b>' + (z.pakiet ? z.pakiet.nazwa : '—') + '</b></td>' +
+          '<td>' + (z.termin ? z.termin.data : '—') + '</td>' +
+          '<td>' + persTxt + '</td></tr>';
+      }).join('') || '<tr><td colspan="6">Brak zapytań o termin.</td></tr>';
+    } else {
+      wbody.innerHTML = '<tr><td colspan="4">Lista wiadomości z arkusza będzie dostępna po wdrożeniu (akcja „wiadomosci-lista").</td></tr>';
+      zbody.innerHTML = '<tr><td colspan="6">Zapytania o wynajem z arkusza będą dostępne po wdrożeniu.</td></tr>';
+    }
+  }
+
+  /* ============ produkty ============ */
+  async function ladujProdukty(){
+    var kat = await SYG.katalog();
+    var tbody = document.querySelector('#tabela-produkty tbody');
+    tbody.innerHTML = kat.map(function(p){
+      return '<tr>' +
+        '<td><b>' + p.nazwa + '</b><br><span class="mala">#' + p.id +
+        (p.storyId ? ' · <a href="blog-wpis.html?id=' + p.storyId + '" target="_blank" rel="noopener" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">historia →</a>' : '') +
+        '</span></td>' +
+        '<td><input type="number" step="0.01" min="0" class="p-cena" data-id="' + p.id + '" value="' + p.cena + '" style="width:110px"></td>' +
+        '<td><label style="cursor:pointer;font-size:14px"><input type="checkbox" class="p-dost" data-id="' + p.id + '"' + (p.dostepny ? ' checked' : '') + '> widoczny</label></td>' +
+        '<td><button class="btn outline" type="button" style="padding:8px 16px" data-id="' + p.id + '">Zapisz</button></td>' +
+      '</tr>';
+    }).join('') || '<tr><td colspan="4">Brak produktów.</td></tr>';
+
+    tbody.querySelectorAll('button[data-id]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        var id = Number(b.getAttribute('data-id'));
+        var cena = Number(tbody.querySelector('.p-cena[data-id="' + id + '"]').value) || 0;
+        var dost = tbody.querySelector('.p-dost[data-id="' + id + '"]').checked ? 1 : 0;
+        var odp = await SYG.wezwij('produkty-zapisz', { id: id, cena: cena, dostepny: dost });
+        var f = document.getElementById('produkty-info');
+        f.style.display = 'block';
+        f.textContent = odp.ok ? 'Zapisano: produkt #' + id + ' (' + cena + ' zł, ' + (dost ? 'widoczny' : 'ukryty') + ').' : (odp.blad || 'Nie zapisano.');
+        setTimeout(function(){ f.style.display = 'none'; }, 4000);
+      });
+    });
+  }
+
+  /* produkt bez historii */
+  var pnObraz = '';
+  document.getElementById('pn-obraz').addEventListener('change', function(){
+    var f = this.files[0];
+    if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function(){ pnObraz = fr.result; };
+    fr.readAsDataURL(f);
+  });
+  document.getElementById('produkt-nowy').addEventListener('click', function(){
+    document.getElementById('produkt-nowy-form').style.display = 'block';
+  });
+  document.getElementById('pn-zapisz').addEventListener('click', async function(){
+    var nazwa = document.getElementById('pn-nazwa').value.trim();
+    if (!nazwa){ alert('Podaj nazwę produktu.'); return; }
+    var odp = await SYG.wezwij('produkt-nowy', {
+      nazwa: nazwa,
+      cena: Number(document.getElementById('pn-cena').value) || 0,
+      opis: document.getElementById('pn-opis').value.trim(),
+      obraz: pnObraz || 'szopka.jpg'
+    });
+    var f = document.getElementById('produkty-info');
+    f.style.display = 'block';
+    f.textContent = odp.ok ? 'Dodano produkt: ' + nazwa + '.' : (odp.blad || 'Nie dodano.');
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+    if (odp.ok){
+      document.getElementById('pn-nazwa').value = '';
+      document.getElementById('pn-cena').value = '';
+      document.getElementById('pn-opis').value = '';
+      document.getElementById('pn-obraz').value = '';
+      pnObraz = '';
+      document.getElementById('produkt-nowy-form').style.display = 'none';
+      ladujProdukty();
+    }
+  });
+
+  /* ============ BLOG ============ */
+  var blogEdytor = SYG.edytor('bf-tresc', 'bf-zrodlo');
+  var wpisyBlog = [];
+  var wybranyId = null;
+  var trybEdycji = false;
+  var nowySzkic = false;
+  var galeria = [];
+
+  function escB(s){
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function infoBlog(txt){
+    var f = document.getElementById('blog-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  function rysujMini(){
+    var kont = document.getElementById('bf-mini');
+    kont.innerHTML = '';
+    galeria.forEach(function(g, i){
+      var el = document.createElement('div');
+      el.className = 'bf-mini-el';
+      el.innerHTML = '<img src="' + g.src + '" alt="">' +
+        '<label><input type="radio" name="bf-glowna" ' + (g.glowna ? 'checked' : '') + '> główne</label>' +
+        '<button type="button" class="bf-mini-x" title="Usuń zdjęcie">✕</button>';
+      el.querySelector('input').addEventListener('change', function(){
+        galeria.forEach(function(x){ x.glowna = false; });
+        g.glowna = true;
+        rysujMini();
+      });
+      el.querySelector('.bf-mini-x').addEventListener('click', function(){
+        galeria.splice(i, 1);
+        if (!galeria.length) galeria = [];
+        else if (!galeria.some(function(x){ return x.glowna; })) galeria[0].glowna = true;
+        rysujMini();
+      });
+      kont.appendChild(el);
+    });
+  }
+
+  document.getElementById('bf-pliki').addEventListener('change', function(){
+    var files = Array.prototype.slice.call(this.files || []);
+    files.forEach(function(f){
+      if (galeria.length >= 10){ alert('Maksymalnie 10 zdjęć.'); return; }
+      var fr = new FileReader();
+      fr.onload = function(){
+        galeria.push({ src: fr.result, glowna: galeria.length === 0 });
+        rysujMini();
+      };
+      fr.readAsDataURL(f);
+    });
+    this.value = '';
+  });
+
+  document.getElementById('bf-sklep').addEventListener('change', function(){
+    document.getElementById('bf-produkt').style.display = this.checked ? 'block' : 'none';
+  });
+
+  async function wypelnijLinkProdukty(){
+    var kat = await SYG.katalog();
+    var sel = document.getElementById('bf-p-link');
+    sel.innerHTML = '<option value="">— nowy produkt —</option>' +
+      kat.map(function(p){ return '<option value="' + p.id + '">' + p.nazwa + ' (#' + p.id + ')</option>'; }).join('');
+    /* kategorie do datalisty */
+    var odp = await SYG.wezwij('blog-lista', {});
+    var katLista = [];
+    (odp.wpisy || []).forEach(function(w){ if (w.kategoria && katLista.indexOf(w.kategoria) < 0) katLista.push(w.kategoria); });
+    document.getElementById('bf-kategorie').innerHTML = katLista.map(function(k){
+      return '<option value="' + k.replace(/"/g, '&quot;') + '">';
+    }).join('');
+  }
+
+  var _katCache = null;
+  async function katCache(){
+    if (_katCache) return _katCache;
+    _katCache = await SYG.katalog();
+    return _katCache;
+  }
+  function katProduktIstnieje(id){
+    return (_katCache || []).some(function(p){ return Number(p.id) === Number(id); });
+  }
+
+  function wpisWybrany(){
+    return wpisyBlog.find(function(x){ return Number(x.id) === Number(wybranyId); }) || null;
+  }
+
+  async function ladujBlog(){
+    await wypelnijLinkProdukty();
+    var odp = await SYG.wezwij('blog-lista', {});
+    wpisyBlog = odp.ok ? (odp.wpisy || []) : [];
+    /* najnowsze na górze, najstarsze na dole */
+    wpisyBlog.sort(function(a, b){
+      var da = String(a.data || ''), db = String(b.data || '');
+      return db < da ? -1 : (db > da ? 1 : 0);
+    });
+    if (!wpisWybrany()) wybranyId = wpisyBlog.length ? wpisyBlog[0].id : null;
+    rysujListeBlog();
+    if (trybEdycji) wypelnijFormularz(wpisWybrany());
+    else pokazPodglad();
+  }
+
+  /* lista po prawej: data, tytuł, widoczny */
+  function rysujListeBlog(){
+    var tbody = document.querySelector('#tabela-blog tbody');
+    tbody.innerHTML = wpisyBlog.map(function(w){
+      var wid = w.widoczny !== false;
+      return '<tr data-wiersz="' + w.id + '"' + (Number(w.id) === Number(wybranyId) ? ' class="wybrany"' : '') + '>' +
+        '<td>' + escB(String(w.data || '').slice(0, 10)) + '</td>' +
+        '<td><b>' + escB(w.tytul) + '</b>' +
+        (w.produkt && w.produkt.sklep ? '<br><span class="mala" style="color:var(--butelkowa)">✓ produkt w sklepie</span>' : '') + '</td>' +
+        '<td><label style="cursor:pointer;font-size:14px;white-space:nowrap"><input type="checkbox" class="w-wid" data-id="' + w.id + '"' + (wid ? ' checked' : '') + '> widoczny</label></td></tr>';
+    }).join('') || '<tr><td colspan="3">Brak wpisów.</td></tr>';
+
+    tbody.querySelectorAll('tr[data-wiersz]').forEach(function(tr){
+      tr.addEventListener('click', function(){
+        var id = Number(tr.getAttribute('data-wiersz'));
+        if (Number(wybranyId) === id && !trybEdycji) return;
+        if (trybEdycji && !confirm('Porzucić niezapisane zmiany i przejść do innego wpisu?')) return;
+        wybranyId = id;
+        wyjdzZTrybuEdycji();
+        rysujListeBlog();
+        pokazPodglad();
+      });
+    });
+    tbody.querySelectorAll('.w-wid').forEach(function(ch){
+      ch.addEventListener('click', function(e){ e.stopPropagation(); });
+      ch.addEventListener('change', async function(){
+        var id = Number(ch.getAttribute('data-id'));
+        var odp = await SYG.wezwij('blog-widocznosc', { id: id, widoczny: ch.checked });
+        var w = wpisyBlog.find(function(x){ return Number(x.id) === id; });
+        if (odp.ok && w) w.widoczny = ch.checked;
+        infoBlog(odp.ok
+          ? 'Wpis „' + (w ? w.tytul : '') + '” jest teraz ' + (ch.checked ? 'WIDOCZNY na stronie.' : 'UKRYTY.')
+          : (odp.blad || 'Nie zapisano.'));
+        if (Number(wybranyId) === id && !trybEdycji) pokazPodglad();
+      });
+    });
+    document.getElementById('blog-edytuj').disabled = !wpisWybrany();
+  }
+
+  /* podgląd zaznaczonego wpisu — jak na stronie */
+  function pokazPodglad(){
+    var kont = document.getElementById('blog-podglad');
+    var w = wpisWybrany();
+    if (!w){
+      kont.innerHTML = '<p class="mala">Brak wpisów — kliknij „+ Dodaj nowy wpis", aby utworzyć pierwszy.</p>';
+      return;
+    }
+    var wid = w.widoczny !== false;
+    var wszystkie = [w.okladka].concat((w.galeria || []).filter(function(g){ return g && g !== w.okladka; }));
+    var mini = wszystkie.length > 1
+      ? '<div class="bf-podglad-mini">' + wszystkie.map(function(g){ return '<img src="' + escB(g) + '" alt="">'; }).join('') + '</div>'
+      : '';
+    kont.innerHTML =
+      (wid ? '' : '<div class="w-ukryty-ban">UKRYTY — niewidoczny na stronie „Nasze realizacje"</div>') +
+      '<span class="tag">' + escB(w.kategoria || 'Realizacje') + '</span>' +
+      '<h1 style="font-size:24px;margin:6px 0 2px">' + escB(w.tytul) + '</h1>' +
+      '<p class="sub">' + escB(String(w.data || '').slice(0, 10)) +
+      (w.produkt && w.produkt.sklep ? ' · <b style="color:var(--butelkowa)">✓ produkt w sklepie</b>' : '') + '</p>' +
+      (w.okladka ? '<figure class="wpis-okladka" style="margin:10px 0"><img src="' + escB(w.okladka) + '" alt="" style="max-width:100%;height:auto"></figure>' : '') +
+      mini +
+      (w.zajawka ? '<p><i>' + escB(w.zajawka) + '</i></p>' : '') +
+      '<div class="blog-tresc">' + (w.tresc || '<p class="mala">(brak treści)</p>') + '</div>' +
+      (w.video ? '<p class="mala">Film: <a href="' + escB(w.video) + '" target="_blank" rel="noopener">' + escB(w.video) + '</a></p>' : '') +
+      ((w.produkt && w.produkt.sklep)
+        ? '<p class="mala">Sklep: <b>' + escB(w.produkt.nazwa) + '</b> — ' + SYG.zl(w.produkt.cena) +
+          (w.produkt.gabaryt ? ' · ' + escB(w.produkt.gabaryt) : '') + '</p>' : '') +
+      '<p style="margin-top:10px"><a class="btn outline" style="padding:6px 12px;font-size:13px" href="blog-wpis.html?id=' + w.id + '" target="_blank" rel="noopener">Zobacz na stronie →</a></p>';
+  }
+
+  function wypelnijFormularz(w){
+    if (!w) return;
+    galeria = [].concat([w.okladka], (w.galeria || [])).filter(function(g, i, a){ return g && a.indexOf(g) === i; })
+      .map(function(g, i){ return { src: g, glowna: i === 0 }; });
+    document.getElementById('blog-form-tytul').textContent = nowySzkic ? 'Nowy wpis' : 'Edycja wpisu #' + w.id;
+    document.getElementById('bf-tytul').value = nowySzkic ? '' : (w.tytul || '');
+    document.getElementById('bf-kategoria').value = nowySzkic ? '' : (w.kategoria || '');
+    document.getElementById('bf-data').value = w.data || new Date().toISOString().slice(0, 10);
+    document.getElementById('bf-zajawka').value = nowySzkic ? '' : (w.zajawka || '');
+    document.getElementById('bf-video').value = w.video || '';
+    blogEdytor.ustaw(nowySzkic ? '' : (w.tresc || ''));
+    document.getElementById('bf-widoczny').checked = w.widoczny !== false;
+    var prod = w.produkt || {};
+    document.getElementById('bf-sklep').checked = !!prod.sklep;
+    document.getElementById('bf-produkt').style.display = prod.sklep ? 'block' : 'none';
+    document.getElementById('bf-p-nazwa').value = prod.nazwa || '';
+    document.getElementById('bf-p-link').value = prod.sklep && katProduktIstnieje(prod.id) ? String(prod.id) : '';
+    document.getElementById('bf-p-cena').value = prod.cena || '';
+    document.getElementById('bf-p-gabaryt').value = prod.gabaryt || '';
+    rysujMini();
+  }
+
+  function wejdzWTrybEdycji(){
+    var w = wpisWybrany();
+    if (!w) return;
+    trybEdycji = true;
+    wypelnijFormularz(w);
+    document.getElementById('blog-podglad').style.display = 'none';
+    document.getElementById('blog-przyciski').style.display = 'none';
+    document.getElementById('blog-form').style.display = 'block';
+  }
+
+  function wyjdzZTrybuEdycji(){
+    trybEdycji = false;
+    nowySzkic = false;
+    document.getElementById('blog-form').style.display = 'none';
+    document.getElementById('blog-podglad').style.display = 'block';
+    document.getElementById('blog-przyciski').style.display = '';
+  }
+
+  /* „Dodaj nowy wpis" — od razu tworzy rekord w tabeli i otwiera edycję */
+  document.getElementById('blog-nowy').addEventListener('click', async function(){
+    var dzis = new Date().toISOString().slice(0, 10);
+    var odp = await SYG.wezwij('blog-zapisz', { wpis: {
+      id: null, tytul: '(Nowy wpis)', kategoria: 'Realizacje', data: dzis,
+      zajawka: '', okladka: 'assets/media/sklep/szopka.jpg', galeria: [], video: '',
+      tresc: '', produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' },
+      widoczny: false
+    } });
+    if (!odp.ok){ infoBlog(odp.blad || 'Nie utworzono wpisu.'); return; }
+    _katCache = null;
+    wybranyId = odp.id;
+    nowySzkic = true;
+    await ladujBlog();
+    infoBlog('Utworzono nowy wpis — uzupełnij go i zapisz.');
+    wejdzWTrybEdycji();
+  });
+
+  document.getElementById('blog-edytuj').addEventListener('click', function(){
+    wejdzWTrybEdycji();
+  });
+
+  document.getElementById('blog-anuluj').addEventListener('click', async function(){
+    if (nowySzkic && wybranyId){
+      await SYG.wezwij('blog-usun', { id: wybranyId });
+      wybranyId = null;
+      infoBlog('Nowy wpis odrzucony.');
+    }
+    wyjdzZTrybuEdycji();
+    ladujBlog();
+  });
+
+  document.getElementById('blog-usun-wpis').addEventListener('click', async function(){
+    var w = wpisWybrany();
+    if (!w) return;
+    if (!confirm('Usunąć wpis „' + w.tytul + '"?')) return;
+    var odp = await SYG.wezwij('blog-usun', { id: w.id });
+    infoBlog(odp.ok ? 'Wpis usunięty.' : (odp.blad || 'Nie usunięto.'));
+    if (odp.ok){
+      wybranyId = null;
+      wyjdzZTrybuEdycji();
+      ladujBlog();
+    }
+  });
+
+  document.getElementById('blog-zapisz').addEventListener('click', async function(){
+    var tytul = document.getElementById('bf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł wpisu.'); return; }
+    var widoczny = document.getElementById('bf-widoczny').checked;
+    var sklep = document.getElementById('bf-sklep').checked;
+    var link = document.getElementById('bf-p-link').value;
+    var kat = await katCache();
+    var istniejacy = kat.find(function(p){ return Number(p.id) === Number(link); });
+    var w = wpisWybrany() || {};
+    var glowna = galeria.find(function(g){ return g.glowna; }) || galeria[0];
+    var wpis = {
+      id: wybranyId,
+      tytul: tytul,
+      widoczny: widoczny,
+      kategoria: document.getElementById('bf-kategoria').value.trim() || 'Realizacje',
+      data: document.getElementById('bf-data').value || new Date().toISOString().slice(0, 10),
+      zajawka: document.getElementById('bf-zajawka').value.trim(),
+      okladka: glowna ? glowna.src : 'assets/media/sklep/szopka.jpg',
+      galeria: galeria.map(function(g){ return g.src; }),
+      video: document.getElementById('bf-video').value.trim(),
+      tresc: blogEdytor.pobierz(),
+      produkt: {
+        sklep: sklep,
+        id: istniejacy ? Number(link) : (w.produkt && w.produkt.id ? w.produkt.id : 0),
+        nazwa: document.getElementById('bf-p-nazwa').value.trim() || tytul,
+        cena: Number(document.getElementById('bf-p-cena').value) || (istniejacy ? istniejacy.cena : 0),
+        gabaryt: document.getElementById('bf-p-gabaryt').value.trim()
+      }
+    };
+    var odp = await SYG.wezwij('blog-zapisz', { wpis: wpis });
+    if (odp.ok){
+      _katCache = null;
+      wybranyId = odp.id;
+      wyjdzZTrybuEdycji();
+      await ladujBlog();
+      ladujProdukty();
+      infoBlog('Wpis zapisany' + (sklep ? ' i dodany do sklepu.' : '.') +
+        (widoczny ? '' : ' (UKRYTY — zaznacz „widoczny", aby pokazać go na stronie.)'));
+    } else {
+      infoBlog(odp.blad || 'Nie zapisano.');
+    }
+  });
+
+  /* ============ PODSTRONY ============ */
+  var stronaEdytor = SYG.edytor('sf-tresc', 'sf-zrodlo');
+  var edycjaStrona = null;
+
+  function infoStrony(txt){
+    var f = document.getElementById('strony-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  async function ladujStrony(){
+    var odp = await SYG.wezwij('strony-lista', {});
+    var lista = odp.ok ? (odp.strony || []) : [];
+    var tbody = document.querySelector('#tabela-stron tbody');
+    tbody.innerHTML = lista.map(function(s){
+      return '<tr>' +
+        '<td><b>' + s.tytul + '</b><br><span class="mala">/' + s.slug + '</span></td>' +
+        '<td>' + (s.menu ? '✓' : '—') + '</td>' +
+        '<td>' + s.kol + '</td>' +
+        '<td style="white-space:nowrap">' +
+        '<a class="btn outline" style="padding:6px 12px;font-size:13px" href="podstrona.html?s=' + encodeURIComponent(s.slug) + '" target="_blank" rel="noopener">Podgląd</a> ' +
+        '<button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="' + s.slug + '">Edytuj</button> ' +
+        '<button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="' + s.slug + '">Usuń</button>' +
+        '</td></tr>';
+    }).join('') || '<tr><td colspan="4">Brak podstron. Dodaj pierwszą.</td></tr>';
+
+    tbody.querySelectorAll('button[data-edit]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var s = lista.find(function(x){ return x.slug === b.getAttribute('data-edit'); });
+        if (!s) return;
+        edycjaStrona = s.slug;
+        document.getElementById('strona-form-tytul').textContent = 'Edycja: ' + s.tytul;
+        document.getElementById('sf-slug').value = s.slug;
+        document.getElementById('sf-tytul').value = s.tytul || '';
+        document.getElementById('sf-menu').checked = s.menu !== 0;
+        document.getElementById('sf-kol').value = s.kol || 10;
+        stronaEdytor.ustaw(s.tresc || '');
+        document.getElementById('strona-form').style.display = 'block';
+      });
+    });
+    tbody.querySelectorAll('button[data-usun]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        if (!confirm('Usunąć podstronę „' + b.getAttribute('data-usun') + '"? Zniknie też z menu.')) return;
+        var odp2 = await SYG.wezwij('strona-usun', { slug: b.getAttribute('data-usun') });
+        infoStrony(odp2.ok ? 'Podstrona usunięta.' : (odp2.blad || 'Nie usunięto.'));
+        ladujStrony();
+      });
+    });
+  }
+
+  document.getElementById('strona-nowa').addEventListener('click', function(){
+    edycjaStrona = null;
+    document.getElementById('strona-form-tytul').textContent = 'Nowa podstrona';
+    document.getElementById('sf-slug').value = '';
+    document.getElementById('sf-tytul').value = '';
+    document.getElementById('sf-menu').checked = true;
+    document.getElementById('sf-kol').value = 10;
+    stronaEdytor.ustaw('');
+    document.getElementById('strona-form').style.display = 'block';
+  });
+
+  document.getElementById('strona-anuluj').addEventListener('click', function(){
+    document.getElementById('strona-form').style.display = 'none';
+  });
+
+  document.getElementById('strona-zapisz').addEventListener('click', async function(){
+    var slug = document.getElementById('sf-slug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+    var tytul = document.getElementById('sf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł podstrony.'); return; }
+    if (!slug){ slug = tytul.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40); }
+    var odp = await SYG.wezwij('strona-zapisz', {
+      strona: {
+        slug: slug, tytul: tytul,
+        menu: document.getElementById('sf-menu').checked ? 1 : 0,
+        kol: Number(document.getElementById('sf-kol').value) || 10,
+        tresc: stronaEdytor.pobierz()
+      }
+    });
+    infoStrony(odp.ok ? 'Podstrona zapisana („/' + slug + '").' : (odp.blad || 'Nie zapisano.'));
+    if (odp.ok){ edycjaStrona = null; ladujStrony(); }
+  });
+
+  /* ============ ustawienia (cennik dostawy) ============ */
+  function ladujUstawienia(){
+    var c = SYG.ustawieniaDostawa();
+    document.getElementById('u-paczkomat-s').value = c.paczkomat.S;
+    document.getElementById('u-paczkomat-m').value = c.paczkomat.M;
+    document.getElementById('u-paczkomat-l').value = c.paczkomat.L;
+    document.getElementById('u-kurier-s').value = c.kurier.S;
+    document.getElementById('u-kurier-m').value = c.kurier.M;
+    document.getElementById('u-kurier-l').value = c.kurier.L;
+  }
+  document.getElementById('zapisz-dostawe').addEventListener('click', async function(){
+    var cennik = {
+      paczkomat: { S: Number(document.getElementById('u-paczkomat-s').value) || 0,
+                   M: Number(document.getElementById('u-paczkomat-m').value) || 0,
+                   L: Number(document.getElementById('u-paczkomat-l').value) || 0 },
+      kurier: { S: Number(document.getElementById('u-kurier-s').value) || 0,
+                M: Number(document.getElementById('u-kurier-m').value) || 0,
+                L: Number(document.getElementById('u-kurier-l').value) || 0 }
+    };
+    var odp = await SYG.wezwij('ustawienia-dostawa-zapisz', { cennik: cennik });
+    var f = document.getElementById('ustawienia-info');
+    f.style.display = 'block';
+    f.textContent = odp.ok ? 'Cennik dostawy zapisany — formularz zamówienia używa nowych stawek.' : (odp.blad || 'Nie zapisano.');
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  });
+
+  /* ============ logowanie wymuszane po każdym zamknięciu strony (sesja) ============ */
+  function pokazPanel(){
+    logowanie.style.display = 'none';
+    panel.style.display = 'block';
+    document.getElementById('admin-tytul').textContent = 'Panel administracyjny';
+    ladujPodsumowanie();
+    ladujStronaGlowna();
+    ladujZamowienia();
+    ladujWiadomosci();
+    ladujProdukty();
+    ladujBlog();
+    ladujStrony();
+    ladujUstawienia();
+  }
+
+  var zalogowany = false;
+  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
+  if (zalogowany){
+    pokazPanel();
+  } else {
+    logowanie.style.display = 'block';
+  }
+
+  document.getElementById('pokaz-admin-haslo').addEventListener('click', function(){
+    var inp = document.getElementById('admin-haslo');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    this.classList.toggle('aktywne', inp.type === 'text');
+  });
+
+  document.getElementById('zaloguj').addEventListener('click', async function(){
+    var l = document.getElementById('admin-login').value.trim();
+    var h = document.getElementById('admin-haslo').value;
+    if (!l || !h){
+      logowanieBlad.textContent = 'Podaj login i hasło.';
+      logowanieBlad.style.display = 'block';
+      return;
+    }
+    if (SYG.TRYB_DEMO){
+      if (l === SYG.ADMIN_DEMO_LOGIN && h === SYG.ADMIN_DEMO_HASLO){
+        try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
+        logowanieBlad.style.display = 'none';
+        pokazPanel();
+      } else {
+        logowanieBlad.textContent = 'Nieprawidłowy login lub hasło.';
+        logowanieBlad.style.display = 'block';
+      }
+    } else {
+      var odp = await SYG.wezwij('admin-login', { login: l, haslo: h, klucz: klucz });
+      if (odp.ok){
+        try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
+        logowanieBlad.style.display = 'none';
+        pokazPanel();
+      } else {
+        logowanieBlad.textContent = odp.blad || 'Nieprawidłowy login lub hasło.';
+        logowanieBlad.style.display = 'block';
+      }
+    }
+  });
+
+  document.getElementById('wyloguj').addEventListener('click', function(){
+    try { sessionStorage.removeItem('syg-admin'); } catch(e){}
+    window.location.reload();
+  });
+
+  document.getElementById('odswiez').addEventListener('click', function(){
+    _katCache = null;
+    ladujPodsumowanie();
+    ladujStronaGlowna();
+    ladujZamowienia();
+    ladujWiadomosci();
+    ladujProdukty();
+    ladujBlog();
+    ladujStrony();
+  });
+})();
+</script>
+</body>
+</html>
