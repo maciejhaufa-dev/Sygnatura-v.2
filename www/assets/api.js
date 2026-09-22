@@ -117,7 +117,7 @@
   /* ---------- BLOG: wpisy (realizacje) ---------- */
   /* WERSJE seedów — podbij liczbę, aby odświeżyć treści startowe
      u WSZYSTKICH (wpisy panelu o innych id/slugach zostają nietknięte) */
-  const SEED_BLOG_W = 4;
+  const SEED_BLOG_W = 5;
   const SEED_STRON_W = 2;
 
   function seedBlog(odswiez) {
@@ -151,7 +151,7 @@
       {
         id: 4, widoczny: true, data: '2026-08-28', kategoria: 'Prezenty personalizowane', tytul: 'Rodzinka niedźwiadków — puzzle z imionami',
         zajawka: 'Drewniane puzzle rodzinne: misie z wygrawerowanymi imionami i czerwonym sercem.',
-        okladka: 'assets/media/sklep/niedzwiadki.jpg', video: '', galeria: ['assets/media/sklep/niedzwiadki-2.jpg', 'assets/media/sklep/niedzwiadki-3.jpg'], tresc:
+        okladka: 'assets/media/sklep/niedzwiadki.jpg', video: '', galeria: ['assets/media/sklep/niedzwiadki-2.jpg'], tresc:
           '<h2>Cała rodzina w jednym sercu</h2>' +
           '<p>Cztery misie — duzi i mali — składają się w jedną całość. Na każdym grawerujemy imię, a pośrodku malujemy serce.</p>' +
           '<ul><li>Materiał: lite drewno, ręczny szlif i olej</li><li>Grawer: imiona domowników na każdej figurce</li><li>Prezent: na rocznicę, Dzień Mamy i Taty, parapetówkę</li></ul>',
@@ -200,6 +200,78 @@
           '<h2>Dwie pary rąk</h2>' +
           '<p>Aniołki z makramy na żerdzi, w złotej obręczy. Obręcz robię ja, makramy plotła żona — rodzinna pamiątka na ścianę.</p>' +
           '<ul><li>Obręcz: złota, z żerdzią na figurki</li><li>Figurki: makramowe aniołki — liczba do ustalenia</li><li>Prezent: na chrzest, roczek, nowe mieszkanie</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 10, widoczny: true, data: '2025-12-03', kategoria: 'Deski do krojenia', tytul: 'Deski do krojenia z grawerem',
+        zajawka: 'Grawer na desce: logo klubu, śmieszny napis, dedykacja — deska do krojenia i do ozdoby.',
+        okladka: 'assets/media/sklep/deska.jpg', video: '', galeria: ['assets/media/sklep/deska-2.jpg', 'assets/media/sklep/deska-3.jpg', 'assets/media/sklep/deska-4.jpg', 'assets/media/sklep/deska-5.jpg', 'assets/media/sklep/deska-6.jpg'], tresc:
+          '<h2>Deska, która mówi</h2>' +
+          '<p>Laserowy grawer na desce kuchennej — od logo „Klubu Kąśniwych Smakoszy" po żart dla żołnierza. Do krojenia na co dzień i do powieszenia na ścianie.</p>' +
+          '<ul><li>Grawer: logo, napis, dedykacja — Twój projekt albo nasz</li><li>Rozmiary: od śniadaniowej po rodzinny zestaw</li><li>Materiał: deska kuchenna — drewno lub bambus do wyboru</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 11, widoczny: true, data: '2026-08-28', kategoria: 'Pudełka prezentowe', tytul: 'Pudełka drewniane z grawerem',
+        zajawka: 'Na komunię, na zegarek, na pamiątkę — pudełko z wygrawerowaną dedykacją.',
+        okladka: 'assets/media/sklep/pudelko.jpg', video: '', galeria: ['assets/media/sklep/pudelko-2.jpg', 'assets/media/sklep/pudelko-3.jpg'], tresc:
+          '<h2>Opakowanie też jest prezentem</h2>' +
+          '<p>Drewniane pudełko z laserowym grawerem: cytat na komunię, życzenia na zegarek, data i imię. Same pudełko cieszy tak samo jak zawartość.</p>' +
+          '<ul><li>Dedykacja: cytat, imię, data — Twój tekst</li><li>Okucia: zameczek, zawiasy</li><li>Środek: na zegarek, biżuterię, pamiątki</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 12, widoczny: true, data: '2026-01-08', kategoria: 'Kartki okolicznościowe', tytul: 'Kartka „Sto lat!"',
+        zajawka: 'Kolorowe świeczki i życzenia — kartka na urodziny.',
+        okladka: 'assets/media/sklep/kartka.jpg', video: '', galeria: [], tresc:
+          '<h2>Sto lat, sto świeczek</h2>' +
+          '<p>Ręcznie zdobiona kartka urodzinowa z tęczowymi świeczkami. Prosta, wesoła, z miejscem na Twoje życzenia.</p>' +
+          '<ul><li>Personalizacja: imię solenizanta, liczba świeczek</li><li>Okazje: urodziny, rocznice, jubileusze</li><li>Dodatek: pasuje do pudełka z prezentem</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 13, widoczny: true, data: '2025-12-08', kategoria: 'Decoupage i DIY', tytul: 'Dębowe puzzle do własnych aranżacji',
+        zajawka: 'Laserowo cięte elementy z dębu — do decoupage, scrapbookingu i własnych pomysłów.',
+        okladka: 'assets/media/sklep/puzzle.jpg', video: '', galeria: [], tresc:
+          '<h2>Półfabrykat z charakterem</h2>' +
+          '<p>Elementy cięte laserem w dębie — baza pod decoupage, kartki, zawieszki i dekoracje. Równe krawędzie, czysty detal.</p>' +
+          '<ul><li>Materiał: dąb, cięcie laserowe</li><li>Zastosowanie: decoupage, kartki, zawieszki</li><li>Wzory i ilości: do ustalenia</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 14, widoczny: true, data: '2026-09-02', kategoria: 'Dewocjonalia', tytul: 'Krzyżyk „Zmartwychwstałem dla Ciebie"',
+        zajawka: 'Ścienny krzyżyk z postacią Chrystusa i cytatem — pamiątka i dekoracja.',
+        okladka: 'assets/media/sklep/krzyzyk.jpg', video: '', galeria: [], tresc:
+          '<h2>Zmartwychwstałem dla Ciebie</h2>' +
+          '<p>Krzyżyk na ścianę z wygrawerowanym napisem i cytatem. Cięty laserem, z naturalnym rysunkiem drewna.</p>' +
+          '<ul><li>Napis: „Zmartwychwstałem dla Ciebie" + cytat</li><li>Wykonanie: cięcie laserowe, grawer</li><li>Na ścianę: do domu, na pamiątkę komunii, bierzmowania</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 15, widoczny: true, data: '2026-07-01', kategoria: 'Breloki i gadżety', tytul: 'Breloki z logo firmy',
+        zajawka: 'Drewniany brelok z wygrawerowanym logo — gadżet dla klientów i pracowników.',
+        okladka: 'assets/media/sklep/brelok.jpg', video: '', galeria: ['assets/media/sklep/brelok-2.jpg'], tresc:
+          '<h2>Logo zawsze pod ręką</h2>' +
+          '<p>Brelok z drewna z laserowym grawerem logo firmy. Lekki, trwały, miły w dotyku — gadżet, którego się nie wyrzuca.</p>' +
+          '<ul><li>Grawer: Twoje logo, po jednej lub obu stronach</li><li>Nakład: od kilku sztuk w górę</li><li>Kształt: kwadrat, kółko, na wymiar</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 16, widoczny: true, data: '2026-08-29', kategoria: 'Kuchnia i stół', tytul: 'Frezowany plater na przekąski',
+        zajawka: 'Pięć komór na przekąski — frezowany w drewnie plater na imprezę.',
+        okladka: 'assets/media/sklep/plater.jpg', video: '', galeria: [], tresc:
+          '<h2>Impreza zaczyna się od deski</h2>' +
+          '<p>Plater frezowany w drewnie: pięć komór na dipy, orzeszki, oliwki i co tylko podasz. Stabilny, łatwy do umycia, ładny na stole.</p>' +
+          '<ul><li>Komory: 5 — na dipy, przekąski, dodatki</li><li>Materiał: lite drewno, olejowane</li><li>Wymiar: rodzinny, na środek stołu</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 17, widoczny: true, data: '2026-08-29', kategoria: 'Kuchnia i stół', tytul: 'Frezowana podstawka na jajka',
+        zajawka: 'Dziesięć gniazd frezowanych w litym drewnie — na jajka i pisanki.',
+        okladka: 'assets/media/sklep/jajka.jpg', video: '', galeria: ['assets/media/sklep/jajka-2.jpg'], tresc:
+          '<h2>Porządek w jajkach</h2>' +
+          '<p>Podstawka frezowana w litym drewnie: dziesięć gniazd na jajka. Na co dzień do kuchni, od święta na pisanki.</p>' +
+          '<ul><li>Gniazda: 10, frezowane w litym drewnie</li><li>Materiał: lite drewno, olejowane</li><li>Okazje: Wielkanoc, śniadania, stół wiejski</li></ul>',
         produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
       }
     ];
