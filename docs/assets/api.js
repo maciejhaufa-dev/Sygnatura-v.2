@@ -120,7 +120,7 @@
       {
         id: 1, widoczny: true, data: '2026-08-14', kategoria: 'Dekoracje świąteczne', tytul: 'Szopka warstwowa z podświetleniem',
         zajawka: 'Nasz flagowy produkt: ręcznie cięte warstwy sklejki 20×20 cm, ciepłe światło LED 2700 K, rama z wpustami i listwą sosnową.',
-        okladka: 'assets/media/sklep/szopka.jpg', video: '', galeria: [], tresc:
+        okladka: 'assets/media/sklep/szopka.jpg', video: '', galeria: ['assets/media/sklep/szopka-2.jpg', 'assets/media/sklep/szopka-3.jpg', 'assets/media/sklep/szopka-4.jpg', 'assets/media/sklep/szopka-5.jpg'], tresc:
           '<h2>Od deski do podświetlonej szopki</h2>' +
           '<p>Każda szopka zaczyna się od wyboru deski. Tniemy warstwy jedna po drugiej, szlifujemy krawędzie i składamy je z dystansami, żeby światło pracowało między płaszczyznami.</p>' +
           '<ul><li>Materiał: sklejka liściasta 4 mm, rama sosnowa z wpustami</li><li>Wykonanie: cięcie laserowe + ręczny szlif, bejca wodna i olej</li><li>Światło: taśma LED 2700 K (ciepła), włącznik przy ramie</li><li>Czas pracy: ok. 6–8 godzin na egzemplarz</li></ul>',
@@ -129,7 +129,7 @@
       {
         id: 2, widoczny: true, data: '2026-08-02', kategoria: 'Szyldy i tablice', tytul: 'Szyld powitalny „Witajcie"',
         zajawka: 'Drewniany szyld z grawerem — wita gości w domu, na weselu i w lokalu.',
-        okladka: 'assets/media/sklep/szyld.jpg', video: '', galeria: [], tresc:
+        okladka: 'assets/media/sklep/szyld.jpg', video: '', galeria: ['assets/media/sklep/szyld-2.jpg'], tresc:
           '<h2>Pierwsze wrażenie robi szyld</h2>' +
           '<p>Frezyjemy napis w litym drewnie, barwimy kontrastowo litery i zabezpieczamy całość olejowoskiem.</p>',
         produkt: { sklep: true, id: 2, nazwa: 'Szyld powitalny „Witajcie"', cena: 189, gabaryt: '50×25×2 cm' }
