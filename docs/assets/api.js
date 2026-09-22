@@ -115,41 +115,90 @@
   }
 
   /* ---------- BLOG: wpisy (realizacje) ---------- */
-  function seedBlog() {
+  /* WERSJE seedów — podbij liczbę, aby odświeżyć treści startowe
+     u WSZYSTKICH (wpisy panelu o innych id/slugach zostają nietknięte) */
+  const SEED_BLOG_W = 2;
+  const SEED_STRON_W = 2;
+
+  function seedBlog(odswiez) {
     const posts = [
       {
         id: 1, widoczny: true, data: '2026-08-14', kategoria: 'Dekoracje świąteczne', tytul: 'Szopka warstwowa z podświetleniem',
         zajawka: 'Nasz flagowy produkt: ręcznie cięte warstwy sklejki 20×20 cm, ciepłe światło LED 2700 K, rama z wpustami i listwą sosnową.',
-        okladka: 'assets/media/sklep/szopka.jpg', video: '', galeria: ['assets/media/sklep/szopka-2.jpg', 'assets/media/sklep/szopka-3.jpg', 'assets/media/sklep/szopka-4.jpg', 'assets/media/sklep/szopka-5.jpg'], tresc:
+        okladka: 'assets/media/sklep/szopka.jpg', video: '', galeria: ['assets/media/sklep/szopka-2.jpg', 'assets/media/sklep/szopka-3.jpg', 'assets/media/sklep/szopka-4.jpg', 'assets/media/sklep/szopka-5.jpg', 'assets/media/sklep/szopka-6.jpg', 'assets/media/sklep/szopka-7.jpg'], tresc:
           '<h2>Od deski do podświetlonej szopki</h2>' +
           '<p>Każda szopka zaczyna się od wyboru deski. Tniemy warstwy jedna po drugiej, szlifujemy krawędzie i składamy je z dystansami, żeby światło pracowało między płaszczyznami.</p>' +
           '<ul><li>Materiał: sklejka liściasta 4 mm, rama sosnowa z wpustami</li><li>Wykonanie: cięcie laserowe + ręczny szlif, bejca wodna i olej</li><li>Światło: taśma LED 2700 K (ciepła), włącznik przy ramie</li><li>Czas pracy: ok. 6–8 godzin na egzemplarz</li></ul>',
         produkt: { sklep: true, id: 1, nazwa: 'Szopka bożonarodzeniowa (warstwowa)', cena: 249, gabaryt: '20×20×8 cm' }
       },
       {
-        id: 2, widoczny: true, data: '2026-08-02', kategoria: 'Szyldy i tablice', tytul: 'Szyld powitalny „Witajcie"',
-        zajawka: 'Drewniany szyld z grawerem — wita gości w domu, na weselu i w lokalu.',
-        okladka: 'assets/media/sklep/szyld.jpg', video: '', galeria: ['assets/media/sklep/szyld-2.jpg'], tresc:
-          '<h2>Pierwsze wrażenie robi szyld</h2>' +
-          '<p>Frezyjemy napis w litym drewnie, barwimy kontrastowo litery i zabezpieczamy całość olejowoskiem.</p>',
+        id: 2, widoczny: true, data: '2026-08-02', kategoria: 'Szyldy i tablice', tytul: 'Napis „Cześć!" w ramie z pleksi',
+        zajawka: 'Frezowany drewniany napis na pleksi w podwójnej ramie — wita gości w domu i w lokalu.',
+        okladka: 'assets/media/sklep/szyld.jpg', video: '', galeria: ['assets/media/sklep/szyld-2.jpg', 'assets/media/sklep/szyld-3.jpg', 'assets/media/sklep/szyld-4.jpg', 'assets/media/sklep/szyld-5.jpg'], tresc:
+          '<h2>Cześć na wejściu</h2>' +
+          '<p>Napis frezujemy w drewnie i montujemy na przezroczystej pleksi na dystansach. Za nim ciemna rama, a całość zamyka jasna oprawa z frezowanym wzorem.</p>' +
+          '<ul><li>Napis: frezowane drewno, dowolne słowo</li><li>Montaż: pleksi na dystansach — efekt lewitacji napisu</li><li>Oprawa: podwójna rama z frezem</li></ul>',
         produkt: { sklep: true, id: 2, nazwa: 'Szyld powitalny „Witajcie"', cena: 189, gabaryt: '50×25×2 cm' }
       },
       {
-        id: 3, widoczny: true, data: '2026-07-21', kategoria: 'Personalizacja', tytul: 'Ramka z sentencją — prezent, który zostaje',
+        id: 3, widoczny: false, data: '2026-07-21', kategoria: 'Personalizacja', tytul: 'Ramka z sentencją — prezent, który zostaje',
         zajawka: 'Ramka ze sklejki z wybraną sentencją, imionami i datą.',
         okladka: 'assets/media/sklep/ramka.jpg', video: '', galeria: [], tresc:
           '<h2>Sentencja, która nie wyjdzie z mody</h2>' +
           '<p>Ramka z grawerem to najprostszy i najbardziej osobisty prezent — od jubileuszu po dzień ślubu.</p>',
         produkt: { sklep: true, id: 4, nazwa: 'Ramka z sentencją', cena: 89, gabaryt: '20×25×2 cm' }
+      },
+      {
+        id: 4, widoczny: true, data: '2026-08-28', kategoria: 'Prezenty personalizowane', tytul: 'Rodzinka niedźwiadków — puzzle z imionami',
+        zajawka: 'Drewniane puzzle rodzinne: misie z wygrawerowanymi imionami i czerwonym sercem.',
+        okladka: 'assets/media/sklep/niedzwiadki.jpg', video: '', galeria: [], tresc:
+          '<h2>Cała rodzina w jednym sercu</h2>' +
+          '<p>Cztery misie — duzi i mali — składają się w jedną całość. Na każdym grawerujemy imię, a pośrodku malujemy serce.</p>' +
+          '<ul><li>Materiał: lite drewno, ręczny szlif i olej</li><li>Grawer: imiona domowników na każdej figurce</li><li>Prezent: na rocznicę, Dzień Mamy i Taty, parapetówkę</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 5, widoczny: true, data: '2026-08-28', kategoria: 'Dekoracje stołu', tytul: 'Serwetnik „Góry"',
+        zajawka: 'Drewniany serwetnik z linią gór — na stół w domu i na imprezę w góralskim klimacie.',
+        okladka: 'assets/media/sklep/serwetnik.jpg', video: '', galeria: ['assets/media/sklep/serwetnik-2.jpg'], tresc:
+          '<h2>Górski akcent na stole</h2>' +
+          '<p>Serwetnik wycinany w kształt górskiego łańcucha — z podstawką, stabilny, na zwykłe serwetki stołowe.</p>' +
+          '<ul><li>Materiał: drewno, olejowane</li><li>Motyw: linia gór — wytniemy też inny (serce, napis, datę)</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 6, widoczny: true, data: '2026-08-28', kategoria: 'Krzyżówki i napisy', tytul: 'Rodzinna ściana Scrabble',
+        zajawka: 'Imiona domowników w krzyżówce na ścianę — z rodzinnymi zdjęciami i słowami: miłość, radość, wdzięczność.',
+        okladka: 'assets/media/sklep/scrabble.jpg', video: '', galeria: ['assets/media/sklep/scrabble-2.jpg'], tresc:
+          '<h2>Krzyżówka, która opowiada o rodzinie</h2>' +
+          '<p>Klocki z imionami układamy w krzyżówkę na wymiar ściany. Obok wieszamy ramki ze zdjęciami, a całość spinamy słowami ważnymi dla domu.</p>' +
+          '<ul><li>Klocki: drewniane, z grawerowanymi literami</li><li>Układ: projektujemy pod Twoją ścianę i listę imion</li><li>Dodatki: ramki na zdjęcia, słowa-relacje (miłość, radość…)</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 7, widoczny: true, data: '2026-08-12', kategoria: 'Numery i cyfry', tytul: 'Ażurowa ósemka w ramie',
+        zajawka: 'Cyfra „8" z ażurowym kwiatowym tłem — od surowego wycięcia po oprawiony obraz.',
+        okladka: 'assets/media/sklep/osemka.jpg', video: '', galeria: ['assets/media/sklep/osemka-2.jpg'], tresc:
+          '<h2>Od surowego wycięcia do obrazu</h2>' +
+          '<p>Najpierw ażur: cyfra i kwiatowe tło wycinane warstwa po warstwie. Potem kolor — ciemna bejca i złoty środek — i oprawa w ramę.</p>' +
+          '<ul><li>Technika: warstwowy ażur + bejca i złocenie</li><li>Na zdjęciach: stan przed oprawieniem i gotowy obraz</li><li>Możliwa każda cyfra, litera albo monogram</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
       }
     ];
-    zapisz(KL.blog, posts);
+    if (odswiez) {
+      const ids = {};
+      posts.forEach(function (p) { ids[p.id] = 1; });
+      const obce = blog().filter(function (w) { return !ids[Number(w.id)]; });
+      zapisz(KL.blog, posts.concat(obce));
+    } else {
+      zapisz(KL.blog, posts);
+    }
   }
   function blog() { return czytaj(KL.blog) || []; }
 
   /* ---------- PODSTRONY zarządzane z panelu ---------- */
-  function seedStrony() {
-    zapisz(KL.strony, [
+  function seedStrony(odswiez) {
+    const seedy = [
       {
         slug: 'pracownia', tytul: 'Pracownia', menu: 1, kol: 3,
         tresc: '<h2>Kim jesteśmy</h2>' +
@@ -163,7 +212,15 @@
           '<p><a href="realizacje.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">Zobacz nasze realizacje →</a> · ' +
           '<a href="kontakt.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">Zapytaj o wycenę →</a></p>'
       }
-    ]);
+    ];
+    if (odswiez) {
+      const slugi = {};
+      seedy.forEach(function (x) { slugi[x.slug] = 1; });
+      const obce = strony().filter(function (x) { return !slugi[x.slug]; });
+      zapisz(KL.strony, seedy.concat(obce));
+    } else {
+      zapisz(KL.strony, seedy);
+    }
   }
   function strony() { return czytaj(KL.strony) || []; }
 
@@ -499,8 +556,13 @@
   /* zalążki demo — przy pierwszym uruchomieniu */
   if (SYG.TRYB_DEMO) {
     try {
-      if (localStorage.getItem(KL.blog) === null) seedBlog();
-      if (localStorage.getItem(KL.strony) === null) seedStrony();
+      let sw = {};
+      try { sw = JSON.parse(localStorage.getItem('syg-seed-wersja') || '{}'); } catch (e2) { sw = {}; }
+      if (localStorage.getItem(KL.blog) === null) { seedBlog(false); sw.blog = SEED_BLOG_W; }
+      else if ((Number(sw.blog) || 0) < SEED_BLOG_W) { seedBlog(true); sw.blog = SEED_BLOG_W; }
+      if (localStorage.getItem(KL.strony) === null) { seedStrony(false); sw.strony = SEED_STRON_W; }
+      else if ((Number(sw.strony) || 0) < SEED_STRON_W) { seedStrony(true); sw.strony = SEED_STRON_W; }
+      try { localStorage.setItem('syg-seed-wersja', JSON.stringify(sw)); } catch (e3) { /* brak zapisu */ }
       seedKonta();
     } catch (e) { /* brak localStorage */ }
   }

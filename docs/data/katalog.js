@@ -29,19 +29,21 @@ window.SYG_KATALOG = [
   },
   {
     id: 3,
+    /* UKRYTE do czasu prawdziwego zdjęcia (stock) */
     nazwa: 'Litery podświetlane LOVE',
     opis: 'Drewniane litery przestrzenne z ciepłym podświetleniem.',
     cena: 249,
     obraz: 'love.jpg',
-    dostepny: 1
+    dostepny: 0
   },
   {
     id: 4,
     nazwa: 'Ramka z sentencją',
     opis: 'Ramka ze sklejki z wybraną sentencją lub imionami i datą.',
     cena: 89,
+    /* UKRYTA do czasu prawdziwego zdjęcia (stock) */
     obraz: 'ramka.jpg',
-    dostepny: 1,
+    dostepny: 0,
     gabaryt: '20×25×2 cm',
     storyId: 3
   }
