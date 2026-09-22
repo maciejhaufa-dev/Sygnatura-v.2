@@ -7,6 +7,55 @@
 
 ---
 
+## 0. CHECKPOINT — wznowienie pracy (22.09.2026, wersja 28.37) ⭐ CZYTAJ NAJPIERW
+
+> Ten rozdział to migawka stanu na koniec rozmowy z 22.09.2026. Nowy agent: wykonaj
+> KROK 0 (recovery), sprawdź zgodność HEAD, i kontynuuj od NASTĘPNEGO KROKU.
+
+**KROK 0 — recovery po resecie sandboxa (ZAWSZE najpierw):**
+```bash
+cd /home/user/Sygnatura-v.2
+git fetch origin arena/01a056f0-sygnatura-v-2 && git reset FETCH_HEAD   # jawnY fetch, NIGDY ślepy FETCH_HEAD
+git log --oneline -1            # oczekiwane: 929b81f (lub nowszy, jeśli checkpoint dopisany)
+git status --short | wc -l      # oczekiwane: 0
+```
+
+**Stan na 22.09.2026:**
+| Co | Wartość |
+|---|---|
+| Gałąź pracy (TYLKO na niej) | `arena/01a056f0-sygnatura-v-2` |
+| HEAD | `929b81f` „DZIENNIK: 8 nowych wpisow z duzego zrzutu" (worktree czysty) |
+| Treść live | `670d2c3` → **wersja 28.37, marker `?v=317`**, Pages `built`, zweryfikowane fetch_page (16 kafli) |
+| PR | #1 OPEN (Serwis: kreator Zamówienia A/B/C) — nie ruszać bez polecenia |
+| `origin/main` | `80efcca` (zrzut 18 zdjęć + folder pracownia/ + re-uploady) |
+| Seedy (`www/assets/api.js`) | `SEED_BLOG_W = 5`, `SEED_STRON_W = 2`, znacznik `syg-seed-wersja` |
+| Kontakt (POTWIERDZONY 2×, nie dopytywać) | kontakt@studiosygnatura.pl, 510 767 076 |
+
+**Portfolio live (17 seedów, 16 widocznych, sortowanie od najnowszych):**
+#1 szopka (7 zdjęć) · #2 szyld „Cześć!" (2, TYLKO w drewnianej ramce) · #3 ramka (`widoczny:false`, stock) ·
+#4 misie (główne WA0006 nowa sceneria + zbliżenie w galerii) · #5 serwetnik (2) · #6 krzyżówka z imionami (2) ·
+#7 ósemka (2) · #8 lustro (crop bez drzwi + róg ramy) · #9 makrama (1) · #10 deski z grawerem (6) ·
+#11 pudełka (3) · #12 kartka „Sto lat!" (1) · #13 dębowe puzzle DIY (1) · #14 krzyżyk (1) ·
+#15 breloki (2) · #16 plater (1) · #17 podstawka na jajka (2). Katalog sklepu: TYLKO szopka+szyld
+(LOVE/ramka `dostepny:0` — stock). Zdjęcia: `www/assets/media/sklep/` (~9 MB, 46 plików).
+
+**Zasady twarde (złamanie = cofanie roboty):**
+1. Zmiana seeda (blog/strony) = PODBIJ `SEED_BLOG_W`/`SEED_STRON_W` (merge roznosi się sam; klucze demo: `syg-demo-blog`, `syg-demo-strony`).
+2. Deploy = `rm -rf docs/* && cp -r www/* docs/` + `docs/404.html` + `touch docs/.nojekyll` + commit + push + `gh api .../pages/builds/latest` + verify `fetch_page` z markerem `?v=`.
+3. Wersja = marker `?v=NNN` we wszystkich `www/*.html` + `wersja 28.xx` w `www/assets/main.js` (zawsze razem, zawsze +1).
+4. Zdjęcia usera lądują na `origin/main` (folder `uploads/`, web-upload); nowości = `git diff --name-only origin/main~1 origin/main -- uploads/` (main bywa shallow → `git fetch --depth=5 origin main`).
+5. Optymalizacja zdjęć: `convert -auto-orient -resize 1600x1600> -quality 82 -strip`; daty wpisów z EXIF `DateTimeOriginal`.
+6. `/tmp/` NIE przetrwa resetu — oryginały odtwarzalne z `origin/main` (`git show <sha>:uploads/...`).
+7. Weryfikacja live TYLKO przez `fetch_page` (curl z sandboxa = HTTP 000).
+8. ZAKAZ słowa „Scrabble" (znak towarowy) — wszędzie „krzyżówka z imionami" (grep: czysto od 28.35).
+9. Tryb pracy: „Działamy nie śpimy" — decyzje bierze agent, user potwierdza dane na końcu; opisy robocze SZYBKO, korekty później; NIE rozbudowywać edytora treści ani serwisu bez polecenia.
+
+**DO WZIĘCIA OD USERA:** potwierdzenie „pisanki" (wpis #17); korekty opisów; prawdziwe zdjęcia ramki i liter LOVE (albo wycofanie produktów); kolejne zdjęcia prac.
+**NASTĘPNY KROK:** korekty + kolejne prace do portfolio; potem cz. 2 planu (baza Google Sheets, sekcja świąteczna, sklep, wynajem, wizytówka Google).
+**Drobiazg:** build Pages dla `929b81f` (sam DZIENNIK) pokazał `errored | Page build failed` — treść `docs/` identyczna z `670d2c3` (built), live 28.37 ZWERYFIKOWANE po fakcie. Gdyby następny deploy też errorował — sprawdzić szczegóły błędu.
+
+---
+
 ## 1. NAJWAŻNIEJSZE — stan na 07.09.2026
 
 | Co | Gdzie | Status |
