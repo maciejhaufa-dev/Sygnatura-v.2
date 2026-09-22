@@ -15,16 +15,17 @@
 **KROK 0 — recovery po resecie sandboxa (ZAWSZE najpierw):**
 ```bash
 cd /home/user/Sygnatura-v.2
-git fetch origin arena/01a056f0-sygnatura-v-2 && git reset FETCH_HEAD   # jawnY fetch, NIGDY ślepy FETCH_HEAD
-git log --oneline -1            # oczekiwane: 929b81f (lub nowszy, jeśli checkpoint dopisany)
+git fetch origin arena/01a0ca92-sygnatura-v-2 && git reset FETCH_HEAD   # jawnY fetch, NIGDY ślepy FETCH_HEAD
+git log --oneline -1            # oczekiwane: 136ca30 (lub nowszy, jeśli checkpoint dopisany)
 git status --short | wc -l      # oczekiwane: 0
 ```
 
 **Stan na 22.09.2026:**
 | Co | Wartość |
 |---|---|
-| Gałąź pracy (TYLKO na niej) | `arena/01a056f0-sygnatura-v-2` |
-| HEAD | `929b81f` „DZIENNIK: 8 nowych wpisow z duzego zrzutu" (worktree czysty) |
+| Gałąź pracy (TYLKO na niej) | `arena/01a0ca92-sygnatura-v-2` (od 22.09; stara `01a056f0` = historia + cel PR #1) |
+| HEAD | `136ca30` „DZIENNIK: checkpoint wznowienia 22.09 (stan 28.37)" (worktree czysty) |
+| Źródło Pages | gałąź `arena/01a0ca92-sygnatura-v-2`, folder `/docs` (przełączono 22.09 — user w Ustawieniach; bot ma 403) |
 | Treść live | `670d2c3` → **wersja 28.37, marker `?v=317`**, Pages `built`, zweryfikowane fetch_page (16 kafli) |
 | PR | #1 OPEN (Serwis: kreator Zamówienia A/B/C) — nie ruszać bez polecenia |
 | `origin/main` | `80efcca` (zrzut 18 zdjęć + folder pracownia/ + re-uploady) |
@@ -77,14 +78,14 @@ git status --short | wc -l      # oczekiwane: 0
 ```bash
 cd /home/user/Sygnatura-v.2
 # 1. przywróć historię gita (sandbox resetuje HEAD do pierwszego commita):
-git fetch origin arena/01a056f0-sygnatura-v-2 && git reset --mixed FETCH_HEAD
+git fetch origin arena/01a0ca92-sygnatura-v-2 && git reset --mixed FETCH_HEAD
 # 2. doinstaluj brakujące pakiety (reset kasuje pip):
 pip install --break-system-packages flask pillow
 # 3. uruchom serwis (baza tworzy się sama; usunięcie data/serwis.db = reset do seeda):
 cd serwis && python3 app.py     # -> http://127.0.0.1:8000  (admin: /admin/, hasło startowe sygnatura-2026)
 ```
 
-Gałąź pracy: **`arena/01a056f0-sygnatura-v-2`** (tylko na niej commitujemy). Remote: `maciejhaufa-dev/Sygnatura-v.2`.
+Gałąź pracy: **`arena/01a0ca92-sygnatura-v-2`** (tylko na niej commitujemy; zmiana 22.09, stara `01a056f0` = historia). Remote: `maciejhaufa-dev/Sygnatura-v.2`.
 
 ---
 
@@ -250,7 +251,7 @@ Uwagi techniczne:
 ## ⚠️ PROCEDURA ODTWORZENIA PO RESECIE SANDBOXA (zdarzył się 2× w sesji 19 — bez paniki, wszystko jest w repo)
 Sandbox resetuje: git cofa HEAD do `2284074`, usuwa `.venv`, czasem zabija proces Flask. PLIKI W KATALOGU ROBOCZYM ZOSTAJĄ.
 1. Zapisz niezcommitowane zmiany: `cp` edytowanych plików do /tmp (NAJPIERW to, zanim git reset).
-2. `git fetch origin arena/01a056f0-sygnatura-v-2:refs/remotes/origin/arena/01a056f0-sygnatura-v-2` + `git reset --hard origin/arena/01a056f0-sygnatura-v-2`.
+2. `git fetch origin arena/01a0ca92-sygnatura-v-2:refs/remotes/origin/arena/01a0ca92-sygnatura-v-2` + `git reset --hard origin/arena/01a0ca92-sygnatura-v-2` (od 22.09; wcześniej: gałąź `01a056f0`).
 3. Przywróć pliki z /tmp (jeśli były niezcommitowane zmiany).
 4. `cd /home/user/Sygnatura-v.2 && python3 -m venv .venv && .venv/bin/pip install -q flask` (pip systemowy blokuje PEP 668; ewentualnie pillow do obróbki zdjęć).
 5. Start serwisu przez start_process: cwd=`/home/user/Sygnatura-v.2/serwis`, komenda `/home/user/Sygnatura-v.2/.venv/bin/python app.py`, name „Serwis Sygnatura".
@@ -1612,3 +1613,27 @@ DO WZIĘCIA OD USERA: potwierdzenie „pisanki"; korekty opisów; prawdziwe zdj�
 i liter LOVE (albo wycofanie); reszta zdjęć.
 NASTĘPNY KROK: korekty + kolejne prace do portfolio; potem cz. 2 planu (baza Google Sheets,
 sekcja świąteczna, sklep, wynajem, wizytówka Google).
+
+---
+
+## Sesja 29 — wznowienie pracy (22.09.2026): KROK 0 + ZMIANA GAŁĄZI PRACY + zmiana źródła Pages
+
+Nowy sandbox/sesja Arena. KROK 0 wykonany: fetch + reset do `136ca30` (checkpoint wznowienia
+22.09), worktree czysty, stan 1:1 z live (28.37, ?v=317, seedy SEED_BLOG_W=5 / SEED_STRON_W=2,
+16 kafli zweryfikowane live przez fetch_page).
+
+- **ZMIANA GAŁĄZI PRACY** (wymóg techniczny platformy Arena — sesja przypięta jest do własnej
+  gałęzi): `arena/01a056f0-sygnatura-v-2` → `arena/01a0ca92-sygnatura-v-2`. Stara gałąź ZOSTAJE
+  na GitHubie (pełna historia + cel PR #1 — nie ruszany), na niej nie pracujemy dalej.
+  Wszystkie commity/pushy TYLKO na nową gałąź (gałąź wypchnięta: `136ca30`).
+- **ŹRÓDŁO GitHub Pages PRZEŁĄCZONE na nową gałąź** (ścieżka `/docs`) — wykonane przez usera
+  w Ustawieniach (bot ma 403 na Pages). Zweryfikowane API: `source.branch = arena/01a0ca92-…`,
+  build `136ca30` = **built**; fetch_page live: index (tryb startu) + realizacje (16 kafli,
+  kategorie 28.37).
+- Od teraz: każdy push na nową gałąź = automatyczna publikacja (stary model z 27.09, tylko
+  inna gałąź).
+- DZIENNIK: KROK 0 + procedury awaryjne zaktualizowane na nową gałąź. „Drobiazg" z 22.09
+  (build dla `929b81f` = errored) — buildy samych zmian DZIENNIKA na nowej gałęzi wychodzą
+  **built** (`136ca30` + checkpoint z tej sesji).
+
+Bez zmian: treść live, seedy, zasady twarde, PR #1, `origin/main`.
