@@ -1478,6 +1478,34 @@ WYKONANE (wersja 28.33, ?v=313):
   sync docs; Pages built | c4860e1; fetch_page live blog-wpis?id=1 (okładka + 5 miniatur + CTA).
 UWAGA: zdjęcia użytkownika lądują na main w uploads/ (osobna historia main — nasz branch
 bierze je przez git show do www/ w wersjach zoptymalizowanych; surowe oryginały zostają na main).
-DO WZIĘCIA OD USERA: potwierdzenie prawdziwości e-mail/tel; reszta zdjęć z sesji (niedziela).
-NASTĘPNY KROK: kolejne prawdziwe wpisy do portfolio; potem cz. 2 planu (baza Google Sheets,
+## Sesja 28 — PORTFOLIO Z PRAWDZIWYCH PRAC + wersjonowane seedy (commit 59caf52, wersja 28.34)
+
+Właściciel: (1) „widzę tylko jedno zdjęcie szopki" — jego przeglądarka miała STARY seed
+(galeria pusta); (2) w uploads/ pełno zdjęć realizacji, a w zakładce nieopisane — szopka
+ma mieć WSZYSTKIE wrzucone zdjęcia (główne pierwsze); (3) opisać inne prace („magnes na
+klienta") — SZYBKO, korekty później. Mail i telefon POTWIERDZONE jako dobre.
+
+WYKONANE (wersja 28.34, ?v=314):
+- Przegląd wszystkich uploads/ z main (2 arkusze kontaktowe): zidentyfikowano prace —
+  niedźwiadki-puzzle, serwetnik Góry, ściana Scrabble, ósemka ażurowa (przed/po oprawieniu),
+  dodatkowe ujęcia szyldu; odrzucono: screeny Pinteresta (inspiracje, nie ich prace),
+  logo (asset marki), makramowe aniołki + fb1/fb2 (niepewne autorstwo/temat — do decyzji usera).
+- Szopka: KOMPLET 7 zdjęć (główne frontalne + 6 w galerii, w tym dzienne i tył skrzynki).
+- Szyld: 5 zdjęć (finał 2 + detal front/skos + stylizacja) + RETITUL na „Napis „Cześć!"
+  w ramie z pleksi" (stary tytuł „Witajcie" nie pasował do zdjęcia) + opis z procesu.
+- 4 NOWE wpisy z opisami-roboczymi (user skoryguje): #4 niedźwiadki, #5 serwetnik,
+  #6 Scrabble, #7 ósemka. Razem 6 widocznych kafli (sortowanie od najnowszych).
+- Ramka (#3) i LOVE ukryte (dostepny:0 + widoczny:false) — zdjęcia stockowe/AI, nie ich
+  prace; wrócą z prawdziwymi zdjęciami. Ramka.jpg/LOVE.jpg obejrzane — potwierdzony stock.
+- WERSJONOWANE SEEDY (SEED_BLOG_W/SEED_STRON_W=2, 'syg-seed-wersja'): odświeżenie treści
+  startowych u WSZYSTKICH bez utraty wpisów z panelu (merge: seedy podmieniane, obce id/slugi
+  zostają). Od teraz każda zmiana seeda = podbicie wersji, koniec z „wyczyść dane".
+- Testy Node: fresh (7 seedów + stempel), upgrade ze starego (8 = 7 + wpis panelu, galeria
+  6, retitul, ramka ukryta, pracownia odświeżona, obce zachowane), reload bez duplikatów,
+  20/20 zdjęć seedów na dysku, katalog tylko szopka+szyld. Uwaga testowa: KL.strony to
+  'syg-demo-strony' (nie -admin-).
+- Pages built | 59caf52; fetch_page live realizacje (6 kafli + filtry kategorii).
+DO WZIĘCIA OD USERA: korekty opisów; decyzja o aniołkach/fb1/fb2; prawdziwe zdjęcia ramki
+i liter LOVE (albo wycofanie tych produktów); reszta zdjęć z sesji.
+NASTĘPNY KROK: korekty + kolejne prace do portfolio; potem cz. 2 planu (baza Google Sheets,
 sekcja świąteczna, sklep, wynajem, wizytówka Google).
