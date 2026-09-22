@@ -117,7 +117,7 @@
   /* ---------- BLOG: wpisy (realizacje) ---------- */
   /* WERSJE seedów — podbij liczbę, aby odświeżyć treści startowe
      u WSZYSTKICH (wpisy panelu o innych id/slugach zostają nietknięte) */
-  const SEED_BLOG_W = 2;
+  const SEED_BLOG_W = 3;
   const SEED_STRON_W = 2;
 
   function seedBlog(odswiez) {
@@ -167,9 +167,9 @@
         produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
       },
       {
-        id: 6, widoczny: true, data: '2026-08-28', kategoria: 'Krzyżówki i napisy', tytul: 'Rodzinna ściana Scrabble',
+        id: 6, widoczny: true, data: '2026-08-28', kategoria: 'Krzyżówki z imionami', tytul: 'Rodzinna krzyżówka z imionami',
         zajawka: 'Imiona domowników w krzyżówce na ścianę — z rodzinnymi zdjęciami i słowami: miłość, radość, wdzięczność.',
-        okladka: 'assets/media/sklep/scrabble.jpg', video: '', galeria: ['assets/media/sklep/scrabble-2.jpg'], tresc:
+        okladka: 'assets/media/sklep/krzyzowka.jpg', video: '', galeria: ['assets/media/sklep/krzyzowka-2.jpg'], tresc:
           '<h2>Krzyżówka, która opowiada o rodzinie</h2>' +
           '<p>Klocki z imionami układamy w krzyżówkę na wymiar ściany. Obok wieszamy ramki ze zdjęciami, a całość spinamy słowami ważnymi dla domu.</p>' +
           '<ul><li>Klocki: drewniane, z grawerowanymi literami</li><li>Układ: projektujemy pod Twoją ścianę i listę imion</li><li>Dodatki: ramki na zdjęcia, słowa-relacje (miłość, radość…)</li></ul>',
@@ -182,6 +182,24 @@
           '<h2>Od surowego wycięcia do obrazu</h2>' +
           '<p>Najpierw ażur: cyfra i kwiatowe tło wycinane warstwa po warstwie. Potem kolor — ciemna bejca i złoty środek — i oprawa w ramę.</p>' +
           '<ul><li>Technika: warstwowy ażur + bejca i złocenie</li><li>Na zdjęciach: stan przed oprawieniem i gotowy obraz</li><li>Możliwa każda cyfra, litera albo monogram</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 8, widoczny: true, data: '2026-08-26', kategoria: 'Lustra i ramy', tytul: 'Lustro w ramie do kompletu z „Cześć!"',
+        zajawka: 'Lustro w ramie korespondującej z napisem „Cześć!" — ta sama kolorystyka, farba i motywy.',
+        okladka: 'assets/media/sklep/lustro.jpg', video: '', galeria: ['assets/media/sklep/lustro-2.jpg'], tresc:
+          '<h2>Komplet, nie przypadek</h2>' +
+          '<p>Szeroka rama i jasne tło z frezowanym wzorem — lustro gra z napisem „Cześć!" jak komplet: ta sama kolorystyka, ta sama farba, te same motywy.</p>' +
+          '<ul><li>Komplet: rama i tło w stylu napisu „Cześć!"</li><li>Tło: jasne, z frezowanym motywem</li><li>Wymiar: na ścianę w przedpokoju albo salonie</li></ul>',
+        produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
+      },
+      {
+        id: 9, widoczny: true, data: '2026-08-28', kategoria: 'Makrama i obręcze', tytul: 'Makramowa rodzina na złotej obręczy',
+        zajawka: 'Rodzinna makrama na ścianę: obręcz mojej roboty, aniołki żony — wspólna praca.',
+        okladka: 'assets/media/sklep/makrama.jpg', video: '', galeria: [], tresc:
+          '<h2>Dwie pary rąk</h2>' +
+          '<p>Aniołki z makramy na żerdzi, w złotej obręczy. Obręcz robię ja, makramy plotła żona — rodzinna pamiątka na ścianę.</p>' +
+          '<ul><li>Obręcz: złota, z żerdzią na figurki</li><li>Figurki: makramowe aniołki — liczba do ustalenia</li><li>Prezent: na chrzest, roczek, nowe mieszkanie</li></ul>',
         produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' }
       }
     ];
@@ -204,7 +222,7 @@
         tresc: '<h2>Kim jesteśmy</h2>' +
           '<p>Studio Sygnatura to <b>rodzinna manufaktura</b> — w naszych rzeczach spotykają się drewno, światło i detal.</p>' +
           '<h2>Co robimy</h2>' +
-          '<ul><li><b>Dekoracje na wydarzenia</b> — tablice powitalne, plany stołów, litery przestrzenne, mozaiki „scrabble".</li>' +
+          '<ul><li><b>Dekoracje na wydarzenia</b> — tablice powitalne, plany stołów, litery przestrzenne, krzyżówki z imionami.</li>' +
           '<li><b>Personalizowane prezenty</b> — grawerowane wkładki, winietki, ramki z sentencją.</li>' +
           '<li><b>Produkty do domu</b> — szopki warstwowe, szyldy powitalne, podświetlane litery.</li></ul>' +
           '<h2>Nasza zasada</h2>' +
