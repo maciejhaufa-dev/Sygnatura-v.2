@@ -1505,7 +1505,26 @@ WYKONANE (wersja 28.34, ?v=314):
   20/20 zdjęć seedów na dysku, katalog tylko szopka+szyld. Uwaga testowa: KL.strony to
   'syg-demo-strony' (nie -admin-).
 - Pages built | 59caf52; fetch_page live realizacje (6 kafli + filtry kategorii).
-DO WZIĘCIA OD USERA: korekty opisów; decyzja o aniołkach/fb1/fb2; prawdziwe zdjęcia ramki
-i liter LOVE (albo wycofanie tych produktów); reszta zdjęć z sesji.
+## Sesja 28 — ZERO „SCRABBLE" + lustro i makrama (commit 342ce1c, wersja 28.35)
+
+Właściciel: (1) ciemny panel (fb1) to LUSTRO odbijające ciemne drzwi; rama i tło (fb2)
+korespondują z napisem „Cześć!" — te same ramki, kolorystyka, farba, motywy; ICH prace.
+(2) Makramowa rodzina na złotej obręczy ICH praca (on: obręcz, żona: makramy). (3) ZAKAZ
+słowa „Scrabble" (nazwa zastrzeżona) — opisywać jako „krzyżówka z imionami". (4) Dorzuci
+zdjęcia misiów u znajomych (prezent) — czekamy.
+
+WYKONANE (wersja 28.35, ?v=315):
+- „Scrabble" usunięte Z CAŁEGO serwisu (grep: czysto): seed #6 → „Rodzinna krzyżówka
+  z imionami" (kat. „Krzyżówki z imionami"), seedStrony/pracownia, 3 pakiety wynajmu,
+  produkt personalizacji (nazwa + foto), lista SG_OBRAZY w adminie; rename plików:
+  scrabble(-2).jpg → krzyzowka(-2).jpg, pers-kafelki-scrabble.jpg → pers-kafelki-krzyzowka.jpg.
+- Nowe wpisy: #8 „Lustro w ramie do kompletu z „Cześć!"" (26.08 z EXIF, okladka + róg ramy
+  w galerii), #9 „Makramowa rodzina na złotej obręczy" (28.08). Zdjęcia zoptymalizowane.
+- SEED_BLOG_W 2→3: retitul + nowe wpisy rozejdą się same u wszystkich (merge chroni wpisy
+  panelu). Test Node: upgrade 2→3 (10 = 9 seed + 1 panelu, retitul, lustro/makrama, obce
+  zachowane), 23/23 zdjęć na dysku.
+- Pages built | 342ce1c; fetch_page live realizacje (8 kafli, filtry, zero Scrabble).
+DO WZIĘCIA OD USERA: zdjęcia misiów u znajomych; korekty opisów; prawdziwe zdjęcia ramki
+i liter LOVE (albo wycofanie); reszta zdjęć z sesji.
 NASTĘPNY KROK: korekty + kolejne prace do portfolio; potem cz. 2 planu (baza Google Sheets,
 sekcja świąteczna, sklep, wynajem, wizytówka Google).
