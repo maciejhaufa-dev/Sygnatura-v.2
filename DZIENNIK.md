@@ -1539,7 +1539,27 @@ WYKONANE (wersja 28.36, ?v=316):
 - Lustro: crop prawej strony (1200→990px) — drzwi i zawiasy poza kadrem, samo lustro w ramie.
 - SEED_BLOG_W 3→4 (rozchodzi się samo). Test: 22/22 zdjęć na dysku, brak refów do
   szyld-3/4/5. Pages built | 10d35c1; fetch_page live wpis #4 (okładka + 2 + CTA).
-DO WZIĘCIA OD USERA: korekty opisów; prawdziwe zdjęcia ramki i liter LOVE (albo wycofanie);
-reszta zdjęć z sesji.
+## Sesja 28 — 8 NOWYCH WPISÓW z dużego zrzutu (commit 670d2c3, wersja 28.37)
+
+Właściciel wrzucił 18 nowych zdjęć (main 80efcca; UWAGA: commit zawiera też cały folder
+pracownia/ z dokumentami oraz re-uploady starszych zdjęć — diff origin/main~1 to podstawa).
+Plus pytanie o bambus (trawa, nie drewno — czy podawać?) i „posłanki" = odczytane jako
+PISANKI (podstawka na jajka; do potwierdzenia).
+
+WYKONANE (wersja 28.37, ?v=317):
+- Nowe wpisy: #10 deski z grawerem (6 zdjęć, 03.12.2025), #11 pudełka (3, 28.08),
+  #12 kartka „Sto lat!" (08.01), #13 dębowe puzzle DIY (08.12.2025), #14 krzyżyk
+  „Zmartwychwstałem dla Ciebie" (02.09), #15 breloki z logo (2, 01.07), #16 plater
+  (29.08), #17 podstawka na jajka (2, 29.08). Nowe kategorie: Deski do krojenia,
+  Pudełka prezentowe, Kartki okolicznościowe, Decoupage i DIY, Dewocjonalia,
+  Breloki i gadżety, Kuchnia i stół.
+- Bambus: NIE nagłaśniany — opis skupiony na grawerze, materiał jako „drewno lub
+  bambus do wyboru".
+- Misie: główne = nowa sceneria (WA0006); w galerii tylko zbliżenie; zdjęcia z daleka
+  w szafce (190322/190327) USUNIĘTE z seeda i z repo. Data wpisu bez zmian (28.08).
+- SEED_BLOG_W 4→5. Test: 18 (17 seed + 1 panelu), 38/38 zdjęć na dysku.
+- Pages built | 670d2c3; fetch_page live realizacje (16 kafli + filtry nowych kategorii).
+DO WZIĘCIA OD USERA: potwierdzenie „pisanki"; korekty opisów; prawdziwe zdjęcia ramki
+i liter LOVE (albo wycofanie); reszta zdjęć.
 NASTĘPNY KROK: korekty + kolejne prace do portfolio; potem cz. 2 planu (baza Google Sheets,
 sekcja świąteczna, sklep, wynajem, wizytówka Google).
