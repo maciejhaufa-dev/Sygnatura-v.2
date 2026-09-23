@@ -24,9 +24,10 @@ git status --short | wc -l      # oczekiwane: 0
 | Co | Wartość |
 |---|---|
 | Gałąź pracy (TYLKO na niej) | `arena/01a0ca92-sygnatura-v-2` (od 22.09; stara `01a056f0` = historia + cel PR #1) |
-| HEAD | `136ca30` „DZIENNIK: checkpoint wznowienia 22.09 (stan 28.37)" (worktree czysty) |
+| HEAD | `eb417a4` (lub nowszy, jeśli checkpoint dopisany) — worktree czysty |
 | Źródło Pages | gałąź `arena/01a0ca92-sygnatura-v-2`, folder `/docs` (przełączono 22.09 — user w Ustawieniach; bot ma 403) |
-| Treść live | `670d2c3` → **wersja 28.37, marker `?v=317`**, Pages `built`, zweryfikowane fetch_page (16 kafli) |
+| Treść live | `eb417a4` → **wersja 28.38, marker `?v=318`** (meta OG/canonical/noindex, og.jpg, admin.html poza Pages) |
+| Domena | `studiosygnatura.pl` → GitHub Pages (custom domain); OVH DNS: `@` = 4×A `185.199.108/109/110/111.153`, `www` = CNAME `maciejhaufa-dev.github.io` — krok usera (23.09); MX/SPF/DKIM NIE TYKAĆ |
 | PR | #1 OPEN (Serwis: kreator Zamówienia A/B/C) — nie ruszać bez polecenia |
 | `origin/main` | `80efcca` (zrzut 18 zdjęć + folder pracownia/ + re-uploady) |
 | Seedy (`www/assets/api.js`) | `SEED_BLOG_W = 5`, `SEED_STRON_W = 2`, znacznik `syg-seed-wersja` |
@@ -51,8 +52,8 @@ git status --short | wc -l      # oczekiwane: 0
 8. ZAKAZ słowa „Scrabble" (znak towarowy) — wszędzie „krzyżówka z imionami" (grep: czysto od 28.35).
 9. Tryb pracy: „Działamy nie śpimy" — decyzje bierze agent, user potwierdza dane na końcu; opisy robocze SZYBKO, korekty później; NIE rozbudowywać edytora treści ani serwisu bez polecenia.
 
-**DO WZIĘCIA OD USERA:** potwierdzenie „pisanki" (wpis #17); korekty opisów; prawdziwe zdjęcia ramki i liter LOVE (albo wycofanie produktów); kolejne zdjęcia prac.
-**NASTĘPNY KROK:** korekty + kolejne prace do portfolio; potem cz. 2 planu (baza Google Sheets, sekcja świąteczna, sklep, wynajem, wizytówka Google).
+**DO WZIĘCIA OD USERA:** (1) kroki podpięcia domeny z sesji 29 (OVH: 4×A + CNAME; GitHub: custom domain + Enforce HTTPS); potwierdzenie „pisanki" (wpis #17); korekty opisów; prawdziwe zdjęcia ramki i liter LOVE (albo wycofanie produktów); kolejne zdjęcia prac.
+**NASTĘPNY KROK:** podpięcie domeny (user: OVH DNS + GitHub custom domain → agent weryfikuje) → potem formularz zgłoszeniowy + baza Google Sheets (cz. 2 planu), potem wizytówka Google.
 **Drobiazg:** build Pages dla `929b81f` (sam DZIENNIK) pokazał `errored | Page build failed` — treść `docs/` identyczna z `670d2c3` (built), live 28.37 ZWERYFIKOWANE po fakcie. Gdyby następny deploy też errorował — sprawdzić szczegóły błędu.
 
 ---
@@ -1637,3 +1638,39 @@ Nowy sandbox/sesja Arena. KROK 0 wykonany: fetch + reset do `136ca30` (checkpoin
   **built** (`136ca30` + checkpoint z tej sesji).
 
 Bez zmian: treść live, seedy, zasady twarde, PR #1, `origin/main`.
+
+---
+
+## Sesja 29 — launch domeny MVP (23.09.2026): repo gotowe pod `studiosygnatura.pl`
+
+UWAGA: sandbox zresetował się rano (23.09) — HEAD → `80efcca`, drzewo bez www/ i docs/;
+odzyskano KROK 0 z zaktualizowanego checkpointu (fetch + reset --hard gałęzi `01a0ca92`
+→ `e96dd3f`). Procedura sprawdziła się po raz drugi — działa.
+
+Decyzja właściciela (telefon): MVP na GitHub Pages + podpięcie domeny (ludzie pytają,
+gdzie nas znaleźć); formularz zgłoszeniowy + baza Google — KOLEJNO, po domenie.
+Hosting = Pages (zerowy koszt, zero obsługi).
+
+WYKONANE (wersja 28.38, ?v=318, commit `eb417a4`, Pages built):
+- Meta share na 21 stronach: og:type/site_name/locale/title/description/image
+  (`assets/og.jpg` = karta 1200×630 z tła splashu — zdjęcie lasu) + twitter:card;
+  canonical + og:url na 6 stronach statycznych (index/realizacje/blog/pracownia/
+  jak-pracujemy/kontakt); blog-wpis + podstrona = og BEZ canonical (URL dynamiczny).
+- noindex,follow na 12 stronach „w budowie" (tryb startu) + dziekuje — czyste SEO na start.
+- admin.html USUNIĘTY z docs/ (poza Pages) — panel demo (admin/test) nie jest publiczny;
+  www/admin.html zostaje (praca lokalna).
+- docs: 404.html (redirect na /) + .nojekyll + og.jpg.
+- Zmiana treści = bump wersji wg zasady 3 (28.37→28.38, 317→318, 21 plików).
+
+DO WYKONANIA PRZEZ USERA (telefon, ~5 min):
+1. GitHub (repo → Settings → Pages): Custom domain = `studiosygnatura.pl`, zaznacz `www` → Save.
+   GitHub sam wystawi certyfikat (kilkanaście minut – kilka godzin) → potem „Enforce HTTPS".
+2. OVH (Nazwy domen → studiosygnatura.pl → Strefa DNS):
+   - rekord `@`: USUŃ A `213.186.33.5` (parking), DODAJ 4× A (IP GitHub Pages):
+     `185.199.108.153` · `185.199.109.153` · `185.199.110.153` · `185.199.111.153`;
+   - rekord `www`: USUŃ stare A, DODAJ CNAME → `maciejhaufa-dev.github.io`;
+   - MX/SPF/DKIM (poczta OVH — działa i jest testowana) NIE TYKAĆ.
+3. Daj znać → agent weryfikuje (DNS, Pages API: custom_domain + certyfikat, fetch_page
+   z https://www.studiosygnatura.pl/) i potwierdza Enforce HTTPS.
+
+NASTĘPNY KROK po domenie: formularz zgłoszeniowy + baza w Google (Apps Script + arkusz).
