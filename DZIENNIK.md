@@ -24,9 +24,10 @@ git status --short | wc -l      # oczekiwane: 0
 | Co | Wartość |
 |---|---|
 | Gałąź pracy (TYLKO na niej) | `arena/01a0ca92-sygnatura-v-2` (od 22.09; stara `01a056f0` = historia + cel PR #1) |
-| HEAD | `eb417a4` (lub nowszy, jeśli checkpoint dopisany) — worktree czysty |
+| HEAD | `a532b2f` (lub nowszy, jeśli checkpoint dopisany) — worktree czysty |
 | Źródło Pages | gałąź `arena/01a0ca92-sygnatura-v-2`, folder `/docs` (przełączono 22.09 — user w Ustawieniach; bot ma 403) |
-| Treść live | `eb417a4` → **wersja 28.38, marker `?v=318`** (meta OG/canonical/noindex, og.jpg, admin.html poza Pages) |
+| Treść live | **wersja 28.39, marker `?v=319`** (121 markerów), **`LAUNCH: false` = pełny serwis** (testy u znajomych); meta/og z 28.38, admin.html poza Pages |
+| Silnik (baza) | `engine/` = full parity 30 akcji (konta/wynajem/blog/podstrony/panel, SHA-256, `dane_json` zamówień) — **do wdrożenia przez właściciela** (engine/README.md, telefon); po URL `/exec` bot wpije do config.js i wypchnie |
 | Domena | `studiosygnatura.pl` → GitHub Pages (custom domain); OVH DNS: `@` = 4×A `185.199.108/109/110/111.153`, `www` = CNAME `maciejhaufa-dev.github.io` — krok usera (23.09); MX/SPF/DKIM NIE TYKAĆ |
 | PR | #1 OPEN (Serwis: kreator Zamówienia A/B/C) — nie ruszać bez polecenia |
 | `origin/main` | `80efcca` (zrzut 18 zdjęć + folder pracownia/ + re-uploady) |
@@ -52,8 +53,8 @@ git status --short | wc -l      # oczekiwane: 0
 8. ZAKAZ słowa „Scrabble" (znak towarowy) — wszędzie „krzyżówka z imionami" (grep: czysto od 28.35).
 9. Tryb pracy: „Działamy nie śpimy" — decyzje bierze agent, user potwierdza dane na końcu; opisy robocze SZYBKO, korekty później; NIE rozbudowywać edytora treści ani serwisu bez polecenia.
 
-**DO WZIĘCIA OD USERA:** (1) kroki podpięcia domeny z sesji 29 (OVH: 4×A + CNAME; GitHub: custom domain + Enforce HTTPS); potwierdzenie „pisanki" (wpis #17); korekty opisów; prawdziwe zdjęcia ramki i liter LOVE (albo wycofanie produktów); kolejne zdjęcia prac.
-**NASTĘPNY KROK:** podpięcie domeny (user: OVH DNS + GitHub custom domain → agent weryfikuje) → potem formularz zgłoszeniowy + baza Google Sheets (cz. 2 planu), potem wizytówka Google.
+**DO WZIĘCIA OD USERA:** (0) URL `/exec` z wdrożonego silnika Apps Script (+ ARKUSZ_ID/TOKEN w Konfig.gs — engine/README.md); (1) kroki podpięcia domeny (OVH: 4×A + CNAME; GitHub: custom domain + Enforce HTTPS); potwierdzenie „pisanki" (wpis #17); korekty opisów; prawdziwe zdjęcia ramki i liter LOVE (albo wycofanie produktów); kolejne zdjęcia prac.
+**NASTĘPNY KROK:** (1) właściciel wdraża `engine/` w Apps Script (engine/README.md, ~15 min z telefonu) i prześle URL `/exec` → bot wpije do config.js i wypchnie (blokujące testy u znajomych); (2) równolegle: podpięcie domeny (user: kroki A/B/C z sekcji „launch domeny MVP") → weryfikacja robota → wizytówka Google.
 **Drobiazg:** build Pages dla `929b81f` (sam DZIENNIK) pokazał `errored | Page build failed` — treść `docs/` identyczna z `670d2c3` (built), live 28.37 ZWERYFIKOWANE po fakcie. Gdyby następny deploy też errorował — sprawdzić szczegóły błędu.
 
 ---
@@ -1674,3 +1675,55 @@ DO WYKONANIA PRZEZ USERA (telefon, ~5 min):
    z https://www.studiosygnatura.pl/) i potwierdza Enforce HTTPS.
 
 NASTĘPNY KROK po domenie: formularz zgłoszeniowy + baza w Google (Apps Script + arkusz).
+
+---
+
+## Sesja 29 — SILNIK Apps Script: FULL PARITY (30 akcji) + pełny serwis na testy (23.09, commit `a532b2f`)
+
+**Zmiana priorytetu (właściciel, telefon):** najpierw zamówienia przez panel + baza Google
+(konta, historia, kody rabatowe, hasła), testy u znajomych; domena idzie równolegle
+(kroki A/B/C z sekcji „launch domeny MVP" nadal otwarte, nie blokują).
+Uwaga właściciela: „za dużo treści na telefon" → instrukcje wdrożenia krótkie i mobilne.
+
+Audit starego `engine/` (5 akcji, ~30 wołanych przez strony) wykazał: `doPost` czytał akcję
+z CIAŁA JSON, a `api.js` wysyła ją w URL `?akcja=` → każda akcja = „Nieznana akcja";
+`zapiszZamowienie` czytał `klient.dostawa`, a klient wysyła `d.dostawa` na szycie; brakowało
+kont (7 akcji), wynajmu, bloga (5), podstron (3), treści strony głównej/zamówień (4),
+produktów (2), cennika, admin-login, terminy-zajete, pakiet-dostepny; seedy katalogu bez
+gabaryt/storyId i z LOVE/ramka `dostepny=1` (musiały być 0).
+
+WYKONANE (wersja 28.39, ?v=319, 121 markerów):
+1. `engine/Kod.gs` — pełne lustro demo, 30 akcji. Poprawki: akcja z `e.parameter.akcja`;
+   dostawa/kod/zgoda z szycia prośby; zamówienie = kolumny czytelne + `dane_json` (pełny zrzut)
+   + `historia_json`; maile do studia i klienta (nie blokują zapisu); sygnatury z LockService.
+2. KONTA: zakładka `Konta`, hasła SHA-256 (`Utilities.computeDigest`; demo `hashDemo`
+   tylko na identyfikację demo), `konto-*` dostają `_email` z sesji, `konto-zamowienia`
+   ≤ 12 miesięcy, rejestracja = mail powitalny.
+3. WYNAJEM: `wynajem-zapytanie` (maile 2×) + kalendarz na żywo: `terminy-zajete`/
+   `pakiet-dostepny` = hashDemo (`h=(h*33+c)>>>0`, ten sam co w demo) + realne blokady
+   z `status='zarezerwowany'` (po wpłacie właściciel zmienia status w arkuszu;
+   zapytania NIE blokują — spójne z demem).
+4. BLOG/PODSTRONY/TREŚCI: `Blog` (11 kolumn), `Strony`, `Ustawienia` (stronaGlowna/
+   stronaZamowienia = JSON); `blog-zapisz` z `syncProdukt` (normalizuje obraz — ściąga
+   prefiks `assets/media/sklep/`; bug latentny z demo); `produkty-zapisz`/`produkt-nowy`/
+   `ustawienia-dostawa-zapisz`; `admin-login` = TOKEN + e-mail/hasło z `Admini`
+   (domyślnie kontakt@studiosygnatura.pl / `sygnatura-2026` — ZMIEŃ).
+5. `engine/Konfig.gs`: 9 zakładek (Ustawienia, Katalog, Wiadomosci, Zamowienia, Wynajem,
+   Konta, Blog, Strony, Admini), `instaluj()` (nagłówki + seedy + admin), `sha256()`,
+   `DOSTAWA_STARTOWA`; `engine/SEED.gs` wygenerowany z seedy klienta
+   (`tools/gen_seed_gs.js`: 17 wpisów bloga, podstrona pracownia, 4 produkty
+   z LOVE/ramka `dostepny=0`); `engine/README.md` — instrukcja pod telefon
+   (sheets.new → script.google.com → 4 pliki → `instaluj` → Wdróż: „ja" + „Każdy"
+   → URL `/exec`) + checklista testów.
+6. `www/assets/api.js`: tryb API samo-serwisuje sesję i KASH konta (localStorage) —
+   strony czytają `SYG.demoDb.zalogowany()` synchronicznie, więc kash odświeżany
+   `konto-pobierz` przy wejściu na stronę i po zalogowaniu/rejestracji/zapisie;
+   `wezwij()` dopisuje `_email` do akcji `konto-*` (poza rej/zalog/wylog).
+7. `www/assets/config.js`: **`LAUNCH: false`** — pełny serwis (sklep + koszyk + konta
+   + kreator + wynajem) na testy u znajomych. deploy: 20 stron + 404, admin.html BRAK.
+
+KROK WŁAŚCICIELA (JEDYNY BLOKOWĄCY TESTY): wdrożyć `engine/` w Apps Script wg
+`engine/README.md` (~15 min z telefonu) i prześlij URL `/exec` → bot wpije `SYG.API`
+do config.js, bump + wypchnięcie (banner „TRYB DEMO" zniknie sam). Potem: testy
+znajomych wg checkliasty (kontakt → konto → zamówienie z `POWITANIE5` → historia/paragon
+→ wynajem → panel `admin.html?klucz=…`).
