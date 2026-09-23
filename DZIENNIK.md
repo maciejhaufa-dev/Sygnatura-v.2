@@ -1722,8 +1722,16 @@ WYKONANE (wersja 28.39, ?v=319, 121 markerów):
 7. `www/assets/config.js`: **`LAUNCH: false`** — pełny serwis (sklep + koszyk + konta
    + kreator + wynajem) na testy u znajomych. deploy: 20 stron + 404, admin.html BRAK.
 
-KROK WŁAŚCICIELA (JEDYNY BLOKOWĄCY TESTY): wdrożyć `engine/` w Apps Script wg
+KROK WŁAŚCIELA (JEDYNY BLOKOWĄCY TESTY): wdrożyć `engine/` w Apps Script wg
 `engine/README.md` (~15 min z telefonu) i prześlij URL `/exec` → bot wpije `SYG.API`
 do config.js, bump + wypchnięcie (banner „TRYB DEMO" zniknie sam). Potem: testy
 znajomych wg checkliasty (kontakt → konto → zamówienie z `POWITANIE5` → historia/paragon
 → wynajem → panel `admin.html?klucz=…`).
+
+Dopisek (po weryfikacji live): strona główna w trybie LAUNCH=false pokazywała nagłówek
+launchowy (Napisz/Zadzwoń, „Jak zamówić — bez konta") — przywrócono pełny serwis
+(commit `bb1e08b`): szukajka + KOSZYK + PANEL UŻYTKOWNIKA + „Jak działamy" + stopka
+spójna z podstronami (Regulamin/Jak pracujemy/wersja); wariant launchowy zachowany
+pod flagą (oba bloki w HTML, przełącznik JS wg `SYG.LAUNCH`). Live: config.js
+`LAUNCH: false` ✓, index z koszykiem/panelem ✓. Uwaga: `fetch_page` cache'uje po URL —
+weryfikować z parametrem cache-busting.
