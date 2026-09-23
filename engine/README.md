@@ -1,41 +1,53 @@
-# SILNIK — Google Apps Script (czysty JavaScript, zero Pythona)
+# SILNIK — Google Apps Script (arkusz Google = baza)
 
 Silnik serwisu Studio Sygnatura. Strony w `www/` wołają go przez `fetch`
-(funkcje `SYG.wezwij(...)` z `www/assets/api.js`), a on zapisuje dane w **arkuszu Google**
-i wysyła maile (Gmail). Cały system to HTML + CSS + JS — dokładnie tak, jak chciał właściciel.
+(`SYG.wezwij(...)` z `www/assets/api.js`); on zapisuje dane w **arkuszu Google**
+i wysyła maile (Gmail). Całość: HTML + CSS + JS — zero Pythona, zero serwera.
 
-## Co tu jest
-- `Konfig.gs` — ustawienia (ID arkusza, klucz admina, maile) + `instaluj()` (zakłada zakładki i katalog)
-- `Kod.gs` — API: `katalog`, `wiadomosc`, `zamowienie` (publiczne) oraz `zamowienia-lista`, `zamowienie-status` (klucz admina)
-- `Uruchom.gs` — codzienny backup arkusza na Dysk Google (folder `SYGNATURA-Backup`, retencja 30 dni) + alarm mailowy
+## Pliki (wszystkie 4 wklejasz do Apps Script jako osobne pliki)
+- `Konfig.gs` — ustawienia (ID arkusza, klucz admina, maile, hasło startowe admina) + `instaluj()`
+- `Kod.gs` — API komplet (30 akcji: sklep, zamówienia, konta, wynajem, blog, podstrony, panel)
+- `SEED.gs` — SEEDY wygenerowane z klienta (17 wpisów bloga, podstrona, 4 produkty) —
+  NIE edytować ręcznie; po zmianie seedy klienta: `node tools/gen_seed_gs.js`
+- `Uruchom.gs` — codzienny backup arkusza na Dysk (folder `SYGNATURA-Backup`, retencja 30 dni)
 
-## Wdrożenie krok po kroku (robi to WŁAŚCICIEL — bot nie ma dostępu do Google)
-1. Otwórz https://sheets.new na koncie Google Studia → utwórz arkusz **„SYGNATURA-BAZA"**.
-   Skopiuj jego ID z adresu: `docs.google.com/spreadsheets/d/<ID>/edit`.
-2. Otwórz https://script.google.com → **Nowy projekt** → usuń zawartość `Code.gs` i wklej kolejno
-   pliki: `Konfig.gs`, `Kod.gs`, `Uruchom.gs` (każdy jako osobny plik: `+` → Skrypt).
-3. W `Konfig.gs` wstaw: `ARKUSZ_ID` (z kroku 1) i własny `TOKEN` (długi ciąg liter i cyfr —
-   to „hasło" do panelu `/admin/`).
-4. Zapisz projekt (Ctrl+S). Z listy funkcji wybierz **`instaluj`** → **Uruchom** → zezwól na uprawnienia
-   (komunikat „Google hasn't verified this app" jest normalny: Zaawansowane → Przejdź do projektu).
-5. **Wdróż → Nowe wdrożenie → typ: Aplikacja internetowa**:
+## Wdrożenie (robi WŁAŚCICIEL — bot nie ma dostępu do Google, ~15 min, da się z telefonu)
+1. **ARKUSZ**: na koncie Google Studia otwórz https://sheets.new → nazwij **„SYGNATURA-BAZA”**.
+   Skopiuj ID z adresu: `docs.google.com/spreadsheets/d/<ID>/edit`.
+2. **SKRYPT**: https://script.google.com → **Nowy projekt**. Usuń zawartość `Code.gs`;
+   dla każdego pliku: `+` → Skrypt → wklej (Konfig.gs, Kod.gs, SEED.gs, Uruchom.gs). Zapisz.
+3. W `Konfig.gs` wstaw: `ARKUSZ_ID` (krok 1) i `TOKEN` — długi ciąg liter + cyfr
+   (to „klucz” do panelu, np. 24 znaki; nie podawaj go nikomu).
+4. Z listy funkcji wybierz **`instaluj`** → Uruchom → zezwól na uprawnienia
+   (komunikat „Google hasn't verified this app” = normalny: Zaawansowane → Przejdź do projektu → zezwól).
+5. **Wdróż → Nowe wdrożenie → Aplikacja internetowa**:
    - Wykonuj jako: **ja**
-   - Dostęp: **Każdy** (endpointy admina i tak wymagają klucza)
+   - Kto ma dostęp: **Każdy** (akcje admina i tak wymagają klucza)
    - Skopiuj **URL aplikacji internetowej** (kończy się `/exec`).
-6. Wklej ten URL do `www/assets/config.js` → `API: 'https://script.google.com/macros/s/…/exec'`.
-   Banner „TRYB DEMO" zniknie sam.
-7. Z listy funkcji uruchom **`zalozHarmonogram`** (nocny backup).
-8. Test: wyślij wiadomość z formularza na stronie → sprawdź zakładkę `Wiadomosci` w arkuszu i skrzynkę Studia.
+6. URL prześlij na czat — wkleję go do `www/assets/config.js` → `API: …` i wypchnę.
+   (Albo wkleisz sam.) Banner „TRYB DEMO” zniknie automatycznie.
+7. Z listy funkcji uruchom **`zalozHarmonogram`** (backup nocny 03:00).
 
-## Jak to działa od strony technicznej
-- Przeglądarka wysyła POST z `Content-Type: text/plain` (bez preflight CORS) na `URL?akcja=…`,
-  treścią jest JSON. Apps Script odpowiada JSON-em.
-- Publiczne akcje nie mają klucza — mogą je wywołać tylko formularze strony (walidacja jest po obu stronach).
-- Kolejne sygnatury (SYG-2026-001…) są przydzielane z blokadą (`LockService`), więc się nie zdublują.
-- Limity darmowego Google: ~100 maili dziennie (MailApp) — w zupełności wystarczy przy tej skali.
+## Testy (checklista po wpięciu)
+1. **Kontakt**: wyślij formularz → wiersz w zakładce `Wiadomosci` + mail na skrzynkę.
+2. **Konto**: rejestracja (ikona konta, prawy górny róg) → logowanie → zapisz adres →
+   mail powitalny; w nagłówku „Witaj, {imię}”.
+3. **Zamówienie**: sklep → koszyk → dane (autopodpisywanie z konta) → podsumowanie
+   (sprawdź kod `POWITANIE5`) → „Zamawiam” → w zakładce `Zamowienia` sygnatura `SYG-2026-001`
+   + 2 maile (do Studia i do klienta).
+4. **Historia**: panel konta → Historia zamówień → „Paragon” (pełny rachunek).
+5. **Wynajem**: kalendarz (dni na żywo) → zapytanie o termin → zakładka `Wynajem`.
+   **Po wpłacie** zmień status w arkuszu na `zarezerwowany` — dzień i pakiet
+   zablokują się w kalendarzu (zapytania samych zapytań NIE blokują).
+6. **Panel**: otwórz `admin.html?klucz=TWOJ_TOKEN` → logowanie
+   `kontakt@studiosygnatura.pl` / `sygnatura-2026` → **ZMIEŃ HASŁO** (zakładka `Admini`
+   w arkuszu: haslo_sha = wynik `sha256('twoje nowe hasło')` — funkcja `sha256` jest
+   w Konfig.gs; wybierz ją z listy funkcji → Uruchom).
 
-## Kolejne wersje silnika (plan)
-- `wiadomosci-lista` (lista wiadomości w panelu, klucz),
-- edycja katalogu z panelu (aktualnie: bezpośrednio w arkuszu),
-- konta klientów i partnerów (osobne zakładki),
-- raporty kwartalne mąż/żona (arkusz raportowy).
+## Zasady stałe
+- Panel admina zawsze z `?klucz=` (TOKEN z Konfig.gs) — linku nie publikujemy.
+- Mail: limit Gmaila ~100/dzień (MailApp) — przy tej skali wystarczająco.
+- Backup: codziennie 03:00 → Dysk (`SYGNATURA-Backup`), retencja 30 dni; alarm mailem przy błędzie.
+- Cennik dostawy, strona główna, podstrony, produkty, blog — edycja w panelu `admin.html`
+   (zapisy lądują w arkuszu od razu; nic się nie czyści, nie ma „resetu danych”).
+- Hasła kont: SHA-256 w arkuszu (zakładka `Konta`, kolumna `haslo_sha`) — samo hasło nigdzie nie leży.

@@ -25,6 +25,22 @@
     return h;
   }
 
+  /* ---------- sesja i kash konta (tryb API) ----------
+     Strony czytają zalogowane konto synchronicznie (SYG.demoDb.zalogowany()),
+     więc w trybie API trzymamy w localStorage najnowsze konto zwrócone
+     przez silnik (arkusz Google). */
+  const KL_KACH = 'syg-uzytkownik-cache';
+  function sesjaEmail() {
+    const s = czytaj(KL.sesja);
+    return (s && s.email) ? s.email : null;
+  }
+  function zapiszSesje(email) { zapisz(KL.sesja, { email: email }); }
+  function usunSesje() { try { localStorage.removeItem(KL.sesja); } catch (e) {} }
+  function kachKonta() { return czytaj(KL_KACH) || null; }
+  function zapiszKachKonta(k) {
+    if (k) { zapisz(KL_KACH, k); } else { try { localStorage.removeItem(KL_KACH); } catch (e) {} }
+  }
+
   /* cennik dostawy: nadpisania z panelu admina albo wartości z config.js */
   SYG.ustawieniaDostawa = function () {
     if (SYG.TRYB_DEMO) {
@@ -69,6 +85,7 @@
     zalogowany: function () {
       const s = czytaj(KL.sesja);
       if (!s || !s.email) return null;
+      if (!SYG.TRYB_DEMO) return kachKonta();  /* tryb API: kash z silnika */
       const u = (czytaj(KL.uzytkownicy) || []).find(function (x) { return x.email === s.email; });
       return u ? bezHasla(u) : null;
     }
@@ -661,21 +678,54 @@
   SYG.wezwij = async function (akcja, dane) {
     if (SYG.TRYB_DEMO) return demo(akcja, dane);
 
+    dane = dane || {};
+    /* akcje konta: podajemy e-mail sesji (strony go nie przesyłają) */
+    if (String(akcja).indexOf('konto-') === 0 &&
+        akcja !== 'konto-rejestracja' && akcja !== 'konto-zaloguj' && akcja !== 'konto-wyloguj') {
+      const em = sesjaEmail();
+      if (em) dane = Object.assign({}, dane, { _email: em });
+    }
+
     // Google Apps Script: POST z Content-Type text/plain (bez preflight CORS),
     // odpowiedź JSON. Akcja w parametrze URL, dane w treści.
     try {
       const res = await fetch(SYG.API + '?akcja=' + encodeURIComponent(akcja), {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(dane || {})
+        body: JSON.stringify(dane)
       });
       const txt = await res.text();
-      try { return JSON.parse(txt); }
+      let odp;
+      try { odp = JSON.parse(txt); }
       catch (e) { return { ok: false, blad: 'Zła odpowiedź serwera (kod ' + res.status + ').' }; }
+      /* samo-serwisowanie sesji i kasha (demo robi to w demo(); API tutaj) */
+      try {
+        if (odp && odp.ok && odp.konto &&
+            (akcja === 'konto-zaloguj' || akcja === 'konto-rejestracja' ||
+             akcja === 'konto-pobierz' || akcja === 'konto-zapisz')) {
+          zapiszSesje(odp.konto.email);
+          zapiszKachKonta(odp.konto);
+        }
+        if (akcja === 'konto-wyloguj' && odp && odp.ok) { usunSesje(); zapiszKachKonta(null); }
+      } catch (e2) { /* brak storage */ }
+      return odp;
     } catch (e) {
       return { ok: false, blad: 'Brak połączenia z serwerem. Spróbuj ponownie za chwilę.' };
     }
   };
+
+  /* tryb API: odśwież kash konta przy wejściu na stronę (nagłówek „Witaj”,
+     autopodpisywanie pól na stronie danych) */
+  if (!SYG.TRYB_DEMO) {
+    const em0 = sesjaEmail();
+    if (em0) {
+      try {
+        SYG.wezwij('konto-pobierz', {}).then(function (odp) {
+          if (odp && odp.ok && odp.konto) zapiszKachKonta(odp.konto);
+        })['catch'](function () { /* brak sieci — kash bez zmian */ });
+      } catch (e) { /* ignorujemy */ }
+    }
+  }
 
   /* ---------- katalog (demo: plik data/katalog.js) ---------- */
   SYG.katalog = async function () {
