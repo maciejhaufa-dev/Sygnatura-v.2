@@ -101,6 +101,8 @@ a{text-decoration:none;color:inherit}
 .head-gora{display:flex;align-items:stretch;gap:12px;padding:16px 18px;
   background:linear-gradient(135deg,var(--krem-2) 0%,#EFE6D8 55%,var(--krem-2) 100%);
   border:1px solid rgba(107,69,48,.28);box-shadow:0 6px 20px rgba(107,69,48,.10)}
+.hg-pelny{display:flex;align-items:stretch;gap:12px;width:100%}
+.hg-pelny[hidden]{display:none}
 h1.strona-tytul{font-size:clamp(28px,3.4vw,42px);margin:2px 14px 0;padding:8px 0 4px}
 h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;background:var(--zloty);margin-bottom:8px}
 .szukaj{display:flex;align-items:stretch;flex:1;max-width:none;border:1px solid rgba(107,69,48,.4);
@@ -364,7 +366,17 @@ html.dotyk .social{margin-top:14px}
       </span>
     </div>
     <div class="head-gora">
-    <div class="head-przyciski">
+    <div class="hg-pelny" id="hg-pelny" hidden>
+      <form class="szukaj" action="szukaj.html" method="get" role="search">
+        <input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">
+        <button type="submit" aria-label="Szukaj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+      </form>
+      <div class="head-przyciski">
+        <a class="head-przycisk" href="koszyk.html" title="Koszyk" aria-label="Koszyk"><span class="kropka"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.2 13H4.8L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span class="hp-etyk">Koszyk</span></a>
+        <a class="head-przycisk" href="konto.html" title="Konto — logowanie" aria-label="Panel użytkownika"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.3 3.9-5 7-5s5.6 1.7 7 5"/></svg><span class="hp-etyk">Panel użytkownika</span></a>
+      </div>
+    </div>
+    <div class="head-przyciski" id="hg-launch" hidden>
       <a class="head-przycisk" href="mailto:kontakt@studiosygnatura.pl" data-kontakt-mail-btn title="Napisz do nas"><span class="hp-ico">✉</span><span class="hp-etyk">Napisz do nas</span></a>
       <a class="head-przycisk" href="tel:+48510767076" data-kontakt-tel-btn title="Zadzwoń"><span class="hp-ico">☎</span><span class="hp-etyk">Zadzwoń do nas</span></a>
     </div>
@@ -434,16 +446,16 @@ html.dotyk .social{margin-top:14px}
 
   <section class="cta" id="cta-sekcja">
     <div class="jak" id="cta-tresc-box">
-      <h2>Jak zamówić</h2>
-      <p class="pod">Trzy kroki do dekoracji z naszą sygnaturą — bez konta i bez kreatora.</p>
+      <h2>Jak działamy</h2>
+      <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
       <div class="kroki">
-        <div class="krok"><span class="num">01</span><b>Wybierz projekt</b><p>Przejrzyj Nasze realizacje i wybierz coś dla siebie — każdą pracę wykonamy z Twoim napisem, imionami i datą.</p></div>
-        <div class="krok"><span class="num">02</span><b>Napisz lub zadzwoń</b><p>E-mail albo telefon — podaj, który projekt Cię interesuje i na kiedy go potrzebujesz.</p></div>
-        <div class="krok"><span class="num">03</span><b>Potwierdź i czekaj</b><p>W 1–2 dni robocze dostajesz wycenę i termin. Po przedpłacie bierzemy się do pracy.</p></div>
+        <div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>
+        <div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>
+        <div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>
       </div>
       <div class="cta-btn">
-        <a class="btn" href="realizacje.html">Zobacz realizacje</a>
-        <a class="btn outline" href="kontakt.html">Zapytaj o wycenę</a>
+        <a class="btn" href="zamowienia.html" id="cta-btn-1">Zarezerwuj termin</a>
+        <a class="btn outline" href="zamowienia.html" id="cta-btn-2">Złóż zamówienie</a>
       </div>
     </div>
   </section>
@@ -453,8 +465,8 @@ html.dotyk .social{margin-top:14px}
   <div class="listwa-poziom" aria-hidden="true"></div>
 
   <footer class="foot">
-    <span><a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span><a href="pracownia.html">Pracownia</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak zamówić</a><span class="sep">·</span><a href="kontakt.html">Kontakt</a><span class="foot-podstrony"></span></span>
-    <span>© Sygnatura 2026</span>
+    <span><a href="regulamin.html">Regulamin</a><span class="sep">·</span><a href="jak-pracujemy.html">Jak pracujemy</a><span class="sep">·</span><a href="kontakt.html">Kontakt</a><span class="foot-podstrony"></span></span>
+    <span>© Sygnatura 2026 · wersja 28.39</span>
   </footer>
 </div>
 
@@ -464,6 +476,25 @@ html.dotyk .social{margin-top:14px}
 <script src="assets/api.js?v=319"></script>
 <script src="assets/main.js?v=319"></script>
 <script>
+/* nagłówek strony głównej: pełny serwis (szukaj + koszyk + konto) albo
+   tryb startu (napisz/zadzwoń) — wg SYG.LAUNCH */
+(function(){
+  try {
+    var L = !!(window.SYG && window.SYG.LAUNCH);
+    var pelny = document.getElementById('hg-pelny');
+    var launch = document.getElementById('hg-launch');
+    if (pelny && launch) { pelny.hidden = L; launch.hidden = !L; }
+    if (L) {
+      var foot = document.querySelector('.foot');
+      if (foot) foot.innerHTML =
+        '<span><a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
+        '<a href="pracownia.html">Pracownia</a><span class="sep">·</span>' +
+        '<a href="jak-pracujemy.html">Jak zamówić</a><span class="sep">·</span>' +
+        '<a href="kontakt.html">Kontakt</a><span class="foot-podstrony"></span></span>' +
+        '<span>© Sygnatura 2026</span>';
+    }
+  } catch (e) {}
+})();
 /* ============ STRONA GŁÓWNA: slider + treści z panelu admina ============
    Kafle slidera (kolejność, tło, treść HTML, karty produktów) i prędkość
    autoplay renderują się z danych zapisanych w panelu (STRONA GŁÓWNA).
@@ -483,6 +514,17 @@ html.dotyk .social{margin-top:14px}
           tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="kontakt.html">Zapytaj o szopkę →</a>' }
       ]
     },
+    ctaTresc: '<h2>Jak działamy</h2><p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>' +
+      '<div class="kroki">' +
+      '<div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>' +
+      '<div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>' +
+      '<div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>' +
+      '</div>' +
+      '<div class="cta-btn"><a class="btn" href="zamowienia.html">Zarezerwuj termin</a><a class="btn outline" href="zamowienia.html">Złóż zamówienie</a></div>'
+  };
+
+  /* treść startowa w trybie startu (LAUNCH=true) */
+  var DOMYS_LAUNCH = {
     ctaTresc: '<h2>Jak zamówić</h2><p class="pod">Trzy kroki do dekoracji z naszą sygnaturą — bez konta i bez kreatora.</p>' +
       '<div class="kroki">' +
       '<div class="krok"><span class="num">01</span><b>Wybierz projekt</b><p>Przejrzyj Nasze realizacje i wybierz coś dla siebie — każdą pracę wykonamy z Twoim napisem, imionami i datą.</p></div>' +
@@ -629,7 +671,8 @@ html.dotyk .social{margin-top:14px}
   }
 
   async function wczytaj(){
-    var dane = DOMYS;
+    var L = !!(window.SYG && window.SYG.LAUNCH);
+    var dane = L ? DOMYS_LAUNCH : DOMYS;
     try {
       var odp = await SYG.wezwij('strona-glowna-pobierz', {});
       if (odp && odp.ok && odp.dane) dane = migrujStare(odp.dane);
