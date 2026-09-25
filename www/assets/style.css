@@ -319,23 +319,23 @@ body.ma-koszyk{padding-bottom:76px}
 .status-odrzucono{background:#FDF0ED;color:#9E2A2B;border:1px solid #F8D7DA}
 
 /* Pasek miniatur slajdów */
-.sg-slajdy-pasek{display:flex;gap:14px;overflow-x:auto;padding:10px 6px 16px;scroll-behavior:smooth;min-height:190px;align-items:stretch}
-.sg-slajd-karta{flex:0 0 210px;background:#fff;border:2px solid #E2D7CB;border-radius:8px;overflow:hidden;
+.sg-slajdy-pasek, .kafle-pasek{display:flex;gap:14px;overflow-x:auto;padding:10px 6px 16px;scroll-behavior:smooth;min-height:185px;align-items:stretch}
+.sg-slajd-karta, .kafel-mini{flex:0 0 210px;background:#fff;border:2px solid #E2D7CB;border-radius:8px;overflow:hidden;
   box-shadow:0 2px 6px rgba(0,0,0,.06);cursor:pointer;transition:all .18s;display:flex;flex-direction:column}
-.sg-slajd-karta:hover{border-color:var(--zloty);transform:translateY(-2px);box-shadow:0 6px 14px rgba(74,46,27,.12)}
-.sg-slajd-karta.aktywny{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(196,165,130,.5),0 4px 12px rgba(28,58,39,.18)}
-.sg-slajd-mini{position:relative;height:105px;background-size:cover;background-position:center;
+.sg-slajd-karta:hover, .kafel-mini:hover{border-color:var(--zloty);transform:translateY(-2px);box-shadow:0 6px 14px rgba(74,46,27,.12)}
+.sg-slajd-karta.aktywny, .kafel-mini.aktywny{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(196,165,130,.5),0 4px 12px rgba(28,58,39,.18)}
+.sg-slajd-mini, .km-okno{position:relative;height:105px;background-size:cover;background-position:center;
   border-bottom:1px solid #E2D7CB;display:flex;align-items:flex-start;padding:8px}
-.sg-slajd-nr{background:rgba(28,58,39,.88);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px}
+.sg-slajd-nr, .km-nr{background:rgba(28,58,39,.88);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px}
 .sg-slajd-opis{padding:8px 10px 4px;font-size:12px;font-weight:600;color:#332014;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sg-slajd-akcje{display:flex;gap:4px;padding:6px 10px 10px;background:#FAF7F2;border-top:1px solid #ECE4DA;margin-top:auto}
-.sg-slajd-akcje button{flex:1;border:1px solid #D5C4B1;background:#fff;border-radius:4px;padding:4px 6px;
+.sg-slajd-akcje, .km-guzy{display:flex;gap:4px;padding:6px 10px 10px;background:#FAF7F2;border-top:1px solid #ECE4DA;margin-top:auto}
+.sg-slajd-akcje button, .km-guzy button{flex:1;border:1px solid #D5C4B1;background:#fff;border-radius:4px;padding:4px 6px;
   font-size:11.5px;font-weight:600;color:#4A2E1B;cursor:pointer;transition:background .15s}
-.sg-slajd-akcje button:hover{background:#EFE8DF}
-.sg-dodaj-btn{flex:0 0 160px;min-height:165px;border:2px dashed var(--zloty);border-radius:8px;
+.sg-slajd-akcje button:hover, .km-guzy button:hover{background:#EFE8DF}
+.sg-dodaj-btn, .kafel-dodaj{flex:0 0 160px;min-height:165px;border:2px dashed var(--zloty);border-radius:8px;
   background:rgba(248,245,238,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:8px;cursor:pointer;color:var(--brunatny);font-weight:700;font-size:13px;transition:all .18s}
-.sg-dodaj-btn:hover{background:#FAF7F2;border-color:var(--butelkowa);color:var(--butelkowa)}
+.sg-dodaj-btn:hover, .kafel-dodaj:hover{background:#FAF7F2;border-color:var(--butelkowa);color:var(--butelkowa)}
 
 /* Canva Canvas Frame w panelu */
 .sg-canvas-frame{border:1px solid #D5C4B1;border-radius:8px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);margin-top:14px}

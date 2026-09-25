@@ -3,12 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Panel — Studio Sygnatura</title>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=324">
+<link rel="stylesheet" href="assets/style.css?v=325">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -95,6 +98,7 @@
       </div>
 
       <div class="flash" id="sg-info" style="display:none"></div>
+      <div class="flash" id="sg-sukces" style="display:none;background:var(--butelkowa);color:#fff;font-weight:700;padding:12px 18px;border-radius:6px;margin:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.15)">✓ Wszystkie zmiany strony głównej zostały pomyślnie zapisane!</div>
       <div class="flash" id="sg-brudny" style="display:none;background:#8a5a1d">
         Masz <b>niezapisane zmiany</b> — strona główna zostanie zapisana i opublikowana po kliknięciu „Zapisz zmiany strony głównej”.
       </div>
@@ -113,13 +117,58 @@
         </div>
 
         <!-- Pasek miniatur slajdów -->
-        <div class="sg-slajdy-pasek" id="sg-kafle"></div>
+        <div class="sg-slajdy-pasek" id="sg-kafle">
+          <div class="sg-slajd-karta" draggable="true" data-sg-kafel="nowosci">
+            <div class="sg-slajd-mini" style="background-image:url('assets/media/sklep/szopka.jpg')"><span class="sg-slajd-nr">Slajd 1</span></div>
+            <div class="sg-slajd-opis" title="Nowości Najnowsze produkty z pracowni">Nowości — Najnowsze produkty...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <div class="sg-slajd-karta aktywny" draggable="true" data-sg-kafel="bestsellery">
+            <div class="sg-slajd-mini" style="background-image:url('assets/media/sklep/szyld.jpg')"><span class="sg-slajd-nr">Slajd 2</span></div>
+            <div class="sg-slajd-opis" title="Bestsellery Najczęściej zamawiane">Bestsellery — Najczęściej zamawiane...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <div class="sg-slajd-karta" draggable="true" data-sg-kafel="aktualnosci">
+            <div class="sg-slajd-mini" style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"><span class="sg-slajd-nr">Slajd 3</span></div>
+            <div class="sg-slajd-opis" title="Aktualności z pracowni">Aktualności — Z pracowni...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <div class="sg-slajd-karta" draggable="true" data-sg-kafel="sezonowa">
+            <div class="sg-slajd-mini" style="background-image:url('assets/hero.jpg')"><span class="sg-slajd-nr">Slajd 4</span></div>
+            <div class="sg-slajd-opis" title="Oferta sezonowa">Oferta sezonowa — Sezon świąteczny...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <button type="button" class="sg-dodaj-btn" id="sg-dodaj-kafel">
+            <span style="font-size:28px;line-height:1">+</span>
+            <span>Nowy slajd</span>
+          </button>
+        </div>
 
         <!-- Canva Slide Canvas Frame -->
         <div id="sg-edycja" style="margin-top:16px">
           <div class="sg-canvas-frame">
             <div class="sg-canvas-topbar">
-              <span class="status-badge status-platnosc" id="sg-edycja-tytul">Slajd 1</span>
+              <span class="status-badge status-platnosc" id="sg-edycja-tytul">Slajd 2 (bestsellery)</span>
               <label style="margin-left:8px">Zdjęcie w tle:
                 <select id="sg-obraz" style="max-width:260px"></select>
               </label>
@@ -129,10 +178,10 @@
 
               <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
                 <label style="cursor:pointer;font-weight:600">
-                  <input type="checkbox" id="sg-karty" style="width:auto;margin-right:6px">
+                  <input type="checkbox" id="sg-karty" checked style="width:auto;margin-right:6px">
                   Karty produktów pod treścią
                 </label>
-                <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-kafel" style="padding:7px 16px;font-size:13px;border-radius:4px;box-shadow:none">💾 Zapisz zmiany</button>
+                <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-kafel" style="padding:6px 14px;font-size:12.5px;border-radius:4px;box-shadow:none">💾 Zapisz stronę główną</button>
               </div>
             </div>
 
@@ -157,7 +206,12 @@
                 <div class="sl-bg" id="sg-tresc-bg" style="background-image:url('assets/media/sklep/szyld.jpg')"></div>
                 <div class="sl-cien"></div>
                 <div class="sl-tresc">
-                  <div class="edtr-tresc" id="sg-tresc-pole" contenteditable="true"></div>
+                  <div class="edtr-tresc" id="sg-tresc-pole" contenteditable="true">
+                    <p class="sl-tag">Bestsellery</p>
+                    <h2>Najczęściej zamawiane</h2>
+                    <p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p>
+                    <a class="sl-btn" href="kontakt.html">Zapytaj o wycenę →</a>
+                  </div>
                   <div class="sl-karty" id="sg-karty-podglad">
                     <a class="sl-karta" href="sklep.html" onclick="return false;">
                       <img src="assets/media/sklep/szyld.jpg" alt="Szyld powitalny">
@@ -179,9 +233,8 @@
             </div>
           </div>
           <div style="display:none" id="sg-obraz-podglad"></div>
-          <div class="przyciski" style="justify-content:space-between;margin-top:10px">
-            <button class="btn-odrzuc" type="button" id="sg-odrzuc">↩ Odrzuć zmiany w tym slajdzie</button>
-            <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-kafel-dol">💾 Zapisz zmiany strony głównej</button>
+          <div class="przyciski" style="justify-content:flex-start;margin-top:10px">
+            <button class="btn-odrzuc" type="button" id="sg-odrzuc">↩ Odrzuć zmiany w bieżącym slajdzie</button>
           </div>
         </div>
       </div>
@@ -192,7 +245,19 @@
         <p class="mala" style="margin:0 0 14px">Sekcja z trzema krokami i przyciskami zamówień. Kliknij i edytuj treść bezpośrednio na podglądzie poniżej.</p>
         <div id="sg-cta-edytor">
           <div class="jak" style="border:1px solid #D5C4B1;border-radius:0 0 8px 8px;border-top:none;margin:0">
-            <div id="sg-cta-pole" contenteditable="true" style="outline:none;cursor:text"></div>
+            <div id="sg-cta-pole" contenteditable="true" style="outline:none;cursor:text">
+              <h2>Jak działamy</h2>
+              <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
+              <div class="kroki">
+                <div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>
+                <div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>
+                <div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>
+              </div>
+              <div class="cta-btn">
+                <a class="btn" href="zamowienia.html">Zarezerwuj termin</a>
+                <a class="btn outline" href="zamowienia.html">Złóż zamówienie</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -498,13 +563,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=324"></script>
-<script src="assets/koszyk.js?v=324"></script>
-<script src="assets/api.js?v=324"></script>
-<script src="assets/editor.js?v=324"></script>
-<script src="assets/edytor.js?v=324"></script>
-<script src="data/katalog.js?v=324"></script>
-<script src="assets/main.js?v=324"></script>
+<script src="assets/config.js?v=325"></script>
+<script src="assets/koszyk.js?v=325"></script>
+<script src="assets/api.js?v=325"></script>
+<script src="assets/editor.js?v=325"></script>
+<script src="assets/edytor.js?v=325"></script>
+<script src="data/katalog.js?v=325"></script>
+<script src="assets/main.js?v=325"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -599,7 +664,7 @@
   function wyczyscBrudny(){
     SG_BRUDNY = false;
     var b = document.getElementById('sg-brudny');
-    if (b) b.style.display = 'none';
+    if (b) b.style.setProperty('display', 'none', 'important');
   }
 
   var SG_DOMYS = {
@@ -809,7 +874,11 @@
     } catch(e){}
     wyczyscBrudny();
     rysujKafle();
-    sgInfo('✓ Strona główna została pomyślnie zapisana!', false);
+    var suk = document.getElementById('sg-sukces');
+    if (suk){
+      suk.style.display = 'block';
+      setTimeout(function(){ suk.style.display = 'none'; }, 4000);
+    }
 
     /* 2. Zapis w chmurze (Google Sheets) w tle */
     try {
@@ -1904,7 +1973,12 @@
   }
 
   var zalogowany = false;
-  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
+  try {
+    if (klucz === MASTER_KLUCZ || sessionStorage.getItem('syg-admin') === '1'){
+      zalogowany = true;
+      sessionStorage.setItem('syg-admin', '1');
+    }
+  } catch(e){}
   if (zalogowany){
     pokazPanel();
   } else {
