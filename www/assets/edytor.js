@@ -360,7 +360,6 @@
       try { pole.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
     }
 
-    /* ---------- narzędzia ---------- */
     /* ---------- narzędzia (WSTĄŻKA POWERPOINT / CANVA) ---------- */
     function dodajGrupe(nazwa) {
       var gr = document.createElement('div');
@@ -382,21 +381,28 @@
       return { r1: r1, r2: r2, gr: gr };
     }
 
-    function B(rodzic, etykieta, tytul, cmd, arg) {
+    function B(rodzic, etykieta, tytul, cmdOrFn, arg) {
       var b = document.createElement('button');
       b.type = 'button'; b.title = tytul; b.innerHTML = etykieta;
-      b.addEventListener('click', function () {
+      b.addEventListener('click', function (e) {
         pole.focus();
-        document.execCommand(cmd, false, arg || null);
+        if (typeof cmdOrFn === 'function') {
+          cmdOrFn(e);
+        } else if (typeof cmdOrFn === 'string' && cmdOrFn) {
+          document.execCommand(cmdOrFn, false, arg || null);
+          zglaszaZmiane();
+        }
       });
       (rodzic || bar).appendChild(b);
       return b;
     }
+
     function Gr(etykieta, tytul) {
       var s = document.createElement('span');
       s.className = 'edtr-gr'; s.title = tytul; s.innerHTML = etykieta;
       bar.appendChild(s);
     }
+
     function Sel(rodzic, opcje, tytul, cb) {
       var s = document.createElement('select');
       s.className = 'edtr-sel'; s.title = tytul;
@@ -413,6 +419,7 @@
       (rodzic || bar).appendChild(s);
       return s;
     }
+
     var zamknijWszystkiePalety = function () {};
     function Paleta(rodzic, znak, tytul, cmd) {
       var przyc = document.createElement('span');
@@ -457,8 +464,10 @@
       pop.querySelectorAll('.edtr-kwadrat').forEach(function (kw) {
         kw.addEventListener('click', function () { pokazKolor(kw.getAttribute('data-c')); });
       });
-      pop.querySelector('input[type=color]').addEventListener('input', function () { pokazKolor(this.value); });
-      pop.querySelector('.edtr-ok').addEventListener('click', function () {
+      var inColor = pop.querySelector('input[type=color]');
+      if (inColor) inColor.addEventListener('input', function () { pokazKolor(this.value); });
+      var okBtn = pop.querySelector('.edtr-ok');
+      if (okBtn) okBtn.addEventListener('click', function () {
         pole.focus();
         document.execCommand(cmd, false, wybrany);
         zamknij();
@@ -486,138 +495,26 @@
         sp.appendChild(r.extractContents());
         r.insertNode(sp);
         sel.removeAllRanges();
+        zglaszaZmiane();
         return true;
       } catch (e) { return false; }
     }
-    function stylAkapi(v) {
+
+    /* ---------- link, obraz, video ---------- */
+    function wstawLinkModal() {
       pole.focus();
-      if (v === 'div.sl-tag') {
-        document.execCommand('formatBlock', false, 'div');
-        var sel = window.getSelection();
-        var n = sel && sel.anchorNode;
-        while (n && n !== pole && !(n.nodeType === 1 && n.tagName === 'DIV')) n = n.parentNode;
-        if (n && n !== pole) n.className = 'sl-tag';
-      } else {
-        document.execCommand('formatBlock', false, v);
+      var url = prompt('Adres (https://…):', 'https://');
+      if (url && url !== 'https://') {
+        document.execCommand('createLink', false, url);
+        zglaszaZmiane();
       }
     }
 
-    /* ================= WSTĄŻKA POWERPOINT / CANVA — POGRUPOWANE MATRYCE ================= */
-
-    /* --- GRUPA 1: CZCIONKA --- */
-    var grCzcionka = dodajGrupe('Czcionka');
-    var selCzcionka = Sel(grCzcionka.r1, [{ v:'', t:'Czcionka…' }].concat(FONTY_LISTA.map(function (f) {
-      return { v: f[0], t: f[1] };
-    })), 'Czcionka (FONT) — zaznacz tekst i wybierz; pasek pokazuje czcionkę zaznaczenia', function (v) {
-      if (!v) return;
-      var css = FONTY[v] || v;
-      if (!owinSpan('font-family:' + css)) document.execCommand('fontName', false, css);
-    });
-    var selRozmiar = Sel(grCzcionka.r1, [{ v:'', t:'Rozmiar…' },
-      { v:'10', t:'10 px' }, { v:'12', t:'12 px' }, { v:'14', t:'14 px' }, { v:'16', t:'16 px' },
-      { v:'18', t:'18 px' }, { v:'20', t:'20 px' }, { v:'24', t:'24 px' }, { v:'28', t:'28 px' },
-      { v:'32', t:'32 px' }, { v:'36', t:'36 px' }, { v:'48', t:'48 px' }],
-      'Wielkość tekstu — zaznacz tekst i wybierz; pasek pokazuje wielkość zaznaczenia', function (v) {
-      if (!v) return;
-      if (!owinSpan('font-size:' + v + 'px')) {
-        var m = { '10':'1','12':'2','14':'3','16':'4','18':'4','20':'5','24':'5','28':'6','32':'7','36':'7','48':'7' };
-        document.execCommand('fontSize', false, m[v] || '4');
-      }
-    });
-    B(grCzcionka.r1, '✕ Format', 'Wyczyść formatowanie zaznaczenia', 'removeFormat');
-
-    B(grCzcionka.r2, '<b>B</b>', 'Pogrubienie (Ctrl+B)', 'bold');
-    B(grCzcionka.r2, '<i>I</i>', 'Kursywa (Ctrl+I)', 'italic');
-    B(grCzcionka.r2, '<u>U</u>', 'Podkreślenie', 'underline');
-    B(grCzcionka.r2, '<s>S</s>', 'Przekreślenie', 'strikeThrough');
-    var paletaTekst = Paleta(grCzcionka.r2, 'A', 'Kolor tekstu — paleta kolorów z przyciskiem OK', 'foreColor');
-    var paletaTlo = Paleta(grCzcionka.r2, '🖍', 'Kolor tła tekstu (podświetlenie) — z opcją „Bez tła" (przezroczyste)', 'hiliteColor');
-    Sel(grCzcionka.r2, [{ v:'', t:'Odstęp…' }, { v:'0', t:'0 (normalny)' }, { v:'1', t:'1 px' },
-      { v:'2', t:'2 px' }, { v:'3', t:'3 px' }, { v:'4', t:'4 px' }, { v:'6', t:'6 px' },
-      { v:'8', t:'8 px' }, { v:'-1', t:'−1 px' }],
-      'Odstęp między znakami — zaznacz tekst i wybierz', function (v) {
-      if (!v) return;
-      if (!owinSpan('letter-spacing:' + v + 'px')) alert('Zaznacz tekst, aby ustawić odstęp między znakami.');
-    });
-
-    /* --- GRUPA 2: AKAPIT --- */
-    var grAkapit = dodajGrupe('Akapit');
-    B(grAkapit.r1, 'H2 Tytuł', 'Tytuł (nagłówek 2)', 'formatBlock', 'h2');
-    B(grAkapit.r1, 'H3 Podtytuł', 'Podtytuł (nagłówek 3)', 'formatBlock', 'h3');
-    B(grAkapit.r1, 'P Tekst', 'Zwykły akapit', 'formatBlock', 'p');
-    B(grAkapit.r1, '🏷 Etykieta', 'Blok-etykieta w ramce (mały napis, np. „Nowości")', 'tag');
-
-    B(grAkapit.r2, '⇤', 'Justowanie: do lewej', 'justifyLeft');
-    B(grAkapit.r2, '↔', 'Justowanie: do środka', 'justifyCenter');
-    B(grAkapit.r2, '⇥', 'Justowanie: do prawej', 'justifyRight');
-    B(grAkapit.r2, '≡', 'Justowanie: wyjustuj (rozciągnięcie do lewej i prawej)', 'justifyFull');
-    B(grAkapit.r2, '• Lista', 'Lista punktowana', 'insertUnorderedList');
-    B(grAkapit.r2, '1. Lista', 'Lista numerowana', 'insertOrderedList');
-    B(grAkapit.r2, '„Cytat"', 'Cytat', 'formatBlock', 'blockquote');
-    Sel(grAkapit.r2, [{ v:'', t:'Kolumny…' }, { v:'1', t:'1 kolumna' }, { v:'2', t:'2 kolumny' },
-      { v:'3', t:'3 kolumny' }, { v:'4', t:'4 kolumny' }],
-      'Układ kolumnowy (1–4 kolumny)', function (v) {
-      if (!v) return;
-      if (v === '1') { pole.focus(); document.execCommand('formatBlock', false, 'p'); return; }
-      wstawKolumny(parseInt(v, 10));
-    });
-
-    /* --- GRUPA 3: TABELA --- */
-    var grTabela = dodajGrupe('Tabela');
-    B(grTabela.r1, '▦ Tabela…', 'Wstaw tabelę (wiersze × kolumny, z ramką lub bez)', 'tabelaNowa');
-    B(grTabela.r1, '◫ Ramka', 'Obramowanie tabeli: włącz / wyłącz', 'tab-ramka');
-
-    B(grTabela.r2, '+ Wiersz', 'Dodaj wiersz poniżej (stań kursorem w tabeli)', 'tab-wiersz');
-    B(grTabela.r2, '+ Kol.', 'Dodaj kolumnę obok (stań kursorem w tabeli)', 'tab-kol');
-    B(grTabela.r2, '− Wiersz', 'Usuń wiersz (stań kursorem w tabeli)', 'tab-usun-wiersz');
-    B(grTabela.r2, '− Kol.', 'Usuń kolumnę (stań kursorem w tabeli)', 'tab-usun-kol');
-
-    /* --- GRUPA 4: KSZTAŁTY I MEDIA (Canva / PowerPoint) --- */
-    var grKsztalty = dodajGrupe('Kształty i Media');
-    B(grKsztalty.r1, '🅃 Pole', 'Pole tekstowe', 'rys-pole');
-    B(grKsztalty.r1, '▭ Prostokąt', 'Prostokąt', 'rys-prostokat');
-    B(grKsztalty.r1, '▢ Zaokrąglony', 'Zaokrąglony prostokąt', 'rys-zaokraglony');
-    B(grKsztalty.r1, '◯ Elipsa', 'Koło / elipsa', 'rys-elipsa');
-
-    B(grKsztalty.r2, '─ Linia', 'Linia', 'rys-linia');
-    B(grKsztalty.r2, '➜ Strzałka', 'Strzałka', 'rys-strzalka');
-    B(grKsztalty.r2, '△ Trójkąt', 'Trójkąt', 'rys-trojkat');
-    B(grKsztalty.r2, '🔗', 'Wstaw link', 'link');
-    B(grKsztalty.r2, '🖼', 'Wstaw obraz (plik)', 'obraz');
-    B(grKsztalty.r2, '▶ Film', 'Wstaw film YouTube', 'youtube');
-
-    /* --- GRUPA 5: UKŁAD I WARSTWY --- */
-    var grUklad = dodajGrupe('Układ i Warstwy');
-    B(grUklad.r1, '⤒ Na wierzch', 'Warstwa: na wierzch', 'war-wierzch');
-    B(grUklad.r1, '⤓ Na spód', 'Warstwa: na spód', 'war-spod');
-    B(grUklad.r1, '⊞ Grupuj', 'Grupuj zaznaczone obiekty (blokada wzajemnego położenia, Ctrl+G)', 'grupuj');
-    B(grUklad.r1, '⬆', 'Wyrównaj: do góry', 'obj-gora');
-    B(grUklad.r1, '↕', 'Wyrównaj: do środka (pionowo)', 'obj-srodek-pion');
-    B(grUklad.r1, '⬇', 'Wyrównaj: do dołu', 'obj-dol');
-
-    B(grUklad.r2, '🔼 Do przodu', 'Warstwa: do przodu', 'war-przod');
-    B(grUklad.r2, '🔽 Do tyłu', 'Warstwa: do tyłu', 'war-tyl');
-    B(grUklad.r2, '⊟ Rozgrupuj', 'Rozgrupuj zaznaczoną grupę (Ctrl+Shift+G)', 'rozgrupuj');
-    B(grUklad.r2, '↺ +90°', 'Kierunek tekstu: +90° (zaznaczony kształt z tekstem)', 'kier-90');
-    B(grUklad.r2, '↻ −90°', 'Kierunek tekstu: −90° (zaznaczony kształt z tekstem)', 'kier-270');
-    B(grUklad.r2, '🗑 Usuń', 'Usuń zaznaczone obiekty (Backspace)', 'usun-obiekty');
-
-    /* ---------- link ---------- */
-    bar.querySelector('button[title="Wstaw link"]').addEventListener('click', function () {
-      pole.focus();
-      var url = prompt('Adres (https://…):', 'https://');
-      if (url && url !== 'https://') document.execCommand('createLink', false, url);
-    });
-
-    /* ---------- obraz ---------- */
     var imgInput = document.createElement('input');
     imgInput.type = 'file';
     imgInput.accept = 'image/*';
     imgInput.style.display = 'none';
     document.body.appendChild(imgInput);
-    bar.querySelector('button[title="Wstaw obraz (plik)"]').addEventListener('click', function () {
-      imgInput.click();
-    });
     imgInput.addEventListener('change', function () {
       var f = imgInput.files && imgInput.files[0];
       if (!f) return;
@@ -649,8 +546,7 @@
       }
     });
 
-    /* ---------- film YouTube ---------- */
-    bar.querySelector('button[title="Wstaw film YouTube"]').addEventListener('click', function () {
+    function wstawYoutubeModal() {
       var url = prompt('Link do filmu YouTube:', 'https://www.youtube.com/watch?v=');
       if (!url) return;
       var m = url.match(/(?:v=|youtu\.be\/)([\w-]{6,})/);
@@ -659,9 +555,9 @@
       document.execCommand('insertHTML', false,
         '<div class="edtr-video"><iframe width="560" height="315" src="https://www.youtube.com/embed/' + m[1] +
         '" frameborder="0" allowfullscreen></iframe></div><p><br></p>');
-    });
+      zglaszaZmiane();
+    }
 
-    /* ---------- kolumny ---------- */
     function wstawKolumny(n) {
       var kom = '<p>Tekst kolumny…</p>';
       var wew = '';
@@ -669,19 +565,16 @@
       pole.focus();
       document.execCommand('insertHTML', false,
         '<div class="tre-kolumny tre-k-' + n + '">' + wew + '</div><p><br></p>');
+      zglaszaZmiane();
     }
 
-    /* ---------- etykieta / linia pozioma ---------- */
-    bar.querySelector('button[title^="Blok-etykieta"]').addEventListener('click', function () {
+    function wstawEtykiete() {
       var txt = prompt('Tekst etykiety (np. „Nowości"):', 'Nowości');
       if (!txt) return;
       pole.focus();
       document.execCommand('insertHTML', false, '<p class="sl-tag">' + escA(txt) + '</p>');
-    });
-    bar.querySelector('button[title="Pozioma linia"]').addEventListener('click', function () {
-      pole.focus();
-      document.execCommand('insertHTML', false, '<hr class="tre-linia"><p><br></p>');
-    });
+      zglaszaZmiane();
+    }
 
     /* ---------- TABELE ---------- */
     function komorka(){
@@ -690,8 +583,12 @@
       var n = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
       return n && n.closest ? n.closest('td, th') : null;
     }
-    function tabelaOb(){ var k = komorka(); return k ? k.closest('table') : null; }
-    bar.querySelector('button[title^="Wstaw tabelę"]').addEventListener('click', function () {
+    function tabelaOb(){
+      var k = komorka();
+      if (k) return k.closest('table');
+      return pole.querySelector('table');
+    }
+    function otworzModalTabeli() {
       modal('Tabela',
         '<div class="pole" style="display:flex;gap:10px">' +
         '<div style="flex:1"><label>Wiersze</label><select id="et-r">' +
@@ -709,47 +606,67 @@
             for (var j = 0; j < c; j++) komorki += '<td>Komórka</td>';
             wiersze += '<tr>' + komorki + '</tr>';
           }
+          var html = '<table class="tre-tabela' + bez + '"><tbody>' + wiersze + '</tbody></table><p><br></p>';
           pole.focus();
-          document.execCommand('insertHTML', false,
-            '<table class="tre-tabela' + bez + '"><tbody>' + wiersze + '</tbody></table><p><br></p>');
+          var sel = window.getSelection();
+          var wPolu = false;
+          if (sel && sel.anchorNode && (sel.anchorNode === pole || pole.contains(sel.anchorNode))) {
+            wPolu = true;
+          }
+          if (!wPolu) {
+            var rng = document.createRange();
+            rng.selectNodeContents(pole);
+            rng.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(rng);
+          }
+          var ok = document.execCommand('insertHTML', false, html);
+          if (!ok) {
+            var tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            while (tmp.firstChild) pole.appendChild(tmp.firstChild);
+          }
           zglaszaZmiane();
         }, 'Wstaw');
-    });
-    bar.querySelector('button[title="Dodaj wiersz poniżej (stań kursorem w tabeli)"]').addEventListener('click', function () {
+    }
+    function dodajWierszTabeli() {
       var t = tabelaOb(), k = komorka();
       if (!t) { alert('Stań najpierw kursorem w komórce tabeli.'); return; }
-      var row = t.insertRow(k.parentElement.rowIndex + 1);
-      for (var i = 0; i < k.parentElement.cells.length; i++) row.insertCell().innerHTML = 'Komórka';
+      var rIdx = (k && k.parentElement) ? k.parentElement.rowIndex : t.rows.length - 1;
+      var row = t.insertRow(rIdx + 1);
+      var numCells = (k && k.parentElement) ? k.parentElement.cells.length : (t.rows[0] ? t.rows[0].cells.length : 2);
+      for (var i = 0; i < numCells; i++) row.insertCell().innerHTML = 'Komórka';
       zglaszaZmiane();
-    });
-    bar.querySelector('button[title="Dodaj kolumnę obok (stań kursorem w tabeli)"]').addEventListener('click', function () {
+    }
+    function dodajKolumneTabeli() {
       var t = tabelaOb(), k = komorka();
       if (!t) { alert('Stań najpierw kursorem w komórce tabeli.'); return; }
-      var idx = k.cellIndex + 1;
+      var idx = k ? (k.cellIndex + 1) : (t.rows[0] ? t.rows[0].cells.length : 1);
       for (var i = 0; i < t.rows.length; i++) t.rows[i].insertCell(idx).innerHTML = 'Komórka';
       zglaszaZmiane();
-    });
-    bar.querySelector('button[title="Usuń wiersz (stań kursorem w tabeli)"]').addEventListener('click', function () {
+    }
+    function usunWierszTabeli() {
       var t = tabelaOb(), k = komorka();
       if (!t) { alert('Stań najpierw kursorem w komórce tabeli.'); return; }
       if (t.rows.length < 2) { alert('To jedyny wiersz tabeli.'); return; }
-      t.deleteRow(k.parentElement.rowIndex);
+      var rIdx = (k && k.parentElement) ? k.parentElement.rowIndex : (t.rows.length - 1);
+      t.deleteRow(rIdx);
       zglaszaZmiane();
-    });
-    bar.querySelector('button[title="Usuń kolumnę (stań kursorem w tabeli)"]').addEventListener('click', function () {
+    }
+    function usunKolumneTabeli() {
       var t = tabelaOb(), k = komorka();
       if (!t) { alert('Stań najpierw kursorem w komórce tabeli.'); return; }
       if (t.rows[0].cells.length < 2) { alert('To jedyna kolumna tabeli.'); return; }
-      var idx = k.cellIndex;
+      var idx = k ? k.cellIndex : (t.rows[0].cells.length - 1);
       for (var i = 0; i < t.rows.length; i++) t.rows[i].deleteCell(idx);
       zglaszaZmiane();
-    });
-    bar.querySelector('button[title^="Obramowanie tabeli"]').addEventListener('click', function () {
+    }
+    function przelaczRamkeTabeli() {
       var t = tabelaOb();
-      if (!t) { alert('Stań najpierw kursorem w komórce tabeli.'); return; }
+      if (!t) { alert('Stań najpierw kursorem w tabeli.'); return; }
       t.classList.toggle('tre-bez');
       zglaszaZmiane();
-    });
+    }
 
     /* ---------- akapit: pion i kierunek ---------- */
     function pionTekstu(v){
@@ -772,9 +689,6 @@
       }
       alert('Stań kursorem w komórce tabeli lub zaznacz kształt z tekstem.');
     }
-    bar.querySelector('button[title^="Wyrównanie pionowe: góra"]').addEventListener('click', function(){ pionTekstu('gora'); });
-    bar.querySelector('button[title^="Wyrównanie pionowe: środek"]').addEventListener('click', function(){ pionTekstu('srodek'); });
-    bar.querySelector('button[title^="Wyrównanie pionowe: dół"]').addEventListener('click', function(){ pionTekstu('dol'); });
     function kierunekKsztaltu(stopnie){
       var ob = obiektZaznaczony();
       if (!ob || !ob.classList || !ob.classList.contains('tre-ksztalt')) {
@@ -791,8 +705,6 @@
       ob.setAttribute('data-ks-kier', nowa);
       zglaszaZmiane();
     }
-    bar.querySelector('button[title^="Kierunek tekstu: +90"]').addEventListener('click', function(){ kierunekKsztaltu('90'); });
-    bar.querySelector('button[title^="Kierunek tekstu: −90"]').addEventListener('click', function(){ kierunekKsztaltu('270'); });
 
     /* ---------- model zaznaczania obiektów ---------- */
     var wybrane = [];
@@ -850,13 +762,13 @@
       var pr = pole.getBoundingClientRect();
       var r = ob.getBoundingClientRect();
       ob.style.position = 'absolute';
-      ob.style.left = Math.max(0, (r.left - pr.left) / pr.width * 100) + '%';
-      ob.style.top = Math.max(0, (r.top - pr.top) / pr.height * 100) + '%';
+      ob.style.left = Math.max(0, (r.left - pr.left) / (pr.width || 1) * 100) + '%';
+      ob.style.top = Math.max(0, (r.top - pr.top) / (pr.height || 1) * 100) + '%';
       ob.style.right = 'auto'; ob.style.bottom = 'auto';
       ob.style.margin = '0'; ob.style.zIndex = '5';
     }
 
-    /* ---------- mini-pasek kontekstowy przy zaznaczeniu (ikony jak PowerPoint) ---------- */
+    /* ---------- mini-pasek kontekstowy przy zaznaczeniu ---------- */
     var kontekst = null;
     function rysujKontekst(){
       if (!kontekst) {
@@ -908,7 +820,7 @@
       kontekst.style.top = T + 'px';
     }
 
-    /* ---------- wstawianie kształtów (rysowanie obiektów) ---------- */
+    /* ---------- wstawianie kształtów ---------- */
     function wstawKsztalt(d){
       var html = budujKsztalt(d) + '&nbsp;';
       var ob = obiektZaznaczony();
@@ -918,55 +830,81 @@
         nowyEl = ob.nextElementSibling;
       } else {
         pole.focus();
-        document.execCommand('insertHTML', false, html);
+        var sel = window.getSelection();
+        var wPolu = false;
+        if (sel && sel.anchorNode && (sel.anchorNode === pole || pole.contains(sel.anchorNode))) {
+          wPolu = true;
+        }
+        if (!wPolu) {
+          var rng = document.createRange();
+          rng.selectNodeContents(pole);
+          rng.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(rng);
+        }
+        var wstawione = document.execCommand('insertHTML', false, html);
+        if (!wstawione) {
+          var tmp = document.createElement('div');
+          tmp.innerHTML = html;
+          var el = tmp.firstElementChild;
+          if (el) {
+            pole.appendChild(el);
+            pole.appendChild(document.createTextNode(' '));
+            nowyEl = el;
+          }
+        }
       }
       czyscWybranie();
+      if (!nowyEl) {
+        var allKszt = pole.querySelectorAll('.tre-ksztalt');
+        if (allKszt.length > 0) nowyEl = allKszt[allKszt.length - 1];
+      }
       if (nowyEl && nowyEl.classList && nowyEl.classList.contains('tre-ksztalt')){
         wybrane = [nowyEl];
         odswiezWybranie();
       }
       zglaszaZmiane();
     }
-    bar.querySelector('button[title="Pole tekstowe"]').addEventListener('click', function () {
+
+    function wstawPoleTekstowe() {
       wstawKsztalt({ typ:'pole', tekst:'Tekst', tlo:'#FBF7F0', przez:true, ramka:'transparent', gr:1,
         kolor:'#33261C', czcionka:'sans', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:260, wys:56 });
-      /* od razu można pisać — tekst-placeholder jest zaznaczony */
       setTimeout(function () {
         var ob = wybrane[0];
         if (ob && ob.classList && ob.classList.contains('tre-ksztalt')) edytujTekstObiektu(ob, true);
       }, 80);
-    });
-    bar.querySelector('button[title="Prostokąt"]').addEventListener('click', function () {
+    }
+    function wstawProstokat() {
       wstawKsztalt({ typ:'prostokat', tekst:'', tlo:'#1F3A32', przez:false, ramka:'#C4A582', gr:2,
         kolor:'#FBF7F0', czcionka:'serif', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:180, wys:60 });
-    });
-    bar.querySelector('button[title="Zaokrąglony prostokąt"]').addEventListener('click', function () {
+    }
+    function wstawZaokraglony() {
       wstawKsztalt({ typ:'zaokraglony', tekst:'', tlo:'#1F3A32', przez:false, ramka:'#C4A582', gr:2,
         kolor:'#FBF7F0', czcionka:'serif', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:180, wys:60 });
-    });
-    bar.querySelector('button[title="Koło / elipsa"]').addEventListener('click', function () {
+    }
+    function wstawElipse() {
       wstawKsztalt({ typ:'elipsa', tekst:'', tlo:'#1F3A32', przez:false, ramka:'#C4A582', gr:2,
         kolor:'#FBF7F0', czcionka:'serif', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:140, wys:140 });
-    });
-    bar.querySelector('button[title="Linia"]').addEventListener('click', function () {
+    }
+    function wstawLinie() {
       wstawKsztalt({ typ:'linia', tekst:'', tlo:'#33261C', przez:false, ramka:'transparent', gr:2,
         kolor:'#FBF7F0', czcionka:'serif', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:120, wys:0 });
-    });
-    bar.querySelector('button[title="Strzałka"]').addEventListener('click', function () {
+    }
+    function wstawStrzalke() {
       wstawKsztalt({ typ:'strzalka', tekst:'', tlo:'#33261C', przez:false, ramka:'transparent', gr:1,
         kolor:'#FBF7F0', czcionka:'serif', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:140, wys:24 });
-    });
-    bar.querySelector('button[title="Trójkąt"]').addEventListener('click', function () {
+    }
+    function wstawTrojkat() {
       wstawKsztalt({ typ:'trojkat', tekst:'', tlo:'#1F3A32', przez:false, ramka:'transparent', gr:1,
         kolor:'#FBF7F0', czcionka:'serif', rozmiar:15, valign:'srodek', kier:'0',
         przycisk:false, link:'', rot:0, szer:100, wys:90 });
-    });
+    }
 
     /* ---------- właściwości obiektu (2×klik) ---------- */
     function otworzWlasciwosci(ob){
@@ -999,7 +937,6 @@
       });
     }
 
-    /* ---------- edycja tekstu w kształcie (✏) ---------- */
     function edytujTekstObiektu(ob, zaznaczWszystko){
       if (!ob || !ob.classList || !ob.classList.contains('tre-ksztalt')) {
         alert('Zaznacz kształt z tekstem (prostokąt, elipsa, pole tekstowe).'); return;
@@ -1030,52 +967,39 @@
       }
     });
 
-    /* ---------- GRUPOWANIE (blokada wzajemnego położenia) ---------- */
+    /* ---------- grupy ---------- */
     function grupuj(){
       if (wybrane.length < 2) {
-        alert('Zaznacz co najmniej 2 obiekty (klik + Ctrl+klik), aby je zgrupować.');
+        alert('Zaznacz co najmniej 2 obiekty (Ctrl+klik), aby je zgrupować.');
         return;
       }
-      for (var i = 0; i < wybrane.length; i++) {
-        if (wybrane[i].classList && wybrane[i].classList.contains('tre-grupa')) {
-          alert('W zaznaczeniu jest już grupa — najpierw ją rozgrupuj (nie zagnieżdżamy grup).');
-          return;
-        }
-      }
       var pr = pole.getBoundingClientRect();
-      var bL = 1e9, bT = 1e9, bR = -1e9, bB = -1e9;
-      var rodzice = [];
-      wybrane.forEach(function (ob) {
-        zrobAbsolutny(ob);
-        var r = ob.getBoundingClientRect();
-        if (r.left < bL) bL = r.left;
-        if (r.top < bT) bT = r.top;
-        if (r.right > bR) bR = r.right;
-        if (r.bottom > bB) bB = r.bottom;
-        if (ob.parentNode && ob.parentNode !== pole && rodzice.indexOf(ob.parentNode) < 0) rodzice.push(ob.parentNode);
+      var minL = 1e9, minT = 1e9, maxR = -1e9, maxB = -1e9;
+      wybrane.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.left < minL) minL = r.left;
+        if (r.top < minT) minT = r.top;
+        if (r.right > maxR) maxR = r.right;
+        if (r.bottom > maxB) maxB = r.bottom;
       });
       var g = document.createElement('div');
       g.className = 'tre-grupa';
-      g.setAttribute('contenteditable', 'false');
       g.style.position = 'absolute';
-      g.style.left = Math.max(0, (bL - pr.left) / pr.width * 100) + '%';
-      g.style.top = Math.max(0, (bT - pr.top) / pr.height * 100) + '%';
-      g.style.width = Math.round(bR - bL) + 'px';
-      g.style.height = Math.round(bB - bT) + 'px';
+      g.style.left = Math.max(0, (minL - pr.left) / (pr.width || 1) * 100) + '%';
+      g.style.top = Math.max(0, (minT - pr.top) / (pr.height || 1) * 100) + '%';
+      g.style.width = Math.max(20, (maxR - minL) / (pr.width || 1) * 100) + '%';
+      g.style.height = Math.max(20, (maxB - minT) / (pr.height || 1) * 100) + '%';
       g.style.zIndex = '5';
-      pole.insertBefore(g, wybrane[0]);
-      wybrane.forEach(function (ob) {
-        var r = ob.getBoundingClientRect();
-        ob.style.left = Math.round(r.left - bL) + 'px';
-        ob.style.top = Math.round(r.top - bT) + 'px';
-        ob.style.right = 'auto'; ob.style.bottom = 'auto';
-        ob.style.margin = '0';
-        g.appendChild(ob);
-      });
-      rodzice.forEach(function (p) {
-        if (p !== pole && !p.hasChildNodes() === false && p.textContent.trim() === '' && !p.querySelector('img,br,hr,iframe')) {
-          if (p.parentNode) p.parentNode.removeChild(p);
-        }
+      pole.appendChild(g);
+      var gW = maxR - minL, gH = maxB - minT;
+      wybrane.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        el.style.position = 'absolute';
+        el.style.left = ((r.left - minL) / (gW || 1) * 100) + '%';
+        el.style.top = ((r.top - minT) / (gH || 1) * 100) + '%';
+        el.style.right = 'auto'; el.style.bottom = 'auto';
+        el.style.margin = '0';
+        g.appendChild(el);
       });
       wybrane = [g];
       odswiezWybranie();
@@ -1091,8 +1015,8 @@
         dzieci.forEach(function (ch) {
           var r = ch.getBoundingClientRect();
           ch.style.position = 'absolute';
-          ch.style.left = Math.max(0, (r.left - pr.left) / pr.width * 100) + '%';
-          ch.style.top = Math.max(0, (r.top - pr.top) / pr.height * 100) + '%';
+          ch.style.left = Math.max(0, (r.left - pr.left) / (pr.width || 1) * 100) + '%';
+          ch.style.top = Math.max(0, (r.top - pr.top) / (pr.height || 1) * 100) + '%';
           ch.style.right = 'auto'; ch.style.bottom = 'auto';
           ch.style.margin = '0'; ch.style.zIndex = '5';
           g.parentNode.insertBefore(ch, g);
@@ -1104,10 +1028,8 @@
       odswiezWybranie();
       zglaszaZmiane();
     }
-    bar.querySelector('button[title^="Grupuj zaznaczone"]').addEventListener('click', grupuj);
-    bar.querySelector('button[title^="Rozgrupuj zaznaczoną"]').addEventListener('click', rozgrupuj);
 
-    /* ---------- WARSTWY (coś nad czymś) ---------- */
+    /* ---------- warstwy ---------- */
     function warstwa(kier){
       if (!wybrane.length) { alert('Zaznacz obiekt(y), aby zmienić warstwę.'); return; }
       wybrane.forEach(zrobAbsolutny);
@@ -1124,26 +1046,16 @@
       });
       zglaszaZmiane();
     }
-    bar.querySelector('button[title="Warstwa: na wierzch"]').addEventListener('click', function(){ warstwa('wierzch'); });
-    bar.querySelector('button[title="Warstwa: do przodu"]').addEventListener('click', function(){ warstwa('przod'); });
-    bar.querySelector('button[title="Warstwa: do tyłu"]').addEventListener('click', function(){ warstwa('tyl'); });
-    bar.querySelector('button[title="Warstwa: na spód"]').addEventListener('click', function(){ warstwa('spod'); });
-    bar.querySelector('button[title="Usuń zaznaczone obiekty (Backspace)"]').addEventListener('click', function () {
-      if (!wybrane.length) { alert('Zaznacz obiekt(y) do usunięcia.'); return; }
-      wybrane.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
-      czyscWybranie();
-      zglaszaZmiane();
-    });
 
-    /* ---------- WYRÓWNANIE OBIEKTÓW (jeden → pole; kilka → względem siebie) ---------- */
+    /* ---------- wyrównanie ---------- */
     function wyrownajObiekt(strona){
       if (!wybrane.length) {
-        alert('Zaznacz najpierw obiekt(y): klik = jeden, Ctrl+klik = kilka naraz (jak w PowerPoint).');
+        alert('Zaznacz najpierw obiekt(y): klik = jeden, Ctrl+klik = kilka naraz.');
         return;
       }
       var pr = pole.getBoundingClientRect();
-      function pxn(p){ return (p / pr.width * 100) + '%'; }
-      function pyn(p){ return (p / pr.height * 100) + '%'; }
+      function pxn(p){ return (p / (pr.width || 1) * 100) + '%'; }
+      function pyn(p){ return (p / (pr.height || 1) * 100) + '%'; }
       var dane = wybrane.map(function (ob) {
         var or = ob.getBoundingClientRect();
         return { ob: ob, l: or.left - pr.left, t: or.top - pr.top, w: or.width, h: or.height };
@@ -1182,60 +1094,162 @@
       odswiezWybranie();
       zglaszaZmiane();
     }
-    function rozlozObiekty(kier){
-      if (wybrane.length < 3) {
-        alert('Zaznacz co najmniej 3 obiekty (Ctrl+klik), aby je rozłożyć w równych odstępach.');
+
+    function akcjaGora() {
+      if (komorka()) { pionTekstu('gora'); return; }
+      var ob = obiektZaznaczony();
+      if (ob && ob.classList && ob.classList.contains('tre-ksztalt') &&
+          KSZTALTY_TEKST.indexOf(ob.getAttribute('data-ks-typ')) >= 0 &&
+          ob.style.position !== 'absolute') {
+        pionTekstu('gora');
         return;
       }
-      var pr = pole.getBoundingClientRect();
-      var dane = wybrane.map(function (ob) {
-        var or = ob.getBoundingClientRect();
-        return { ob: ob, l: or.left - pr.left, t: or.top - pr.top, w: or.width, h: or.height };
-      });
-      if (kier === 'poziom'){
-        dane.sort(function (a, b) { return a.l - b.l; });
-        var sumaW = dane.reduce(function (su, x) { return su + x.w; }, 0);
-        var minL = dane[0].l, maxR = dane[dane.length - 1].l + dane[dane.length - 1].w;
-        var gap = Math.max(0, (maxR - minL - sumaW) / (dane.length - 1));
-        var x = dane[0].l;
-        dane.forEach(function (it) {
-          it.ob.style.left = (x / pr.width * 100) + '%';
-          it.ob.style.position = 'absolute';
-          it.ob.style.right = 'auto'; it.ob.style.bottom = 'auto';
-          it.ob.style.margin = '0'; it.ob.style.zIndex = '5';
-          x += it.w + gap;
-        });
-      } else {
-        dane.sort(function (a, b) { return a.t - b.t; });
-        var sumaH = dane.reduce(function (su, x) { return su + x.h; }, 0);
-        var minT = dane[0].t, maxB = dane[dane.length - 1].t + dane[dane.length - 1].h;
-        var gap2 = Math.max(0, (maxB - minT - sumaH) / (dane.length - 1));
-        var y = dane[0].t;
-        dane.forEach(function (it) {
-          it.ob.style.top = (y / pr.height * 100) + '%';
-          it.ob.style.position = 'absolute';
-          it.ob.style.right = 'auto'; it.ob.style.bottom = 'auto';
-          it.ob.style.margin = '0'; it.ob.style.zIndex = '5';
-          y += it.h + gap2;
-        });
-      }
-      odswiezWybranie();
-      zglaszaZmiane();
+      if (wybrane.length) { wyrownajObiekt('gora'); return; }
+      alert('Stań kursorem w komórce tabeli lub zaznacz obiekt.');
     }
-    bar.querySelector('button[title="Wyrównaj: do lewej krawędzi"]').addEventListener('click', function(){ wyrownajObiekt('lewo'); });
-    bar.querySelector('button[title="Wyrównaj: do środka (poziomo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek'); });
-    bar.querySelector('button[title="Wyrównaj: do prawej krawędzi"]').addEventListener('click', function(){ wyrownajObiekt('prawo'); });
-    bar.querySelector('button[title="Wyrównaj: do góry"]').addEventListener('click', function(){ wyrownajObiekt('gora'); });
-    bar.querySelector('button[title="Wyrównaj: do środka (pionowo)"]').addEventListener('click', function(){ wyrownajObiekt('srodek-pion'); });
-    bar.querySelector('button[title="Wyrównaj: do dołu"]').addEventListener('click', function(){ wyrownajObiekt('dol'); });
-    bar.querySelector('button[title="Rozłóż w poziomie (jednakowe odstępy)"]').addEventListener('click', function(){ rozlozObiekty('poziom'); });
-    bar.querySelector('button[title="Rozłóż w pionie (jednakowe odstępy)"]').addEventListener('click', function(){ rozlozObiekty('pion'); });
+    function akcjaSrodek() {
+      if (komorka()) { pionTekstu('srodek'); return; }
+      var ob = obiektZaznaczony();
+      if (ob && ob.classList && ob.classList.contains('tre-ksztalt') &&
+          KSZTALTY_TEKST.indexOf(ob.getAttribute('data-ks-typ')) >= 0 &&
+          ob.style.position !== 'absolute') {
+        pionTekstu('srodek');
+        return;
+      }
+      if (wybrane.length) { wyrownajObiekt('srodek-pion'); return; }
+      alert('Stań kursorem w komórce tabeli lub zaznacz obiekt.');
+    }
+    function akcjaDol() {
+      if (komorka()) { pionTekstu('dol'); return; }
+      var ob = obiektZaznaczony();
+      if (ob && ob.classList && ob.classList.contains('tre-ksztalt') &&
+          KSZTALTY_TEKST.indexOf(ob.getAttribute('data-ks-typ')) >= 0 &&
+          ob.style.position !== 'absolute') {
+        pionTekstu('dol');
+        return;
+      }
+      if (wybrane.length) { wyrownajObiekt('dol'); return; }
+      alert('Stań kursorem w komórce tabeli lub zaznacz obiekt.');
+    }
+
+    function usunWybrane(e) {
+      if (!wybrane.length) return;
+      if (e && e.type === 'keydown') {
+        if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+        var act = document.activeElement;
+        if (act && act.isContentEditable && act !== pole && !act.classList.contains('tre-ksztalt-s')) return;
+        if (act && (act.tagName === 'INPUT' || act.tagName === 'TEXTAREA' || act.tagName === 'SELECT')) return;
+      }
+      wybrane.forEach(function (el) { if (el && el.parentNode) el.parentNode.removeChild(el); });
+      czyscWybranie();
+      zglaszaZmiane();
+      if (e && e.preventDefault) e.preventDefault();
+    }
+
+    /* ================= WSTĄŻKA POWERPOINT / CANVA — POGRUPOWANE MATRYCE ================= */
+
+    /* --- GRUPA 1: CZCIONKA --- */
+    var grCzcionka = dodajGrupe('Czcionka');
+    var selCzcionka = Sel(grCzcionka.r1, [{ v:'', t:'Czcionka…' }].concat(FONTY_LISTA.map(function (f) {
+      return { v: f[0], t: f[1] };
+    })), 'Czcionka (FONT) — zaznacz tekst i wybierz; pasek pokazuje czcionkę zaznaczenia', function (v) {
+      if (!v) return;
+      var css = FONTY[v] || v;
+      if (!owinSpan('font-family:' + css)) document.execCommand('fontName', false, css);
+    });
+    var selRozmiar = Sel(grCzcionka.r1, [{ v:'', t:'Rozmiar…' },
+      { v:'10', t:'10 px' }, { v:'12', t:'12 px' }, { v:'14', t:'14 px' }, { v:'16', t:'16 px' },
+      { v:'18', t:'18 px' }, { v:'20', t:'20 px' }, { v:'24', t:'24 px' }, { v:'28', t:'28 px' },
+      { v:'32', t:'32 px' }, { v:'36', t:'36 px' }, { v:'48', t:'48 px' }],
+      'Wielkość tekstu — zaznacz tekst i wybierz; pasek pokazuje wielkość zaznaczenia', function (v) {
+      if (!v) return;
+      if (!owinSpan('font-size:' + v + 'px')) {
+        var m = { '10':'1','12':'2','14':'3','16':'4','18':'4','20':'5','24':'5','28':'6','32':'7','36':'7','48':'7' };
+        document.execCommand('fontSize', false, m[v] || '4');
+      }
+    });
+    B(grCzcionka.r1, '✕ Format', 'Wyczyść formatowanie zaznaczenia', 'removeFormat');
+
+    B(grCzcionka.r2, '<b>B</b>', 'Pogrubienie (Ctrl+B)', 'bold');
+    B(grCzcionka.r2, '<i>I</i>', 'Kursywa (Ctrl+I)', 'italic');
+    B(grCzcionka.r2, '<u>U</u>', 'Podkreślenie', 'underline');
+    B(grCzcionka.r2, '<s>S</s>', 'Przekreślenie', 'strikeThrough');
+    var paletaTekst = Paleta(grCzcionka.r2, 'A', 'Kolor tekstu — paleta kolorów z przyciskiem OK', 'foreColor');
+    var paletaTlo = Paleta(grCzcionka.r2, '🖍', 'Kolor tła tekstu (podświetlenie) — z opcją „Bez tła" (przezroczyste)', 'hiliteColor');
+    Sel(grCzcionka.r2, [{ v:'', t:'Odstęp…' }, { v:'0', t:'0 (normalny)' }, { v:'1', t:'1 px' },
+      { v:'2', t:'2 px' }, { v:'3', t:'3 px' }, { v:'4', t:'4 px' }, { v:'6', t:'6 px' },
+      { v:'8', t:'8 px' }, { v:'-1', t:'−1 px' }],
+      'Odstęp między znakami — zaznacz tekst i wybierz', function (v) {
+      if (!v) return;
+      if (!owinSpan('letter-spacing:' + v + 'px')) alert('Zaznacz tekst, aby ustawić odstęp między znakami.');
+    });
+
+    /* --- GRUPA 2: AKAPIT --- */
+    var grAkapit = dodajGrupe('Akapit');
+    B(grAkapit.r1, 'H2 Tytuł', 'Tytuł (nagłówek 2)', 'formatBlock', 'h2');
+    B(grAkapit.r1, 'H3 Podtytuł', 'Podtytuł (nagłówek 3)', 'formatBlock', 'h3');
+    B(grAkapit.r1, 'P Tekst', 'Zwykły akapit', 'formatBlock', 'p');
+    B(grAkapit.r1, '🏷 Etykieta', 'Blok-etykieta w ramce (mały napis, np. „Nowości")', wstawEtykiete);
+
+    B(grAkapit.r2, '⇤', 'Justowanie: do lewej', 'justifyLeft');
+    B(grAkapit.r2, '↔', 'Justowanie: do środka', 'justifyCenter');
+    B(grAkapit.r2, '⇥', 'Justowanie: do prawej', 'justifyRight');
+    B(grAkapit.r2, '≡', 'Justowanie: wyjustuj (rozciągnięcie do lewej i prawej)', 'justifyFull');
+    B(grAkapit.r2, '• Lista', 'Lista punktowana', 'insertUnorderedList');
+    B(grAkapit.r2, '1. Lista', 'Lista numerowana', 'insertOrderedList');
+    B(grAkapit.r2, '„Cytat"', 'Cytat', 'formatBlock', 'blockquote');
+    Sel(grAkapit.r2, [{ v:'', t:'Kolumny…' }, { v:'1', t:'1 kolumna' }, { v:'2', t:'2 kolumny' },
+      { v:'3', t:'3 kolumny' }, { v:'4', t:'4 kolumny' }],
+      'Układ kolumnowy (1–4 kolumny)', function (v) {
+      if (!v) return;
+      if (v === '1') { pole.focus(); document.execCommand('formatBlock', false, 'p'); return; }
+      wstawKolumny(parseInt(v, 10));
+    });
+
+    /* --- GRUPA 3: TABELA --- */
+    var grTabela = dodajGrupe('Tabela');
+    B(grTabela.r1, '▦ Tabela…', 'Wstaw tabelę (wiersze × kolumny, z ramką lub bez)', otworzModalTabeli);
+    B(grTabela.r1, '◫ Ramka', 'Obramowanie tabeli: włącz / wyłącz', przelaczRamkeTabeli);
+
+    B(grTabela.r2, '+ Wiersz', 'Dodaj wiersz poniżej (stań kursorem w tabeli)', dodajWierszTabeli);
+    B(grTabela.r2, '+ Kol.', 'Dodaj kolumnę obok (stań kursorem w tabeli)', dodajKolumneTabeli);
+    B(grTabela.r2, '− Wiersz', 'Usuń wiersz (stań kursorem w tabeli)', usunWierszTabeli);
+    B(grTabela.r2, '− Kol.', 'Usuń kolumnę (stań kursorem w tabeli)', usunKolumneTabeli);
+
+    /* --- GRUPA 4: KSZTAŁTY I MEDIA (Canva / PowerPoint) --- */
+    var grKsztalty = dodajGrupe('Kształty i Media');
+    B(grKsztalty.r1, '🅃 Pole', 'Pole tekstowe', wstawPoleTekstowe);
+    B(grKsztalty.r1, '▭ Prostokąt', 'Prostokąt', wstawProstokat);
+    B(grKsztalty.r1, '▢ Zaokrąglony', 'Zaokrąglony prostokąt', wstawZaokraglony);
+    B(grKsztalty.r1, '◯ Elipsa', 'Koło / elipsa', wstawElipse);
+
+    B(grKsztalty.r2, '─ Linia', 'Linia', wstawLinie);
+    B(grKsztalty.r2, '➜ Strzałka', 'Strzałka', wstawStrzalke);
+    B(grKsztalty.r2, '△ Trójkąt', 'Trójkąt', wstawTrojkat);
+    B(grKsztalty.r2, '🔗', 'Wstaw link', wstawLinkModal);
+    B(grKsztalty.r2, '🖼', 'Wstaw obraz (plik)', function(){ imgInput.click(); });
+    B(grKsztalty.r2, '▶ Film', 'Wstaw film YouTube', wstawYoutubeModal);
+
+    /* --- GRUPA 5: UKŁAD I WARSTWY --- */
+    var grUklad = dodajGrupe('Układ i Warstwy');
+    B(grUklad.r1, '⤒ Na wierzch', 'Warstwa: na wierzch', function(){ warstwa('wierzch'); });
+    B(grUklad.r1, '⤓ Na spód', 'Warstwa: na spód', function(){ warstwa('spod'); });
+    B(grUklad.r1, '⊞ Grupuj', 'Grupuj zaznaczone obiekty (blokada wzajemnego położenia, Ctrl+G)', grupuj);
+    B(grUklad.r1, '⬆', 'Wyrównaj: do góry (komórka lub obiekt)', akcjaGora);
+    B(grUklad.r1, '↕', 'Wyrównaj: do środka pionowo (komórka lub obiekt)', akcjaSrodek);
+    B(grUklad.r1, '⬇', 'Wyrównaj: do dołu (komórka lub obiekt)', akcjaDol);
+
+    B(grUklad.r2, '🔼 Do przodu', 'Warstwa: do przodu', function(){ warstwa('przod'); });
+    B(grUklad.r2, '🔽 Do tyłu', 'Warstwa: do tyłu', function(){ warstwa('tyl'); });
+    B(grUklad.r2, '⊟ Rozgrupuj', 'Rozgrupuj zaznaczoną grupę (Ctrl+Shift+G)', rozgrupuj);
+    B(grUklad.r2, '↺ +90°', 'Kierunek tekstu: +90° (zaznaczony kształt z tekstem)', function(){ kierunekKsztaltu('90'); });
+    B(grUklad.r2, '↻ −90°', 'Kierunek tekstu: −90° (zaznaczony kształt z tekstem)', function(){ kierunekKsztaltu('270'); });
+    B(grUklad.r2, '🗑 Usuń', 'Usuń zaznaczone obiekty (Backspace)', usunWybrane);
 
     /* ---------- DRAG&DROP + uchwyty rozmiaru i obrotu ---------- */
     var drag = null, justDragged = false, uchwytDrag = null;
     pole.addEventListener('pointerdown', function (e) {
       var t = e.target;
-      /* uchwyty: rozmiar (narożniki) i obrót (kółko) */
       if (t && t.classList && (t.classList.contains('tre-uchwyt') || t.classList.contains('tre-uchwyt-obrot'))) {
         e.preventDefault(); e.stopPropagation();
         var ob = wybrane[0];
@@ -1243,8 +1257,8 @@
         var r = ob.getBoundingClientRect();
         if (ob.style.position !== 'absolute'){
           ob.style.position = 'absolute';
-          ob.style.left = Math.max(0, (r.left - pr.left) / pr.width * 100) + '%';
-          ob.style.top = Math.max(0, (r.top - pr.top) / pr.height * 100) + '%';
+          ob.style.left = Math.max(0, (r.left - pr.left) / (pr.width || 1) * 100) + '%';
+          ob.style.top = Math.max(0, (r.top - pr.top) / (pr.height || 1) * 100) + '%';
           ob.style.right = 'auto'; ob.style.bottom = 'auto';
           ob.style.margin = '0'; ob.style.zIndex = '5';
           r = ob.getBoundingClientRect();
@@ -1263,26 +1277,27 @@
       if (t && t.closest && t.closest('[contenteditable="true"]')) return;
       if (!(t && t.closest) || e.button !== 0) return;
       var grp = t.closest('.tre-grupa');
-      var ob = grp || t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img');
-      if (!ob) return;
+      var ob2 = grp || t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img');
+      if (!ob2) return;
       if (e.ctrlKey || e.metaKey){
-        var ix = wybrane.indexOf(ob);
-        if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob);
-      } else if (wybrane.indexOf(ob) < 0){
-        wybrane = [ob];
+        var ix = wybrane.indexOf(ob2);
+        if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob2);
+      } else if (wybrane.indexOf(ob2) < 0){
+        wybrane = [ob2];
       }
       clearTimeout(klikTimer);
       odswiezWybranie();
-      var pr = pole.getBoundingClientRect();
+      var pr2 = pole.getBoundingClientRect();
       var start = wybrane.map(function (el) {
-        var r = el.getBoundingClientRect();
-        return { el: el, offX: e.clientX - r.left, offY: e.clientY - r.top,
-                 left0: r.left - pr.left, top0: r.top - pr.top, w0: r.width, h0: r.height };
+        var r2 = el.getBoundingClientRect();
+        return { el: el, offX: e.clientX - r2.left, offY: e.clientY - r2.top,
+                 left0: r2.left - pr2.left, top0: r2.top - pr2.top, w0: r2.width, h0: r2.height };
       });
       drag = { start: start, startX: e.clientX, startY: e.clientY, przes: false };
       e.preventDefault();
-      if (ob.setPointerCapture) try { ob.setPointerCapture(e.pointerId); } catch(_){}
+      if (ob2.setPointerCapture) try { ob2.setPointerCapture(e.pointerId); } catch(_){}
     });
+
     pole.addEventListener('pointermove', function (e) {
       if (uchwytDrag){
         if (uchwytDrag.typ === 'obrot'){
@@ -1316,33 +1331,34 @@
       if (!drag) return;
       var dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
       if (!drag.przes && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
-      var pr = pole.getBoundingClientRect();
+      var prMove = pole.getBoundingClientRect();
       if (!drag.przes){
         drag.przes = true;
         drag.start.forEach(function (it) {
           it.el.style.position = 'absolute';
-          it.el.style.left = Math.max(0, it.left0 / pr.width * 100) + '%';
-          it.el.style.top = Math.max(0, it.top0 / pr.height * 100) + '%';
+          it.el.style.left = Math.max(0, it.left0 / (prMove.width || 1) * 100) + '%';
+          it.el.style.top = Math.max(0, it.top0 / (prMove.height || 1) * 100) + '%';
           it.el.style.right = 'auto'; it.el.style.bottom = 'auto';
           it.el.style.margin = '0'; it.el.style.zIndex = '5';
         });
       }
       drag.start.forEach(function (it) {
-        var l = Math.min(Math.max(0, it.left0 + dx), pr.width - it.w0);
-        var t2 = Math.min(Math.max(0, it.top0 + dy), pr.height - it.h0);
-        it.el.style.left = (l / pr.width * 100) + '%';
-        it.el.style.top = (t2 / pr.height * 100) + '%';
+        var l = Math.min(Math.max(0, it.left0 + dx), prMove.width - it.w0);
+        var t2 = Math.min(Math.max(0, it.top0 + dy), prMove.height - it.h0);
+        it.el.style.left = (l / (prMove.width || 1) * 100) + '%';
+        it.el.style.top = (t2 / (prMove.height || 1) * 100) + '%';
       });
       rysujUchwyty();
       rysujKontekst();
       e.preventDefault();
     });
+
     pole.addEventListener('pointerup', function () {
       if (uchwytDrag && uchwytDrag.typ === 'skala'){
         var pr = pole.getBoundingClientRect();
         var ob = uchwytDrag.ob;
-        ob.style.left = (parseFloat(ob.style.left) / pr.width * 100) + '%';
-        ob.style.top = (parseFloat(ob.style.top) / pr.height * 100) + '%';
+        ob.style.left = (parseFloat(ob.style.left) / (pr.width || 1) * 100) + '%';
+        ob.style.top = (parseFloat(ob.style.top) / (pr.height || 1) * 100) + '%';
         zglaszaZmiane();
       }
       if (uchwytDrag && uchwytDrag.typ === 'obrot') zglaszaZmiane();
@@ -1364,7 +1380,6 @@
         var ob = grp || t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img');
         if (ob){
           e.preventDefault();
-          /* drugie pojedyncze kliknięcie tego samego obiektu = tryb rozmiar ↔ obrót (jak Inkscape) */
           if (!e.ctrlKey && !e.metaKey && wybrane.length === 1 && wybrane[0] === ob){
             clearTimeout(klikTimer);
             klikTimer = setTimeout(function () {
@@ -1375,10 +1390,11 @@
           return;
         }
         var a = t.closest('a');
-        if (a) e.preventDefault(); /* linki w edytorze nie nawigują */
+        if (a) e.preventDefault();
         if (!e.ctrlKey && !e.metaKey) czyscWybranie();
       }
     });
+
     pole.addEventListener('dblclick', function (e) {
       clearTimeout(klikTimer);
       var t = e.target;
@@ -1394,53 +1410,36 @@
     });
 
     /* ---------- klawisze ---------- */
-    function usunWybrane(e){
-      var tg = e.target;
-      if (tg && tg.closest && tg.closest('[contenteditable="true"]')) return;
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'g' || e.key === 'G')){
-        e.preventDefault();
-        if (e.shiftKey) rozgrupuj(); else grupuj();
-        return;
-      }
-      if (e.key === 'Escape'){
-        if (wybrane.length) czyscWybranie();
-        return;
-      }
-      if ((e.key === 'Delete' || e.key === 'Backspace') && wybrane.length){
-        var wPolu = tg === pole || (pole.contains(tg) &&
-          !(tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT'));
-        var naTle = tg === document.body || tg === document.documentElement;
-        if (wPolu || naTle){
-          e.preventDefault();
-          wybrane.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
-          czyscWybranie();
-          zglaszaZmiane();
-        }
-      }
-    }
     pole.addEventListener('keydown', usunWybrane);
     document.addEventListener('keydown', usunWybrane);
 
-    /* ---------- pasek pokazuje czcionkę i wielkość zaznaczonego tekstu ---------- */
+    /* ---------- pasek pokazuje czcionkę i wielkość zaznaczonego tekstu (throttled) ---------- */
+    var selRaf = null;
     document.addEventListener('selectionchange', function () {
-      var sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return;
-      var n = sel.anchorNode;
-      var el = n && n.nodeType === 1 ? n : (n && n.parentElement);
-      if (!el || !pole.contains(el)) return;
-      if (el.closest && el.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, .tre-grupa, [contenteditable="true"]')) return;
-      var cs = window.getComputedStyle(el);
-      var fam = String(cs.fontFamily || '').split(',')[0].replace(/['"]/g, '').trim().toLowerCase();
-      var klucz = CZCIONKI_WG[fam] || '';
-      selCzcionka.value = klucz;
-      if (paletaTekst) paletaTekst.pasek.style.background = cs.color || '#6B4530';
-      var px = Math.round(parseFloat(cs.fontSize) || 16);
-      var naj = '', najlepsza = 99;
-      ['10','12','14','16','18','20','24','28','32','36','48'].forEach(function (r) {
-        var od = Math.abs(parseInt(r, 10) - px);
-        if (od < najlepsza){ najlepsza = od; naj = r; }
+      if (selRaf) return;
+      selRaf = requestAnimationFrame(function () {
+        selRaf = null;
+        var sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return;
+        var n = sel.anchorNode;
+        var el = n && n.nodeType === 1 ? n : (n && n.parentElement);
+        if (!el || !pole.contains(el)) return;
+        if (el.closest && el.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-grupa')) return;
+        try {
+          var cs = window.getComputedStyle(el);
+          var fam = String(cs.fontFamily || '').split(',')[0].replace(/['"]/g, '').trim().toLowerCase();
+          var klucz = CZCIONKI_WG[fam] || '';
+          if (selCzcionka) selCzcionka.value = klucz;
+          if (paletaTekst && paletaTekst.pasek) paletaTekst.pasek.style.background = cs.color || '#6B4530';
+          var px = Math.round(parseFloat(cs.fontSize) || 16);
+          var naj = '', najlepsza = 99;
+          ['10','12','14','16','18','20','24','28','32','36','48'].forEach(function (r) {
+            var od = Math.abs(parseInt(r, 10) - px);
+            if (od < najlepsza){ najlepsza = od; naj = r; }
+          });
+          if (selRozmiar) selRozmiar.value = naj;
+        } catch (_) {}
       });
-      selRozmiar.value = naj;
     });
 
     /* ---------- API ---------- */
@@ -1466,5 +1465,5 @@
   }
 
   window.SYG = window.SYG || {};
-  SYG.edytorTresci = { stworz: stworz };
+  window.SYG.edytorTresci = { stworz: stworz };
 })();
