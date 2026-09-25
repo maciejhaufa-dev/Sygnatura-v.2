@@ -25,16 +25,12 @@
     if (dotyk) document.documentElement.classList.add('dotyk');
   })();
 
-  /* TRYB STARTU: tylko portfolio + kontakt. Pełny serwis wraca po SYG.LAUNCH = false. */
-  const MENU = SYG.LAUNCH ? [
+  /* Menu główne serwisu (pełny serwis — wszystkie podstrony aktywne) */
+  const MENU = [
     ['index.html', 'Strona główna'],
-    ['realizacje.html', 'Nasze realizacje'],
-    ['pracownia.html', 'Pracownia'],
-    ['jak-pracujemy.html', 'Jak zamówić'],
-    ['kontakt.html', 'Kontakt']
-  ] : [
-    ['index.html', 'Strona główna'],
+    ['sklep.html', 'Sklep'],
     ['zamowienia.html', 'Zamówienia'],
+    ['wynajem.html', 'Wynajem'],
     ['pracownia.html', 'Pracownia'],
     ['realizacje.html', 'Nasze realizacje'],
     ['wspolpraca.html', 'Współpraca'],
@@ -168,7 +164,7 @@
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.40</span>';
+      '<span>© Sygnatura 2026 · wersja 28.41</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {

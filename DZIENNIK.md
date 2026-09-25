@@ -26,8 +26,8 @@ git status --short | wc -l      # oczekiwane: 0
 | Gałąź pracy (TYLKO na niej) | `arena/01a0ca92-sygnatura-v-2` (od 22.09; stara `01a056f0` = historia + cel PR #1) |
 | HEAD | `a532b2f` (lub nowszy, jeśli checkpoint dopisany) — worktree czysty |
 | Źródło Pages | gałąź `arena/01a0ca92-sygnatura-v-2`, folder `/docs` (przełączono 22.09 — user w Ustawieniach; bot ma 403) |
-| Treść live | **wersja 28.40, marker `?v=320`** (121 markerów), **`LAUNCH: false` = pełny serwis**, **`API: WPIĘTE (Google Sheets/Apps Script)`**; TRYB DEMO wyłączony, admin.html poza Pages |
-| Silnik (baza) | **WDROŻONY I POŁĄCZONY NA ŻYWO (23.09.2026)!** URL `/exec` wpięty w `config.js`; baza Google Sheets (SYGNATURA-BAZA) odbiera zamówienia, konta, wynajem i formularz kontaktowy. |
+| Treść live | **wersja 28.41, marker `?v=321`** (121 markerów), **`LAUNCH: false` = pełny serwis**, **`API: WPIĘTE (Google Sheets/Apps Script)`**; wszystkie podstrony aktywne (Sklep, Wynajem, Zamówienia w menu), formularz kontaktowy aktywny, admin.html aktywny na Pages |
+| Silnik (baza) | **WDROŻONY I POŁĄCZONY NA ŻYWO (23.09.2026)!** URL `/exec` wpięty w `config.js`; baza Google Sheets (SYGNATURA-BAZA) odbiera zamówienia, konta, wynajem i formularz kontaktowy. Panel admin.html?klucz=f255094c5fe76e5ce8b7c429 wdrożony na Pages. |
 | Domena | `studiosygnatura.pl` → GitHub Pages (custom domain); OVH DNS: `@` = 4×A `185.199.108/109/110/111.153`, `www` = CNAME `maciejhaufa-dev.github.io` — krok usera (23.09); MX/SPF/DKIM NIE TYKAĆ |
 | PR | #1 OPEN (Serwis: kreator Zamówienia A/B/C) — nie ruszać bez polecenia |
 | `origin/main` | `80efcca` (zrzut 18 zdjęć + folder pracownia/ + re-uploady) |
@@ -1751,3 +1751,18 @@ weryfikować z parametrem cache-busting.
 5. Deploy wykonany: synchronizacja `www/` do `docs/`, `404.html` zachowane, `.nojekyll`
    dodane, `docs/admin.html` usunięte z publicznego katalogu Pages (zgodnie z regułą bezpieczeństwa).
 6. Całość wypchnięta na gałąź `arena/01a0ca92-sygnatura-v-2`. Baza danych Google działa na żywo.
+
+---
+
+### Sesja 29/5 — PEŁNE PRZYWRÓCENIE PODSTRON I PANELU ADMINA (wersja 28.41, ?v=321)
+
+1. Rozwiązano problem z panelem admina: plik `docs/admin.html` był omyłkowo usuwany ze skryptu deployu (stąd błąd 404 / przekierowanie na stronę główną przy próbie wejścia przez link). Przywrócono `admin.html` do katalogu `docs/`. Panel logowania jest teraz w 100% dostępny pod:
+   `https://maciejhaufa-dev.github.io/Sygnatura-v.2/admin.html?klucz=f255094c5fe76e5ce8b7c429`
+2. Przywrócono pełną aktywność wszystkich podstron i nawigacji (usunięcie pozostałości trybu startu):
+   - `kontakt.html`: przywrócono interaktywny formularz kontaktowy (walidacja, anty-spam, wysyłka przez `wezwij('wiadomosc')` do zakładki `Wiadomosci` w Google Sheets + powiadomienie e-mail).
+   - `jak-pracujemy.html`: przywrócono pełną treść procesu (Krok 1: zamówienie online/kreator, Krok 2: wycena i sygnatura, Krok 3: kaucja i rezerwacja, Krok 4: montaż i odbiór, Krok 5: zwrot kaucji, Personalizacja, Sklep).
+   - `pracownia.html`: usunięto wzmiankę 'w budowie' o wynajmie, przywrócono aktywny opis wynajmu dekoracji na wydarzenia.
+   - Menu główne (`main.js` + `index.html`): dodano bezpośrednie linki do **Sklep** (`sklep.html`) i **Wynajem** (`wynajem.html`) obok Zamówień, Pracowni, Realizacji, Współpracy i Kontaktu.
+   - Nagłówek: przyciski `Koszyk` i `Panel użytkownika` mają teraz widoczne czytelne etykiety również na urządzeniach mobilnych (`.hp-etyk`).
+3. Podbicie do wersji **28.41**, znacznik zasobów podbity do **`?v=321`** (121 wystąpień w 21 plikach HTML).
+4. Deploy do `docs/` z zachowaniem `admin.html`. Wypchnięte na gałąź produkcyjną.

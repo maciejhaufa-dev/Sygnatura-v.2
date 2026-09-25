@@ -338,7 +338,7 @@ body.ma-koszyk{padding-bottom:76px}
   .head-gora{flex-wrap:wrap;padding:10px 12px}
   .szukaj{order:3;max-width:none;flex-basis:100%;margin-left:0}
   .head-przyciski{order:1;margin-left:auto;width:100%;justify-content:flex-end}
-  .hp-etyk{display:none}
+  .hp-etyk{display:inline;font-size:12px}
   h1.strona-tytul{margin:2px 12px 0}
   .strona-uklad main.wrap{padding:8px 18px 40px}
   .forma{padding:18px 16px}
