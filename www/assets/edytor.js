@@ -35,7 +35,7 @@
      ed.pobierz();             // aktualny HTML (do zapisu)
    ============================================================ */
 (function () {
-  var SANS = "'Segoe UI',Arial,sans-serif";
+  var SANS = "'Montserrat','Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif";
   var SERIF = "'Cormorant Garamond','Playfair Display',Georgia,serif";
   var MONO = "'Courier New',Courier,monospace";
   var FONTY = {
@@ -49,11 +49,11 @@
     playfair: "'Playfair Display',Georgia,serif"
   };
   var FONTY_LISTA = [
-    ['serif', 'Serif (styl studia)'], ['playfair', 'Playfair Display'],
+    ['montserrat', 'Montserrat (Księga Znaku)'], ['lato', 'Lato'],
+    ['serif', 'Cormorant (styl studia)'], ['playfair', 'Playfair Display'],
     ['georgia', 'Georgia'], ['times', 'Times New Roman'],
-    ['lato', 'Lato'], ['montserrat', 'Montserrat'], ['oswald', 'Oswald'],
-    ['arial', 'Arial'], ['verdana', 'Verdana'], ['sans', 'Segoe UI'],
-    ['mono', 'Courier New'], ['impact', 'Impact']
+    ['oswald', 'Oswald'], ['arial', 'Arial'], ['verdana', 'Verdana'],
+    ['sans', 'Bezszeryfowa'], ['mono', 'Maszyna (mono)'], ['impact', 'Impact']
   ];
   var CZCIONKI_WG = {
     'cormorant garamond': 'serif', 'playfair display': 'playfair',
@@ -339,6 +339,10 @@
   function stworz(kontener, poleWlasne) {
     if (!kontener) return null;
     kontener.classList.add('edtr');
+
+    /* Usuwamy ewentualne stare paski narzędzi w tym kontenerze, aby zapobiec powstawaniu podwójnych pasków */
+    var stareBary = kontener.querySelectorAll('.edtr-bar');
+    stareBary.forEach(function (b) { b.remove(); });
 
     var bar = document.createElement('div');
     bar.className = 'edtr-bar';

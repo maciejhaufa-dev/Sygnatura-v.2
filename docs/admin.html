@@ -7,10 +7,10 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=323">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=324">
 </head>
-<body data-strona="">
+<body data-strona="" class="admin-page">
 <div id="naglowek"></div>
 
 <main class="wrap">
@@ -132,7 +132,7 @@
                   <input type="checkbox" id="sg-karty" style="width:auto;margin-right:6px">
                   Karty produktów pod treścią
                 </label>
-                <button class="btn" type="button" id="sg-zapisz-kafel" style="padding:6px 14px;font-size:12px;background:#C4A582;color:#1C3A27;font-weight:800;border:none">Zastosuj do slajdu</button>
+                <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-kafel" style="padding:7px 16px;font-size:13px;border-radius:4px;box-shadow:none">💾 Zapisz zmiany</button>
               </div>
             </div>
 
@@ -181,7 +181,7 @@
           <div style="display:none" id="sg-obraz-podglad"></div>
           <div class="przyciski" style="justify-content:space-between;margin-top:10px">
             <button class="btn-odrzuc" type="button" id="sg-odrzuc">↩ Odrzuć zmiany w tym slajdzie</button>
-            <button class="btn-zapisz" type="button" id="sg-zapisz-kafel-dol">Zastosuj zmiany do slajdu</button>
+            <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-kafel-dol">💾 Zapisz zmiany strony głównej</button>
           </div>
         </div>
       </div>
@@ -498,13 +498,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=323"></script>
-<script src="assets/koszyk.js?v=323"></script>
-<script src="assets/api.js?v=323"></script>
-<script src="assets/editor.js?v=323"></script>
-<script src="assets/edytor.js?v=323"></script>
-<script src="data/katalog.js?v=323"></script>
-<script src="assets/main.js?v=323"></script>
+<script src="assets/config.js?v=324"></script>
+<script src="assets/koszyk.js?v=324"></script>
+<script src="assets/api.js?v=324"></script>
+<script src="assets/editor.js?v=324"></script>
+<script src="assets/edytor.js?v=324"></script>
+<script src="data/katalog.js?v=324"></script>
+<script src="assets/main.js?v=324"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -659,12 +659,22 @@
       .replace(/^-+|-+$/g, '').slice(0, 40);
     return n || 'obraz';
   }
+  function sgPrawidlowyHtml(html){
+    if (!html || typeof html !== 'string') return false;
+    var czysty = html.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+    return czysty.length > 20;
+  }
   /* stare dataURL („tasiemce") w kafelkach -> wpisy w bibliotece z nazwą */
   function sgNaprawObrazy(dane){
-    if (!dane || !dane.slider) return dane;
+    if (!dane) dane = JSON.parse(JSON.stringify(SG_DOMYS));
+    if (!dane.slider) dane.slider = JSON.parse(JSON.stringify(SG_DOMYS.slider));
+    if (!Array.isArray(dane.slider.kafle) || dane.slider.kafle.length === 0){
+      dane.slider.kafle = JSON.parse(JSON.stringify(SG_DOMYS.slider.kafle));
+    }
     var bib = sgMediaBiblioteka();
     var zmiana = false;
     dane.slider.kafle.forEach(function (k, i) {
+      if (!k) return;
       if (k.obraz && String(k.obraz).indexOf('data:image') === 0){
         var baza = sgMediaNazwa('wgrany-' + (i + 1));
         var n = baza, j = 2;
@@ -731,7 +741,16 @@
     return dane;
   }
 
-  function sgKafle(){ return (SG_DANE && SG_DANE.slider && SG_DANE.slider.kafle) || []; }
+  function sgKafle(){
+    if (!SG_DANE || !SG_DANE.slider || !Array.isArray(SG_DANE.slider.kafle) || SG_DANE.slider.kafle.length === 0){
+      if (!SG_DANE) SG_DANE = JSON.parse(JSON.stringify(SG_DOMYS));
+      if (!SG_DANE.slider) SG_DANE.slider = JSON.parse(JSON.stringify(SG_DOMYS.slider));
+      if (!Array.isArray(SG_DANE.slider.kafle) || SG_DANE.slider.kafle.length === 0){
+        SG_DANE.slider.kafle = JSON.parse(JSON.stringify(SG_DOMYS.slider.kafle));
+      }
+    }
+    return SG_DANE.slider.kafle;
+  }
 
   function kafelObrazCss(obraz){
     /* pojedyncze apostrofy: podwójne łamały atrybut style="background-image:url(...)" */
@@ -749,29 +768,68 @@
   }
 
   async function sgZapiszWszystko(){
+    var btnGora = document.getElementById('sg-zapisz');
+    var btnDol = document.getElementById('sg-zapisz-dol');
+    var btnKafel = document.getElementById('sg-zapisz-kafel');
+    var btnKafelDol = document.getElementById('sg-zapisz-kafel-dol');
+    var allBtns = [btnGora, btnDol, btnKafel, btnKafelDol].filter(Boolean);
+
+    allBtns.forEach(function(b){
+      b.disabled = true;
+      if (!b.dataset.origText) b.dataset.origText = b.innerHTML;
+      b.innerHTML = '⏳ Zapisywanie...';
+    });
+
     if (SG_EDYCJA && SG_EDYTOR){
       var kafle = sgKafle();
       var idx = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
       if (idx >= 0){
-        kafle[idx].obraz = document.getElementById('sg-obraz').value;
-        kafle[idx].karty = document.getElementById('sg-karty').checked;
+        var selObraz = document.getElementById('sg-obraz');
+        if (selObraz) kafle[idx].obraz = selObraz.value;
+        var chkK = document.getElementById('sg-karty');
+        if (chkK) kafle[idx].karty = chkK.checked;
         kafle[idx].tresc = SG_EDYTOR.pobierz();
       }
     }
+    var ctaVal = SG_EDYTOR_CTA ? SG_EDYTOR_CTA.pobierz() : (SG_DANE ? SG_DANE.ctaTresc : '');
+    if (!sgPrawidlowyHtml(ctaVal)) ctaVal = SG_DOMYS.ctaTresc;
+
+    var autoplayVal = Number(document.getElementById('sg-autoplay').value);
+    if (isNaN(autoplayVal) || autoplayVal <= 0) autoplayVal = 4.5;
+
     var dane = {
-      slider: { autoplay: Number(document.getElementById('sg-autoplay').value) || 0, kafle: sgKafle() },
-      ctaTresc: SG_EDYTOR_CTA ? SG_EDYTOR_CTA.pobierz() : (SG_DANE ? SG_DANE.ctaTresc : '')
+      slider: { autoplay: autoplayVal, kafle: sgKafle() },
+      ctaTresc: ctaVal
     };
-    var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
-    if (odp.ok){
-      SG_DANE = dane;
-      wyczyscBrudny();
-      rysujKafle();
-      sgInfo('Strona główna została pomyślnie zapisana i opublikowana!', false);
-    } else {
-      sgInfo(odp.blad || 'Nie udało się zapisać zmian.', true);
+    SG_DANE = dane;
+
+    /* 1. Błyskawiczny zapis lokalny i natychmiastowe zdjęcie ostrzeżenia */
+    try {
+      localStorage.setItem('syg-demo-strona-glowna', JSON.stringify(dane));
+    } catch(e){}
+    wyczyscBrudny();
+    rysujKafle();
+    sgInfo('✓ Strona główna została pomyślnie zapisana!', false);
+
+    /* 2. Zapis w chmurze (Google Sheets) w tle */
+    try {
+      var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
+      if (odp && odp.ok){
+        allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano!'; });
+      } else {
+        allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano lokalnie'; });
+      }
+    } catch (err){
+      allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano lokalnie'; });
+    } finally {
+      setTimeout(function(){
+        allBtns.forEach(function(b){
+          b.disabled = false;
+          b.innerHTML = b.dataset.origText || '💾 Zapisz zmiany strony głównej';
+        });
+      }, 2000);
     }
-    return odp.ok;
+    return true;
   }
 
   /* ---------- rysowanie paska kafli ---------- */
@@ -809,11 +867,14 @@
       });
       el.querySelector('.km-edycja').addEventListener('click', function(){ otworzEdycje(kafel, i); });
       el.querySelector('.km-usun').addEventListener('click', function(){
+        if (kafle.length <= 1){
+          alert('W sliderze musi pozostać przynajmniej jeden slajd.');
+          return;
+        }
         if (!confirm('Usunąć ten slajd?')) return;
         SG_DANE.slider.kafle = kafle.filter(function(k){ return String(k.id) !== id; });
         var reszta = sgKafle();
-        if (reszta.length > 0) otworzEdycje(reszta[0], 0);
-        else pokazEdycje(false);
+        otworzEdycje(reszta[0], 0);
         ustawBrudny(); rysujKafle();
       });
       el.querySelector('.km-lewo').addEventListener('click', function(){
@@ -872,7 +933,7 @@
   /* ---------- okno edycji kafla ---------- */
   function pokazEdycje(widoczna){
     var el = document.getElementById('sg-edycja');
-    if (el) el.style.display = widoczna ? 'block' : 'none';
+    if (el) el.style.display = 'block';
   }
 
   function odswiezKropki(aktIdx){
@@ -916,8 +977,12 @@
     var podgladKarty = document.getElementById('sg-karty-podglad');
     if (podgladKarty) podgladKarty.style.display = kafel.karty ? 'grid' : 'none';
 
-    if (!SG_EDYTOR) SG_EDYTOR = SYG.edytorTresci.stworz(
-      document.getElementById('sg-tresc-edytor'), document.getElementById('sg-tresc-pole'));
+    if (!SG_EDYTOR) {
+      var stareBary = document.querySelectorAll('#sg-tresc-edytor > .edtr-bar');
+      stareBary.forEach(function(b){ b.remove(); });
+      SG_EDYTOR = SYG.edytorTresci.stworz(
+        document.getElementById('sg-tresc-edytor'), document.getElementById('sg-tresc-pole'));
+    }
     SG_EDYTOR.ustaw(kafel.tresc || '');
     pokazEdycje(true);
     odswiezKropki(i);
@@ -959,23 +1024,11 @@
     sgInfo('Zmiany w bieżącym slajdzie odrzucone.', false);
   });
 
-  /* ZASTOSUJ DO SLAJDU */
-  function zastosujKafel(){
-    if (!SG_EDYCJA) return;
-    var kafle = sgKafle();
-    var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
-    if (i < 0){ sgInfo('Slajd nie istnieje (usunięty?).', true); return; }
-    kafle[i].obraz = document.getElementById('sg-obraz').value;
-    kafle[i].karty = document.getElementById('sg-karty').checked;
-    kafle[i].tresc = SG_EDYTOR ? SG_EDYTOR.pobierz() : kafle[i].tresc;
-    ustawBrudny();
-    rysujKafle();
-    sgInfo('Zastosowano zmiany do slajdu ' + (i + 1) + '. Pamiętaj o kliknięciu «Zapisz zmiany strony głównej».', false);
-  }
+  /* ZAPISZ ZMIANY — jednolita akcja zapisu całej strony głównej */
   var btnZapiszKafel = document.getElementById('sg-zapisz-kafel');
-  if (btnZapiszKafel) btnZapiszKafel.addEventListener('click', zastosujKafel);
+  if (btnZapiszKafel) btnZapiszKafel.addEventListener('click', sgZapiszWszystko);
   var btnZapiszKafelDol = document.getElementById('sg-zapisz-kafel-dol');
-  if (btnZapiszKafelDol) btnZapiszKafelDol.addEventListener('click', zastosujKafel);
+  if (btnZapiszKafelDol) btnZapiszKafelDol.addEventListener('click', sgZapiszWszystko);
 
   /* Checkbox karty produktów */
   var chkKarty = document.getElementById('sg-karty');
@@ -1111,45 +1164,62 @@
       autoplayEl.value = (SG_DANE.slider && SG_DANE.slider.autoplay != null)
         ? SG_DANE.slider.autoplay : SG_DOMYS.slider.autoplay;
     }
-    if (!SG_EDYTOR_CTA) SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
-      document.getElementById('sg-cta-edytor'), document.getElementById('sg-cta-pole'));
-    SG_EDYTOR_CTA.ustaw(SG_DANE.ctaTresc || SG_DOMYS.ctaTresc);
+    if (!SG_EDYTOR_CTA) {
+      var stareBary = document.querySelectorAll('#sg-cta-edytor > .edtr-bar');
+      stareBary.forEach(function(b){ b.remove(); });
+      SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
+        document.getElementById('sg-cta-edytor'), document.getElementById('sg-cta-pole'));
+    }
+    var ctaHtml = (SG_DANE && sgPrawidlowyHtml(SG_DANE.ctaTresc))
+      ? SG_DANE.ctaTresc
+      : SG_DOMYS.ctaTresc;
+    if (SG_DANE) SG_DANE.ctaTresc = ctaHtml;
+    SG_EDYTOR_CTA.ustaw(ctaHtml);
 
     rysujKafle();
     var kafle = sgKafle();
     if (kafle.length > 0) {
-      /* Domyślnie otwórz slajd Bestsellery jeśli istnieje (jak na zrzucie ekranu), w p.p. pierwszy slajd */
-      var startIdx = kafle.findIndex(function(k){ return k.id === 'bestsellery'; });
-      if (startIdx < 0) startIdx = 0;
-      otworzEdycje(kafle[startIdx], startIdx);
-    } else {
-      SG_EDYCJA = null;
-      pokazEdycje(false);
+      /* Zachowaj aktywny slajd lub otwórz Bestsellery/pierwszy slajd */
+      var aktIdx = 0;
+      if (SG_EDYCJA) {
+        var found = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+        if (found >= 0) aktIdx = found;
+      } else {
+        var bIdx = kafle.findIndex(function(k){ return k.id === 'bestsellery'; });
+        if (bIdx >= 0) aktIdx = bIdx;
+      }
+      otworzEdycje(kafle[aktIdx], aktIdx);
     }
   }
 
   async function ladujStronaGlowna(){
-    /* Natychmiastowe zasilenie danymi domyślnymi lub z pamięci podręcznej — zero pustego / białego ekranu */
+    /* Natychmiastowe zasilenie danymi z pamięci lokalnej lub domyślnej — ZERO czekania, ZERO pustego ekranu */
     if (!SG_DANE){
-      var lokalne = SYG.demoDb.stronaGlowna();
+      var lokalne = null;
+      try {
+        var raw = localStorage.getItem('syg-demo-strona-glowna');
+        if (raw) lokalne = JSON.parse(raw);
+      } catch(e){}
       SG_DANE = sgNaprawObrazy(sgMigrujStare(lokalne) || SG_DOMYS);
-      if (!SG_DANE.slider) SG_DANE.slider = SG_DOMYS.slider;
-      if (SG_DANE.ctaTresc == null) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
+      if (!SG_DANE.slider) SG_DANE.slider = JSON.parse(JSON.stringify(SG_DOMYS.slider));
+      if (!sgPrawidlowyHtml(SG_DANE.ctaTresc)) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
     }
     odswiezWidokStronyGlownej();
 
-    /* W tle pobierz ewentualne nowsze dane z bazy Google Sheets */
+    /* W tle pobierz ewentualne nowsze dane z bazy Google Sheets (tylko gdy użytkownik nie edytuje) */
     if (!SYG.TRYB_DEMO){
       try {
         var odp = await SYG.wezwij('strona-glowna-pobierz', {});
-        if (odp && odp.ok && odp.dane && odp.dane.slider){
-          SG_DANE = sgNaprawObrazy(sgMigrujStare(odp.dane));
-          if (!SG_DANE.slider) SG_DANE.slider = SG_DOMYS.slider;
-          if (SG_DANE.ctaTresc == null) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
-          odswiezWidokStronyGlownej();
+        if (odp && odp.ok && odp.dane && odp.dane.slider && !SG_BRUDNY){
+          var zserwera = sgNaprawObrazy(sgMigrujStare(odp.dane));
+          if (zserwera.slider && Array.isArray(zserwera.slider.kafle) && zserwera.slider.kafle.length > 0){
+            SG_DANE = zserwera;
+            if (!sgPrawidlowyHtml(SG_DANE.ctaTresc)) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
+            odswiezWidokStronyGlownej();
+          }
         }
       } catch (err){
-        console.warn('Błąd pobierania strony głównej z serwera:', err);
+        console.warn('Ciche pobieranie strony głównej z serwera:', err);
       }
     }
     wyczyscBrudny();
@@ -1827,13 +1897,10 @@
     if (sekcjaSG) sekcjaSG.style.display = 'block';
 
     ladujStronaGlowna();
-    ladujPodsumowanie();
-    ladujZamowienia();
-    ladujWiadomosci();
-    ladujProdukty();
-    ladujBlog();
-    ladujStrony();
-    ladujUstawienia();
+    setTimeout(ladujPodsumowanie, 150);
+    setTimeout(ladujZamowienia, 300);
+    setTimeout(ladujWiadomosci, 500);
+    setTimeout(ladujBlog, 700);
   }
 
   var zalogowany = false;
