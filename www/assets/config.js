@@ -4,8 +4,8 @@
    ============================================================ */
 window.SYG = {
   // URL aplikacji Google Apps Script („Wdróż → Aplikacja internetowa → URL").
-  // Gdy puste — serwis działa w TRYBIE DEMO: zapisuje tylko w tej przeglądarce.
-  API: '',
+  // Wdrożony i połączony z arkuszem Google Sheets (od wersji 28.40).
+  API: 'https://script.google.com/macros/s/AKfycbyz9ixShXhx0BpwTtSTnzDuasIaEcqgoGU-xhBsX195TvStvndEkTkmTYEe7N9OXgzcxA/exec',
 
   // TRYB STARTU (launch): true = strona-portfolio (realizacje + kontakt e-mail/tel),
   // podstrony sklepu/wynajmu/kont pokazują komunikat „w budowie". false = pełny

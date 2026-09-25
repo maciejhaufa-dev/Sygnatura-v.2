@@ -26,8 +26,8 @@ git status --short | wc -l      # oczekiwane: 0
 | Gałąź pracy (TYLKO na niej) | `arena/01a0ca92-sygnatura-v-2` (od 22.09; stara `01a056f0` = historia + cel PR #1) |
 | HEAD | `a532b2f` (lub nowszy, jeśli checkpoint dopisany) — worktree czysty |
 | Źródło Pages | gałąź `arena/01a0ca92-sygnatura-v-2`, folder `/docs` (przełączono 22.09 — user w Ustawieniach; bot ma 403) |
-| Treść live | **wersja 28.39, marker `?v=319`** (121 markerów), **`LAUNCH: false` = pełny serwis** (testy u znajomych); meta/og z 28.38, admin.html poza Pages |
-| Silnik (baza) | `engine/` = full parity 30 akcji (konta/wynajem/blog/podstrony/panel, SHA-256, `dane_json` zamówień) — **do wdrożenia przez właściciela** (engine/README.md, telefon); po URL `/exec` bot wpije do config.js i wypchnie |
+| Treść live | **wersja 28.40, marker `?v=320`** (121 markerów), **`LAUNCH: false` = pełny serwis**, **`API: WPIĘTE (Google Sheets/Apps Script)`**; TRYB DEMO wyłączony, admin.html poza Pages |
+| Silnik (baza) | **WDROŻONY I POŁĄCZONY NA ŻYWO (23.09.2026)!** URL `/exec` wpięty w `config.js`; baza Google Sheets (SYGNATURA-BAZA) odbiera zamówienia, konta, wynajem i formularz kontaktowy. |
 | Domena | `studiosygnatura.pl` → GitHub Pages (custom domain); OVH DNS: `@` = 4×A `185.199.108/109/110/111.153`, `www` = CNAME `maciejhaufa-dev.github.io` — krok usera (23.09); MX/SPF/DKIM NIE TYKAĆ |
 | PR | #1 OPEN (Serwis: kreator Zamówienia A/B/C) — nie ruszać bez polecenia |
 | `origin/main` | `80efcca` (zrzut 18 zdjęć + folder pracownia/ + re-uploady) |
@@ -1735,3 +1735,19 @@ spójna z podstronami (Regulamin/Jak pracujemy/wersja); wariant launchowy zachow
 pod flagą (oba bloki w HTML, przełącznik JS wg `SYG.LAUNCH`). Live: config.js
 `LAUNCH: false` ✓, index z koszykiem/panelem ✓. Uwaga: `fetch_page` cache'uje po URL —
 weryfikować z parametrem cache-busting.
+
+---
+
+### Sesja 29/4 — WDROŻENIE BAZY GOOGLE: SILNIK LIVE (wersja 28.40, ?v=320)
+
+1. Właściciel wdrożył skrypt w Google Apps Script i przekazał produkcyjny URL `/exec`:
+   `https://script.google.com/macros/s/AKfycbyz9ixShXhx0BpwTtSTnzDuasIaEcqgoGU-xhBsX195TvStvndEkTkmTYEe7N9OXgzcxA/exec`
+2. Weryfikacja działania endpointu na żywo (`fetch_page`): zwrócił status 200 i JSON
+   `{"ok":true,"katalog":[...]}` prosto z arkusza Google Sheets (zainstalowanego przez `instaluj()`).
+3. URL wpięty do `www/assets/config.js` (`SYG.API`). Zmienna `SYG.TRYB_DEMO = !SYG.API`
+   automatycznie przyjmuje wartość `false` — banner ostrzegawczy „TRYB DEMO" zniknął.
+4. Wersja podbita z 28.39 na **28.40**, znacznik assetów podbity z `?v=319` na **`?v=320`**
+   (121 wystąpień we wszystkich 21 plikach HTML oraz w stopkach).
+5. Deploy wykonany: synchronizacja `www/` do `docs/`, `404.html` zachowane, `.nojekyll`
+   dodane, `docs/admin.html` usunięte z publicznego katalogu Pages (zgodnie z regułą bezpieczeństwa).
+6. Całość wypchnięta na gałąź `arena/01a0ca92-sygnatura-v-2`. Baza danych Google działa na żywo.
