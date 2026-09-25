@@ -264,22 +264,78 @@ body.ma-koszyk{padding-bottom:76px}
 }
 
 /* ============ ZAKŁADKI ADMINA ============ */
-.admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;border-bottom:2px solid rgba(107,69,48,.3)}
-.admin-tab{border:none;background:transparent;font-family:inherit;font-size:14px;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;color:rgba(51,38,28,.65);padding:12px 18px 10px;
-  cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .25s}
-.admin-tab:hover{color:var(--brunatny)}
-.admin-tab.on{color:var(--butelkowa);border-bottom-color:var(--zloty)}
+.admin-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 20px;border-bottom:2px solid #E2D7CB;padding-bottom:2px}
+.admin-tab{border:none;background:transparent;font-family:inherit;font-size:13.5px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:#7A6B5F;padding:10px 18px;border-radius:6px 6px 0 0;
+  cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.admin-tab:hover{color:var(--butelkowa);background:rgba(196,165,130,.15)}
+.admin-tab.on{color:var(--butelkowa);background:#fff;border:1px solid #E2D7CB;border-bottom:3px solid var(--butelkowa);
+  box-shadow:0 -2px 6px rgba(0,0,0,.03)}
 
-/* ============ TABELA ADMINA ============ */
-.tabela{width:100%;border-collapse:collapse;background:#fff;border:1px solid rgba(107,69,48,.3);
-  margin-top:14px;font-size:15.5px}
-.tabela th{background:var(--butelkowa);color:var(--zloty);text-align:left;padding:10px 12px;
-  font-size:13px;letter-spacing:.1em;text-transform:uppercase}
-.tabela td{padding:10px 12px;border-top:1px solid rgba(107,69,48,.2);vertical-align:top}
-.tabela select{font-family:inherit;font-size:15px;padding:5px;border:1px solid rgba(107,69,48,.45);
-  background:var(--krem)}
-.tabela-wrap{overflow-x:auto}
+/* ============ KARTY I BLOKI PANELU ADMINA ============ */
+.admin-card{background:#fff;border:1px solid #E2D7CB;border-radius:8px;padding:22px 24px;margin-bottom:24px;
+  box-shadow:0 2px 8px rgba(74,46,27,.04)}
+.admin-action-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  background:#FAF7F2;border:1px solid #E2D7CB;border-radius:8px;padding:14px 20px;margin:16px 0 20px}
+.btn-zapisz-duzy{background:var(--butelkowa);color:#fff;border:none;font-family:inherit;font-weight:700;
+  font-size:14px;padding:10px 22px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;
+  gap:8px;box-shadow:0 2px 6px rgba(28,58,39,.25);transition:background .18s,transform .12s}
+.btn-zapisz-duzy:hover{background:#254d34;transform:translateY(-1px)}
+.btn-odrzuc-duzy{background:#fff;color:#8A2F1D;border:1px solid #D5C4B1;font-family:inherit;font-weight:600;
+  font-size:13.5px;padding:9px 18px;border-radius:6px;cursor:pointer;transition:all .18s}
+.btn-odrzuc-duzy:hover{background:#FFF5F2;border-color:#8A2F1D}
+
+/* ============ TABELA ADMINA (Excel SaaS Style) ============ */
+.tabela-wrap{background:#fff;border:1px solid #E2D7CB;border-radius:8px;overflow-x:auto;
+  box-shadow:0 2px 8px rgba(74,46,27,.04);margin:14px 0 24px}
+.tabela{width:100%;border-collapse:separate;border-spacing:0;background:#fff;font-size:13.5px}
+.tabela th{background:#F5EFE8;color:var(--butelkowa);text-align:left;padding:12px 14px;
+  font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:2px solid #D5C4B1;
+  white-space:nowrap}
+.tabela td{padding:12px 14px;border-bottom:1px solid #ECE4DA;vertical-align:middle;color:#332014}
+.tabela tbody tr:nth-child(even) td{background:#FAF7F2}
+.tabela tbody tr:hover td{background:#F1EAE1}
+.tabela select{font-family:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--zloty);
+  border-radius:4px;background:#fff;color:var(--butelkowa);font-weight:600;cursor:pointer}
+
+/* Status badges */
+.status-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em}
+.status-zapytanie{background:#FFF4E5;color:#9A5B00;border:1px solid #FFE0B2}
+.status-platnosc{background:#EBF5FB;color:#1B629B;border:1px solid #BEE3F8}
+.status-zarezerwowany{background:#EBF8F2;color:#1B6B3E;border:1px solid #BCE5D1}
+.status-zrealizowane{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7}
+.status-odrzucono{background:#FDF0ED;color:#9E2A2B;border:1px solid #F8D7DA}
+
+/* Pasek miniatur slajdów */
+.sg-slajdy-pasek{display:flex;gap:14px;overflow-x:auto;padding:8px 4px 16px;scroll-behavior:smooth}
+.sg-slajd-karta{flex:0 0 210px;background:#fff;border:2px solid #E2D7CB;border-radius:8px;overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);cursor:pointer;transition:all .18s;display:flex;flex-direction:column}
+.sg-slajd-karta:hover{border-color:var(--zloty);transform:translateY(-2px);box-shadow:0 6px 14px rgba(74,46,27,.12)}
+.sg-slajd-karta.aktywny{border-color:var(--butelkowa);box-shadow:0 0 0 3px rgba(196,165,130,.5),0 4px 12px rgba(28,58,39,.18)}
+.sg-slajd-mini{position:relative;height:105px;background-size:cover;background-position:center;
+  border-bottom:1px solid #E2D7CB;display:flex;align-items:flex-start;padding:8px}
+.sg-slajd-nr{background:rgba(28,58,39,.88);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px}
+.sg-slajd-opis{padding:8px 10px 4px;font-size:12px;font-weight:600;color:#332014;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-slajd-akcje{display:flex;gap:4px;padding:6px 10px 10px;background:#FAF7F2;border-top:1px solid #ECE4DA;margin-top:auto}
+.sg-slajd-akcje button{flex:1;border:1px solid #D5C4B1;background:#fff;border-radius:4px;padding:4px 6px;
+  font-size:11.5px;font-weight:600;color:#4A2E1B;cursor:pointer;transition:background .15s}
+.sg-slajd-akcje button:hover{background:#EFE8DF}
+.sg-dodaj-btn{flex:0 0 160px;min-height:165px;border:2px dashed var(--zloty);border-radius:8px;
+  background:rgba(248,245,238,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;cursor:pointer;color:var(--brunatny);font-weight:700;font-size:13px;transition:all .18s}
+.sg-dodaj-btn:hover{background:#FAF7F2;border-color:var(--butelkowa);color:var(--butelkowa)}
+
+/* Canva Canvas Frame w panelu */
+.sg-canvas-frame{border:1px solid #D5C4B1;border-radius:8px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);margin-top:14px}
+.sg-canvas-topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#23272A;color:#fff;
+  font-size:13px;flex-wrap:wrap}
+.sg-canvas-topbar select{background:#36393F;color:#fff;border:1px solid #4F545C;border-radius:4px;padding:4px 8px;font-size:12.5px}
+.sg-canvas-topbar label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#E2D7CB;font-size:12.5px}
+.sg-mini-karty-preview{position:absolute;bottom:20px;left:clamp(16px,3.4vw,38px);right:clamp(16px,3.4vw,38px);
+  display:flex;gap:12px;flex-wrap:wrap;z-index:4;pointer-events:none}
+.sg-mini-karta-p{background:rgba(255,255,255,.94);color:#332014;border-radius:6px;padding:8px 14px;font-size:12px;
+  font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.8)}
 
 /* ============ STOPKA ============ */
 .stopka{background:var(--butelkowa);color:var(--krem);display:flex;align-items:center;
@@ -598,19 +654,29 @@ body.launch-budowa main.wrap > :not(.budowa-box){display:none}
 /* ============ Duże przyciski ============ */
 .btn.duzy{padding:16px 34px;font-size:17.5px;letter-spacing:.08em;font-weight:700}
 
-/* ============ EDYTOR TREŚCI (silnik uniwersalny) ============ */
+/* ============ EDYTOR TREŚCI (silnik uniwersalny — WSTĄŻKA POWERPOINT / CANVA) ============ */
 .edtr{border:1px solid rgba(107,69,48,.45);background:#fff}
-.edtr-bar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px 10px;
-  background:var(--krem-2);border-bottom:1px solid rgba(107,69,48,.3)}
-.edtr-bar button{border:1px solid rgba(107,69,48,.4);background:#fff;color:var(--brunatny);
-  font-family:inherit;font-size:13.5px;padding:6px 10px;cursor:pointer;line-height:1.2}
-.edtr-bar button:hover{background:var(--krem-2);border-color:var(--brunatny)}
+.edtr-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;padding:8px 10px;
+  background:#F5EFE6;border-bottom:2px solid rgba(107,69,48,.35);position:relative}
+.edtr-grupa{display:flex;flex-direction:column;justify-content:space-between;background:#ffffff;
+  border:1px solid rgba(107,69,48,.25);border-radius:6px;padding:4px 6px;box-shadow:0 1px 3px rgba(107,69,48,.08)}
+.edtr-grupa-cialo{display:flex;flex-direction:column;gap:4px}
+.edtr-grupa-rzad{display:flex;align-items:center;gap:3px;flex-wrap:nowrap}
+.edtr-grupa-etyk{text-align:center;font-size:9px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:#8C6A4E;padding-top:3px;margin-top:3px;
+  border-top:1px solid rgba(107,69,48,.12);user-select:none}
+.edtr-bar button{border:1px solid rgba(107,69,48,.3);background:#FAF8F5;color:var(--brunatny);
+  font-family:inherit;font-size:12px;font-weight:600;padding:3px 7px;border-radius:4px;
+  cursor:pointer;line-height:1.2;white-space:nowrap;transition:all .15s ease;height:24px;
+  display:inline-flex;align-items:center;justify-content:center}
+.edtr-bar button:hover{background:#EDE6DC;border-color:var(--brunatny);box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .edtr-gr{color:rgba(107,69,48,.4);font-size:13px;padding:0 2px}
-.edtr-bar select.edtr-sel{font-size:12.5px;padding:4px 6px;border:1px solid rgba(107,69,48,.4);
-  border-radius:6px;background:#fff;color:var(--brunatny);max-width:140px}
-.edtr-kolor{display:inline-flex;align-items:center;gap:3px;border:1px solid rgba(107,69,48,.35);
-  border-radius:6px;padding:2px 5px;background:#fff}
-.edtr-kolor span{font-size:11.5px;font-weight:700;color:var(--brunatny)}
+.edtr-bar select.edtr-sel{font-size:11.5px;padding:2px 5px;border:1px solid rgba(107,69,48,.35);
+  border-radius:4px;background:#fff;color:var(--brunatny);max-width:130px;height:24px}
+.edtr-kolor{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;border:1px solid rgba(107,69,48,.35);border-radius:4px;padding:1px 5px;background:#fff;height:24px;cursor:pointer}
+.edtr-kolor span{font-size:11px;font-weight:700;color:var(--brunatny);line-height:1}
+.edtr-kolor i{display:block;width:14px;height:3px;border-radius:2px;background:#6B4530}
 .edtr-kolor input[type=color]{width:26px;height:22px;border:none;padding:0;background:none;cursor:pointer}
 .edtr-pole{min-height:240px;max-height:560px;overflow:auto;padding:16px 18px;font-size:17px;
   line-height:1.6;color:var(--ink);font-family:var(--serif)}

@@ -357,14 +357,35 @@
     }
 
     /* ---------- narzędzia ---------- */
-    function B(etykieta, tytul, cmd, arg) {
+    /* ---------- narzędzia (WSTĄŻKA POWERPOINT / CANVA) ---------- */
+    function dodajGrupe(nazwa) {
+      var gr = document.createElement('div');
+      gr.className = 'edtr-grupa';
+      var cialo = document.createElement('div');
+      cialo.className = 'edtr-grupa-cialo';
+      var r1 = document.createElement('div');
+      r1.className = 'edtr-grupa-rzad';
+      var r2 = document.createElement('div');
+      r2.className = 'edtr-grupa-rzad';
+      cialo.appendChild(r1);
+      cialo.appendChild(r2);
+      gr.appendChild(cialo);
+      var etyk = document.createElement('div');
+      etyk.className = 'edtr-grupa-etyk';
+      etyk.textContent = nazwa;
+      gr.appendChild(etyk);
+      bar.appendChild(gr);
+      return { r1: r1, r2: r2, gr: gr };
+    }
+
+    function B(rodzic, etykieta, tytul, cmd, arg) {
       var b = document.createElement('button');
       b.type = 'button'; b.title = tytul; b.innerHTML = etykieta;
       b.addEventListener('click', function () {
         pole.focus();
         document.execCommand(cmd, false, arg || null);
       });
-      bar.appendChild(b);
+      (rodzic || bar).appendChild(b);
       return b;
     }
     function Gr(etykieta, tytul) {
@@ -372,7 +393,7 @@
       s.className = 'edtr-gr'; s.title = tytul; s.innerHTML = etykieta;
       bar.appendChild(s);
     }
-    function Sel(opcje, tytul, cb) {
+    function Sel(rodzic, opcje, tytul, cb) {
       var s = document.createElement('select');
       s.className = 'edtr-sel'; s.title = tytul;
       opcje.forEach(function (o) {
@@ -385,18 +406,18 @@
         s.value = '';
         cb(v);
       });
-      bar.appendChild(s);
+      (rodzic || bar).appendChild(s);
       return s;
     }
     var zamknijWszystkiePalety = function () {};
-    function Paleta(znak, tytul, cmd) {
+    function Paleta(rodzic, znak, tytul, cmd) {
       var przyc = document.createElement('span');
       przyc.className = 'edtr-kolor'; przyc.title = tytul;
       var z = document.createElement('span');
       z.textContent = znak;
       var i = document.createElement('i');
       przyc.appendChild(z); przyc.appendChild(i);
-      bar.appendChild(przyc);
+      (rodzic || bar).appendChild(przyc);
       var pop = document.createElement('div');
       pop.className = 'edtr-paleta';
       var KOLORY = ['#33261C','#6B4530','#1F3A32','#C4A582','#E5D9C5','#FBF7F0','#8A2F1D',
@@ -477,20 +498,18 @@
       }
     }
 
-    /* ================= pasek narzędzi ================= */
-    /* --- TEKST (czcionka, rozmiar, styl, kolory, odstęp) --- */
-    B('Tytuł', 'Tytuł (nagłówek 2)', 'formatBlock', 'h2');
-    B('Podtytuł', 'Podtytuł (nagłówek 3)', 'formatBlock', 'h3');
-    B('Tekst', 'Zwykły akapit', 'formatBlock', 'p');
-    Gr('|', 'Czcionka, rozmiar, styl, kolory, odstępy');
-    var selCzcionka = Sel([{ v:'', t:'Czcionka…' }].concat(FONTY_LISTA.map(function (f) {
+    /* ================= WSTĄŻKA POWERPOINT / CANVA — POGRUPOWANE MATRYCE ================= */
+
+    /* --- GRUPA 1: CZCIONKA --- */
+    var grCzcionka = dodajGrupe('Czcionka');
+    var selCzcionka = Sel(grCzcionka.r1, [{ v:'', t:'Czcionka…' }].concat(FONTY_LISTA.map(function (f) {
       return { v: f[0], t: f[1] };
     })), 'Czcionka (FONT) — zaznacz tekst i wybierz; pasek pokazuje czcionkę zaznaczenia', function (v) {
       if (!v) return;
       var css = FONTY[v] || v;
       if (!owinSpan('font-family:' + css)) document.execCommand('fontName', false, css);
     });
-    var selRozmiar = Sel([{ v:'', t:'Rozmiar…' },
+    var selRozmiar = Sel(grCzcionka.r1, [{ v:'', t:'Rozmiar…' },
       { v:'10', t:'10 px' }, { v:'12', t:'12 px' }, { v:'14', t:'14 px' }, { v:'16', t:'16 px' },
       { v:'18', t:'18 px' }, { v:'20', t:'20 px' }, { v:'24', t:'24 px' }, { v:'28', t:'28 px' },
       { v:'32', t:'32 px' }, { v:'36', t:'36 px' }, { v:'48', t:'48 px' }],
@@ -501,87 +520,83 @@
         document.execCommand('fontSize', false, m[v] || '4');
       }
     });
-    B('<b>B</b>', 'Pogrubienie (Ctrl+B)', 'bold');
-    B('<i>I</i>', 'Kursywa (Ctrl+I)', 'italic');
-    B('<u>U</u>', 'Podkreślenie', 'underline');
-    B('<s>S</s>', 'Przekreślenie', 'strikeThrough');
-    var paletaTekst = Paleta('A', 'Kolor tekstu — paleta kolorów z przyciskiem OK', 'foreColor');
-    var paletaTlo = Paleta('🖍', 'Kolor tła tekstu (podświetlenie) — z opcją „Bez tła" (przezroczyste)', 'hiliteColor');
-    Sel([{ v:'', t:'Odstęp znaków…' }, { v:'0', t:'0 (normalny)' }, { v:'1', t:'1 px' },
+    B(grCzcionka.r1, '✕ Format', 'Wyczyść formatowanie zaznaczenia', 'removeFormat');
+
+    B(grCzcionka.r2, '<b>B</b>', 'Pogrubienie (Ctrl+B)', 'bold');
+    B(grCzcionka.r2, '<i>I</i>', 'Kursywa (Ctrl+I)', 'italic');
+    B(grCzcionka.r2, '<u>U</u>', 'Podkreślenie', 'underline');
+    B(grCzcionka.r2, '<s>S</s>', 'Przekreślenie', 'strikeThrough');
+    var paletaTekst = Paleta(grCzcionka.r2, 'A', 'Kolor tekstu — paleta kolorów z przyciskiem OK', 'foreColor');
+    var paletaTlo = Paleta(grCzcionka.r2, '🖍', 'Kolor tła tekstu (podświetlenie) — z opcją „Bez tła" (przezroczyste)', 'hiliteColor');
+    Sel(grCzcionka.r2, [{ v:'', t:'Odstęp…' }, { v:'0', t:'0 (normalny)' }, { v:'1', t:'1 px' },
       { v:'2', t:'2 px' }, { v:'3', t:'3 px' }, { v:'4', t:'4 px' }, { v:'6', t:'6 px' },
-      { v:'8', t:'8 px' }, { v:'-1', t:'−1 px (ścisły)' }],
+      { v:'8', t:'8 px' }, { v:'-1', t:'−1 px' }],
       'Odstęp między znakami — zaznacz tekst i wybierz', function (v) {
       if (!v) return;
       if (!owinSpan('letter-spacing:' + v + 'px')) alert('Zaznacz tekst, aby ustawić odstęp między znakami.');
     });
-    B('✕ Format', 'Wyczyść formatowanie zaznaczenia', 'removeFormat');
 
-    /* --- AKAPIT --- */
-    Gr('|', 'Akapit: listy, justowanie, pion, kierunek, kolumny');
-    B('• Lista', 'Lista punktowana', 'insertUnorderedList');
-    B('1. Lista', 'Lista numerowana', 'insertOrderedList');
-    B('„Cytat"', 'Cytat', 'formatBlock', 'blockquote');
-    B('⇤', 'Justowanie: do lewej', 'justifyLeft');
-    B('↔', 'Justowanie: do środka', 'justifyCenter');
-    B('⇥', 'Justowanie: do prawej', 'justifyRight');
-    B('≡', 'Justowanie: wyjustuj (rozciągnięcie do lewej i prawej)', 'justifyFull');
-    B('⬆', 'Wyrównanie pionowe: góra (komórka tabeli lub kształt)', 'pion-gora');
-    B('↕', 'Wyrównanie pionowe: środek (komórka tabeli lub kształt)', 'pion-srodek');
-    B('⬇', 'Wyrównanie pionowe: dół (komórka tabeli lub kształt)', 'pion-dol');
-    B('↺ +90°', 'Kierunek tekstu: +90° (zaznaczony kształt z tekstem)', 'kier-90');
-    B('↻ −90°', 'Kierunek tekstu: −90° (zaznaczony kształt z tekstem)', 'kier-270');
-    Sel([{ v:'', t:'Kolumny…' }, { v:'1', t:'1 kolumna' }, { v:'2', t:'2 kolumny' },
+    /* --- GRUPA 2: AKAPIT --- */
+    var grAkapit = dodajGrupe('Akapit');
+    B(grAkapit.r1, 'H2 Tytuł', 'Tytuł (nagłówek 2)', 'formatBlock', 'h2');
+    B(grAkapit.r1, 'H3 Podtytuł', 'Podtytuł (nagłówek 3)', 'formatBlock', 'h3');
+    B(grAkapit.r1, 'P Tekst', 'Zwykły akapit', 'formatBlock', 'p');
+    B(grAkapit.r1, '🏷 Etykieta', 'Blok-etykieta w ramce (mały napis, np. „Nowości")', 'tag');
+
+    B(grAkapit.r2, '⇤', 'Justowanie: do lewej', 'justifyLeft');
+    B(grAkapit.r2, '↔', 'Justowanie: do środka', 'justifyCenter');
+    B(grAkapit.r2, '⇥', 'Justowanie: do prawej', 'justifyRight');
+    B(grAkapit.r2, '≡', 'Justowanie: wyjustuj (rozciągnięcie do lewej i prawej)', 'justifyFull');
+    B(grAkapit.r2, '• Lista', 'Lista punktowana', 'insertUnorderedList');
+    B(grAkapit.r2, '1. Lista', 'Lista numerowana', 'insertOrderedList');
+    B(grAkapit.r2, '„Cytat"', 'Cytat', 'formatBlock', 'blockquote');
+    Sel(grAkapit.r2, [{ v:'', t:'Kolumny…' }, { v:'1', t:'1 kolumna' }, { v:'2', t:'2 kolumny' },
       { v:'3', t:'3 kolumny' }, { v:'4', t:'4 kolumny' }],
       'Układ kolumnowy (1–4 kolumny)', function (v) {
       if (!v) return;
       if (v === '1') { pole.focus(); document.execCommand('formatBlock', false, 'p'); return; }
       wstawKolumny(parseInt(v, 10));
     });
-    B('🏷 Etykieta', 'Blok-etykieta w ramce (mały napis, np. „Nowości")', 'tag');
 
-    /* --- TABELA --- */
-    Gr('|', 'Tabela: wstawianie i edycja');
-    B('▦ Tabela…', 'Wstaw tabelę (wiersze × kolumny, z ramką lub bez)', 'tabelaNowa');
-    B('+ Wiersz', 'Dodaj wiersz poniżej (stań kursorem w tabeli)', 'tab-wiersz');
-    B('+ Kol.', 'Dodaj kolumnę obok (stań kursorem w tabeli)', 'tab-kol');
-    B('− Wiersz', 'Usuń wiersz (stań kursorem w tabeli)', 'tab-usun-wiersz');
-    B('− Kol.', 'Usuń kolumnę (stań kursorem w tabeli)', 'tab-usun-kol');
-    B('◫ Ramka', 'Obramowanie tabeli: włącz / wyłącz', 'tab-ramka');
+    /* --- GRUPA 3: TABELA --- */
+    var grTabela = dodajGrupe('Tabela');
+    B(grTabela.r1, '▦ Tabela…', 'Wstaw tabelę (wiersze × kolumny, z ramką lub bez)', 'tabelaNowa');
+    B(grTabela.r1, '◫ Ramka', 'Obramowanie tabeli: włącz / wyłącz', 'tab-ramka');
 
-    /* --- LINKI I MEDIA --- */
-    Gr('|', 'Linki i media');
-    B('🔗', 'Wstaw link', 'link');
-    B('🖼', 'Wstaw obraz (plik)', 'obraz');
-    B('▶ Film', 'Wstaw film YouTube', 'youtube');
+    B(grTabela.r2, '+ Wiersz', 'Dodaj wiersz poniżej (stań kursorem w tabeli)', 'tab-wiersz');
+    B(grTabela.r2, '+ Kol.', 'Dodaj kolumnę obok (stań kursorem w tabeli)', 'tab-kol');
+    B(grTabela.r2, '− Wiersz', 'Usuń wiersz (stań kursorem w tabeli)', 'tab-usun-wiersz');
+    B(grTabela.r2, '− Kol.', 'Usuń kolumnę (stań kursorem w tabeli)', 'tab-usun-kol');
 
-    /* --- RYSOWANIE OBIEKTÓW (jak PowerPoint) --- */
-    Gr('|', 'Rysowanie obiektów: klik = zaznaczenie, 2×klik = właściwości, narożnik = rozmiar, kółko = obrót');
-    B('🅃 Pole', 'Pole tekstowe', 'rys-pole');
-    B('▭ Prostokąt', 'Prostokąt', 'rys-prostokat');
-    B('▢ Zaokrąglony', 'Zaokrąglony prostokąt', 'rys-zaokraglony');
-    B('◯ Elipsa', 'Koło / elipsa', 'rys-elipsa');
-    B('─ Linia', 'Linia', 'rys-linia');
-    B('➜ Strzałka', 'Strzałka', 'rys-strzalka');
-    B('△ Trójkąt', 'Trójkąt', 'rys-trojkat');
-    B('⊞ Grupuj', 'Grupuj zaznaczone obiekty (blokada wzajemnego położenia, Ctrl+G)', 'grupuj');
-    B('⊟ Rozgrupuj', 'Rozgrupuj zaznaczoną grupę (Ctrl+Shift+G)', 'rozgrupuj');
+    /* --- GRUPA 4: KSZTAŁTY I MEDIA (Canva / PowerPoint) --- */
+    var grKsztalty = dodajGrupe('Kształty i Media');
+    B(grKsztalty.r1, '🅃 Pole', 'Pole tekstowe', 'rys-pole');
+    B(grKsztalty.r1, '▭ Prostokąt', 'Prostokąt', 'rys-prostokat');
+    B(grKsztalty.r1, '▢ Zaokrąglony', 'Zaokrąglony prostokąt', 'rys-zaokraglony');
+    B(grKsztalty.r1, '◯ Elipsa', 'Koło / elipsa', 'rys-elipsa');
 
-    /* --- OBIEKT: wyrównanie, rozłożenie, warstwy --- */
-    Gr('|', 'Obiekt: wyrównanie względem siebie, odstępy, warstwy');
-    B('⬅', 'Wyrównaj: do lewej krawędzi (kilka obiektów — względem siebie)', 'obj-lewo');
-    B('↔', 'Wyrównaj: do środka (poziomo) (kilka — w jednej kolumnie)', 'obj-srodek');
-    B('➡', 'Wyrównaj: do prawej krawędzi (kilka obiektów — względem siebie)', 'obj-prawo');
-    B('⬆', 'Wyrównaj: do góry (kilka — w jednej linii)', 'obj-gora');
-    B('↕', 'Wyrównaj: do środka (pionowo) (kilka — w jednej linii)', 'obj-srodek-pion');
-    B('⬇', 'Wyrównaj: do dołu (kilka obiektów — względem siebie)', 'obj-dol');
-    B('⇶', 'Rozłóż w poziomie (jednakowe odstępy)', 'rozloz-poziom');
-    B('⇵', 'Rozłóż w pionie (jednakowe odstępy)', 'rozloz-pion');
-    B('⤒', 'Warstwa: na wierzch', 'war-wierzch');
-    B('🔼', 'Warstwa: do przodu', 'war-przod');
-    B('🔽', 'Warstwa: do tyłu', 'war-tyl');
-    B('⤓', 'Warstwa: na spód', 'war-spod');
-    B('🗑', 'Usuń zaznaczone obiekty (Backspace)', 'usun-obiekty');
-    B('⎯ Przerwa', 'Pozioma linia', 'linia');
+    B(grKsztalty.r2, '─ Linia', 'Linia', 'rys-linia');
+    B(grKsztalty.r2, '➜ Strzałka', 'Strzałka', 'rys-strzalka');
+    B(grKsztalty.r2, '△ Trójkąt', 'Trójkąt', 'rys-trojkat');
+    B(grKsztalty.r2, '🔗', 'Wstaw link', 'link');
+    B(grKsztalty.r2, '🖼', 'Wstaw obraz (plik)', 'obraz');
+    B(grKsztalty.r2, '▶ Film', 'Wstaw film YouTube', 'youtube');
+
+    /* --- GRUPA 5: UKŁAD I WARSTWY --- */
+    var grUklad = dodajGrupe('Układ i Warstwy');
+    B(grUklad.r1, '⤒ Na wierzch', 'Warstwa: na wierzch', 'war-wierzch');
+    B(grUklad.r1, '⤓ Na spód', 'Warstwa: na spód', 'war-spod');
+    B(grUklad.r1, '⊞ Grupuj', 'Grupuj zaznaczone obiekty (blokada wzajemnego położenia, Ctrl+G)', 'grupuj');
+    B(grUklad.r1, '⬆', 'Wyrównaj: do góry', 'obj-gora');
+    B(grUklad.r1, '↕', 'Wyrównaj: do środka (pionowo)', 'obj-srodek-pion');
+    B(grUklad.r1, '⬇', 'Wyrównaj: do dołu', 'obj-dol');
+
+    B(grUklad.r2, '🔼 Do przodu', 'Warstwa: do przodu', 'war-przod');
+    B(grUklad.r2, '🔽 Do tyłu', 'Warstwa: do tyłu', 'war-tyl');
+    B(grUklad.r2, '⊟ Rozgrupuj', 'Rozgrupuj zaznaczoną grupę (Ctrl+Shift+G)', 'rozgrupuj');
+    B(grUklad.r2, '↺ +90°', 'Kierunek tekstu: +90° (zaznaczony kształt z tekstem)', 'kier-90');
+    B(grUklad.r2, '↻ −90°', 'Kierunek tekstu: −90° (zaznaczony kształt z tekstem)', 'kier-270');
+    B(grUklad.r2, '🗑 Usuń', 'Usuń zaznaczone obiekty (Backspace)', 'usun-obiekty');
 
     /* ---------- link ---------- */
     bar.querySelector('button[title="Wstaw link"]').addEventListener('click', function () {

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&family=Montserrat:wght@500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=321">
+<link rel="stylesheet" href="assets/style.css?v=322">
 </head>
 <body data-strona="">
 <div id="naglowek"></div>
@@ -56,9 +56,15 @@
 
     <!-- PODSUMOWANIE (kwartał) -->
     <section class="admin-sekcja" id="tab-podsumowanie">
-      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podsumowanie kwartału</h2>
-      <p class="mala">Liczby z tej przeglądarki (tryb demo). Po wdrożeniu arkusza Google będą liczone
-      ze wszystkich zamówień i zapytań.</p>
+      <div class="admin-action-bar">
+        <div>
+          <h2 style="font-size:20px;color:var(--butelkowa);margin:0 0 4px">Podsumowanie pracowni</h2>
+          <p class="mala" style="margin:0">Bieżące statystyki zamówień ze sklepu, wynajmu dekoracji oraz wiadomości od klientów.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn outline" type="button" onclick="document.querySelector('[data-tab=zamowienia]').click()">Zobacz zamówienia →</button>
+        </div>
+      </div>
       <div class="podsum-karty">
         <div class="podsum-karta"><span class="num">01</span><h3>Zapytania</h3>
           <b id="ps-zapytania">0</b>
@@ -69,108 +75,141 @@
         <div class="podsum-karta"><span class="num">03</span><h3>Suma kwot zamówień</h3>
           <b id="ps-suma">0 zł</b>
           <p class="mala">kwoty szacunkowe z rachunków</p></div>
-        <div class="podsum-karta"><span class="num">04</span><h3>Terminarz</h3>
-          <div class="term-placeholder">
-            <div class="ph">1. widok miesiąca</div>
-            <div class="ph">2. widok kwartału</div>
-            <div class="ph">3. terminy wolne</div>
-            <div class="ph">4. terminy zajęte</div>
-            <div class="ph">5. rezerwacje potwierdzone</div>
-            <div class="ph">6. zapytania na dni</div>
-          </div>
-          <p class="mala">Podgląd terminarza dodamy w kolejnym kroku.</p></div>
+        <div class="podsum-karta"><span class="num">04</span><h3>Baza Google Sheets</h3>
+          <b style="font-size:18px;color:var(--butelkowa);padding-top:8px">Połączona na żywo</b>
+          <p class="mala">Wszystkie rekordy synchronizowane z arkuszem Google.</p></div>
       </div>
     </section>
 
     <!-- STRONA GŁÓWNA -->
     <section class="admin-sekcja" id="tab-strona-glowna" style="display:none">
-      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Strona główna — slider i treści</h2>
-      <p class="mala">Kolejność kafli w panelu = kolejność przewijania slidera na stronie głównej
-      (przeciągnij kafel, aby zmienić kolejność — jak monitory w ustawieniach ekranu). Kliknij
-      EDYTUJ, aby otworzyć EDYTOR TREŚCI danego kafla. W trybie demo dane zapisują się w tej
-      przeglądarce; po wdrożeniu trafią do arkusza Google.</p>
+      <div class="admin-action-bar">
+        <div>
+          <h2 style="font-size:20px;color:var(--butelkowa);margin:0 0 4px">Strona główna — podgląd i edycja na żywo</h2>
+          <p class="mala" style="margin:0">Wszystkie zmiany widzisz na żywo na podglądzie poniżej. Kliknij «Zapisz zmiany», aby opublikować je na stronie.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn-odrzuc-duzy" type="button" id="sg-odrzuc-strona">↩ Odrzuć zmiany</button>
+          <button class="btn-zapisz-duzy" type="button" id="sg-zapisz">💾 Zapisz zmiany strony głównej</button>
+        </div>
+      </div>
+
       <div class="flash" id="sg-info" style="display:none"></div>
       <div class="flash" id="sg-brudny" style="display:none;background:#8a5a1d">
-        Masz <b>niezapisane zmiany</b> — strona główna zostanie zapisana dopiero po kliknięciu
-        <a href="#sg-zapisz" style="color:#fff;border-bottom:1px solid #fff">ZAPISZ ZMIANY STRONY GŁÓWNEJ</a>
-        na dole zakładki.
+        Masz <b>niezapisane zmiany</b> — strona główna zostanie zapisana i opublikowana po kliknięciu „Zapisz zmiany strony głównej”.
       </div>
 
-      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Slider</h3>
-      <div class="pole" style="max-width:300px">
-        <label>Ustaw prędkość automatycznego przewijania (w sekundach) — 0 = bez autoplay</label>
-        <input type="number" id="sg-autoplay" min="0" step="0.5">
-      </div>
-      <div class="kafle-pasek" id="sg-kafle"></div>
-      <p class="mala">Pod każdym kaflem: EDYTUJ / USUŃ oraz strzałki ‹ › (zmiana kolejności także przez przeciąganie).</p>
+      <!-- KARTA 1: SLIDER -->
+      <div class="admin-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+          <div>
+            <h3 style="font-size:17px;color:var(--butelkowa);margin:0 0 4px">1. Slider na stronie głównej (slajdy)</h3>
+            <p class="mala" style="margin:0">Wybierz kafel poniżej, aby edytować jego tło, teksty i układ. Kolejność zmieniasz strzałkami ‹ › lub przeciągając kafel.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <label style="font-size:13px;font-weight:700;color:var(--brunatny)">Czas slajdu (sekundy):</label>
+            <input type="number" id="sg-autoplay" min="0" step="0.5" style="width:75px;padding:6px 10px;border:1px solid #C4A582;border-radius:4px">
+          </div>
+        </div>
 
-      <div id="sg-edycja" style="display:none;border:1px solid rgba(107,69,48,.4);background:#fff;padding:16px 18px;margin:18px 0">
-        <h3 id="sg-edycja-tytul" style="font-size:16.5px;color:var(--butelkowa);margin:0 0 12px">Edycja kafla</h3>
-        <div class="forma" style="max-width:780px">
-          <div class="pole">
-            <label>Zdjęcie w tle kafla</label>
-            <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap">
-              <select id="sg-obraz" style="flex:1;min-width:240px"></select>
-              <button class="btn outline" type="button" id="sg-obraz-wgraj" style="flex:none">Wgraj własne zdjęcie…</button>
-            </div>
-            <div id="sg-obraz-wgraj-box" style="display:none;border:1px dashed rgba(107,69,48,.55);background:#FBF7F0;padding:10px 12px;margin-top:8px">
-              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-                <div style="flex:1;min-width:220px"><label style="font-size:13.5px;color:var(--brunatny);display:block;margin-bottom:4px">Nazwa zdjęcia (w wersji docelowej: folder sieciowy assets/media/przeslane/)</label>
-                <input type="text" id="sg-obraz-nazwa" placeholder="np. kafla-tlo"></div>
-                <div><label style="font-size:13.5px;color:var(--brunatny);display:block;margin-bottom:4px">Plik ze zdjęciem</label>
-                <input type="file" id="sg-obraz-plik" accept="image/*"></div>
-                <button class="btn" type="button" id="sg-obraz-zapisz">Zapisz do biblioteki</button>
+        <!-- Pasek miniatur slajdów -->
+        <div class="sg-slajdy-pasek" id="sg-kafle"></div>
+
+        <!-- Canva Slide Canvas Frame -->
+        <div id="sg-edycja" style="margin-top:16px">
+          <div class="sg-canvas-frame">
+            <div class="sg-canvas-topbar">
+              <span class="status-badge status-platnosc" id="sg-edycja-tytul">Slajd 1</span>
+              <label style="margin-left:8px">Zdjęcie w tle:
+                <select id="sg-obraz" style="max-width:260px"></select>
+              </label>
+              <button class="btn outline" type="button" id="sg-obraz-wgraj" style="padding:4px 10px;font-size:12px;background:#36393F;color:#FFF;border-color:#555">+ Wgraj zdjęcie…</button>
+              <button class="btn outline" type="button" id="sg-obraz-zmien" style="display:none;padding:4px 8px;font-size:12px;background:#36393F;color:#FFF;border-color:#555">✏ Nazwa</button>
+              <button class="btn outline" type="button" id="sg-obraz-usun" style="display:none;padding:4px 8px;font-size:12px;background:#5A2B2B;color:#FFF;border-color:#733">🗑 Usuń</button>
+
+              <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+                <label style="cursor:pointer;font-weight:600">
+                  <input type="checkbox" id="sg-karty" style="width:auto;margin-right:6px">
+                  Karty produktów pod treścią
+                </label>
+                <button class="btn" type="button" id="sg-zapisz-kafel" style="padding:6px 14px;font-size:12px;background:#C4A582;color:#1C3A27;font-weight:800;border:none">Zastosuj do slajdu</button>
               </div>
-              <p class="mala" style="margin:6px 0 0">Zdjęcie zapisuje się w bibliotece pod KRÓTKĄ nazwą — na liście
-              nie będzie już długich „tasiemców". W wersji demo biblioteka jest w tej przeglądarce;
-              po wdrożeniu Google Apps Script plik trafi do folderu sieciowego <b>assets/media/przeslane/</b> pod tą samą nazwą.</p>
             </div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn outline" type="button" id="sg-obraz-zmien" style="display:none">✏ Zmień nazwę</button>
-              <button class="btn outline" type="button" id="sg-obraz-usun" style="display:none">🗑 Usuń z biblioteki</button>
+
+            <!-- Upload panel -->
+            <div id="sg-obraz-wgraj-box" style="display:none;background:#2B2F33;color:#FFF;padding:12px 16px;border-bottom:1px solid #444">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:200px">
+                  <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;color:#DDD">Krótka nazwa zdjęcia:</label>
+                  <input type="text" id="sg-obraz-nazwa" placeholder="np. tlo-nowosci" style="width:100%;padding:6px 10px;background:#1E2124;border:1px solid #4F545C;color:#FFF;border-radius:4px">
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;color:#DDD">Wybierz plik ze zdjęciem:</label>
+                  <input type="file" id="sg-obraz-plik" accept="image/*" style="color:#CCC;font-size:13px">
+                </div>
+                <button class="btn" type="button" id="sg-obraz-zapisz" style="padding:7px 14px;background:#1C3A27;color:#FFF;font-weight:700">Dodaj do biblioteki</button>
+              </div>
             </div>
-            <div class="sg-obraz-podglad" id="sg-obraz-podglad">podgląd tła</div>
-          </div>
-          <div class="pole">
-            <label style="cursor:pointer"><input type="checkbox" id="sg-karty" style="width:auto;margin-right:8px">
-            Pokaż karty produktów ze sklepu pod treścią</label>
-          </div>
-          <div class="pole">
-            <label>Treść kafla — EDYTOR TREŚCI (edytujesz kafla na żywo, na jego tle: tytuły,
-            podtytuły, tekst, kolumny, tabele, rysowanie obiektów (kształty, pola tekstowe, grupowanie, warstwy);
-            obiekty: klik = zaznaczenie, 2×klik = właściwości)</label>
+
+            <!-- Edytor treści ze wstążką i podglądem na żywo -->
             <div id="sg-tresc-edytor">
-              <div class="edtr-podglad">
+              <div class="edtr-podglad" style="border-radius:0 0 8px 8px;border-top:none">
                 <div class="edtr-bg" id="sg-tresc-bg"></div>
                 <div class="edtr-tresc" id="sg-tresc-pole" contenteditable="true"></div>
+                <div class="sg-mini-karty-preview" id="sg-karty-podglad" style="display:none">
+                  <div class="sg-mini-karta-p">
+                    <span style="font-size:16px">🧩</span>
+                    <div>
+                      <div style="font-size:10px;color:#7A6B5F;text-transform:uppercase;letter-spacing:0.05em">Personalizacja</div>
+                      <div style="font-size:12px;font-weight:700">Krzyżówka z imionami</div>
+                    </div>
+                  </div>
+                  <div class="sg-mini-karta-p">
+                    <span style="font-size:16px">🖼️</span>
+                    <div>
+                      <div style="font-size:10px;color:#7A6B5F;text-transform:uppercase;letter-spacing:0.05em">Prezent</div>
+                      <div style="font-size:12px;font-weight:700">Ramka na zdjęcia</div>
+                    </div>
+                  </div>
+                  <div class="sg-mini-karta-p">
+                    <span style="font-size:16px">🎂</span>
+                    <div>
+                      <div style="font-size:10px;color:#7A6B5F;text-transform:uppercase;letter-spacing:0.05em">Dekoracje</div>
+                      <div style="font-size:12px;font-weight:700">Topper na tort</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <p class="mala" style="margin-top:10px">Zmiany w kaflu trafiają do podglądu poniżej.
-          Strona główna zostaje ZAPISANA dopiero po kliknięciu „ZAPISZ ZMIANY STRONY GŁÓWNEJ" na dole zakładki.</p>
+          <div style="display:none" id="sg-obraz-podglad"></div>
           <div class="przyciski" style="justify-content:space-between;margin-top:10px">
-            <button class="btn-odrzuc" type="button" id="sg-odrzuc">ODRZUĆ ZMIANY</button>
-            <button class="btn-zapisz" type="button" id="sg-zapisz-kafel">ZASTOSUJ DO PODGLĄDU</button>
+            <button class="btn-odrzuc" type="button" id="sg-odrzuc">↩ Odrzuć zmiany w tym slajdzie</button>
+            <button class="btn-zapisz" type="button" id="sg-zapisz-kafel-dol">Zastosuj zmiany do slajdu</button>
           </div>
         </div>
       </div>
 
-      <h3 style="font-size:16.5px;color:var(--butelkowa);margin:20px 0 8px">Treść pod sliderem („Jak działamy" i przyciski)</h3>
-      <p class="mala">Edytujesz całą sekcję pod sliderem w EDYTORZE TREŚCI na jasnym podglądzie
-      (biały box jak na stronie) — edytor działa jak PowerPoint: sekcja „RYSOWANIE OBIEKTÓW"
-      (pole tekstowe, prostokąt, zaokrąglony, elipsa, linia, strzałka, trójkąt), klik =
-      zaznaczenie, drugi klik = tryb obrotu, narożniki = rozmiar, 2×klik = właściwości
-      (wypełnienie przezroczyste lub kolor, ramka, checkbox „to jest PRZYCISK" + pole linku),
-      Ctrl+klik = kilka obiektów, Ctrl+G = GRUPOWANIE (blokada wzajemnego położenia),
-      warstwy (na wierzch / na spód), wyrównywanie względem siebie i równe odstępy.</p>
-      <div id="sg-cta-edytor">
-        <div class="edtr-podglad edtr-podglad-jasny">
-          <div class="edtr-tresc edtr-tresc-jasna" id="sg-cta-pole" contenteditable="true"></div>
+      <!-- KARTA 2: TREŚĆ POD SLIDEREM -->
+      <div class="admin-card">
+        <h3 style="font-size:17px;color:var(--butelkowa);margin:0 0 4px">2. Sekcja pod sliderem („Jak działamy”)</h3>
+        <p class="mala" style="margin:0 0 14px">Sekcja z trzema krokami i przyciskami zamówień. Edytuj tekst, kolory i obiekty na jasnym tle we wstążce edytora.</p>
+        <div id="sg-cta-edytor">
+          <div class="edtr-podglad edtr-podglad-jasny" style="border-radius:8px">
+            <div class="edtr-tresc edtr-tresc-jasna" id="sg-cta-pole" contenteditable="true"></div>
+          </div>
         </div>
       </div>
-      <div class="przyciski" style="justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
-        <button class="btn-odrzuc" type="button" id="sg-odrzuc-strona">ODRZUĆ ZMIANY STRONY GŁÓWNEJ</button>
-        <button class="btn-zapisz" type="button" id="sg-zapisz">ZAPISZ ZMIANY STRONY GŁÓWNEJ</button>
+
+      <div class="admin-action-bar">
+        <div>
+          <span style="font-weight:700;color:var(--butelkowa)">Publikacja strony głównej</span>
+          <p class="mala" style="margin:0">Kliknij „Zapisz zmiany”, aby wysłać uaktualnione slajdy i treści do serwisu.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn-odrzuc-duzy" type="button" id="sg-odrzuc-strona-dol">↩ Odrzuć zmiany</button>
+          <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-dol">💾 Zapisz zmiany strony głównej</button>
+        </div>
       </div>
     </section>
 
@@ -463,13 +502,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=321"></script>
-<script src="assets/koszyk.js?v=321"></script>
-<script src="assets/api.js?v=321"></script>
-<script src="assets/editor.js?v=321"></script>
-<script src="assets/edytor.js?v=321"></script>
-<script src="data/katalog.js?v=321"></script>
-<script src="assets/main.js?v=321"></script>
+<script src="assets/config.js?v=322"></script>
+<script src="assets/koszyk.js?v=322"></script>
+<script src="assets/api.js?v=322"></script>
+<script src="assets/editor.js?v=322"></script>
+<script src="assets/edytor.js?v=322"></script>
+<script src="data/katalog.js?v=322"></script>
+<script src="assets/main.js?v=322"></script>
 <script>
 (function(){
   var klucz = SYG.param('klucz');
@@ -501,18 +540,49 @@
       tabs.forEach(function(x){ x.classList.remove('on'); });
       t.classList.add('on');
       document.querySelectorAll('.admin-sekcja').forEach(function(s){ s.style.display = 'none'; });
-      document.getElementById('tab-' + t.getAttribute('data-tab')).style.display = 'block';
+      var target = t.getAttribute('data-tab');
+      var el = document.getElementById('tab-' + target);
+      if (el) el.style.display = 'block';
+      if (target === 'podsumowanie') ladujPodsumowanie();
+      if (target === 'strona-glowna') ladujStronaGlowna();
+      if (target === 'zamowienia') ladujZamowienia();
+      if (target === 'wiadomosci') ladujWiadomosci();
+      if (target === 'blog') ladujBlog();
+      if (target === 'produkty') ladujProdukty();
+      if (target === 'strony') ladujStrony();
+      if (target === 'ustawienia') ladujUstawienia();
     });
   });
 
-  /* ============ PODSUMOWANIE (kwartał) ============ */
-  function ladujPodsumowanie(){
-    var zam = SYG.demoDb.zamowienia();
-    var zap = SYG.demoDb.wynajemZapytania();
-    var wiad = SYG.demoDb.wiadomosci();
-    document.getElementById('ps-zapytania').textContent = zap.length + wiad.length;
-    document.getElementById('ps-zamowienia').textContent = zam.length;
-    var suma = zam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
+  /* ============ PODSUMOWANIE ============ */
+  async function ladujPodsumowanie(){
+    var zapCount = 0;
+    var zamCount = 0;
+    var suma = 0;
+    if (SYG.TRYB_DEMO){
+      var zam = SYG.demoDb.zamowienia();
+      var zap = SYG.demoDb.wynajemZapytania();
+      var wiad = SYG.demoDb.wiadomosci();
+      zapCount = zap.length + wiad.length;
+      zamCount = zam.length;
+      suma = zam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
+    } else {
+      try {
+        var odpZam = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
+        var odpWiad = await SYG.wezwij('wiadomosci-lista', { klucz: klucz });
+        var odpZap = await SYG.wezwij('wynajem-zapytania-lista', { klucz: klucz });
+        var listaZam = (odpZam && odpZam.ok && odpZam.zamowienia) ? odpZam.zamowienia : [];
+        var listaWiad = (odpWiad && odpWiad.ok && odpWiad.wiadomosci) ? odpWiad.wiadomosci : [];
+        var listaZap = (odpZap && odpZap.ok && odpZap.zapytania) ? odpZap.zapytania : [];
+        zamCount = listaZam.length;
+        zapCount = listaWiad.length + listaZap.length;
+        suma = listaZam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
+      } catch (e) {
+        console.warn('Błąd pobierania podsumowania live:', e);
+      }
+    }
+    document.getElementById('ps-zapytania').textContent = zapCount;
+    document.getElementById('ps-zamowienia').textContent = zamCount;
     document.getElementById('ps-suma').textContent = SYG.zl(suma);
   }
 
@@ -681,45 +751,71 @@
   }
 
   async function sgZapiszWszystko(){
+    if (SG_EDYCJA && SG_EDYTOR){
+      var kafle = sgKafle();
+      var idx = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (idx >= 0){
+        kafle[idx].obraz = document.getElementById('sg-obraz').value;
+        kafle[idx].karty = document.getElementById('sg-karty').checked;
+        kafle[idx].tresc = SG_EDYTOR.pobierz();
+      }
+    }
     var dane = {
       slider: { autoplay: Number(document.getElementById('sg-autoplay').value) || 0, kafle: sgKafle() },
       ctaTresc: SG_EDYTOR_CTA ? SG_EDYTOR_CTA.pobierz() : (SG_DANE ? SG_DANE.ctaTresc : '')
     };
     var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
-    if (odp.ok){ SG_DANE = dane; wyczyscBrudny(); sgInfo('Strona główna zapisana.', false); }
-    else sgInfo(odp.blad || 'Nie udało się zapisać.', true);
+    if (odp.ok){
+      SG_DANE = dane;
+      wyczyscBrudny();
+      rysujKafle();
+      sgInfo('Strona główna została pomyślnie zapisana i opublikowana!', false);
+    } else {
+      sgInfo(odp.blad || 'Nie udało się zapisać zmian.', true);
+    }
     return odp.ok;
   }
 
   /* ---------- rysowanie paska kafli ---------- */
   function rysujKafle(){
     var pasek = document.getElementById('sg-kafle');
+    if (!pasek) return;
     var kafle = sgKafle();
     var html = '';
     kafle.forEach(function(k, i){
-      html += '<div class="kafel-mini" draggable="true" data-sg-kafel="' + sgEsc(k.id) + '">' +
-        '<div class="km-okno" style="background-image:' + kafelObrazCss(k.obraz) + '"><span class="km-nr">' + (i + 1) + '</span></div>' +
-        '<div class="km-guzy">' +
-          '<button type="button" class="km-edycja">Edytuj</button>' +
-          '<button type="button" class="km-usun">Usuń</button>' +
-          '<span class="km-strzalki">' +
-            '<button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>' +
-            '<button type="button" class="km-prawo" title="Przesuń w prawo">›</button>' +
-          '</span>' +
+      var isAkt = SG_EDYCJA && String(SG_EDYCJA.id) === String(k.id);
+      var czystyTekst = (k.tresc || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      var tytulKrotki = czystyTekst.slice(0, 32) || ('Slajd ' + (i + 1));
+      html += '<div class="sg-slajd-karta' + (isAkt ? ' aktywny' : '') + '" draggable="true" data-sg-kafel="' + sgEsc(k.id) + '">' +
+        '<div class="sg-slajd-mini" style="background-image:' + kafelObrazCss(k.obraz) + '">' +
+          '<span class="sg-slajd-nr">Slajd ' + (i + 1) + '</span>' +
+        '</div>' +
+        '<div class="sg-slajd-opis" title="' + sgEsc(czystyTekst) + '">' + sgEsc(tytulKrotki) + '</div>' +
+        '<div class="sg-slajd-akcje">' +
+          '<button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>' +
+          '<button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>' +
+          '<button type="button" class="km-prawo" title="Przesuń w prawo">›</button>' +
+          '<button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>' +
         '</div></div>';
     });
-    html += '<button type="button" class="kafel-dodaj" id="sg-dodaj-kafel"><span class="plus">+</span>' +
-      '<span class="podpis">Dodaj</span></button>';
+    html += '<button type="button" class="sg-dodaj-btn" id="sg-dodaj-kafel"><span style="font-size:28px;line-height:1">+</span>' +
+      '<span>Nowy slajd</span></button>';
     pasek.innerHTML = html;
 
-    pasek.querySelectorAll('.kafel-mini').forEach(function(el, i){
+    pasek.querySelectorAll('.sg-slajd-karta').forEach(function(el, i){
       var id = el.getAttribute('data-sg-kafel');
       var kafel = kafle.find(function(k){ return String(k.id) === id; });
+      el.addEventListener('click', function(e){
+        if (e.target.closest('button')) return;
+        otworzEdycje(kafel, i);
+      });
       el.querySelector('.km-edycja').addEventListener('click', function(){ otworzEdycje(kafel, i); });
       el.querySelector('.km-usun').addEventListener('click', function(){
-        if (!confirm('Usunąć kafel „' + ((kafel && kafel.tresc) || '').replace(/<[^>]+>/g, '').slice(0, 40) + '"?') ) return;
+        if (!confirm('Usunąć ten slajd?')) return;
         SG_DANE.slider.kafle = kafle.filter(function(k){ return String(k.id) !== id; });
-        if (SG_EDYCJA && SG_EDYCJA.id === id) pokazEdycje(false);
+        var reszta = sgKafle();
+        if (reszta.length > 0) otworzEdycje(reszta[0], 0);
+        else pokazEdycje(false);
         ustawBrudny(); rysujKafle();
       });
       el.querySelector('.km-lewo').addEventListener('click', function(){
@@ -732,7 +828,7 @@
         var t = kafle[i + 1]; kafle[i + 1] = kafle[i]; kafle[i] = t;
         ustawBrudny(); rysujKafle();
       });
-      /* Drag & Drop — jak ustawianie monitorów */
+      /* Drag & Drop */
       el.addEventListener('dragstart', function(e){
         e.dataTransfer.setData('text/plain', id);
         e.dataTransfer.effectAllowed = 'move';
@@ -759,11 +855,16 @@
         ustawBrudny(); rysujKafle();
       });
     });
+
     var dodaj = document.getElementById('sg-dodaj-kafel');
     if (dodaj) dodaj.addEventListener('click', function(){
-      var nowyKafel = { id: 'k' + Date.now(), obraz: 'assets/hero.jpg', karty: false,
-        tresc: '<p class="sl-tag">Nowy kafel</p><h2>Tytuł kafla</h2><p>Opis — edytuj mnie w EDYTORZE TREŚCI.</p>' };
-      SG_DANE.slider.kafle.push(nowyKafel);
+      var nowyKafel = {
+        id: 'slajd-' + Date.now(),
+        obraz: 'assets/hero.jpg',
+        karty: false,
+        tresc: '<p class="sl-tag">Nowość</p><h2>Tytuł nowego slajdu</h2><p>Opis oferty lub nowości z pracowni — kliknij i edytuj w edytorze powyżej.</p><a class="sl-btn" href="sklep.html">Zobacz więcej →</a>'
+      };
+      sgKafle().push(nowyKafel);
       ustawBrudny();
       rysujKafle();
       otworzEdycje(nowyKafel, sgKafle().length - 1, true);
@@ -772,82 +873,112 @@
 
   /* ---------- okno edycji kafla ---------- */
   function pokazEdycje(widoczna){
-    document.getElementById('sg-edycja').style.display = widoczna ? 'block' : 'none';
-    if (widoczna) document.getElementById('sg-edycja').scrollIntoView({ behavior:'smooth', block:'center' });
+    var el = document.getElementById('sg-edycja');
+    if (el) el.style.display = widoczna ? 'block' : 'none';
   }
 
   function otworzEdycje(kafel, i, nowy){
+    if (!kafel) return;
     SG_EDYCJA = { id: String(kafel.id), kopia: JSON.parse(JSON.stringify(kafel)), nowy: !!nowy };
-    document.getElementById('sg-edycja-tytul').textContent = 'Edycja kafla ' + (i + 1);
+    var tytulEl = document.getElementById('sg-edycja-tytul');
+    if (tytulEl) tytulEl.textContent = 'Slajd ' + (i + 1);
     /* tło */
     sgObrazOpcje(kafel.obraz);
     odswiezPodgladObrazu();
-    document.getElementById('sg-karty').checked = !!kafel.karty;
+    var chkKarty = document.getElementById('sg-karty');
+    if (chkKarty) chkKarty.checked = !!kafel.karty;
+    var podgladKarty = document.getElementById('sg-karty-podglad');
+    if (podgladKarty) podgladKarty.style.display = kafel.karty ? 'flex' : 'none';
+
     if (!SG_EDYTOR) SG_EDYTOR = SYG.edytorTresci.stworz(
       document.getElementById('sg-tresc-edytor'), document.getElementById('sg-tresc-pole'));
     SG_EDYTOR.ustaw(kafel.tresc || '');
     odswiezTloEdytora();
     pokazEdycje(true);
+    rysujKafle();
   }
 
   function odswiezPodgladObrazu(){
-    var v = document.getElementById('sg-obraz').value;
+    var sel = document.getElementById('sg-obraz');
+    var v = sel ? sel.value : 'assets/hero.jpg';
     var el = document.getElementById('sg-obraz-podglad');
-    el.style.backgroundImage = kafelObrazCss(v);
-    el.textContent = v === 'gradient' ? 'gradient' : '';
+    if (el){
+      el.style.backgroundImage = kafelObrazCss(v);
+      el.textContent = v === 'gradient' ? 'gradient' : '';
+    }
   }
   function odswiezTloEdytora(){
-    var v = document.getElementById('sg-obraz').value;
+    var sel = document.getElementById('sg-obraz');
+    var v = sel ? sel.value : 'assets/hero.jpg';
     var bg = document.getElementById('sg-tresc-bg');
     if (bg) bg.style.backgroundImage = kafelObrazCss(v);
   }
 
-  /* ODRZUĆ ZMIANY — wraca poprzednia wersja kafla (nowy kafel znika) */
-  document.getElementById('sg-odrzuc').addEventListener('click', function(){
+  /* ODRZUĆ ZMIANY W SLAJDZIE */
+  var btnOdrzucKafel = document.getElementById('sg-odrzuc');
+  if (btnOdrzucKafel) btnOdrzucKafel.addEventListener('click', function(){
     if (!SG_EDYCJA) return;
     var kafle = sgKafle();
     var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
     if (SG_EDYCJA.nowy){
-      /* kafel dodany, ale nigdy nie zapisany — znika */
       if (i >= 0) kafle.splice(i, 1);
+      rysujKafle();
+      if (kafle.length > 0) otworzEdycje(kafle[0], 0);
+      else pokazEdycje(false);
     } else if (i >= 0){
-      kafle[i] = SG_EDYCJA.kopia;
+      kafle[i] = JSON.parse(JSON.stringify(SG_EDYCJA.kopia));
+      otworzEdycje(kafle[i], i);
     }
-    SG_EDYCJA = null;
     ustawBrudny();
-    pokazEdycje(false);
-    rysujKafle();
-    sgInfo('Zmiany odrzucone.', false);
+    sgInfo('Zmiany w bieżącym slajdzie odrzucone.', false);
   });
 
-  /* ZASTOSUJ DO PODGLĄDU — kafel trafia do roboczej wersji (bez zapisu strony) */
-  document.getElementById('sg-zapisz-kafel').addEventListener('click', function(){
+  /* ZASTOSUJ DO SLAJDU */
+  function zastosujKafel(){
     if (!SG_EDYCJA) return;
     var kafle = sgKafle();
     var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
-    if (i < 0){ sgInfo('Kafel nie istnieje (usunięty?).', true); return; }
+    if (i < 0){ sgInfo('Slajd nie istnieje (usunięty?).', true); return; }
     kafle[i].obraz = document.getElementById('sg-obraz').value;
     kafle[i].karty = document.getElementById('sg-karty').checked;
     kafle[i].tresc = SG_EDYTOR ? SG_EDYTOR.pobierz() : kafle[i].tresc;
-    SG_EDYCJA = null;
     ustawBrudny();
-    pokazEdycje(false);
     rysujKafle();
+    sgInfo('Zastosowano zmiany do slajdu ' + (i + 1) + '. Pamiętaj o kliknięciu «Zapisz zmiany strony głównej».', false);
+  }
+  var btnZapiszKafel = document.getElementById('sg-zapisz-kafel');
+  if (btnZapiszKafel) btnZapiszKafel.addEventListener('click', zastosujKafel);
+  var btnZapiszKafelDol = document.getElementById('sg-zapisz-kafel-dol');
+  if (btnZapiszKafelDol) btnZapiszKafelDol.addEventListener('click', zastosujKafel);
+
+  /* Checkbox karty produktów */
+  var chkKarty = document.getElementById('sg-karty');
+  if (chkKarty) chkKarty.addEventListener('change', function(){
+    var podgladKarty = document.getElementById('sg-karty-podglad');
+    if (podgladKarty) podgladKarty.style.display = this.checked ? 'flex' : 'none';
+    if (SG_EDYCJA){
+      var kafle = sgKafle();
+      var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (i >= 0) kafle[i].karty = this.checked;
+    }
+    ustawBrudny();
   });
 
   /* ---------- biblioteka własnych zdjęć: panel wgrywania ---------- */
-  document.getElementById('sg-obraz-wgraj').addEventListener('click', function(){
+  var btnWgraj = document.getElementById('sg-obraz-wgraj');
+  if (btnWgraj) btnWgraj.addEventListener('click', function(){
     var box = document.getElementById('sg-obraz-wgraj-box');
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
   });
-  document.getElementById('sg-obraz-plik').addEventListener('change', function(){
+  var inpPlik = document.getElementById('sg-obraz-plik');
+  if (inpPlik) inpPlik.addEventListener('change', function(){
     var f = this.files && this.files[0];
     if (!f) return;
-    /* proponowana nazwa = nazwa pliku bez rozszerzenia */
-    document.getElementById('sg-obraz-nazwa').value =
-      sgMediaNazwa(String(f.name).replace(/\.[^.]+$/, ''));
+    var inpNazwa = document.getElementById('sg-obraz-nazwa');
+    if (inpNazwa) inpNazwa.value = sgMediaNazwa(String(f.name).replace(/\.[^.]+$/, ''));
   });
-  document.getElementById('sg-obraz-zapisz').addEventListener('click', function(){
+  var btnZapiszObraz = document.getElementById('sg-obraz-zapisz');
+  if (btnZapiszObraz) btnZapiszObraz.addEventListener('click', function(){
     var f = document.getElementById('sg-obraz-plik').files &&
             document.getElementById('sg-obraz-plik').files[0];
     var nazwa = sgMediaNazwa(document.getElementById('sg-obraz-nazwa').value);
@@ -866,12 +997,14 @@
         var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
         if (i >= 0){ kafle[i].obraz = 'media:' + nazwa; ustawBrudny(); rysujKafle(); }
       }
-      document.getElementById('sg-obraz-wgraj-box').style.display = 'none';
+      var box = document.getElementById('sg-obraz-wgraj-box');
+      if (box) box.style.display = 'none';
       sgInfo('Zdjęcie zapisane w bibliotece jako „' + nazwa + '".', false);
     };
     fr.readAsDataURL(f);
   });
-  document.getElementById('sg-obraz-zmien').addEventListener('click', function(){
+  var btnZmienObraz = document.getElementById('sg-obraz-zmien');
+  if (btnZmienObraz) btnZmienObraz.addEventListener('click', function(){
     var val = document.getElementById('sg-obraz').value;
     if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby zmienić nazwę.'); return; }
     var stara = val.slice(6);
@@ -892,7 +1025,8 @@
     rysujKafle();
     sgInfo('Nazwa zmieniona na „' + nowa + '".', false);
   });
-  document.getElementById('sg-obraz-usun').addEventListener('click', function(){
+  var btnUsunObraz = document.getElementById('sg-obraz-usun');
+  if (btnUsunObraz) btnUsunObraz.addEventListener('click', function(){
     var val = document.getElementById('sg-obraz').value;
     if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby je usunąć.'); return; }
     var nazwa = val.slice(6);
@@ -908,7 +1042,8 @@
     rysujKafle();
     sgInfo('Zdjęcie „' + nazwa + '" usunięte z biblioteki.', false);
   });
-  document.getElementById('sg-obraz').addEventListener('change', function(){
+  var selObraz = document.getElementById('sg-obraz');
+  if (selObraz) selObraz.addEventListener('change', function(){
     odswiezPodgladObrazu();
     odswiezTloEdytora();
     sgObrazGuziki();
@@ -916,15 +1051,25 @@
       var kafle = sgKafle();
       var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
       if (i >= 0){
-        kafle[i].obraz = document.getElementById('sg-obraz').value;
+        kafle[i].obraz = this.value;
         ustawBrudny();
         rysujKafle();
       }
     }
   });
 
-  function ladujStronaGlowna(){
-    SG_DANE = sgNaprawObrazy(sgMigrujStare(SYG.demoDb.stronaGlowna()) || SG_DOMYS);
+  async function ladujStronaGlowna(){
+    var zdalne = null;
+    if (!SYG.TRYB_DEMO){
+      try {
+        var odp = await SYG.wezwij('strona-glowna-pobierz', {});
+        if (odp && odp.ok && odp.dane) zdalne = odp.dane;
+      } catch (err){
+        console.warn('Błąd pobierania strony głównej z serwera:', err);
+      }
+    }
+    if (!zdalne) zdalne = SYG.demoDb.stronaGlowna();
+    SG_DANE = sgNaprawObrazy(sgMigrujStare(zdalne) || SG_DOMYS);
     if (!SG_DANE.slider) SG_DANE.slider = SG_DOMYS.slider;
     if (SG_DANE.ctaTresc == null) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
     document.getElementById('sg-autoplay').value =
@@ -932,9 +1077,15 @@
     if (!SG_EDYTOR_CTA) SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
       document.getElementById('sg-cta-edytor'), document.getElementById('sg-cta-pole'));
     SG_EDYTOR_CTA.ustaw(SG_DANE.ctaTresc || SG_DOMYS.ctaTresc);
-    SG_EDYCJA = null;
-    pokazEdycje(false);
+    
     rysujKafle();
+    var kafle = sgKafle();
+    if (kafle.length > 0) {
+      otworzEdycje(kafle[0], 0);
+    } else {
+      SG_EDYCJA = null;
+      pokazEdycje(false);
+    }
     wyczyscBrudny();
   }
 
@@ -945,11 +1096,20 @@
   var ctaPole = document.getElementById('sg-cta-pole');
   if (ctaPole) ctaPole.addEventListener('input', ustawBrudny);
 
-  document.getElementById('sg-zapisz').addEventListener('click', sgZapiszWszystko);
+  var btnZapiszHome = document.getElementById('sg-zapisz');
+  if (btnZapiszHome) btnZapiszHome.addEventListener('click', sgZapiszWszystko);
+  var btnZapiszHomeDol = document.getElementById('sg-zapisz-dol');
+  if (btnZapiszHomeDol) btnZapiszHomeDol.addEventListener('click', sgZapiszWszystko);
 
-  /* ODRZUĆ ZMIANY STRONY GŁÓWNEJ — wraca wersja zapisana */
-  document.getElementById('sg-odrzuc-strona').addEventListener('click', function(){
-    if (!confirm('Odrzucić WSZYSTKIE niezapisane zmiany strony głównej (slider i treść pod sliderem)? Wróci wersja zapisana.')) return;
+  var btnOdrzucHome = document.getElementById('sg-odrzuc-strona');
+  if (btnOdrzucHome) btnOdrzucHome.addEventListener('click', function(){
+    if (!confirm('Odrzucić WSZYSTKIE niezapisane zmiany strony głównej? Wróci wersja zapisana.')) return;
+    ladujStronaGlowna();
+    sgInfo('Wszystkie niezapisane zmiany strony głównej odrzucone.', false);
+  });
+  var btnOdrzucHomeDol = document.getElementById('sg-odrzuc-strona-dol');
+  if (btnOdrzucHomeDol) btnOdrzucHomeDol.addEventListener('click', function(){
+    if (!confirm('Odrzucić WSZYSTKIE niezapisane zmiany strony głównej? Wróci wersja zapisana.')) return;
     ladujStronaGlowna();
     sgInfo('Wszystkie niezapisane zmiany strony głównej odrzucone.', false);
   });
@@ -979,8 +1139,17 @@
     info.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
     setTimeout(function(){ info.style.display = 'none'; }, 5000);
   }
-  function ladujStronaZamowienia(){
-    var dane = (SYG.demoDb && SYG.demoDb.stronaZamowienia) ? SYG.demoDb.stronaZamowienia() : null;
+  async function ladujStronaZamowienia(){
+    var dane = null;
+    if (!SYG.TRYB_DEMO){
+      try {
+        var odp = await SYG.wezwij('strona-zamowienia-pobierz', {});
+        if (odp && odp.ok && odp.dane) dane = odp.dane;
+      } catch (err){
+        console.warn('Błąd pobierania strony zamówień z serwera:', err);
+      }
+    }
+    if (!dane && SYG.demoDb && SYG.demoDb.stronaZamowienia) dane = SYG.demoDb.stronaZamowienia();
     if (!SZ_EDYTOR) SZ_EDYTOR = SYG.edytorTresci.stworz(
       document.getElementById('sz-tresc-edytor'), document.getElementById('sz-tresc-pole'));
     SZ_EDYTOR.ustaw((dane && dane.tresc) || SZ_DOMYS);
@@ -997,9 +1166,12 @@
     ladujStronaZamowienia();
     szInfo('Niezapisane zmiany strony Zamówienia odrzucone.', false);
   }
-  document.getElementById('sz-zapisz').addEventListener('click', szZapisz);
-  document.getElementById('sz-odrzuc').addEventListener('click', szOdrzuc);
-  document.getElementById('sz-tresc-pole').addEventListener('input', szUstawBrudny);
+  var btnSzZapisz = document.getElementById('sz-zapisz');
+  if (btnSzZapisz) btnSzZapisz.addEventListener('click', szZapisz);
+  var btnSzOdrzuc = document.getElementById('sz-odrzuc');
+  if (btnSzOdrzuc) btnSzOdrzuc.addEventListener('click', szOdrzuc);
+  var inpSzTresc = document.getElementById('sz-tresc-pole');
+  if (inpSzTresc) inpSzTresc.addEventListener('input', szUstawBrudny);
 
   /* ============ zamówienia ============ */
   async function ladujZamowienia(){
@@ -1014,18 +1186,19 @@
     var lista = odp.zamowienia || [];
     var tbody = document.querySelector('#tabela-zamowien tbody');
     tbody.innerHTML = lista.map(function(z){
-      var pozycje = (z.pozycje || []).map(function(p){ return p.nazwa + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
+      var pozycje = (z.pozycje || []).map(function(p){ return '<b>' + sgEsc(p.nazwa) + '</b>' + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
       var razem = (z.kwoty && z.kwoty.razem) ? SYG.zl(z.kwoty.razem) : '—';
       var opcje = Object.keys(STAN_NAZWA).map(function(s){
         return '<option value="' + s + '"' + (z.status === s ? ' selected' : '') + '>' + STAN_NAZWA[s] + '</option>';
       }).join('');
-      return '<tr><td><b>' + z.sygnatura + '</b></td>' +
-        '<td>' + (z.data || '').slice(0, 10) + '</td>' +
-        '<td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email + '</span></td>' +
-        '<td>' + pozycje + '</td>' +
-        '<td>' + razem + '</td>' +
-        '<td><select data-syg="' + z.sygnatura + '">' + opcje + '</select></td></tr>';
-    }).join('') || '<tr><td colspan="6">Brak zamówień.</td></tr>';
+      var klientTel = (z.klient && z.klient.telefon) ? ' · ' + sgEsc(z.klient.telefon) : '';
+      return '<tr><td><b>' + sgEsc(z.sygnatura) + '</b></td>' +
+        '<td><b>' + (z.data || '').slice(0, 10) + '</b></td>' +
+        '<td><b>' + sgEsc((z.klient && z.klient.imie) || 'Klient') + ' ' + sgEsc((z.klient && z.klient.nazwisko) || '') + '</b><br><span class="mala">' + sgEsc((z.klient && z.klient.email) || '') + klientTel + '</span></td>' +
+        '<td>' + (pozycje || '—') + '</td>' +
+        '<td><b style="color:var(--butelkowa);font-size:14.5px">' + razem + '</b></td>' +
+        '<td><select data-syg="' + sgEsc(z.sygnatura) + '">' + opcje + '</select></td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#777">Brak zamówień w systemie. Złożone w sklepie zamówienia pojawią się w tym miejscu.</td></tr>';
 
     tbody.querySelectorAll('select').forEach(function(sel){
       sel.addEventListener('change', async function(){
@@ -1036,30 +1209,53 @@
   }
 
   /* ============ wiadomości ============ */
-  function ladujWiadomosci(){
+  async function ladujWiadomosci(){
     var wbody = document.querySelector('#tabela-wiadomosci tbody');
     var zbody = document.querySelector('#tabela-wynajem-zapytania tbody');
+    wbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:#888">Ładowanie wiadomości…</td></tr>';
+    zbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#888">Ładowanie zapytań o wynajem…</td></tr>';
+    
+    var wiadomosci = [];
+    var zap = [];
     if (SYG.TRYB_DEMO){
-      var wiadomosci = SYG.demoDb.wiadomosci();
-      wbody.innerHTML = wiadomosci.map(function(w){
-        return '<tr><td>' + (w.data || '').slice(0, 10) + '</td><td>' + w.imie + '<br><span class="mala">' + w.email + '</span></td>' +
-          '<td>' + w.temat + '</td><td>' + w.tresc + '</td></tr>';
-      }).join('') || '<tr><td colspan="4">Brak wiadomości.</td></tr>';
-      var zap = SYG.demoDb.wynajemZapytania();
-      zbody.innerHTML = zap.map(function(z){
-        var persTxt = (z.pers || []).map(function(p){ return p.nazwa + (p.opis ? ': ' + p.opis.slice(0,60) : ''); }).join('; ') || '—';
-        var evMap = { weselny: 'Wesele', komunijny: 'Komunia / chrzest', firmowy: 'Event firmowy', jubileuszowy: 'Jubileusz / urodziny' };
-        return '<tr><td>' + (z.data || '').slice(0, 10) + '</td><td>' + z.klient.imie + '<br><span class="mala">' + z.klient.email +
-          (z.klient.telefon ? ' · ' + z.klient.telefon : '') + '</span></td>' +
-          '<td>' + (evMap[z.ev] || z.ev || '—') + '</td>' +
-          '<td><b>' + (z.pakiet ? z.pakiet.nazwa : '—') + '</b></td>' +
-          '<td>' + (z.termin ? z.termin.data : '—') + '</td>' +
-          '<td>' + persTxt + '</td></tr>';
-      }).join('') || '<tr><td colspan="6">Brak zapytań o termin.</td></tr>';
+      wiadomosci = SYG.demoDb.wiadomosci();
+      zap = SYG.demoDb.wynajemZapytania();
     } else {
-      wbody.innerHTML = '<tr><td colspan="4">Lista wiadomości z arkusza będzie dostępna po wdrożeniu (akcja „wiadomosci-lista").</td></tr>';
-      zbody.innerHTML = '<tr><td colspan="6">Zapytania o wynajem z arkusza będą dostępne po wdrożeniu.</td></tr>';
+      try {
+        var odpW = await SYG.wezwij('wiadomosci-lista', { klucz: klucz });
+        if (odpW && odpW.ok && Array.isArray(odpW.wiadomosci)) wiadomosci = odpW.wiadomosci;
+        var odpZ = await SYG.wezwij('wynajem-zapytania-lista', { klucz: klucz });
+        if (odpZ && odpZ.ok && Array.isArray(odpZ.zapytania)) zap = odpZ.zapytania;
+      } catch (err){
+        console.warn('Błąd ładowania wiadomości z serwera:', err);
+      }
     }
+
+    wbody.innerHTML = wiadomosci.map(function(w){
+      return '<tr><td><b>' + (w.data || '').slice(0, 10) + '</b></td><td><b>' + sgEsc(w.imie || '') + '</b><br><span class="mala">' + sgEsc(w.email || '') + (w.telefon ? ' · ' + sgEsc(w.telefon) : '') + '</span></td>' +
+        '<td><span class="status-badge status-platnosc">' + sgEsc(w.temat || 'Wiadomość') + '</span></td><td>' + sgEsc(w.tresc || '') + '</td></tr>';
+    }).join('') || '<tr><td colspan="4" style="text-align:center;padding:22px;color:#777">Brak wiadomości z formularza kontaktowego.</td></tr>';
+
+    var evMap = { weselny: 'Wesele', komunijny: 'Komunia / chrzest', firmowy: 'Event firmowy', jubileuszowy: 'Jubileusz / urodziny' };
+    zbody.innerHTML = zap.map(function(z){
+      var persTxt = '';
+      if (Array.isArray(z.pers)) {
+        persTxt = z.pers.map(function(p){ return (p.nazwa || '') + (p.opis ? ': ' + p.opis.slice(0,60) : ''); }).join('; ');
+      } else if (z.szczegoly && z.szczegoly.pers) {
+        persTxt = Array.isArray(z.szczegoly.pers) ? z.szczegoly.pers.map(function(p){ return p.nazwa || p; }).join(', ') : String(z.szczegoly.pers);
+      }
+      var pakietNazwa = (z.pakiet && z.pakiet.nazwa) ? z.pakiet.nazwa : (z.pakietId || '—');
+      var terminData = (z.termin && z.termin.data) ? z.termin.data : (z.termin || '—');
+      var klientImie = (z.klient && z.klient.imie) ? z.klient.imie : (z.imie || '—');
+      var klientEmail = (z.klient && z.klient.email) ? z.klient.email : (z.email || '');
+      var klientTel = (z.klient && z.klient.telefon) ? z.klient.telefon : (z.telefon || '');
+      return '<tr><td><b>' + (z.data || '').slice(0, 10) + '</b></td><td><b>' + sgEsc(klientImie) + '</b><br><span class="mala">' + sgEsc(klientEmail) +
+        (klientTel ? ' · ' + sgEsc(klientTel) : '') + '</span></td>' +
+        '<td>' + (evMap[z.ev] || z.ev || '—') + '</td>' +
+        '<td><b style="color:var(--butelkowa)">' + sgEsc(pakietNazwa) + '</b></td>' +
+        '<td><b>' + sgEsc(terminData) + '</b></td>' +
+        '<td>' + (sgEsc(persTxt) || '—') + '</td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:22px;color:#777">Brak zapytań o rezerwację terminu dekoracji.</td></tr>';
   }
 
   /* ============ produkty ============ */
