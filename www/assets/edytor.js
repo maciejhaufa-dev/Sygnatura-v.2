@@ -548,6 +548,33 @@
           return;
         }
       }
+
+      var html = e.clipboardData ? e.clipboardData.getData('text/html') : '';
+      if (html) {
+        var tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        tmp.querySelectorAll('style, meta, link, script').forEach(function (el) { el.remove(); });
+        tmp.querySelectorAll('*').forEach(function (el) {
+          if (el.style) {
+            if (el.style.width && el.style.width.indexOf('%') < 0) el.style.width = '';
+            if (el.style.minWidth) el.style.minWidth = '';
+            if (el.style.maxWidth && el.style.maxWidth.indexOf('%') < 0) el.style.maxWidth = '100%';
+            if (el.style.whiteSpace === 'nowrap') el.style.whiteSpace = 'normal';
+          }
+        });
+        var cleanHtml = tmp.innerHTML;
+        if (cleanHtml && cleanHtml.trim()) {
+          e.preventDefault();
+          document.execCommand('insertHTML', false, cleanHtml);
+          var k = komorka();
+          if (k) {
+            var t = k.closest('table');
+            if (t) zbalansujSzerokosciKolumn(t);
+          }
+          zglaszaZmiane();
+          return;
+        }
+      }
     });
 
     function wstawYoutubeModal() {
@@ -592,25 +619,88 @@
       if (k) return k.closest('table');
       return pole.querySelector('table');
     }
+    function zbalansujSzerokosciKolumn(t) {
+      if (!t || !t.rows || !t.rows.length) return;
+      t.style.tableLayout = 'fixed';
+      t.style.width = '100%';
+      var numCols = t.rows[0].cells.length;
+      if (!numCols) return;
+      var pct = (100 / numCols).toFixed(2) + '%';
+      for (var r = 0; r < t.rows.length; r++) {
+        for (var c = 0; c < t.rows[r].cells.length; c++) {
+          var cell = t.rows[r].cells[c];
+          cell.style.width = pct;
+          cell.style.wordBreak = 'break-word';
+          cell.style.overflowWrap = 'break-word';
+          cell.style.boxSizing = 'border-box';
+        }
+      }
+    }
+    function wyrownajKolumnyTabeli() {
+      var t = tabelaOb();
+      if (!t) { alert('Stań najpierw kursorem w komórce tabeli.'); return; }
+      zbalansujSzerokosciKolumn(t);
+      zglaszaZmiane();
+    }
     function otworzModalTabeli() {
-      modal('Tabela',
-        '<div class="pole" style="display:flex;gap:10px">' +
-        '<div style="flex:1"><label>Wiersze</label><select id="et-r">' +
-        [1,2,3,4,5,6].map(function (r) { return '<option value="' + r + '"' + (r === 2 ? ' selected' : '') + '>' + r + '</option>'; }).join('') + '</select></div>' +
-        '<div style="flex:1"><label>Kolumny</label><select id="et-c">' +
-        [1,2,3,4,5,6].map(function (r) { return '<option value="' + r + '"' + (r === 2 ? ' selected' : '') + '>' + r + '</option>'; }).join('') + '</select></div></div>' +
-        '<div class="pole"><label style="cursor:pointer"><input type="checkbox" id="et-ramka" checked style="width:auto;margin-right:8px"> Z obramowaniem</label></div>',
-        function (okno) {
-          var r = parseInt(okno.querySelector('#et-r').value, 10);
-          var c = parseInt(okno.querySelector('#et-c').value, 10);
-          var bez = okno.querySelector('#et-ramka').checked ? '' : ' tre-bez';
+      var okno = modal('Wstaw tabelę',
+        '<div style="font-size:14px;color:rgba(51,38,28,.85);margin-bottom:12px">' +
+        'Ustaw liczbę wierszy i kolumn za pomocą strzałek ▲ / ▼ lub wpisz liczbę:' +
+        '</div>' +
+        '<div class="pole" style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">' +
+          '<div style="flex:1;min-width:130px">' +
+            '<label style="font-weight:700;margin-bottom:6px;display:block">Liczba wierszy</label>' +
+            '<div style="display:flex;align-items:center;gap:6px">' +
+              '<input type="number" id="et-r" value="2" min="1" max="50" style="width:70px;text-align:center;font-size:17px;font-weight:700;padding:6px 8px;border:1.5px solid rgba(107,69,48,.45);border-radius:6px;background:#fff">' +
+              '<div style="display:flex;flex-direction:column;gap:3px">' +
+                '<button type="button" class="et-step-btn" id="et-r-up" style="padding:3px 9px;font-size:11px;line-height:1;border:1px solid rgba(107,69,48,.4);background:#FAF8F5;border-radius:4px;cursor:pointer;font-weight:700" title="Więcej wierszy (▲)">▲</button>' +
+                '<button type="button" class="et-step-btn" id="et-r-down" style="padding:3px 9px;font-size:11px;line-height:1;border:1px solid rgba(107,69,48,.4);background:#FAF8F5;border-radius:4px;cursor:pointer;font-weight:700" title="Mniej wierszy (▼)">▼</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="flex:1;min-width:130px">' +
+            '<label style="font-weight:700;margin-bottom:6px;display:block">Liczba kolumn</label>' +
+            '<div style="display:flex;align-items:center;gap:6px">' +
+              '<input type="number" id="et-c" value="2" min="1" max="20" style="width:70px;text-align:center;font-size:17px;font-weight:700;padding:6px 8px;border:1.5px solid rgba(107,69,48,.45);border-radius:6px;background:#fff">' +
+              '<div style="display:flex;flex-direction:column;gap:3px">' +
+                '<button type="button" class="et-step-btn" id="et-c-up" style="padding:3px 9px;font-size:11px;line-height:1;border:1px solid rgba(107,69,48,.4);background:#FAF8F5;border-radius:4px;cursor:pointer;font-weight:700" title="Więcej kolumn (▲)">▲</button>' +
+                '<button type="button" class="et-step-btn" id="et-c-down" style="padding:3px 9px;font-size:11px;line-height:1;border:1px solid rgba(107,69,48,.4);background:#FAF8F5;border-radius:4px;cursor:pointer;font-weight:700" title="Mniej kolumn (▼)">▼</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pole" style="margin-top:14px">' +
+          '<label style="cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px">' +
+            '<input type="checkbox" id="et-ramka" checked style="width:auto"> Obramowanie tabeli (widoczna siatka)' +
+          '</label>' +
+        '</div>' +
+        '<div class="pole" style="margin-top:8px">' +
+          '<label style="cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px">' +
+            '<input type="checkbox" id="et-rownomierne" checked style="width:auto"> Sztywny układ kolumn (tekst nie rozpycha komórek)' +
+          '</label>' +
+        '</div>' +
+        '<div id="et-podglad" style="margin-top:14px;padding:9px 12px;background:#FAF8F5;border:1px dashed rgba(107,69,48,.45);border-radius:6px;font-size:13.5px;color:var(--brunatny);text-align:center;font-weight:600">' +
+          'Tabela: 2 wiersze × 2 kolumny (każda kolumna po 50.0%)' +
+        '</div>',
+        function (oknoModal) {
+          var r = Math.max(1, parseInt(oknoModal.querySelector('#et-r').value, 10) || 2);
+          var c = Math.max(1, parseInt(oknoModal.querySelector('#et-c').value, 10) || 2);
+          var bez = oknoModal.querySelector('#et-ramka').checked ? '' : ' tre-bez';
+          var rowne = oknoModal.querySelector('#et-rownomierne').checked;
+          var pct = (100 / c).toFixed(2) + '%';
           var wiersze = '';
           for (var i = 0; i < r; i++) {
             var komorki = '';
-            for (var j = 0; j < c; j++) komorki += '<td>Komórka</td>';
+            for (var j = 0; j < c; j++) {
+              var styleCell = rowne
+                ? 'style="width:' + pct + ';word-break:break-word;overflow-wrap:break-word;box-sizing:border-box"'
+                : 'style="word-break:break-word;overflow-wrap:break-word;box-sizing:border-box"';
+              komorki += '<td ' + styleCell + '>Komórka</td>';
+            }
             wiersze += '<tr>' + komorki + '</tr>';
           }
-          var html = '<table class="tre-tabela' + bez + '"><tbody>' + wiersze + '</tbody></table><p><br></p>';
+          var styleTable = rowne ? 'style="table-layout:fixed;width:100%"' : 'style="width:100%"';
+          var html = '<table class="tre-tabela' + bez + '" ' + styleTable + '><tbody>' + wiersze + '</tbody></table><p><br></p>';
           pole.focus();
           var sel = window.getSelection();
           var wPolu = false;
@@ -624,14 +714,47 @@
             sel.removeAllRanges();
             sel.addRange(rng);
           }
-          var ok = document.execCommand('insertHTML', false, html);
-          if (!ok) {
+          var okCmd = document.execCommand('insertHTML', false, html);
+          if (!okCmd) {
             var tmp = document.createElement('div');
             tmp.innerHTML = html;
             while (tmp.firstChild) pole.appendChild(tmp.firstChild);
           }
           zglaszaZmiane();
-        }, 'Wstaw');
+        }, 'Wstaw tabelę');
+
+      var inpR = okno.querySelector('#et-r');
+      var inpC = okno.querySelector('#et-c');
+      var podglad = okno.querySelector('#et-podglad');
+
+      function odswiezPodglad() {
+        var rVal = Math.max(1, parseInt(inpR.value, 10) || 1);
+        var cVal = Math.max(1, parseInt(inpC.value, 10) || 1);
+        inpR.value = rVal;
+        inpC.value = cVal;
+        var pVal = (100 / cVal).toFixed(1) + '%';
+        podglad.textContent = 'Tabela: ' + rVal + ' ' + (rVal === 1 ? 'wiersz' : (rVal < 5 ? 'wiersze' : 'wierszy')) +
+          ' × ' + cVal + ' ' + (cVal === 1 ? 'kolumna' : (cVal < 5 ? 'kolumny' : 'kolumn')) + ' (każda kolumna po ' + pVal + ')';
+      }
+
+      okno.querySelector('#et-r-up').addEventListener('click', function () {
+        inpR.value = Math.min(50, (parseInt(inpR.value, 10) || 1) + 1);
+        odswiezPodglad();
+      });
+      okno.querySelector('#et-r-down').addEventListener('click', function () {
+        inpR.value = Math.max(1, (parseInt(inpR.value, 10) || 2) - 1);
+        odswiezPodglad();
+      });
+      okno.querySelector('#et-c-up').addEventListener('click', function () {
+        inpC.value = Math.min(20, (parseInt(inpC.value, 10) || 1) + 1);
+        odswiezPodglad();
+      });
+      okno.querySelector('#et-c-down').addEventListener('click', function () {
+        inpC.value = Math.max(1, (parseInt(inpC.value, 10) || 2) - 1);
+        odswiezPodglad();
+      });
+      inpR.addEventListener('input', odswiezPodglad);
+      inpC.addEventListener('input', odswiezPodglad);
     }
     function dodajWierszTabeli() {
       var t = tabelaOb(), k = komorka();
@@ -639,14 +762,30 @@
       var rIdx = (k && k.parentElement) ? k.parentElement.rowIndex : t.rows.length - 1;
       var row = t.insertRow(rIdx + 1);
       var numCells = (k && k.parentElement) ? k.parentElement.cells.length : (t.rows[0] ? t.rows[0].cells.length : 2);
-      for (var i = 0; i < numCells; i++) row.insertCell().innerHTML = 'Komórka';
+      var pct = (100 / numCells).toFixed(2) + '%';
+      for (var i = 0; i < numCells; i++) {
+        var cell = row.insertCell();
+        cell.innerHTML = 'Komórka';
+        cell.style.width = pct;
+        cell.style.wordBreak = 'break-word';
+        cell.style.overflowWrap = 'break-word';
+        cell.style.boxSizing = 'border-box';
+      }
+      zbalansujSzerokosciKolumn(t);
       zglaszaZmiane();
     }
     function dodajKolumneTabeli() {
       var t = tabelaOb(), k = komorka();
       if (!t) { alert('Stań najpierw kursorem w komórce tabeli.'); return; }
       var idx = k ? (k.cellIndex + 1) : (t.rows[0] ? t.rows[0].cells.length : 1);
-      for (var i = 0; i < t.rows.length; i++) t.rows[i].insertCell(idx).innerHTML = 'Komórka';
+      for (var i = 0; i < t.rows.length; i++) {
+        var cell = t.rows[i].insertCell(idx);
+        cell.innerHTML = 'Komórka';
+        cell.style.wordBreak = 'break-word';
+        cell.style.overflowWrap = 'break-word';
+        cell.style.boxSizing = 'border-box';
+      }
+      zbalansujSzerokosciKolumn(t);
       zglaszaZmiane();
     }
     function usunWierszTabeli() {
@@ -663,6 +802,7 @@
       if (t.rows[0].cells.length < 2) { alert('To jedyna kolumna tabeli.'); return; }
       var idx = k ? k.cellIndex : (t.rows[0].cells.length - 1);
       for (var i = 0; i < t.rows.length; i++) t.rows[i].deleteCell(idx);
+      zbalansujSzerokosciKolumn(t);
       zglaszaZmiane();
     }
     function przelaczRamkeTabeli() {
@@ -1238,13 +1378,14 @@
 
     /* --- GRUPA 3: TABELA --- */
     var grTabela = dodajGrupe('Tabela');
-    B(grTabela.r1, '▦ Tabela…', 'Wstaw tabelę (wiersze × kolumny, z ramką lub bez)', otworzModalTabeli);
+    B(grTabela.r1, '▦ Tabela…', 'Wstaw tabelę — ustaw wiersze i kolumny za pomocą strzałek ▲ / ▼', otworzModalTabeli);
     B(grTabela.r1, '◫ Ramka', 'Obramowanie tabeli: włącz / wyłącz', przelaczRamkeTabeli);
+    B(grTabela.r1, '⚖ Równe', 'Wyrównaj szerokości kolumn (sztywny układ — równe kolumny)', wyrownajKolumnyTabeli);
 
-    B(grTabela.r2, '+ Wiersz', 'Dodaj wiersz poniżej (stań kursorem w tabeli)', dodajWierszTabeli);
-    B(grTabela.r2, '+ Kol.', 'Dodaj kolumnę obok (stań kursorem w tabeli)', dodajKolumneTabeli);
-    B(grTabela.r2, '− Wiersz', 'Usuń wiersz (stań kursorem w tabeli)', usunWierszTabeli);
-    B(grTabela.r2, '− Kol.', 'Usuń kolumnę (stań kursorem w tabeli)', usunKolumneTabeli);
+    B(grTabela.r2, '▲ +Wiersz', 'Dodaj wiersz poniżej (stań kursorem w tabeli)', dodajWierszTabeli);
+    B(grTabela.r2, '▼ −Wiersz', 'Usuń wiersz (stań kursorem w tabeli)', usunWierszTabeli);
+    B(grTabela.r2, '► +Kol.', 'Dodaj kolumnę obok (stań kursorem w tabeli)', dodajKolumneTabeli);
+    B(grTabela.r2, '◄ −Kol.', 'Usuń kolumnę (stań kursorem w tabeli)', usunKolumneTabeli);
 
     /* --- GRUPA 4: KSZTAŁTY I MEDIA (Canva / PowerPoint) --- */
     var grKsztalty = dodajGrupe('Kształty i Media');
@@ -1585,6 +1726,9 @@
         pole.querySelectorAll('[contenteditable="true"]').forEach(function (el) {
           if (el !== pole) el.removeAttribute('contenteditable');
         });
+        pole.querySelectorAll('table.tre-tabela').forEach(function (t) {
+          zbalansujSzerokosciKolumn(t);
+        });
         czyscWybranie();
       },
       pobierz: function () {
@@ -1599,6 +1743,10 @@
           var ob = w.closest('.tre-ksztalt');
           w.setAttribute('contenteditable', 'false');
           if (ob) ob.setAttribute('data-ks-tekst', tekstZHtml(w.innerHTML));
+        });
+        pole.querySelectorAll('table.tre-tabela').forEach(function (t) {
+          t.style.tableLayout = 'fixed';
+          t.style.width = '100%';
         });
         return pole.innerHTML;
       },
