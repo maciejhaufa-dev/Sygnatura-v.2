@@ -839,7 +839,7 @@ body.launch-budowa main.wrap > :not(.budowa-box){display:none}
 .edtr-grupa{display:flex;flex-direction:column;justify-content:space-between;background:#ffffff;
   border:1px solid rgba(107,69,48,.25);border-radius:6px;padding:4px 6px;box-shadow:0 1px 3px rgba(107,69,48,.08)}
 .edtr-grupa-cialo{display:flex;flex-direction:column;gap:4px}
-.edtr-grupa-rzad{display:flex;align-items:center;gap:3px;flex-wrap:nowrap}
+.edtr-grupa-rzad{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
 .edtr-grupa-etyk{text-align:center;font-size:9px;font-weight:700;letter-spacing:.12em;
   text-transform:uppercase;color:#8C6A4E;padding-top:3px;margin-top:3px;
   border-top:1px solid rgba(107,69,48,.12);user-select:none}
@@ -1041,26 +1041,30 @@ body.launch-budowa main.wrap > :not(.budowa-box){display:none}
   font-weight:700;letter-spacing:.08em;padding:6px 16px;border-radius:6px;cursor:pointer}
 .edtr-ok:hover{background:var(--zloty);color:var(--butelkowa)}
 .tre-wybrany{outline:2px dashed var(--zloty);outline-offset:3px}
-.tre-uchwyt{position:absolute;width:10px;height:10px;background:#fff;border:1.5px solid var(--brunatny);
-  border-radius:2px;z-index:70;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.tre-uchwyt-obrot{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;
-  border:2px solid #7CB342;z-index:70;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.tre-ksztalt{display:inline-block;position:relative;vertical-align:middle;margin:4px 8px 4px 0}
+.tre-uchwyt{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--brunatny);
+  border-radius:3px;z-index:70;box-shadow:0 1px 4px rgba(0,0,0,.35);touch-action:none;user-select:none;cursor:pointer}
+.tre-uchwyt::after{content:'';position:absolute;top:-8px;left:-8px;right:-8px;bottom:-8px}
+.tre-uchwyt-obrot{position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;
+  border:2.5px solid #7CB342;z-index:70;box-shadow:0 1px 4px rgba(0,0,0,.35);touch-action:none;user-select:none;cursor:grab}
+.tre-uchwyt-obrot::after{content:'';position:absolute;top:-8px;left:-8px;right:-8px;bottom:-8px}
+.tre-ksztalt{display:inline-block;position:relative;vertical-align:middle;margin:4px 8px 4px 0;touch-action:none;user-select:none}
+.tre-ksztalt[style*="position: absolute"],.tre-ksztalt[style*="position:absolute"]{margin:0}
 .tre-ksztalt-s{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
   padding:2px 10px;font-size:15px;letter-spacing:.04em;box-sizing:border-box}
 .tre-ksztalt.tre-linia{height:0;margin:8px 8px 8px 0;background:none}
-.tre-blok{box-sizing:border-box;overflow:auto}
+.tre-blok{box-sizing:border-box;overflow:auto;touch-action:none}
 .tre-blok:focus{outline:none}
+.tre-przycisk-obiekt{touch-action:none;user-select:none}
 
 /* ============ EDYTOR v6: rysowanie obiektów (PowerPoint) ============ */
 .tre-ksztalt.tre-trojkat{clip-path:polygon(50% 0,100% 100%,0 100%);border:none}
 .tre-ksztalt.tre-strzalka{clip-path:polygon(0 30%,72% 30%,72% 0,100% 50%,72% 100%,72% 70%,0 70%);border:none}
 .tre-ksztalt-a{text-decoration:none;color:inherit;cursor:pointer}
-.tre-grupa{position:absolute;z-index:5}
+.tre-grupa{position:absolute;z-index:5;touch-action:none}
 .tre-grupa .tre-ksztalt,.tre-grupa .tre-przycisk-obiekt,.tre-grupa .tre-blok,.tre-grupa img{position:absolute}
 .edtr-kontekst{position:absolute;display:none;gap:2px;background:#fff;border:1px solid rgba(107,69,48,.5);
   border-radius:8px;padding:3px 5px;box-shadow:0 6px 18px rgba(0,0,0,.28);z-index:60;
-  flex-wrap:wrap;max-width:min(430px,100%)}
+  flex-wrap:wrap;max-width:min(520px,100%)}
 .edtr-kontekst button{border:1px solid rgba(107,69,48,.35);background:#fff;color:var(--brunatny);
   border-radius:6px;font-size:13px;padding:3px 7px;cursor:pointer;line-height:1.2}
 .edtr-kontekst button:hover{background:var(--krem-2);border-color:var(--brunatny)}

@@ -105,7 +105,11 @@
   /* ============================================================
      KSZTAŁTY — rysowanie obiektów (jak w PowerPoint)
      ============================================================ */
-  function budujKsztalt(d) {
+  function budujKsztalt(d, leftPos, topPos) {
+    var isAbs = (d && d.pos === 'absolute') || !!leftPos;
+    var posCss = isAbs
+      ? 'position:absolute;left:' + (leftPos || '20%') + ';top:' + (topPos || '20%') + ';z-index:5;margin:0;'
+      : 'display:inline-block;';
     var atry = ' data-ks-typ="' + escA(d.typ) + '" data-ks-tekst="' + escA(d.tekst) + '"' +
       ' data-ks-tlo="' + escA(d.tlo) + '" data-ks-przez="' + (d.przez ? '1' : '') + '"' +
       ' data-ks-ramka="' + escA(d.ramka) + '" data-ks-gr="' + escA(String(d.gr)) + '"' +
@@ -115,8 +119,8 @@
       ' data-ks-link="' + escA(d.link) + '" data-ks-rot="' + escA(String(d.rot || 0)) + '"';
     if (d.typ === 'linia') {
       return '<span class="tre-ksztalt tre-linia" contenteditable="false"' + atry +
-        ' style="display:inline-block;width:' + d.szer + 'px;height:0;border-top:' + d.gr + 'px solid ' + escA(d.tlo) +
-        ';transform:rotate(' + (d.rot || 0) + 'deg);vertical-align:middle"></span>';
+        ' style="' + posCss + 'display:inline-block;width:' + d.szer + 'px;height:0;border-top:' + d.gr + 'px solid ' + escA(d.tlo) +
+        ';transform:rotate(' + (d.rot || 0) + 'deg);vertical-align:middle;touch-action:none;cursor:move"></span>';
     }
     var promien = d.typ === 'elipsa' ? '50%' : (d.typ === 'zaokraglony' ? '14px' : '0');
     var tlo = d.przez ? 'transparent' : d.tlo;
@@ -133,8 +137,8 @@
         : tresc;
     }
     return '<span class="tre-ksztalt tre-' + escA(d.typ) + '" contenteditable="false"' + atry +
-      ' style="display:inline-block;width:' + d.szer + 'px;height:' + d.wys + 'px;background:' + tlo + ';' + ramka +
-      ';border-radius:' + promien + ';vertical-align:middle;transform:rotate(' + (d.rot || 0) + 'deg)">' +
+      ' style="' + posCss + 'display:inline-block;width:' + d.szer + 'px;height:' + d.wys + 'px;background:' + tlo + ';' + ramka +
+      ';border-radius:' + promien + ';vertical-align:middle;transform:rotate(' + (d.rot || 0) + 'deg);touch-action:none;cursor:move">' +
       '<span class="tre-ksztalt-s" style="font-family:' + font + ';color:' + escA(d.kolor) + ';font-size:' + d.rozmiar +
       'px;align-items:' + val + (kier ? ';transform:' + kier : '') + '">' + wew + '</span></span>';
   }
@@ -737,12 +741,12 @@
         return s;
       }
       if (trybUchwytu !== 'obrot') {
-        uchwyt('tre-uchwyt', 'nwse-resize', L + W - 5, T + H - 5, 'se');
-        uchwyt('tre-uchwyt', 'nesw-resize', L + W - 5, T - 5, 'ne');
-        uchwyt('tre-uchwyt', 'nesw-resize', L - 5, T + H - 5, 'sw');
-        uchwyt('tre-uchwyt', 'nwse-resize', L - 5, T - 5, 'nw');
+        uchwyt('tre-uchwyt', 'nwse-resize', L + W - 6, T + H - 6, 'se');
+        uchwyt('tre-uchwyt', 'nesw-resize', L + W - 6, T - 6, 'ne');
+        uchwyt('tre-uchwyt', 'nesw-resize', L - 6, T + H - 6, 'sw');
+        uchwyt('tre-uchwyt', 'nwse-resize', L - 6, T - 6, 'nw');
       }
-      uchwyt('tre-uchwyt-obrot', 'grab', L + W / 2 - 7, T - 32, 'obrot');
+      uchwyt('tre-uchwyt-obrot', 'grab', L + W / 2 - 8, T - 30, 'obrot');
     }
     function odswiezWybranie(){
       obiektyEl().forEach(function (el) { el.classList.remove('tre-wybrany'); });
@@ -758,14 +762,21 @@
       return wybrane.length === 1 ? wybrane[0] : (wybrane[wybrane.length - 1] || null);
     }
     function zrobAbsolutny(ob){
+      if (!ob || !ob.style) return;
       if (ob.style.position === 'absolute') return;
       var pr = pole.getBoundingClientRect();
       var r = ob.getBoundingClientRect();
+      var pw = pr.width || 1;
+      var ph = pr.height || 1;
+      var l = Math.max(0, (r.left - pr.left + pole.scrollLeft) / pw * 100);
+      var t = Math.max(0, (r.top - pr.top + pole.scrollTop) / ph * 100);
       ob.style.position = 'absolute';
-      ob.style.left = Math.max(0, (r.left - pr.left) / (pr.width || 1) * 100) + '%';
-      ob.style.top = Math.max(0, (r.top - pr.top) / (pr.height || 1) * 100) + '%';
-      ob.style.right = 'auto'; ob.style.bottom = 'auto';
-      ob.style.margin = '0'; ob.style.zIndex = '5';
+      ob.style.left = l.toFixed(2) + '%';
+      ob.style.top = t.toFixed(2) + '%';
+      ob.style.right = 'auto';
+      ob.style.bottom = 'auto';
+      ob.style.margin = '0';
+      if (!ob.style.zIndex) ob.style.zIndex = '5';
     }
 
     /* ---------- mini-pasek kontekstowy przy zaznaczeniu ---------- */
@@ -789,13 +800,19 @@
         KB('🎨', 'Właściwości: wypełnienie, ramka, przycisk/link (2×klik)', function () {
           otworzWlasciwosci(obiektZaznaczony());
         });
+        KB('⇤', 'Wyrównaj do lewej', function(){ wyrownajObiekt('lewo'); });
+        KB('⬌', 'Wyrównaj do środka poziomo', function(){ wyrownajObiekt('srodek'); });
+        KB('⇥', 'Wyrównaj do prawej', function(){ wyrownajObiekt('prawo'); });
+        KB('⬆', 'Wyrównaj do góry', akcjaGora);
+        KB('↕', 'Wyrównaj do środka pionowo', akcjaSrodek);
+        KB('⬇', 'Wyrównaj do dołu', akcjaDol);
+        KB('⇹', 'Rozłóż w poziomie (min. 2 obiekty)', function(){ rozlozObiekty('poziom'); });
+        KB('⇳', 'Rozłóż w pionie (min. 2 obiekty)', function(){ rozlozObiekty('pion'); });
         KB('⊞', 'Grupuj zaznaczone (Ctrl+G)', grupuj);
         KB('⊟', 'Rozgrupuj (Ctrl+Shift+G)', rozgrupuj);
         KB('⤒', 'Na wierzch', function(){ warstwa('wierzch'); });
-        KB('🔼', 'Do przodu', function(){ warstwa('przod'); });
-        KB('🔽', 'Do tyłu', function(){ warstwa('tyl'); });
         KB('⤓', 'Na spód', function(){ warstwa('spod'); });
-        KB('🗑', 'Usuń zaznaczone', function () {
+        KB('🗑', 'Usuń zaznaczone (Del)', function () {
           wybrane.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
           czyscWybranie();
           zglaszaZmiane();
@@ -813,7 +830,7 @@
         if (r.bottom > bB) bB = r.bottom;
       });
       var L = Math.max(0, bL - pr.left + pole.scrollLeft);
-      var nad = bT - pr.top + pole.scrollTop - 34;
+      var nad = bT - pr.top + pole.scrollTop - 36;
       var T = nad >= 0 ? nad : (bB - pr.top + pole.scrollTop + 6);
       kontekst.style.display = 'flex';
       kontekst.style.left = L + 'px';
@@ -822,48 +839,26 @@
 
     /* ---------- wstawianie kształtów ---------- */
     function wstawKsztalt(d){
-      var html = budujKsztalt(d) + '&nbsp;';
-      var ob = obiektZaznaczony();
-      var nowyEl = null;
-      if (ob && !(ob.classList && ob.classList.contains('tre-grupa'))){
-        ob.insertAdjacentHTML('afterend', html);
-        nowyEl = ob.nextElementSibling;
-      } else {
-        pole.focus();
-        var sel = window.getSelection();
-        var wPolu = false;
-        if (sel && sel.anchorNode && (sel.anchorNode === pole || pole.contains(sel.anchorNode))) {
-          wPolu = true;
-        }
-        if (!wPolu) {
-          var rng = document.createRange();
-          rng.selectNodeContents(pole);
-          rng.collapse(false);
-          sel.removeAllRanges();
-          sel.addRange(rng);
-        }
-        var wstawione = document.execCommand('insertHTML', false, html);
-        if (!wstawione) {
-          var tmp = document.createElement('div');
-          tmp.innerHTML = html;
-          var el = tmp.firstElementChild;
-          if (el) {
-            pole.appendChild(el);
-            pole.appendChild(document.createTextNode(' '));
-            nowyEl = el;
-          }
-        }
-      }
-      czyscWybranie();
-      if (!nowyEl) {
-        var allKszt = pole.querySelectorAll('.tre-ksztalt');
-        if (allKszt.length > 0) nowyEl = allKszt[allKszt.length - 1];
-      }
-      if (nowyEl && nowyEl.classList && nowyEl.classList.contains('tre-ksztalt')){
+      d.pos = 'absolute';
+      var pr = pole.getBoundingClientRect();
+      var pw = pr.width || 600;
+      var ph = Math.max(260, pr.height || 300);
+      var defL = Math.max(16, Math.round((pw - (d.szer || 160)) / 2));
+      var defT = Math.max(16, Math.round(pole.scrollTop + (Math.min(ph, 300) - (d.wys || 60)) / 2));
+      var leftPct = ((defL / pw) * 100).toFixed(1) + '%';
+      var topPct = ((defT / ph) * 100).toFixed(1) + '%';
+
+      var html = budujKsztalt(d, leftPct, topPct);
+      var tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      var nowyEl = tmp.firstElementChild;
+      if (nowyEl) {
+        pole.appendChild(nowyEl);
+        czyscWybranie();
         wybrane = [nowyEl];
         odswiezWybranie();
+        zglaszaZmiane();
       }
-      zglaszaZmiane();
     }
 
     function wstawPoleTekstowe() {
@@ -985,8 +980,8 @@
       var g = document.createElement('div');
       g.className = 'tre-grupa';
       g.style.position = 'absolute';
-      g.style.left = Math.max(0, (minL - pr.left) / (pr.width || 1) * 100) + '%';
-      g.style.top = Math.max(0, (minT - pr.top) / (pr.height || 1) * 100) + '%';
+      g.style.left = Math.max(0, (minL - pr.left + pole.scrollLeft) / (pr.width || 1) * 100) + '%';
+      g.style.top = Math.max(0, (minT - pr.top + pole.scrollTop) / (pr.height || 1) * 100) + '%';
       g.style.width = Math.max(20, (maxR - minL) / (pr.width || 1) * 100) + '%';
       g.style.height = Math.max(20, (maxB - minT) / (pr.height || 1) * 100) + '%';
       g.style.zIndex = '5';
@@ -1015,8 +1010,8 @@
         dzieci.forEach(function (ch) {
           var r = ch.getBoundingClientRect();
           ch.style.position = 'absolute';
-          ch.style.left = Math.max(0, (r.left - pr.left) / (pr.width || 1) * 100) + '%';
-          ch.style.top = Math.max(0, (r.top - pr.top) / (pr.height || 1) * 100) + '%';
+          ch.style.left = Math.max(0, (r.left - pr.left + pole.scrollLeft) / (pr.width || 1) * 100) + '%';
+          ch.style.top = Math.max(0, (r.top - pr.top + pole.scrollTop) / (pr.height || 1) * 100) + '%';
           ch.style.right = 'auto'; ch.style.bottom = 'auto';
           ch.style.margin = '0'; ch.style.zIndex = '5';
           g.parentNode.insertBefore(ch, g);
@@ -1053,20 +1048,27 @@
         alert('Zaznacz najpierw obiekt(y): klik = jeden, Ctrl+klik = kilka naraz.');
         return;
       }
+      wybrane.forEach(zrobAbsolutny);
       var pr = pole.getBoundingClientRect();
-      function pxn(p){ return (p / (pr.width || 1) * 100) + '%'; }
-      function pyn(p){ return (p / (pr.height || 1) * 100) + '%'; }
+      function pxn(p){ return ((p / (pr.width || 1)) * 100).toFixed(2) + '%'; }
+      function pyn(p){ return ((p / (pr.height || 1)) * 100).toFixed(2) + '%'; }
       var dane = wybrane.map(function (ob) {
         var or = ob.getBoundingClientRect();
-        return { ob: ob, l: or.left - pr.left, t: or.top - pr.top, w: or.width, h: or.height };
+        return {
+          ob: ob,
+          l: or.left - pr.left + pole.scrollLeft,
+          t: or.top - pr.top + pole.scrollTop,
+          w: or.width,
+          h: or.height
+        };
       });
       if (wybrane.length === 1){
         var it = dane[0];
-        if (strona === 'lewo') it.ob.style.left = '1.5%';
-        if (strona === 'prawo') it.ob.style.left = pxn(Math.max(0, pr.width - it.w - pr.width * 0.015));
+        if (strona === 'lewo') it.ob.style.left = '2%';
+        if (strona === 'prawo') it.ob.style.left = pxn(Math.max(0, pr.width - it.w - pr.width * 0.02));
         if (strona === 'srodek') it.ob.style.left = pxn(Math.max(0, (pr.width - it.w) / 2));
-        if (strona === 'gora') it.ob.style.top = '1.5%';
-        if (strona === 'dol') it.ob.style.top = pyn(Math.max(0, pr.height - it.h - pr.height * 0.015));
+        if (strona === 'gora') it.ob.style.top = '2%';
+        if (strona === 'dol') it.ob.style.top = pyn(Math.max(0, pr.height - it.h - pr.height * 0.02));
         if (strona === 'srodek-pion') it.ob.style.top = pyn(Math.max(0, (pr.height - it.h) / 2));
       } else {
         var minL = Math.min.apply(null, dane.map(function (x) { return x.l; }));
@@ -1088,58 +1090,86 @@
       }
       dane.forEach(function (it) {
         it.ob.style.position = 'absolute';
-        it.ob.style.right = 'auto'; it.ob.style.bottom = 'auto';
-        it.ob.style.margin = '0'; it.ob.style.zIndex = '5';
+        it.ob.style.right = 'auto';
+        it.ob.style.bottom = 'auto';
+        it.ob.style.margin = '0';
+        if (!it.ob.style.zIndex) it.ob.style.zIndex = '5';
       });
+      odswiezWybranie();
+      zglaszaZmiane();
+    }
+
+    /* ---------- rozstawienie / dystrybucja obiektów ---------- */
+    function rozlozObiekty(kier) {
+      if (wybrane.length < 2) {
+        alert('Zaznacz co najmniej 2 obiekty (Ctrl+klik), aby je równomiernie rozstawić.');
+        return;
+      }
+      wybrane.forEach(zrobAbsolutny);
+      var pr = pole.getBoundingClientRect();
+      function pxn(p) { return ((p / (pr.width || 1)) * 100).toFixed(2) + '%'; }
+      function pyn(p) { return ((p / (pr.height || 1)) * 100).toFixed(2) + '%'; }
+
+      var dane = wybrane.map(function (ob) {
+        var or = ob.getBoundingClientRect();
+        return {
+          ob: ob,
+          l: or.left - pr.left + pole.scrollLeft,
+          t: or.top - pr.top + pole.scrollTop,
+          w: or.width,
+          h: or.height
+        };
+      });
+
+      if (kier === 'poziom') {
+        dane.sort(function (a, b) { return a.l - b.l; });
+        var minL = dane[0].l;
+        var maxR = dane[dane.length - 1].l + dane[dane.length - 1].w;
+        var totalW = 0;
+        dane.forEach(function (d) { totalW += d.w; });
+        var availableSpace = (maxR - minL) - totalW;
+        var gap = (dane.length > 1) ? Math.max(0, availableSpace / (dane.length - 1)) : 0;
+        var curX = minL;
+        dane.forEach(function (d) {
+          d.ob.style.left = pxn(Math.max(0, Math.min(curX, pr.width - d.w)));
+          curX += d.w + gap;
+        });
+      } else if (kier === 'pion') {
+        dane.sort(function (a, b) { return a.t - b.t; });
+        var minT = dane[0].t;
+        var maxB = dane[dane.length - 1].t + dane[dane.length - 1].h;
+        var totalH = 0;
+        dane.forEach(function (d) { totalH += d.h; });
+        var availableSpace = (maxB - minT) - totalH;
+        var gap = (dane.length > 1) ? Math.max(0, availableSpace / (dane.length - 1)) : 0;
+        var curY = minT;
+        dane.forEach(function (d) {
+          d.ob.style.top = pyn(Math.max(0, Math.min(curY, pr.height - d.h)));
+          curY += d.h + gap;
+        });
+      }
       odswiezWybranie();
       zglaszaZmiane();
     }
 
     function akcjaGora() {
       if (komorka()) { pionTekstu('gora'); return; }
-      var ob = obiektZaznaczony();
-      if (ob && ob.classList && ob.classList.contains('tre-ksztalt') &&
-          KSZTALTY_TEKST.indexOf(ob.getAttribute('data-ks-typ')) >= 0 &&
-          ob.style.position !== 'absolute') {
-        pionTekstu('gora');
-        return;
-      }
       if (wybrane.length) { wyrownajObiekt('gora'); return; }
       alert('Stań kursorem w komórce tabeli lub zaznacz obiekt.');
     }
     function akcjaSrodek() {
       if (komorka()) { pionTekstu('srodek'); return; }
-      var ob = obiektZaznaczony();
-      if (ob && ob.classList && ob.classList.contains('tre-ksztalt') &&
-          KSZTALTY_TEKST.indexOf(ob.getAttribute('data-ks-typ')) >= 0 &&
-          ob.style.position !== 'absolute') {
-        pionTekstu('srodek');
-        return;
-      }
       if (wybrane.length) { wyrownajObiekt('srodek-pion'); return; }
       alert('Stań kursorem w komórce tabeli lub zaznacz obiekt.');
     }
     function akcjaDol() {
       if (komorka()) { pionTekstu('dol'); return; }
-      var ob = obiektZaznaczony();
-      if (ob && ob.classList && ob.classList.contains('tre-ksztalt') &&
-          KSZTALTY_TEKST.indexOf(ob.getAttribute('data-ks-typ')) >= 0 &&
-          ob.style.position !== 'absolute') {
-        pionTekstu('dol');
-        return;
-      }
       if (wybrane.length) { wyrownajObiekt('dol'); return; }
       alert('Stań kursorem w komórce tabeli lub zaznacz obiekt.');
     }
 
     function usunWybrane(e) {
       if (!wybrane.length) return;
-      if (e && e.type === 'keydown') {
-        if (e.key !== 'Delete' && e.key !== 'Backspace') return;
-        var act = document.activeElement;
-        if (act && act.isContentEditable && act !== pole && !act.classList.contains('tre-ksztalt-s')) return;
-        if (act && (act.tagName === 'INPUT' || act.tagName === 'TEXTAREA' || act.tagName === 'SELECT')) return;
-      }
       wybrane.forEach(function (el) { if (el && el.parentNode) el.parentNode.removeChild(el); });
       czyscWybranie();
       zglaszaZmiane();
@@ -1230,77 +1260,120 @@
     B(grKsztalty.r2, '🖼', 'Wstaw obraz (plik)', function(){ imgInput.click(); });
     B(grKsztalty.r2, '▶ Film', 'Wstaw film YouTube', wstawYoutubeModal);
 
-    /* --- GRUPA 5: UKŁAD I WARSTWY --- */
-    var grUklad = dodajGrupe('Układ i Warstwy');
-    B(grUklad.r1, '⤒ Na wierzch', 'Warstwa: na wierzch', function(){ warstwa('wierzch'); });
-    B(grUklad.r1, '⤓ Na spód', 'Warstwa: na spód', function(){ warstwa('spod'); });
-    B(grUklad.r1, '⊞ Grupuj', 'Grupuj zaznaczone obiekty (blokada wzajemnego położenia, Ctrl+G)', grupuj);
-    B(grUklad.r1, '⬆', 'Wyrównaj: do góry (komórka lub obiekt)', akcjaGora);
-    B(grUklad.r1, '↕', 'Wyrównaj: do środka pionowo (komórka lub obiekt)', akcjaSrodek);
-    B(grUklad.r1, '⬇', 'Wyrównaj: do dołu (komórka lub obiekt)', akcjaDol);
+    /* --- GRUPA 5: UKŁAD I WYRÓWNANIE --- */
+    var grUklad = dodajGrupe('Wyrównanie');
+    B(grUklad.r1, '⇤ Lewo', 'Wyrównaj do lewej krawędzi (obiekt lub grupa)', function(){ wyrownajObiekt('lewo'); });
+    B(grUklad.r1, '⬌ Środek H', 'Wyrównaj do środka w poziomie', function(){ wyrownajObiekt('srodek'); });
+    B(grUklad.r1, '⇥ Prawo', 'Wyrównaj do prawej krawędzi', function(){ wyrownajObiekt('prawo'); });
+    B(grUklad.r1, '⇹ Rozłóż H', 'Rozłóż równomiernie w poziomie (równy odstęp między obiektami, min. 2 obiekty)', function(){ rozlozObiekty('poziom'); });
 
-    B(grUklad.r2, '🔼 Do przodu', 'Warstwa: do przodu', function(){ warstwa('przod'); });
-    B(grUklad.r2, '🔽 Do tyłu', 'Warstwa: do tyłu', function(){ warstwa('tyl'); });
-    B(grUklad.r2, '⊟ Rozgrupuj', 'Rozgrupuj zaznaczoną grupę (Ctrl+Shift+G)', rozgrupuj);
-    B(grUklad.r2, '↺ +90°', 'Kierunek tekstu: +90° (zaznaczony kształt z tekstem)', function(){ kierunekKsztaltu('90'); });
-    B(grUklad.r2, '↻ −90°', 'Kierunek tekstu: −90° (zaznaczony kształt z tekstem)', function(){ kierunekKsztaltu('270'); });
-    B(grUklad.r2, '🗑 Usuń', 'Usuń zaznaczone obiekty (Backspace)', usunWybrane);
+    B(grUklad.r2, '⬆ Góra', 'Wyrównaj do góry (obiekt lub komórka)', akcjaGora);
+    B(grUklad.r2, '↕ Środek V', 'Wyrównaj do środka pionowo (obiekt lub komórka)', akcjaSrodek);
+    B(grUklad.r2, '⬇ Dół', 'Wyrównaj do dołu (obiekt lub komórka)', akcjaDol);
+    B(grUklad.r2, '⇳ Rozłóż V', 'Rozłóż równomiernie w pionie (równy odstęp między obiektami, min. 2 obiekty)', function(){ rozlozObiekty('pion'); });
+
+    /* --- GRUPA 6: WARSTWY I GRUPY --- */
+    var grWarstwy = dodajGrupe('Warstwy i Grupy');
+    B(grWarstwy.r1, '⤒ Na wierzch', 'Warstwa: przenieś na sam wierzch', function(){ warstwa('wierzch'); });
+    B(grWarstwy.r1, '🔼 Do przodu', 'Warstwa: przesuń o 1 poziom do przodu', function(){ warstwa('przod'); });
+    B(grWarstwy.r1, '⊞ Grupuj', 'Grupuj zaznaczone obiekty (blokada wzajemnego położenia, Ctrl+G)', grupuj);
+    B(grWarstwy.r1, '↺ +90°', 'Kierunek tekstu: obróć o 90°', function(){ kierunekKsztaltu('90'); });
+
+    B(grWarstwy.r2, '⤓ Na spód', 'Warstwa: przenieś na sam spód', function(){ warstwa('spod'); });
+    B(grWarstwy.r2, '🔽 Do tyłu', 'Warstwa: przesuń o 1 poziom do tyłu', function(){ warstwa('tyl'); });
+    B(grWarstwy.r2, '⊟ Rozgrupuj', 'Rozgrupuj zaznaczoną grupę (Ctrl+Shift+G)', rozgrupuj);
+    B(grWarstwy.r2, '🗑 Usuń', 'Usuń zaznaczone obiekty (Backspace / Delete)', usunWybrane);
 
     /* ---------- DRAG&DROP + uchwyty rozmiaru i obrotu ---------- */
     var drag = null, justDragged = false, uchwytDrag = null;
+
     pole.addEventListener('pointerdown', function (e) {
       var t = e.target;
-      if (t && t.classList && (t.classList.contains('tre-uchwyt') || t.classList.contains('tre-uchwyt-obrot'))) {
+      if (!t) return;
+
+      /* uchwyty: zmiana rozmiaru lub obrót */
+      if (t.classList && (t.classList.contains('tre-uchwyt') || t.classList.contains('tre-uchwyt-obrot'))) {
         e.preventDefault(); e.stopPropagation();
         var ob = wybrane[0];
+        if (!ob) return;
+        zrobAbsolutny(ob);
         var pr = pole.getBoundingClientRect();
         var r = ob.getBoundingClientRect();
-        if (ob.style.position !== 'absolute'){
-          ob.style.position = 'absolute';
-          ob.style.left = Math.max(0, (r.left - pr.left) / (pr.width || 1) * 100) + '%';
-          ob.style.top = Math.max(0, (r.top - pr.top) / (pr.height || 1) * 100) + '%';
-          ob.style.right = 'auto'; ob.style.bottom = 'auto';
-          ob.style.margin = '0'; ob.style.zIndex = '5';
-          r = ob.getBoundingClientRect();
-        }
-        if (t.classList.contains('tre-uchwyt-obrot')){
-          uchwytDrag = { typ:'obrot', ob: ob,
+        var L0 = r.left - pr.left + pole.scrollLeft;
+        var T0 = r.top - pr.top + pole.scrollTop;
+
+        if (t.classList.contains('tre-uchwyt-obrot')) {
+          uchwytDrag = {
+            typ: 'obrot', ob: ob,
             cx: r.left + r.width / 2, cy: r.top + r.height / 2,
             a0: Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)),
-            rot0: parseFloat(ob.getAttribute('data-ks-rot') || '0') || 0 };
+            rot0: parseFloat(ob.getAttribute('data-ks-rot') || '0') || 0
+          };
         } else {
-          uchwytDrag = { typ:'skala', ob: ob, k: t.getAttribute('data-u'),
-            L0: r.left - pr.left, T0: r.top - pr.top, R0: r.left - pr.left + r.width, B0: r.top - pr.top + r.height };
+          uchwytDrag = {
+            typ: 'skala', ob: ob, k: t.getAttribute('data-u'),
+            L0: L0, T0: T0,
+            R0: L0 + r.width, B0: T0 + r.height
+          };
+        }
+        if (t.setPointerCapture) try { t.setPointerCapture(e.pointerId); } catch (_) {}
+        return;
+      }
+
+      /* Jeżeli użytkownik edytuje tekst wewnątrz kształtu lub w formularzu: nie przechwytuj przeciągania */
+      if (t.closest && t.closest('.tre-ksztalt-s[contenteditable="true"]')) return;
+      if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT') return;
+
+      var grp = t.closest ? t.closest('.tre-grupa') : null;
+      var ob2 = grp || (t.closest ? t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img') : null);
+      if (!ob2) {
+        if (!e.ctrlKey && !e.metaKey && wybrane.length) {
+          czyscWybranie();
         }
         return;
       }
-      if (t && t.closest && t.closest('[contenteditable="true"]')) return;
-      if (!(t && t.closest) || e.button !== 0) return;
-      var grp = t.closest('.tre-grupa');
-      var ob2 = grp || t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img');
-      if (!ob2) return;
-      if (e.ctrlKey || e.metaKey){
+
+      if (e.ctrlKey || e.metaKey) {
         var ix = wybrane.indexOf(ob2);
-        if (ix >= 0) wybrane.splice(ix, 1); else wybrane.push(ob2);
-      } else if (wybrane.indexOf(ob2) < 0){
+        if (ix >= 0) wybrane.splice(ix, 1);
+        else wybrane.push(ob2);
+      } else if (wybrane.indexOf(ob2) < 0) {
         wybrane = [ob2];
       }
       clearTimeout(klikTimer);
       odswiezWybranie();
+
       var pr2 = pole.getBoundingClientRect();
       var start = wybrane.map(function (el) {
         var r2 = el.getBoundingClientRect();
-        return { el: el, offX: e.clientX - r2.left, offY: e.clientY - r2.top,
-                 left0: r2.left - pr2.left, top0: r2.top - pr2.top, w0: r2.width, h0: r2.height };
+        return {
+          el: el,
+          offX: e.clientX - r2.left,
+          offY: e.clientY - r2.top,
+          left0: r2.left - pr2.left + pole.scrollLeft,
+          top0: r2.top - pr2.top + pole.scrollTop,
+          w0: r2.width,
+          h0: r2.height
+        };
       });
-      drag = { start: start, startX: e.clientX, startY: e.clientY, przes: false };
-      e.preventDefault();
-      if (ob2.setPointerCapture) try { ob2.setPointerCapture(e.pointerId); } catch(_){}
+      drag = {
+        start: start,
+        startX: e.clientX,
+        startY: e.clientY,
+        przes: false
+      };
+
+      if (e.pointerType === 'touch' || e.button === 0) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (ob2.setPointerCapture) try { ob2.setPointerCapture(e.pointerId); } catch (_) {}
     });
 
-    pole.addEventListener('pointermove', function (e) {
-      if (uchwytDrag){
-        if (uchwytDrag.typ === 'obrot'){
+    function onPointerMove(e) {
+      if (uchwytDrag) {
+        e.preventDefault();
+        if (uchwytDrag.typ === 'obrot') {
           var a = Math.atan2(e.clientY - uchwytDrag.cy, e.clientX - uchwytDrag.cx);
           var deg = uchwytDrag.rot0 + (a - uchwytDrag.a0) * 180 / Math.PI;
           if (e.shiftKey) deg = Math.round(deg / 15) * 15;
@@ -1309,7 +1382,8 @@
           uchwytDrag.ob.setAttribute('data-ks-rot', String(deg));
         } else {
           var pr = pole.getBoundingClientRect();
-          var x = e.clientX - pr.left, y = e.clientY - pr.top;
+          var x = e.clientX - pr.left + pole.scrollLeft;
+          var y = e.clientY - pr.top + pole.scrollTop;
           var L = uchwytDrag.L0, T = uchwytDrag.T0, R = uchwytDrag.R0, B = uchwytDrag.B0;
           var k = uchwytDrag.k;
           if (k.indexOf('e') >= 0) R = x;
@@ -1325,74 +1399,98 @@
         }
         rysujUchwyty();
         rysujKontekst();
-        e.preventDefault();
         return;
       }
+
       if (!drag) return;
-      var dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
-      if (!drag.przes && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      var dx = e.clientX - drag.startX;
+      var dy = e.clientY - drag.startY;
+      if (!drag.przes && Math.abs(dx) < 3 && Math.abs(dy) < 3) return;
+
+      e.preventDefault();
       var prMove = pole.getBoundingClientRect();
-      if (!drag.przes){
+      var pw = prMove.width || 1;
+      var ph = prMove.height || 1;
+
+      if (!drag.przes) {
         drag.przes = true;
         drag.start.forEach(function (it) {
-          it.el.style.position = 'absolute';
-          it.el.style.left = Math.max(0, it.left0 / (prMove.width || 1) * 100) + '%';
-          it.el.style.top = Math.max(0, it.top0 / (prMove.height || 1) * 100) + '%';
-          it.el.style.right = 'auto'; it.el.style.bottom = 'auto';
-          it.el.style.margin = '0'; it.el.style.zIndex = '5';
+          zrobAbsolutny(it.el);
         });
       }
       drag.start.forEach(function (it) {
-        var l = Math.min(Math.max(0, it.left0 + dx), prMove.width - it.w0);
-        var t2 = Math.min(Math.max(0, it.top0 + dy), prMove.height - it.h0);
-        it.el.style.left = (l / (prMove.width || 1) * 100) + '%';
-        it.el.style.top = (t2 / (prMove.height || 1) * 100) + '%';
+        var newLeft = Math.max(0, it.left0 + dx);
+        var newTop = Math.max(0, it.top0 + dy);
+        it.el.style.left = ((newLeft / pw) * 100).toFixed(2) + '%';
+        it.el.style.top = ((newTop / ph) * 100).toFixed(2) + '%';
+        it.el.style.right = 'auto';
+        it.el.style.bottom = 'auto';
+        it.el.style.margin = '0';
+        if (!it.el.style.zIndex) it.el.style.zIndex = '5';
       });
       rysujUchwyty();
       rysujKontekst();
-      e.preventDefault();
-    });
+    }
 
-    pole.addEventListener('pointerup', function () {
-      if (uchwytDrag && uchwytDrag.typ === 'skala'){
-        var pr = pole.getBoundingClientRect();
-        var ob = uchwytDrag.ob;
-        ob.style.left = (parseFloat(ob.style.left) / (pr.width || 1) * 100) + '%';
-        ob.style.top = (parseFloat(ob.style.top) / (pr.height || 1) * 100) + '%';
-        zglaszaZmiane();
+    function onPointerUp(e) {
+      if (uchwytDrag) {
+        if (uchwytDrag.typ === 'skala') {
+          var pr = pole.getBoundingClientRect();
+          var ob = uchwytDrag.ob;
+          var pw = pr.width || 1;
+          var ph = pr.height || 1;
+          var curL = parseFloat(ob.style.left) || 0;
+          var curT = parseFloat(ob.style.top) || 0;
+          if (String(ob.style.left).indexOf('px') >= 0) {
+            ob.style.left = ((curL / pw) * 100).toFixed(2) + '%';
+          }
+          if (String(ob.style.top).indexOf('px') >= 0) {
+            ob.style.top = ((curT / ph) * 100).toFixed(2) + '%';
+          }
+          zglaszaZmiane();
+        }
+        if (uchwytDrag.typ === 'obrot') zglaszaZmiane();
+        justDragged = true;
+        uchwytDrag = null;
       }
-      if (uchwytDrag && uchwytDrag.typ === 'obrot') zglaszaZmiane();
-      if (uchwytDrag) justDragged = true;
-      if (drag && drag.przes){ justDragged = true; zglaszaZmiane(); }
-      drag = null;
-      uchwytDrag = null;
-    });
-    pole.addEventListener('pointercancel', function () { drag = null; uchwytDrag = null; });
+      if (drag) {
+        if (drag.przes) {
+          justDragged = true;
+          zglaszaZmiane();
+        }
+        drag = null;
+      }
+    }
+
+    pole.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
+    pole.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointerup', onPointerUp, { passive: false });
+    pole.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp, { passive: false });
 
     /* ---------- klik: zaznaczenie / przełączenie trybu rozmiar↔obrót ---------- */
     pole.addEventListener('click', function (e) {
-      if (justDragged){ justDragged = false; return; }
+      if (justDragged) { justDragged = false; return; }
       var t = e.target;
       if (t && t.classList && (t.classList.contains('tre-uchwyt') || t.classList.contains('tre-uchwyt-obrot'))) return;
-      if (t && t.closest){
-        if (t.closest('[contenteditable="true"]')) return;
-        var grp = t.closest('.tre-grupa');
-        var ob = grp || t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img');
-        if (ob){
-          e.preventDefault();
-          if (!e.ctrlKey && !e.metaKey && wybrane.length === 1 && wybrane[0] === ob){
-            clearTimeout(klikTimer);
-            klikTimer = setTimeout(function () {
-              trybUchwytu = trybUchwytu === 'obrot' ? 'skala' : 'obrot';
-              rysujUchwyty();
-            }, 260);
-          }
-          return;
+      if (t && t.closest && t.closest('.tre-ksztalt-s[contenteditable="true"]')) return;
+      var grp = t.closest ? t.closest('.tre-grupa') : null;
+      var ob = grp || (t.closest ? t.closest('.tre-przycisk-obiekt, .tre-ksztalt, .tre-blok, img') : null);
+      if (ob) {
+        e.preventDefault();
+        if (!e.ctrlKey && !e.metaKey && wybrane.length === 1 && wybrane[0] === ob) {
+          clearTimeout(klikTimer);
+          klikTimer = setTimeout(function () {
+            trybUchwytu = (trybUchwytu === 'obrot') ? 'skala' : 'obrot';
+            rysujUchwyty();
+          }, 260);
         }
-        var a = t.closest('a');
-        if (a) e.preventDefault();
-        if (!e.ctrlKey && !e.metaKey) czyscWybranie();
+        return;
       }
+      var a = t.closest && t.closest('a');
+      if (a) e.preventDefault();
+      if (!e.ctrlKey && !e.metaKey) czyscWybranie();
     });
 
     pole.addEventListener('dblclick', function (e) {
@@ -1406,12 +1504,49 @@
       if (ob === grp) { alert('To grupa — rozgrupuj (⊟), aby edytować elementy.'); return; }
       wybrane = [ob];
       odswiezWybranie();
-      otworzWlasciwosci(ob);
+      if (ob.classList.contains('tre-ksztalt') && KSZTALTY_TEKST.indexOf(ob.getAttribute('data-ks-typ')) >= 0) {
+        edytujTekstObiektu(ob);
+      } else {
+        otworzWlasciwosci(ob);
+      }
     });
 
-    /* ---------- klawisze ---------- */
-    pole.addEventListener('keydown', usunWybrane);
-    document.addEventListener('keydown', usunWybrane);
+    /* ---------- klawisze (przesuwanie strzałkami, usuwanie, skróty) ---------- */
+    function obslugaKlawiszy(e) {
+      if (!wybrane.length) return;
+      var act = document.activeElement;
+      if (act && act.isContentEditable && act !== pole && !act.classList.contains('tre-ksztalt-s')) return;
+      if (act && (act.tagName === 'INPUT' || act.tagName === 'TEXTAREA' || act.tagName === 'SELECT')) return;
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        usunWybrane(e);
+        return;
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        var step = e.shiftKey ? 5 : 1;
+        wybrane.forEach(function (ob) {
+          zrobAbsolutny(ob);
+          var curL = parseFloat(ob.style.left) || 0;
+          var curT = parseFloat(ob.style.top) || 0;
+          if (e.key === 'ArrowLeft') ob.style.left = Math.max(0, curL - step).toFixed(2) + '%';
+          if (e.key === 'ArrowRight') ob.style.left = Math.min(99, curL + step).toFixed(2) + '%';
+          if (e.key === 'ArrowUp') ob.style.top = Math.max(0, curT - step).toFixed(2) + '%';
+          if (e.key === 'ArrowDown') ob.style.top = Math.min(99, curT + step).toFixed(2) + '%';
+        });
+        rysujUchwyty();
+        rysujKontekst();
+        zglaszaZmiane();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'g' || e.key === 'G')) {
+        e.preventDefault();
+        if (e.shiftKey) rozgrupuj();
+        else grupuj();
+      }
+    }
+    pole.addEventListener('keydown', obslugaKlawiszy);
+    document.addEventListener('keydown', obslugaKlawiszy);
 
     /* ---------- pasek pokazuje czcionkę i wielkość zaznaczonego tekstu (throttled) ---------- */
     var selRaf = null;
@@ -1453,6 +1588,13 @@
         czyscWybranie();
       },
       pobierz: function () {
+        czyscWybranie();
+        pole.querySelectorAll('.tre-uchwyt, .tre-uchwyt-obrot, .edtr-kontekst').forEach(function (u) {
+          if (u.parentNode) u.parentNode.removeChild(u);
+        });
+        pole.querySelectorAll('.tre-wybrany').forEach(function (el) {
+          el.classList.remove('tre-wybrany');
+        });
         pole.querySelectorAll('.tre-ksztalt-s[contenteditable="true"]').forEach(function (w) {
           var ob = w.closest('.tre-ksztalt');
           w.setAttribute('contenteditable', 'false');
