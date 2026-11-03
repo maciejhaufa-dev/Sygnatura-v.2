@@ -1,0 +1,58 @@
+diff --git a/grbl/config.h b/grbl/config.h
+index f48d958..a7e0f78 100644
+--- a/grbl/config.h
++++ b/grbl/config.h
+@@ -128,6 +128,11 @@
+ // define to force Grbl to always set the machine origin at the homed location despite switch orientation.
+ // #define HOMING_FORCE_SET_ORIGIN // Uncomment to enable.
+ 
++// After a successful homing cycle, store the G54 work origin at the homed (pulled-off) position, so the
++// work zero is at the pull-off point without any manual zeroing. Requires HOMING_FORCE_SET_ORIGIN.
++// A manual zero set after homing (G10 L20 / Zero button) is kept until the next homing cycle.
++#define HOMING_SET_WORK_ORIGIN
++
+ // Number of blocks Grbl executes upon startup. These blocks are stored in EEPROM, where the size
+ // and addresses are defined in settings.h. With the current settings, up to 2 startup blocks may
+ // be stored and executed in order. These startup blocks would typically be used to set the g-code
+diff --git a/grbl/limits.c b/grbl/limits.c
+index 1348c14..9b90f5f 100644
+--- a/grbl/limits.c
++++ b/grbl/limits.c
+@@ -374,7 +374,12 @@ void limits_go_home(uint8_t cycle_mask)
+     // NOTE: settings.max_travel[] is stored as a negative value.
+     if (cycle_mask & bit(idx)) {
+       #ifdef HOMING_FORCE_SET_ORIGIN
+-        set_axis_position = 0;
++        // Pull-off position: machine position after homing = pulloff, so the switch edge is at 0 + pulloff.
++        if ( bit_istrue(settings.homing_dir_mask,bit(idx)) ) {
++          set_axis_position = lround(settings.homing_pulloff*settings.steps_per_mm[idx]);
++        } else {
++          set_axis_position = lround(-settings.homing_pulloff*settings.steps_per_mm[idx]);
++        }
+       #else
+         if ( bit_istrue(settings.homing_dir_mask,bit(idx)) ) {
+           set_axis_position = lround((settings.max_travel[idx]+settings.homing_pulloff)*settings.steps_per_mm[idx]);
+@@ -401,6 +406,23 @@ void limits_go_home(uint8_t cycle_mask)
+ 
+     }
+   }
++  #if defined(HOMING_SET_WORK_ORIGIN) && !defined(COREXY)
++    // Store G54 so the work origin sits at the homed (pulled-off) position of the homed axes.
++    // Work position = machine position - G54 offset, so G54 = machine position of work zero.
++    float g54_offset[N_AXIS];
++    if (settings_read_coord_data(0, g54_offset)) { // 0 = G54
++      for (idx=0; idx<N_AXIS; idx++) {
++        if (cycle_mask & bit(idx)) {
++          g54_offset[idx] = (float)sys_position[idx] / settings.steps_per_mm[idx];
++        }
++      }
++      settings_write_coord_data(0, g54_offset);
++      if (gc_state.modal.coord_select == 0) { // Keep the active coordinate system in sync.
++        memcpy(gc_state.coord_system, g54_offset, sizeof(g54_offset));
++      }
++    }
++  #endif
++
+   sys.step_control = STEP_CONTROL_NORMAL_OP; // Return step control to normal operation.
+ }
+ 
