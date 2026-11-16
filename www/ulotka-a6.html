@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karta z podziękowaniem i realizacjami (A6 / 4 na A4) — Studio Sygnatura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --butelkowa: #1F3A32;
+      --brunatny: #6B4530;
+      --zloty: #C4A582;
+      --zloty-soft: #DCC9AC;
+      --zloty-cien: rgba(196, 165, 130, 0.35);
+      --krem: #FBF7F0;
+      --krem-2: #F3EDE2;
+      --ink: #33261C;
+      --szary-linie: #DCD4C6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #EAE6DF;
+      color: var(--ink);
+      font-family: 'Montserrat', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 20px;
+    }
+
+    /* Pasek nawigacyjny i narzędziowy (tylko na ekranie) */
+    .ekran-pasek {
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+      background: #ffffff;
+      padding: 16px 22px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ekran-info h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      color: var(--butelkowa);
+      line-height: 1.2;
+    }
+
+    .ekran-info p {
+      font-size: 13px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .ekran-przyciski {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1.5px solid var(--butelkowa);
+      transition: all 0.2s;
+    }
+
+    .btn-glowny {
+      background: var(--butelkowa);
+      color: var(--zloty);
+    }
+    .btn-glowny:hover {
+      background: #142721;
+      color: #fff;
+    }
+
+    .btn-drugi {
+      background: transparent;
+      color: var(--butelkowa);
+    }
+    .btn-drugi:hover {
+      background: var(--krem-2);
+    }
+
+    /* Arkusz A4 (210mm x 297mm) */
+    .arkusz-a4 {
+      width: 210mm;
+      min-height: 297mm;
+      height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 105mm 105mm;
+      grid-template-rows: 148.5mm 148.5mm;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Pojedyncza ulotka A6 (105mm x 148.5mm) */
+    .ulotka-a6 {
+      width: 105mm;
+      height: 148.5mm;
+      padding: 7mm 7mm 6mm 7mm;
+      background: var(--krem);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      border: 1px dashed var(--szary-linie);
+    }
+
+    /* Ozdobna podwójna ramka z subtelnymi narożnikami */
+    .ramka-ozdobna {
+      position: absolute;
+      top: 3.5mm;
+      left: 3.5mm;
+      right: 3.5mm;
+      bottom: 3.5mm;
+      border: 1px solid var(--zloty);
+      pointer-events: none;
+    }
+    .ramka-ozdobna::after {
+      content: "";
+      position: absolute;
+      top: 1mm;
+      left: 1mm;
+      right: 1mm;
+      bottom: 1mm;
+      border: 0.5px solid rgba(196, 165, 130, 0.45);
+    }
+
+    /* Nagłówek */
+    .ulotka-naglowek {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-kontener {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-bottom: 2px;
+    }
+
+    .sygnet-ikona {
+      width: 17px;
+      height: 17px;
+    }
+
+    .logo-tekst {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--butelkowa);
+      text-transform: uppercase;
+    }
+
+    .podpis-pracowni {
+      font-size: 7.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brunatny);
+      font-weight: 600;
+    }
+
+    .linia-ozdobna {
+      width: 32px;
+      height: 1px;
+      background: var(--zloty);
+      margin: 4px auto 6px auto;
+    }
+
+    /* Sekcja podziękowania */
+    .sekcja-podziekowanie {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      padding: 0 3mm;
+    }
+
+    .tytul-podziekowanie {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15.5px;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--butelkowa);
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+
+    .tekst-podziekowanie {
+      font-size: 8.5px;
+      line-height: 1.35;
+      color: var(--ink);
+    }
+
+    /* Galeria 3 filarów pracowni */
+    .sekcja-realizacje {
+      position: relative;
+      z-index: 1;
+      margin: 2mm 0;
+    }
+
+    .naglowek-sekcji-male {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      color: var(--brunatny);
+      text-align: center;
+      margin-bottom: 3.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .naglowek-sekcji-male::before, .naglowek-sekcji-male::after {
+      content: "";
+      width: 18px;
+      height: 0.5px;
+      background: var(--zloty);
+    }
+
+    .siatka-filarow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5mm;
+    }
+
+    .karta-filar {
+      background: #ffffff;
+      border: 0.8px solid var(--zloty-soft);
+      border-radius: 4px;
+      padding: 2.5px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .foto-filar {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 3px;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 2.5px;
+    }
+
+    .nazwa-filar {
+      font-size: 7.5px;
+      font-weight: 700;
+      color: var(--butelkowa);
+      line-height: 1.15;
+      margin-bottom: 1px;
+    }
+
+    .opis-filar {
+      font-size: 6.5px;
+      color: #665a4f;
+      line-height: 1.2;
+    }
+
+    /* Blok VIP z kodem na kolejne zamówienie */
+    .sekcja-kod {
+      background: linear-gradient(135deg, #FAF4EB 0%, #F1E5D4 100%);
+      border: 1px solid var(--zloty);
+      border-radius: 4px;
+      padding: 3.5px 5px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      margin: 1mm 0;
+    }
+
+    .kod-naglowek {
+      font-size: 7px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brunatny);
+      font-weight: 600;
+    }
+
+    .kod-wartosc {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--butelkowa);
+      margin: 1px 0;
+    }
+
+    .kod-opis {
+      font-size: 6.8px;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    /* Stopka i kontakt */
+    .ulotka-stopka {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      position: relative;
+      z-index: 1;
+      border-top: 0.5px solid var(--zloty-soft);
+      padding-top: 3.5px;
+    }
+
+    .stopka-kontakt {
+      font-size: 7.2px;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
+    .stopka-kontakt strong {
+      color: var(--butelkowa);
+      font-weight: 700;
+    }
+
+    .stopka-kontakt a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .stopka-qr {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .stopka-qr img {
+      width: 19mm;
+      height: 19mm;
+      display: block;
+      border: 0.5px solid var(--zloty-soft);
+      border-radius: 3px;
+      background: #ffffff;
+      padding: 1px;
+    }
+
+    .qr-napis {
+      font-size: 5.8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brunatny);
+      margin-top: 1px;
+      font-weight: 600;
+    }
+
+    /* Linie cięcia na arkuszu */
+    .linia-ciecia-pion {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 105mm;
+      width: 0.5px;
+      border-left: 0.5px dashed #B8AEA0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .linia-ciecia-poziom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 148.5mm;
+      height: 0.5px;
+      border-top: 0.5px dashed #B8AEA0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ZNACZNIKI NOŻYCZEK NA LINIACH CIĘCIA */
+    .znacznik-nozyczki {
+      position: absolute;
+      font-size: 9px;
+      color: #8C8070;
+      z-index: 11;
+      background: #ffffff;
+      padding: 0 2px;
+    }
+    .zn-gora { top: 3px; left: 105mm; transform: translateX(-50%); }
+    .zn-dol { bottom: 3px; left: 105mm; transform: translateX(-50%); }
+    .zn-lewo { top: 148.5mm; left: 3px; transform: translateY(-50%); }
+    .zn-prawo { top: 148.5mm; right: 3px; transform: translateY(-50%); }
+
+    /* WERSJA DO DRUKU (CTRL + P) */
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .ekran-pasek {
+        display: none !important;
+      }
+      .arkusz-a4 {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pasek sterowania na ekranie komputera / telefonu -->
+  <div class="ekran-pasek">
+    <div class="ekran-info">
+      <h1>Studio Sygnatura — Ulotka do paczki (Format A6)</h1>
+      <p>Arkusz A4 zawiera 4 gotowe ulotki z liniami cięcia. Kliknij „Drukuj”, aby wydrukować na zwykłej drukarce.</p>
+    </div>
+    <div class="ekran-przyciski">
+      <button class="btn btn-glowny" onclick="window.print()">🖨️ Drukuj (4 ulotki na A4)</button>
+      <a class="btn btn-drugi" href="admin.html">← Wróć do panelu</a>
+    </div>
+  </div>
+
+  <!-- Główny arkusz A4 z 4 identycznymi kartami A6 -->
+  <div class="arkusz-a4">
+
+    <!-- Linie cięcia i nożyczki -->
+    <div class="linia-ciecia-pion"></div>
+    <div class="linia-ciecia-poziom"></div>
+    <div class="znacznik-nozyczki zn-gora">✂</div>
+    <div class="znacznik-nozyczki zn-dol">✂</div>
+    <div class="znacznik-nozyczki zn-lewo">✂</div>
+    <div class="znacznik-nozyczki zn-prawo">✂</div>
+
+    <!-- ULOTKA 1 (Lewa góra) -->
+    <div class="ulotka-a6">
+      <div class="ramka-ozdobna"></div>
+      
+      <div class="ulotka-naglowek">
+        <div class="logo-kontener">
+          <img src="assets/sygnet.svg" alt="Sygnet" class="sygnet-ikona">
+          <span class="logo-tekst">Studio Sygnatura</span>
+        </div>
+        <div class="podpis-pracowni">Pracownia rzemiosła i dekoracji</div>
+        <div class="linia-ozdobna"></div>
+      </div>
+
+      <div class="sekcja-podziekowanie">
+        <div class="tytul-podziekowanie">Dziękujemy, że jesteś z nami</div>
+        <p class="tekst-podziekowanie">
+          Cieszymy się, że ręcznie wykonana szopka z naszej pracowni zagości w Twoim domu. 
+          Każdy egzemplarz tworzymy z naturalnego drewna, dbając o precyzję każdego cięcia, szlifu i ciepłego światła.
+        </p>
+      </div>
+
+      <div class="sekcja-realizacje">
+        <div class="naglowek-sekcji-male">Odkryj możliwości naszej pracowni</div>
+        <div class="siatka-filarow">
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szyld.jpg" alt="Ślub i Przyjęcia" class="foto-filar">
+            <div class="nazwa-filar">Ślub i Przyjęcia</div>
+            <div class="opis-filar">Szyldy powitalne, plany stołów, tabliczki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/niedzwiadki.jpg" alt="Pamiątki i Rodzina" class="foto-filar">
+            <div class="nazwa-filar">Pamiątki z duszą</div>
+            <div class="opis-filar">Sygnaturki dla dzieci, puzzle, krzyżówki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szopka.jpg" alt="Światło i Wnętrza" class="foto-filar">
+            <div class="nazwa-filar">Światło i Drewno</div>
+            <div class="opis-filar">Warstwowe obrazy LED i dekoracje wnętrz</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sekcja-kod">
+        <div class="kod-naglowek">Prezent dla Ciebie na kolejne zamówienie</div>
+        <div class="kod-wartosc">KOD: SYGNATURA10</div>
+        <div class="kod-opis">10% rabatu na kolejną realizację lub bezpłatna personalizacja projektu</div>
+      </div>
+
+      <div class="ulotka-stopka">
+        <div class="stopka-kontakt">
+          <div>🌐 <strong>studiosygnatura.pl</strong></div>
+          <div>✉️ kontakt@studiosygnatura.pl</div>
+          <div>📞 510 767 076 · IG: @studio.sygnatura</div>
+        </div>
+        <div class="stopka-qr">
+          <img src="assets/qr-sygnatura.svg" alt="Kod QR do sklepu">
+          <div class="qr-napis">Zeskanuj i zobacz</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ULOTKA 2 (Prawa góra) -->
+    <div class="ulotka-a6">
+      <div class="ramka-ozdobna"></div>
+      
+      <div class="ulotka-naglowek">
+        <div class="logo-kontener">
+          <img src="assets/sygnet.svg" alt="Sygnet" class="sygnet-ikona">
+          <span class="logo-tekst">Studio Sygnatura</span>
+        </div>
+        <div class="podpis-pracowni">Pracownia rzemiosła i dekoracji</div>
+        <div class="linia-ozdobna"></div>
+      </div>
+
+      <div class="sekcja-podziekowanie">
+        <div class="tytul-podziekowanie">Dziękujemy, że jesteś z nami</div>
+        <p class="tekst-podziekowanie">
+          Cieszymy się, że ręcznie wykonana szopka z naszej pracowni zagości w Twoim domu. 
+          Każdy egzemplarz tworzymy z naturalnego drewna, dbając o precyzję każdego cięcia, szlifu i ciepłego światła.
+        </p>
+      </div>
+
+      <div class="sekcja-realizacje">
+        <div class="naglowek-sekcji-male">Odkryj możliwości naszej pracowni</div>
+        <div class="siatka-filarow">
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szyld.jpg" alt="Ślub i Przyjęcia" class="foto-filar">
+            <div class="nazwa-filar">Ślub i Przyjęcia</div>
+            <div class="opis-filar">Szyldy powitalne, plany stołów, tabliczki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/niedzwiadki.jpg" alt="Pamiątki i Rodzina" class="foto-filar">
+            <div class="nazwa-filar">Pamiątki z duszą</div>
+            <div class="opis-filar">Sygnaturki dla dzieci, puzzle, krzyżówki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szopka.jpg" alt="Światło i Wnętrza" class="foto-filar">
+            <div class="nazwa-filar">Światło i Drewno</div>
+            <div class="opis-filar">Warstwowe obrazy LED i dekoracje wnętrz</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sekcja-kod">
+        <div class="kod-naglowek">Prezent dla Ciebie na kolejne zamówienie</div>
+        <div class="kod-wartosc">KOD: SYGNATURA10</div>
+        <div class="kod-opis">10% rabatu na kolejną realizację lub bezpłatna personalizacja projektu</div>
+      </div>
+
+      <div class="ulotka-stopka">
+        <div class="stopka-kontakt">
+          <div>🌐 <strong>studiosygnatura.pl</strong></div>
+          <div>✉️ kontakt@studiosygnatura.pl</div>
+          <div>📞 510 767 076 · IG: @studio.sygnatura</div>
+        </div>
+        <div class="stopka-qr">
+          <img src="assets/qr-sygnatura.svg" alt="Kod QR do sklepu">
+          <div class="qr-napis">Zeskanuj i zobacz</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ULOTKA 3 (Lewy dół) -->
+    <div class="ulotka-a6">
+      <div class="ramka-ozdobna"></div>
+      
+      <div class="ulotka-naglowek">
+        <div class="logo-kontener">
+          <img src="assets/sygnet.svg" alt="Sygnet" class="sygnet-ikona">
+          <span class="logo-tekst">Studio Sygnatura</span>
+        </div>
+        <div class="podpis-pracowni">Pracownia rzemiosła i dekoracji</div>
+        <div class="linia-ozdobna"></div>
+      </div>
+
+      <div class="sekcja-podziekowanie">
+        <div class="tytul-podziekowanie">Dziękujemy, że jesteś z nami</div>
+        <p class="tekst-podziekowanie">
+          Cieszymy się, że ręcznie wykonana szopka z naszej pracowni zagości w Twoim domu. 
+          Każdy egzemplarz tworzymy z naturalnego drewna, dbając o precyzję każdego cięcia, szlifu i ciepłego światła.
+        </p>
+      </div>
+
+      <div class="sekcja-realizacje">
+        <div class="naglowek-sekcji-male">Odkryj możliwości naszej pracowni</div>
+        <div class="siatka-filarow">
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szyld.jpg" alt="Ślub i Przyjęcia" class="foto-filar">
+            <div class="nazwa-filar">Ślub i Przyjęcia</div>
+            <div class="opis-filar">Szyldy powitalne, plany stołów, tabliczki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/niedzwiadki.jpg" alt="Pamiątki i Rodzina" class="foto-filar">
+            <div class="nazwa-filar">Pamiątki z duszą</div>
+            <div class="opis-filar">Sygnaturki dla dzieci, puzzle, krzyżówki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szopka.jpg" alt="Światło i Wnętrza" class="foto-filar">
+            <div class="nazwa-filar">Światło i Drewno</div>
+            <div class="opis-filar">Warstwowe obrazy LED i dekoracje wnętrz</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sekcja-kod">
+        <div class="kod-naglowek">Prezent dla Ciebie na kolejne zamówienie</div>
+        <div class="kod-wartosc">KOD: SYGNATURA10</div>
+        <div class="kod-opis">10% rabatu na kolejną realizację lub bezpłatna personalizacja projektu</div>
+      </div>
+
+      <div class="ulotka-stopka">
+        <div class="stopka-kontakt">
+          <div>🌐 <strong>studiosygnatura.pl</strong></div>
+          <div>✉️ kontakt@studiosygnatura.pl</div>
+          <div>📞 510 767 076 · IG: @studio.sygnatura</div>
+        </div>
+        <div class="stopka-qr">
+          <img src="assets/qr-sygnatura.svg" alt="Kod QR do sklepu">
+          <div class="qr-napis">Zeskanuj i zobacz</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ULOTKA 4 (Prawy dół) -->
+    <div class="ulotka-a6">
+      <div class="ramka-ozdobna"></div>
+      
+      <div class="ulotka-naglowek">
+        <div class="logo-kontener">
+          <img src="assets/sygnet.svg" alt="Sygnet" class="sygnet-ikona">
+          <span class="logo-tekst">Studio Sygnatura</span>
+        </div>
+        <div class="podpis-pracowni">Pracownia rzemiosła i dekoracji</div>
+        <div class="linia-ozdobna"></div>
+      </div>
+
+      <div class="sekcja-podziekowanie">
+        <div class="tytul-podziekowanie">Dziękujemy, że jesteś z nami</div>
+        <p class="tekst-podziekowanie">
+          Cieszymy się, że ręcznie wykonana szopka z naszej pracowni zagości w Twoim domu. 
+          Każdy egzemplarz tworzymy z naturalnego drewna, dbając o precyzję każdego cięcia, szlifu i ciepłego światła.
+        </p>
+      </div>
+
+      <div class="sekcja-realizacje">
+        <div class="naglowek-sekcji-male">Odkryj możliwości naszej pracowni</div>
+        <div class="siatka-filarow">
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szyld.jpg" alt="Ślub i Przyjęcia" class="foto-filar">
+            <div class="nazwa-filar">Ślub i Przyjęcia</div>
+            <div class="opis-filar">Szyldy powitalne, plany stołów, tabliczki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/niedzwiadki.jpg" alt="Pamiątki i Rodzina" class="foto-filar">
+            <div class="nazwa-filar">Pamiątki z duszą</div>
+            <div class="opis-filar">Sygnaturki dla dzieci, puzzle, krzyżówki</div>
+          </div>
+          <div class="karta-filar">
+            <img src="assets/media/sklep/szopka.jpg" alt="Światło i Wnętrza" class="foto-filar">
+            <div class="nazwa-filar">Światło i Drewno</div>
+            <div class="opis-filar">Warstwowe obrazy LED i dekoracje wnętrz</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sekcja-kod">
+        <div class="kod-naglowek">Prezent dla Ciebie na kolejne zamówienie</div>
+        <div class="kod-wartosc">KOD: SYGNATURA10</div>
+        <div class="kod-opis">10% rabatu na kolejną realizację lub bezpłatna personalizacja projektu</div>
+      </div>
+
+      <div class="ulotka-stopka">
+        <div class="stopka-kontakt">
+          <div>🌐 <strong>studiosygnatura.pl</strong></div>
+          <div>✉️ kontakt@studiosygnatura.pl</div>
+          <div>📞 510 767 076 · IG: @studio.sygnatura</div>
+        </div>
+        <div class="stopka-qr">
+          <img src="assets/qr-sygnatura.svg" alt="Kod QR do sklepu">
+          <div class="qr-napis">Zeskanuj i zobacz</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
