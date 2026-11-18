@@ -666,28 +666,42 @@ html.dotyk .social{margin-top:14px}
     idz(0); restart();
   }
 
-  async function wczytaj(){
-    var L = !(window.SYG && window.SYG.LAUNCH === false);
-    var dane = L ? DOMYS_LAUNCH : DOMYS;
-    try {
-      if (!L) {
-        var odp = await SYG.wezwij('strona-glowna-pobierz', {});
-        if (odp && odp.ok && odp.dane) dane = migrujStare(odp.dane);
+ async function wczytaj(){
+  var L = !(window.SYG && window.SYG.LAUNCH === false);
+  var domyslne = L ? DOMYS_LAUNCH : DOMYS;
+  var dane = domyslne;
+
+  // Pobieraj zapisane zmiany również w trybie startowym.
+  try {
+    if (window.SYG && typeof window.SYG.wezwij === 'function') {
+      var odp = await window.SYG.wezwij('strona-glowna-pobierz', {});
+      if (odp && odp.ok && odp.dane) {
+        dane = migrujStare(odp.dane);
       }
-    } catch (e) { /* brak danych — zostają domyślne */ }
-
-    var sliderDane = dane.slider || DOMYS.slider;
-    var kafle = sliderDane.kafle && sliderDane.kafle.length ? sliderDane.kafle : DOMYS.slider.kafle;
-    var autoplayS = Number(sliderDane.autoplay);
-    if (isNaN(autoplayS)) autoplayS = 4.5;
-
-    budujSlajdy(kafle);
-    uruchomSlider(autoplayS);
-
-    /* treść pod sliderem („Jak zamówić" + przyciski) */
-    var box = document.getElementById('cta-tresc-box');
-    if (box) box.innerHTML = L ? DOMYS_LAUNCH.ctaTresc : (dane.ctaTresc || DOMYS.ctaTresc);
+    }
+  } catch (e) {
+    console.warn('Nie udało się pobrać zapisanej strony głównej — używam domyślnej.', e);
   }
+
+  var sliderDane = dane.slider || domyslne.slider || DOMYS.slider;
+  var domyslneKafle =
+    (domyslne.slider && domyslne.slider.kafle) || DOMYS.slider.kafle;
+  var kafle = sliderDane.kafle && sliderDane.kafle.length
+    ? sliderDane.kafle
+    : domyslneKafle;
+
+  var autoplayS = Number(sliderDane.autoplay);
+  if (isNaN(autoplayS)) autoplayS = 4.5;
+
+  budujSlajdy(kafle);
+  uruchomSlider(autoplayS);
+
+  var box = document.getElementById('cta-tresc-box');
+  if (box) {
+    box.innerHTML =
+      dane.ctaTresc || domyslne.ctaTresc || DOMYS.ctaTresc;
+  }
+}
   wczytaj();
 })();
 
