@@ -1841,3 +1841,9 @@ weryfikować z parametrem cache-busting.
 1. Zachowano zgodność nowego panelu z aktualnie wdrożonym Apps Script: logowanie nadal otwiera panel, jeśli starszy endpoint nie zwraca jeszcze `sessionToken`.
 2. Po aktualizacji Apps Script logowanie automatycznie zapisuje i używa sesji serwerowej; do czasu aktualizacji upload na GitHub może zwracać komunikat, że akcja nie jest dostępna.
 3. Cache-bust **`?v=342`**, stopka **28.62**, synchronizacja `docs/`.
+
+### Sesja 30/7 (22.09.2026) — KONTAKT I SOCIAL POD MENU PO LEWEJ (wersja 28.65, ?v=345)
+1. Usunięto powielony pasek kontaktu i social z prawej kolumny, by odzyskać miejsce nad treścią/sliderem. Telefon, pełny e-mail i social są teraz w lewym panelu pod menu; link e-mail prowadzi do `kontakt.html`.
+2. Logo w lewym górnym rogu jest linkiem do strony głównej. Układ kontaktu jest dostosowany do małych ekranów.
+3. Podbito cache-bust do **`?v=345`** i stopkę do **28.65** we wszystkich HTML-ach; zsynchronizowano `docs/` (zachowano `docs/.nojekyll`).
+4. Kontrola składni JS, skryptów inline i `git diff --check` przeszła. Commit **`5c224bf`** wypchnięto na `arena/01a0ca92-sygnatura-v-2`; Pages build ma status **built**. `fetch_page` live potwierdził usunięcie górnego paska kontakt/social.
