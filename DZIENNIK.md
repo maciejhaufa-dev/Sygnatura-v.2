@@ -1804,3 +1804,8 @@ weryfikować z parametrem cache-busting.
 3. Przed renderowaniem slajdów strona pobiera aktualny katalog z publicznego API (`SYG.katalog()`), dzięki czemu ceny i dostępność zmienione w panelu są widoczne na stronie głównej; plik `data/katalog.js` pozostaje fallbackiem.
 4. Podbito cache-bust do **`?v=339`** i wersję stopki do **28.59**; skopiowano `www/` do `docs/`.
 5. Własne zdjęcia w tle nadal używają `localStorage` w przeglądarce administratora; publikacja ich dla wszystkich odwiedzających wymaga osobnego, wspólnego magazynu zdjęć i nie jest rozwiązana tą zmianą.
+
+### Sesja 30/5 (22.09.2026) — NAPRAWA ZAPISU ZAKŁADKI PRODUKTY I POZOSTAŁYCH AKCJI ADMINA (wersja 28.60, ?v=340)
+1. Zdiagnozowano komunikat „Brak dostępu — zły klucz” przy zapisie ceny: akcje `produkty-zapisz` nie przekazywały `klucz` wymaganego przez API.
+2. W `www/assets/api.js` dodano wspólne dołączanie klucza sesji dla wszystkich mutujących akcji administratora, także bloga, produktów, podstron i ustawień. Dotychczas poprawnie przekazane klucze pozostają bez zmian.
+3. Podbito cache-bust do **`?v=340`**, wersję stopki do **28.60**, skopiowano źródło do `docs/`.

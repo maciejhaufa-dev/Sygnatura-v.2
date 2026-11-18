@@ -679,6 +679,20 @@
     if (SYG.TRYB_DEMO) return demo(akcja, dane);
 
     dane = dane || {};
+    /* Akcje zapisu administratora wymagają klucza API. Podpinamy go tutaj,
+       aby każdy przycisk w panelu przekazywał go spójnie. */
+    const ADMIN_AKCJE_ZAPISU = [
+      'zamowienie-status', 'blog-zapisz', 'blog-widocznosc', 'blog-usun',
+      'produkt-nowy', 'produkty-zapisz', 'strona-glowna-zapisz',
+      'strona-zamowienia-zapisz', 'strona-zapisz', 'strona-usun',
+      'ustawienia-dostawa-zapisz'
+    ];
+    if (ADMIN_AKCJE_ZAPISU.indexOf(akcja) !== -1 && !dane.klucz) {
+      try {
+        const kluczAdmina = sessionStorage.getItem('syg-admin-klucz');
+        if (kluczAdmina) dane = Object.assign({}, dane, { klucz: kluczAdmina });
+      } catch (e) { /* bez storage API zwróci standardowy błąd klucza */ }
+    }
     /* akcje konta: podajemy e-mail sesji (strony go nie przesyłają) */
     if (String(akcja).indexOf('konto-') === 0 &&
         akcja !== 'konto-rejestracja' && akcja !== 'konto-zaloguj' && akcja !== 'konto-wyloguj') {
