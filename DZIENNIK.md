@@ -7,18 +7,22 @@
 
 ---
 
-### KONTYNUACJA — audyt trwałych zapisów (22.09.2026)
+### KONTYNUACJA — trwałe zapisy, social media i zdjęcia (22.09.2026)
 
-**Bieżące zadanie:** właściciel wymaga, aby każda zmiana administratora trafiała do wspólnej trwałej bazy i była publiczna dla wszystkich; nie przedstawiać lokalnego zapisu jako sukcesu. Pracować wyłącznie na `arena/01a0ca92-sygnatura-v-2`.
+**Bieżący zakres:** panel musi zapisywać do trwałej, wspólnej bazy; teraz wykonujemy tylko wskazane przez właściciela punkty 1–2 (linki social, proporcje zdjęć) oraz naprawiamy blokujący błąd dodawania produktu. Branch: `arena/01a0ca92-sygnatura-v-2`.
 
-**Wprowadzone w repo (jeszcze nie potwierdzone na live):**
-- `www/admin.html`: zapis strony głównej pokazuje sukces tylko po `ok:true` z API; przy błędzie zachowuje stan niezapisany, nie czyści ostrzeżenia i blokuje zapis, jeśli nie udało się odczytać stanu z bazy. Usunięto widoczne nieaktualne opisy demo; brak API blokuje panel zamiast używać lokalnych zapisów.
-- odczyty błędów bloga/podstron są komunikowane zamiast udawać pustą listę; nieudane przełączenie widoczności/statusu jest cofane.
-- cennik dostawy panelu jest pobierany z Apps Script; dodano publiczną akcję `ustawienia-dostawa-pobierz`, a koszyk nie pozwala iść dalej z domyślną, potencjalnie nieaktualną stawką.
-- `engine/CALOSC.gs`: upload kieruje do `main/uploads/` i zwraca publiczny URL; `www/admin.html` odrzuca starszy format odpowiedzi, aby nie wyświetlić fałszywego sukcesu. To wymaga nowej wersji wdrożenia Apps Script oraz działającej Script Property `GITHUB_TOKEN` z prawem Contents write.
-- wszystkie `www/*.html` mają marker `?v=343`, `main.js` wersję `28.63`; `docs/` zsynchronizowany z `www/`.
+**Wprowadzone w repo (Pages jeszcze nie wdrożony dla tej rundy; Apps Script też wymaga publikacji):**
+- Social media podpięte w nagłówku wszystkich podstron i na stronie głównej do podanych przez właściciela adresów; otwierają się w nowej karcie.
+- Hero jest wyższy, zdjęcie tła ma `contain` (cały obraz widoczny, bez Ken Burns crop); tak samo podgląd panelu. Zdjęcia produktów, realizacji, wpisów i personalizacji mają kwadratowe kadry z `object-fit: contain`; okładka wpisu nie jest przycinana.
+- `www/admin.html`: dodanie produktu potwierdza zapis API; zdjęcie jest kompresowane i najpierw uploadowane do wspólnej biblioteki `main/uploads/`, a potem zapisywany jest URL produktu. Brak potwierdzenia nie pokazuje sukcesu.
+- `engine/PLIK1.gs` i `engine/CALOSC.gs`: publiczny odczyt cennika i upload do `main/uploads/`. `engine/README.md` ma kroki aktualizacji istniejącego Apps Script z zestawem PLIK1–3. W repo są stare, alternatywne `Kod.gs`/`Konfig.gs`; nie należy łączyć ich z aktualnym kompletem.
+- wszystkie `www/*.html` mają marker `?v=344`; `main.js` wersję `28.64`.
 
-**Weryfikacja kodu/live:** składnia JS (assets + inline + Apps Script) przeszła; 35 literalnych akcji UI ma route w `engine/CALOSC.gs`; 125 markerów HTML ma wartość 343. Commit `4764574` wypchnięty na przypiętą gałąź; Pages build `built`. `fetch_page` dla `https://studiosygnatura.pl/admin.html?v=343` oraz `koszyk.html?v=343` potwierdził wdrożone strony, a `assets/api.js?v=343` zawiera nowy odczyt cennika z bazy. Publiczny GET Apps Script zwraca katalog produkcyjny, ale nie testuje zapisów ani nowych akcji POST. Kod Apps Script **nie został wdrożony** — sandbox nie może połączyć się z `script.google.com`; zachowanie zapisów oraz nowy upload wymagają osobnego wdrożenia i testu właściciela. W aktualnym `www/assets/config.js` `LAUNCH:true` mimo że starsza tabela niżej opisuje `false` — nie zmieniono, bo wymaga osobnej decyzji o uruchomieniu pełnego serwisu.
+**Błąd „zły klucz”:** prawdopodobna rozbieżność wersji/`TOKEN` w wdrożonym Apps Script (stary wariant `Kod.gs` + `Konfig.gs`) względem klienta. Nie potwierdzono live przyczyną, bo POST nie jest dostępny przez narzędzie fetch. Nie przyjmować ani nie prosić o auth/sekrety. Aktualizacja i redeploy istniejącego Apps Script przez właściciela są konieczne; `GITHUB_TOKEN` w Script Properties jest wymagany do uploadu zdjęć.
+
+**Testy kodu:** składnia JS assets/inline oraz Apps Script (PLIK1–3 i CALOSC) przeszła; 35 akcji UI mapuje się na backend; wszystkie podane adresy social występują w obu headerach; 125 markerów HTML to `v344`. Po sync `docs/`, commit/push, Pages build check i `fetch_page` live.
+
+**Rozbieżność niezwiązana z tym zakresem:** `www/assets/config.js` ma `LAUNCH:true` mimo że starsza tabela niżej opisuje `false`; nie przełączono bez decyzji właściciela o uruchomieniu pełnego serwisu.
 
 ---
 

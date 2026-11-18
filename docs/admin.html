@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=343">
+<link rel="stylesheet" href="assets/style.css?v=344">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -563,13 +563,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=343"></script>
-<script src="assets/koszyk.js?v=343"></script>
-<script src="assets/api.js?v=343"></script>
-<script src="assets/editor.js?v=343"></script>
-<script src="assets/edytor.js?v=343"></script>
-<script src="data/katalog.js?v=343"></script>
-<script src="assets/main.js?v=343"></script>
+<script src="assets/config.js?v=344"></script>
+<script src="assets/koszyk.js?v=344"></script>
+<script src="assets/api.js?v=344"></script>
+<script src="assets/editor.js?v=344"></script>
+<script src="assets/edytor.js?v=344"></script>
+<script src="data/katalog.js?v=344"></script>
+<script src="assets/main.js?v=344"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -1585,38 +1585,56 @@
   }
 
   /* produkt bez historii */
-  var pnObraz = '';
+  var pnPlikObrazu = null;
   document.getElementById('pn-obraz').addEventListener('change', function(){
-    var f = this.files[0];
-    if (!f) return;
-    var fr = new FileReader();
-    fr.onload = function(){ pnObraz = fr.result; };
-    fr.readAsDataURL(f);
+    pnPlikObrazu = this.files && this.files[0] ? this.files[0] : null;
   });
   document.getElementById('produkt-nowy').addEventListener('click', function(){
     document.getElementById('produkt-nowy-form').style.display = 'block';
   });
   document.getElementById('pn-zapisz').addEventListener('click', async function(){
+    var btn = this;
     var nazwa = document.getElementById('pn-nazwa').value.trim();
     if (!nazwa){ alert('Podaj nazwę produktu.'); return; }
-    var odp = await SYG.wezwij('produkt-nowy', {
-      nazwa: nazwa,
-      cena: Number(document.getElementById('pn-cena').value) || 0,
-      opis: document.getElementById('pn-opis').value.trim(),
-      obraz: pnObraz || 'szopka.jpg'
-    });
+    var cena = Number(document.getElementById('pn-cena').value) || 0;
+    var opis = document.getElementById('pn-opis').value.trim();
     var f = document.getElementById('produkty-info');
-    f.style.display = 'block';
-    f.textContent = odp.ok ? 'Dodano produkt: ' + nazwa + '.' : (odp.blad || 'Nie dodano.');
-    setTimeout(function(){ f.style.display = 'none'; }, 4000);
-    if (odp.ok){
+    var obraz = 'szopka.jpg';
+    btn.disabled = true;
+    btn.textContent = 'Zapisywanie…';
+    try {
+      if (pnPlikObrazu){
+        var dataUrl = await sgObrazDoJpeg(pnPlikObrazu);
+        var upload = await SYG.wezwij('media-upload', { nazwa: nazwa, base64: dataUrl.split(',')[1] || '' });
+        if (!upload || !upload.ok) throw new Error((upload && upload.blad) || 'Nie udało się zapisać zdjęcia.');
+        if (!/^https:\/\/raw\.githubusercontent\.com\/maciejhaufa-dev\/Sygnatura-v\.2\/main\/uploads\/[A-Za-z0-9._-]+\.jpg$/.test(String(upload.obraz || ''))){
+          throw new Error('Backend Apps Script wymaga aktualizacji. Produkt nie został dodany.');
+        }
+        obraz = upload.obraz;
+      }
+      var odp = await SYG.wezwij('produkt-nowy', {
+        nazwa: nazwa, cena: cena, opis: opis, obraz: obraz
+      });
+      if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Nie udało się zapisać produktu w bazie.');
+      f.style.background = 'var(--butelkowa)';
+      f.style.color = '#fff';
+      f.textContent = 'Produkt „' + nazwa + '” zapisano we wspólnym katalogu.';
       document.getElementById('pn-nazwa').value = '';
       document.getElementById('pn-cena').value = '';
       document.getElementById('pn-opis').value = '';
       document.getElementById('pn-obraz').value = '';
-      pnObraz = '';
+      pnPlikObrazu = null;
       document.getElementById('produkt-nowy-form').style.display = 'none';
       ladujProdukty();
+    } catch(err){
+      f.style.background = '#8a2f1d';
+      f.style.color = '#fff';
+      f.textContent = err.message || 'Nie udało się dodać produktu.';
+    } finally {
+      f.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Dodaj produkt';
+      setTimeout(function(){ f.style.display = 'none'; }, 6000);
     }
   });
 

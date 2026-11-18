@@ -592,7 +592,7 @@ var SEED_STRONY = [
  *   wynajem-zapytanie, terminy-zajete, pakiet-dostepny,
  *   blog-lista, blog-pobierz, strony-lista,
  *   strona-glowna-pobierz, strona-zamowienia-pobierz
- * ADMIN (klucz = TOKEN z Konfig.gs; właściciel otwiera
+ * ADMIN (klucz = TOKEN skonfigurowany wyżej w tym pliku; właściciel otwiera
  *   admin.html?klucz=… i klucz idzie w każdej prośbie):
  *   admin-login, zamowienia-lista, zamowienie-status,
  *   blog-zapisz, blog-widocznosc, blog-usun, produkt-nowy,

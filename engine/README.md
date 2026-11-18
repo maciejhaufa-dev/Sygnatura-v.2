@@ -4,29 +4,26 @@ Silnik serwisu Studio Sygnatura. Strony w `www/` wołają go przez `fetch`
 (`SYG.wezwij(...)` z `www/assets/api.js`); on zapisuje dane w **arkuszu Google**
 i wysyła maile (Gmail). Całość: HTML + CSS + JS — zero Pythona, zero serwera.
 
-## Pliki (wszystkie 4 wklejasz do Apps Script jako osobne pliki)
-- `Konfig.gs` — ustawienia (ID arkusza, klucz admina, maile, hasło startowe admina) + `instaluj()`
-- `Kod.gs` — API komplet (30 akcji: sklep, zamówienia, konta, wynajem, blog, podstrony, panel)
-- `SEED.gs` — SEEDY wygenerowane z klienta (17 wpisów bloga, podstrona, 4 produkty) —
-  NIE edytować ręcznie; po zmianie seedy klienta: `node tools/gen_seed_gs.js`
-- `Uruchom.gs` — codzienny backup arkusza na Dysk (folder `SYGNATURA-Backup`, retencja 30 dni)
+## Pliki silnika
+- Do wdrożenia używaj jednego spójnego zestawu: `PLIK1.gs` (konfiguracja, API i zamówienia), `PLIK2.gs` (konta, wynajem, blog, panel i backup), `PLIK3.gs` (seedy).
+- `CALOSC.gs` to wariant scalony; `Kod.gs`, `Konfig.gs`, `SEED.gs` i `Uruchom.gs` są starszymi/alternatywnymi plikami. **Nie łącz ich** z zestawem PLIK1–3, bo powielają stałe i funkcje.
 
-## Wdrożenie (robi WŁAŚCICIEL — bot nie ma dostępu do Google, ~15 min, da się z telefonu)
-1. **ARKUSZ**: na koncie Google Studia otwórz https://sheets.new → nazwij **„SYGNATURA-BAZA”**.
-   Skopiuj ID z adresu: `docs.google.com/spreadsheets/d/<ID>/edit`.
-2. **SKRYPT**: https://script.google.com → **Nowy projekt**. Usuń zawartość `Code.gs`;
-   dla każdego pliku: `+` → Skrypt → wklej (Konfig.gs, Kod.gs, SEED.gs, Uruchom.gs). Zapisz.
-3. W `Konfig.gs` wstaw: `ARKUSZ_ID` (krok 1) i `TOKEN` — długi ciąg liter + cyfr
-   (to „klucz” do panelu, np. 24 znaki; nie podawaj go nikomu).
-4. Z listy funkcji wybierz **`instaluj`** → Uruchom → zezwól na uprawnienia
-   (komunikat „Google hasn't verified this app” = normalny: Zaawansowane → Przejdź do projektu → zezwól).
-5. **Wdróż → Nowe wdrożenie → Aplikacja internetowa**:
-   - Wykonuj jako: **ja**
-   - Kto ma dostęp: **Każdy** (akcje admina i tak wymagają klucza)
-   - Skopiuj **URL aplikacji internetowej** (kończy się `/exec`).
-6. URL prześlij na czat — wkleję go do `www/assets/config.js` → `API: …` i wypchnę.
-   (Albo wkleisz sam.) Banner „TRYB DEMO” zniknie automatycznie.
-7. Z listy funkcji uruchom **`zalozHarmonogram`** (backup nocny 03:00).
+## Aktualizacja istniejącego Apps Script (potrzebna po zmianach silnika)
+
+Nie twórz nowego arkusza ani nowego wdrożenia — strona jest już podłączona do bazy. Aktualizujemy istniejący projekt wskazany przez URL `API` w `www/assets/config.js`.
+
+1. Otwórz **istniejący** projekt Apps Script połączony z tym wdrożeniem. Zrób kopię zapasową projektu.
+2. W edytorze wyszukaj `ARKUSZ_ID` i zachowaj jego obecną wartość prywatnie — nie twórz nowego arkusza.
+3. Zastąp kod serwera aktualnym zestawem z repozytorium: `engine/PLIK1.gs`, `engine/PLIK2.gs`, `engine/PLIK3.gs` (np. jako `Code.gs`, `Admin.gs`, `Seed.gs`). To jeden podzielony na części komplet.
+4. W `PLIK1.gs` podmień wyłącznie `WSTAW_TU_ID_ARKUSZA` na zachowany `ARKUSZ_ID`. Klucz w tym pliku jest zgodny z klientem witryny. Nie udostępniaj ID, klucza, haseł ani tokenów na czacie.
+5. Usuń albo opróżnij stare pliki `.gs`, które powielają funkcje lub stałe (`Kod.gs`, `Konfig.gs`, `SEED.gs`, `Uruchom.gs`). Zachowaj manifest i właściwości projektu; w skrypcie powinien zostać tylko komplet PLIK1+PLIK2+PLIK3.
+6. Kliknij **Zapisz**. Nie uruchamiaj `instaluj()` na istniejącej bazie; samo wdrożenie kodu nie kasuje arkusza ani jego danych.
+7. **Wdróż → Zarządzaj wdrożeniami → ołówek przy obecnej aplikacji internetowej → Nowa wersja → Wdróż**. Zostaw dotychczasowe uprawnienia i zachowaj ten sam URL `/exec`.
+8. Po wdrożeniu wyloguj się z panelu i zaloguj ponownie, a następnie ponów dodanie produktu. Jeśli dodajesz zdjęcie, zostanie ono najpierw zapisane w `main/uploads/`.
+
+**Dlaczego pojawia się „zły klucz”:** strona i backend muszą używać zgodnego klucza administratora; w repo są też stare, alternatywne warianty silnika, w tym `Kod.gs` + `Konfig.gs`. Nie łącz tych plików z aktualnym zestawem PLIK1–3. Nie wysyłaj mi auth, hasła ani tokenów — nie mam dostępu do Twojego Google i ich nie potrzebuję.
+
+Jeśli pojawi się błąd uploadu zdjęcia o braku `GITHUB_TOKEN`, ustaw go w Apps Script: **Ustawienia projektu → Właściwości skryptu** (wartość tokena GitHub z uprawnieniem Contents: Read and write). Nigdy nie wklejaj tokena na czat.
 
 ## Testy (checklista po wpięciu)
 1. **Kontakt**: wyślij formularz → wiersz w zakładce `Wiadomosci` + mail na skrzynkę.
@@ -42,7 +39,7 @@ i wysyła maile (Gmail). Całość: HTML + CSS + JS — zero Pythona, zero serwe
 6. **Panel**: otwórz `admin.html?klucz=TWOJ_TOKEN` → logowanie
    `kontakt@studiosygnatura.pl` / `sygnatura-2026` → **ZMIEŃ HASŁO** (zakładka `Admini`
    w arkuszu: haslo_sha = wynik `sha256('twoje nowe hasło')` — funkcja `sha256` jest
-   w Konfig.gs; wybierz ją z listy funkcji → Uruchom).
+   w PLIK1.gs; wybierz ją z listy funkcji → Uruchom).
 
 ## Własne zdjęcia tła — wspólna biblioteka GitHub
 W trybie produkcyjnym przycisk „Dodaj do biblioteki” kompresuje zdjęcie do JPG (maks. 1600 px), wysyła je do Apps Script, a Apps Script zapisuje je do `origin/main/uploads/`. Strona używa publicznego adresu pliku z `raw.githubusercontent.com`; ścieżka obrazu jest następnie zapisywana we wspólnych ustawieniach strony głównej w arkuszu. Klucz GitHuba **nie trafia do strony ani do przeglądarki**.
@@ -51,16 +48,16 @@ Jednorazowa konfiguracja przez właściciela:
 1. GitHub → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
 2. Ogranicz dostęp do repozytorium `Sygnatura-v.2` i nadaj **Contents: Read and write**. Nie wklejaj tokenu do czatu ani do pliku `.gs`.
 3. Apps Script → otwórz istniejący projekt API → **Project Settings → Script Properties** → dodaj `GITHUB_TOKEN` z wartością tokenu.
-4. Zaktualizuj backend zgodnie z `engine/Kod.gs` (akcja `media-upload`, `mediaUploadGitHub`, sesja admina) albo odpowiednimi plikami `PLIK1.gs` + `PLIK2.gs` w instalacji modułowej. Zapisz i uruchom `sprawdzKonfiguracjeGitHub`, zatwierdzając wymagane uprawnienie do połączeń zewnętrznych.
+4. Wdróż aktualny komplet `PLIK1.gs` + `PLIK2.gs` + `PLIK3.gs`. Zapisz i uruchom `sprawdzKonfiguracjeGitHub`, zatwierdzając wymagane uprawnienie do połączeń zewnętrznych.
 5. **Deploy → Manage deployments → Edit → New version → Deploy**. Adres `/exec` pozostaje ten sam. Po wdrożeniu zaloguj się do panelu ponownie — backend wystawia krótką sesję administratora.
 6. Po aktualizacji strony właściciel wybiera plik, klika „Dodaj do biblioteki”, a potem **„Zapisz zmiany strony głównej”**. Plik trafia do `main/uploads/`, a slajd zapisuje w bazie pełny publiczny adres obrazu.
 
-Po zmianach akcji w `engine/CALOSC.gs` (w tym uploadu lub publicznego odczytu cennika) trzeba wdrożyć nową wersję Apps Script. Sam deploy GitHub Pages nie aktualizuje silnika Google.
+Po zmianach akcji w silniku (w tym uploadu lub publicznego odczytu cennika) trzeba wdrożyć nową wersję Apps Script. Sam deploy GitHub Pages nie aktualizuje silnika Google.
 
 Token ma ograniczone uprawnienia do tego repozytorium i powinien mieć termin ważności. Przy wygaśnięciu wygeneruj nowy i podmień wyłącznie wartość Script Property.
 
 ## Zasady stałe
-- Panel admina zawsze z `?klucz=` (TOKEN z Konfig.gs) — linku nie publikujemy.
+- Panel admina zawsze z `?klucz=` (TOKEN z PLIK1.gs) — linku nie publikujemy.
 - Mail: limit Gmaila ~100/dzień (MailApp) — przy tej skali wystarczająco.
 - Backup: codziennie 03:00 → Dysk (`SYGNATURA-Backup`), retencja 30 dni; alarm mailem przy błędzie.
 - Cennik dostawy, strona główna, podstrony, produkty, blog — edycja w panelu `admin.html`
