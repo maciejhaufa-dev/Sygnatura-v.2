@@ -510,6 +510,13 @@ function adminZmienDane(d){
   return { ok: true, login: loginDocelowy, sessionToken: nowa };
 }
 
+/* Uruchom ręcznie tylko raz, jeśli Apps Script poprosi o zgodę na wysyłkę kodu. */
+function autoryzujPoczteAdmina(){
+  const pozostalo = MailApp.getRemainingDailyQuota();
+  Logger.log('Uprawnienie poczty aktywne; pozostały dzienny limit odbiorców: ' + pozostalo);
+  return pozostalo;
+}
+
 function adminResetKod(d){
   if (!maKlucz(d)) return bladKlucza();
   const login = String(d.login || '').trim().toLowerCase();
