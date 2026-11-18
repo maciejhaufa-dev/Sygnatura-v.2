@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=337">
+<link rel="stylesheet" href="assets/style.css?v=338">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -564,13 +564,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=337"></script>
-<script src="assets/koszyk.js?v=337"></script>
-<script src="assets/api.js?v=337"></script>
-<script src="assets/editor.js?v=337"></script>
-<script src="assets/edytor.js?v=337"></script>
-<script src="data/katalog.js?v=337"></script>
-<script src="assets/main.js?v=337"></script>
+<script src="assets/config.js?v=338"></script>
+<script src="assets/koszyk.js?v=338"></script>
+<script src="assets/api.js?v=338"></script>
+<script src="assets/editor.js?v=338"></script>
+<script src="assets/edytor.js?v=338"></script>
+<script src="data/katalog.js?v=338"></script>
+<script src="assets/main.js?v=338"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -1969,18 +1969,12 @@
     ladujStronaGlowna();
   }
 
+  // Nigdy nie traktuj publicznego klucza API jako dowodu zalogowania.
+  // Tylko znacznik sesji po poprawnym logowaniu może otworzyć panel.
   var zalogowany = false;
-  try {
-    if (klucz === MASTER_KLUCZ || sessionStorage.getItem('syg-admin') === '1'){
-      zalogowany = true;
-      sessionStorage.setItem('syg-admin', '1');
-    }
-  } catch(e){}
-  if (zalogowany){
-    pokazPanel();
-  } else {
-    logowanie.style.display = 'block';
-  }
+  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
+  if (zalogowany) pokazPanel();
+  else logowanie.style.display = 'block';
 
   document.getElementById('pokaz-admin-haslo').addEventListener('click', function(){
     var inp = document.getElementById('admin-haslo');
@@ -1999,11 +1993,7 @@
     logowanieBlad.style.display = 'none';
 
     var passOk = false;
-    if (l.toLowerCase() === 'admin' && (h === 'test' || h === 'sygnatura2026' || h === SYG.ADMIN_DEMO_HASLO)){
-      passOk = true;
-    }
-
-    if (!passOk && !SYG.TRYB_DEMO){
+    if (!SYG.TRYB_DEMO){
       try {
         var odp = await SYG.wezwij('admin-login', { login: l, haslo: h, klucz: klucz });
         if (odp && odp.ok) passOk = true;
@@ -2013,7 +2003,7 @@
           return;
         }
       } catch (err){
-        console.warn('Błąd sieci podczas logowania, fallback do weryfikacji lokalnej:', err);
+        console.warn('Błąd sieci podczas logowania administratora:', err);
       }
     }
 

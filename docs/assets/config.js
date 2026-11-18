@@ -31,12 +31,6 @@ window.SYG = {
     WYNAJEM5:   { proc: 5, opis: '5% na pakiet wynajmu — wpisz kod w uwagach zapytania o termin' }
   },
 
-  // logowanie do panelu administracyjnego w trybie demo (admin.html).
-  // Po wdrożeniu Google Apps Script logowanie sprawdza baza administratorów (arkusz),
-  // a te dwa pola przestają działać — możesz je wtedy usunąć.
-  ADMIN_DEMO_LOGIN: 'admin',
-  ADMIN_DEMO_HASLO: 'test',
-
   // cennik dostawy (zł) — stawki startowe; zaktualizuj wg aktualnych cenników
   // InPost/kuriera. Rozmiary paczek: S (np. ramki, litery), M (np. szopka, szyld), L (duże zamówienia).
   DOSTAWA: {

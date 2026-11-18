@@ -1792,3 +1792,8 @@ weryfikować z parametrem cache-busting.
 3. Zdiagnozowano problem z `www.studiosygnatura.pl`: pozostałość starego rekordu TXT `"1|www.studiosygnatura.pl"` z przekierowania OVH, który powodował błąd 500 w silniku OpenResty OVH. Przekazano instrukcję usunięcia tego wpisu w OVH.
 4. Podbicie wersji do **28.57**, cache-bust **`?v=337`**.
 5. Pełny deploy do `docs/`, push na gałąź produkcyjną.
+
+### Sesja 30/3 (22.09.2026) — WYŁĄCZENIE AUTOMATYCZNEGO WEJŚCIA DO PANELU (wersja 28.58, ?v=338)
+1. Usunięto warunek, który traktował publiczny klucz API jako automatyczne logowanie do `admin.html`; wejście przez `/admin` pokazuje teraz formularz.
+2. Usunięto lokalne hasła testowe (`admin/test`, `sygnatura2026` i demo z configu). W trybie produkcyjnym logowanie musi zostać potwierdzone przez akcję `admin-login` w API.
+3. Zwiększono wersję do **28.58**, cache-bust do **`?v=338`**; wdrożono kopię `www/` do `docs/`.
