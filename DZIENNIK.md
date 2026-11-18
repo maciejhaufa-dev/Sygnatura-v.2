@@ -1817,3 +1817,8 @@ weryfikować z parametrem cache-busting.
 4. Backend wydaje sesję admina w CacheService po prawidłowym loginie/haśle; wszystkie operacje panelu są weryfikowane tą sesją oraz kluczem API. Jednorazowa konfiguracja i redeploy Apps Script opisana w `engine/README.md`.
 5. Po wgraniu zdjęcia żona musi jeszcze kliknąć „Zapisz zmiany strony głównej”.
 5. Podbito wersję do **28.61**, cache-bust do **`?v=341`**, zsynchronizowano `docs/`.
+
+### Sesja 30/6a (22.09.2026) — PŁYNNA AKTUALIZACJA STAREGO BACKENDU DO SESJI ADMINA (wersja 28.62, ?v=342)
+1. Zachowano zgodność nowego panelu z aktualnie wdrożonym Apps Script: logowanie nadal otwiera panel, jeśli starszy endpoint nie zwraca jeszcze `sessionToken`.
+2. Po aktualizacji Apps Script logowanie automatycznie zapisuje i używa sesji serwerowej; do czasu aktualizacji upload na GitHub może zwracać komunikat, że akcja nie jest dostępna.
+3. Cache-bust **`?v=342`**, stopka **28.62**, synchronizacja `docs/`.

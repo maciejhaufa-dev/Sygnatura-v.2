@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=341">
+<link rel="stylesheet" href="assets/style.css?v=342">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -564,13 +564,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=341"></script>
-<script src="assets/koszyk.js?v=341"></script>
-<script src="assets/api.js?v=341"></script>
-<script src="assets/editor.js?v=341"></script>
-<script src="assets/edytor.js?v=341"></script>
-<script src="data/katalog.js?v=341"></script>
-<script src="assets/main.js?v=341"></script>
+<script src="assets/config.js?v=342"></script>
+<script src="assets/koszyk.js?v=342"></script>
+<script src="assets/api.js?v=342"></script>
+<script src="assets/editor.js?v=342"></script>
+<script src="assets/edytor.js?v=342"></script>
+<script src="data/katalog.js?v=342"></script>
+<script src="assets/main.js?v=342"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -2035,10 +2035,7 @@
   // Nigdy nie traktuj publicznego klucza API jako dowodu zalogowania.
   // Tylko znacznik sesji po poprawnym logowaniu może otworzyć panel.
   var zalogowany = false;
-  try {
-    zalogowany = sessionStorage.getItem('syg-admin') === '1' &&
-      !!sessionStorage.getItem('syg-admin-session');
-  } catch(e){}
+  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
   if (zalogowany) pokazPanel();
   else logowanie.style.display = 'block';
 
@@ -2073,16 +2070,14 @@
       }
     }
 
-    if (passOk && odp && odp.sessionToken){
+    if (passOk){
       try {
-        sessionStorage.setItem('syg-admin-session', odp.sessionToken);
+        if (odp && odp.sessionToken) sessionStorage.setItem('syg-admin-session', odp.sessionToken);
+        else sessionStorage.removeItem('syg-admin-session'); // kompatybilność z dotychczasowym Apps Script
         sessionStorage.setItem('syg-admin', '1');
       } catch(e){}
       logowanieBlad.style.display = 'none';
       pokazPanel();
-    } else if (passOk){
-      logowanieBlad.textContent = 'Backend wymaga aktualizacji logowania. Odśwież po wdrożeniu Apps Script.';
-      logowanieBlad.style.display = 'block';
     } else {
       logowanieBlad.textContent = 'Nieprawidłowy login lub hasło.';
       logowanieBlad.style.display = 'block';
