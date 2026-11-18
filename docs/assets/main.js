@@ -103,15 +103,8 @@
         kontoTytul = 'Konto — ' + kuz.email;
       }
     } catch (e) {}
-    var headGora;
-    if (SYG.LAUNCH){
-      headGora = '<div class="head-gora"><div class="head-przyciski">' +
-        '<a class="head-przycisk" href="kontakt.html" title="Napisz do nas / Zamówienie">' +
-        '<span class="hp-ico">✉</span><span class="hp-etyk">Napisz / Zamówienie</span></a>' +
-        '<a class="head-przycisk" href="' + telHref() + '" title="Zadzwoń do nas">' +
-        '<span class="hp-ico">☎</span><span class="hp-etyk">' + SYG.TEL + '</span></a>' +
-        '</div></div>';
-    } else {
+    var headGora = '';
+    if (!SYG.LAUNCH){
       headGora = '<div class="head-gora">' +
         '<form class="szukaj" action="szukaj.html" method="get" role="search">' +
         '<input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">' +
@@ -129,31 +122,28 @@
       '<div class="srodek">' +
       /* A + C: logo i menu */
       '<aside class="side">' +
-      '<div class="brand-blok">' +
+      '<a class="brand-blok" href="index.html" aria-label="Strona główna Studio Sygnatura">' +
       '<div class="brand-kwadrat"><img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura"></div>' +
       '<div class="brand-nazwa"><span class="syg">Syg</span><span class="natura">natura</span></div>' +
       '<div class="brand-tag">drewno · światło · detal</div>' +
-      '</div>' +
+      '</a>' +
       '<nav class="menu-vert" aria-label="Menu główne"></nav>' +
-      '</aside>' +
-      '<div class="listwa" aria-hidden="true"></div>' +
-      /* B + D: prawa kolumna */
-      '<div class="prawa">' +
-      '<div class="head">' +
-      '<div class="head-kontakt">' +
-      '<span class="hk-lewa">' +
-      '<a href="' + telHref() + '">☎ ' + SYG.TEL + '</a>' +
-      '<span class="hk-sep">|</span>' +
-      '<a href="mailto:' + SYG.MAIL + '">✉ ' + SYG.MAIL + '</a>' +
-      '</span>' +
-      '<span class="hk-prawa"><span class="hk-napis">Znajdź nas na:</span>' +
+      '<section class="side-contact" aria-label="Kontakt i media społecznościowe">' +
+      '<a class="side-contact-item" href="' + telHref() + '">☎ <span>' + SYG.TEL + '</span></a>' +
+      '<a class="side-contact-item side-contact-mail" href="kontakt.html" aria-label="Strona kontaktu — ' + SYG.MAIL + '">✉ <span>' + SYG.MAIL + '</span></a>' +
+      '<span class="side-social-label">Znajdź nas na:</span>' +
+      '<div class="side-social">' +
       '<a href="https://pl.pinterest.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" title="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_PIN + '</svg></a>' +
       '<a href="https://studio.youtube.com/channel/UCZRfDHMy_PM7vu0uNQLg8Yw" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_YT + '</svg></a>' +
       '<a href="https://www.instagram.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">' + SVG_IG + '</svg></a>' +
       '<a href="https://www.facebook.com/p/Studio-SygNatura-61595255863642/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_FB + '</svg></a>' +
-      '</span>' +
       '</div>' +
-      headGora +
+      '</section>' +
+      '</aside>' +
+      '<div class="listwa" aria-hidden="true"></div>' +
+      /* B + D: prawa kolumna */
+      '<div class="prawa">' +
+      '<div class="head">' + headGora +
       '<h1 class="strona-tytul" id="strona-tytul"></h1>' +
       '</div>' +
       '</div>' +
@@ -165,14 +155,14 @@
       return '<span><a href="index.html">Strona główna</a><span class="sep">·</span>' +
         '<a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
         '<a href="kontakt.html">Kontakt</a></span>' +
-        '<span>© Sygnatura 2026 · wersja 28.64</span>';
+        '<span>© Sygnatura 2026 · wersja 28.65</span>';
     }
     const czesci = ['<a href="regulamin.html">Regulamin</a>', '<a href="jak-pracujemy.html">Jak pracujemy</a>'];
     STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; }).forEach(function (s) {
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.64</span>';
+      '<span>© Sygnatura 2026 · wersja 28.65</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
