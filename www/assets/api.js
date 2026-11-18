@@ -687,7 +687,7 @@
        aby każdy przycisk w panelu przekazywał go spójnie. */
     const ADMIN_AKCJE = [
       'zamowienia-lista', 'zamowienie-status', 'blog-zapisz', 'blog-widocznosc', 'blog-usun',
-      'produkt-nowy', 'produkty-zapisz', 'media-upload', 'strona-glowna-zapisz',
+      'admin-zmien-dane', 'produkt-nowy', 'produkty-zapisz', 'media-upload', 'strona-glowna-zapisz',
       'strona-zamowienia-zapisz', 'strona-zapisz', 'strona-usun',
       'ustawienia-dostawa-zapisz', 'wynajem-zapytania-lista', 'wiadomosci-lista'
     ];
@@ -720,6 +720,14 @@
       let odp;
       try { odp = JSON.parse(txt); }
       catch (e) { return { ok: false, blad: 'Zła odpowiedź serwera (kod ' + res.status + ').' }; }
+      if (odp && !odp.ok && /Sesja administratora wygasła/i.test(String(odp.blad || ''))){
+        try {
+          sessionStorage.removeItem('syg-admin');
+          sessionStorage.removeItem('syg-admin-session');
+          sessionStorage.removeItem('syg-admin-email');
+        } catch (e) {}
+        try { window.dispatchEvent(new Event('syg-admin-session-expired')); } catch (e) {}
+      }
       /* samo-serwisowanie sesji i kasha (demo robi to w demo(); API tutaj) */
       try {
         if (odp && odp.ok && odp.konto &&

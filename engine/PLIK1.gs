@@ -167,8 +167,9 @@ function instaluj() {
  *   strona-glowna-pobierz, strona-zamowienia-pobierz
  * ADMIN (klucz = TOKEN skonfigurowany w PLIK1.gs; właściciel otwiera
  *   admin.html?klucz=… i klucz idzie w każdej prośbie):
- *   admin-login, zamowienia-lista, zamowienie-status,
- *   blog-zapisz, blog-widocznosc, blog-usun, produkt-nowy,
+ *   admin-login, admin-zmien-dane, admin-reset-kod, admin-reset-haslo,
+ *   zamowienia-lista, zamowienie-status, blog-zapisz, blog-widocznosc,
+ *   blog-usun, produkt-nowy,
  *   produkty-zapisz, strona-glowna-zapisz, strona-zamowienia-zapisz,
  *   strona-zapisz, strona-usun, ustawienia-dostawa-zapisz,
  *   wynajem-zapytania-lista, wiadomosci-lista
@@ -218,6 +219,9 @@ function doPost(e) {
       case 'ustawienia-dostawa-pobierz': return odpowiedz({ ok: true, cennik: odczytJsonUstawienia('dostawa') || DOSTAWA_STARTOWA });
       /* ---------------- admin (klucz) ---------------- */
       case 'admin-login':             return odpowiedz(adminLogin(dane));
+      case 'admin-zmien-dane':        return odpowiedz(maAdminDostep(dane) ? adminZmienDane(dane) : bladSesjiAdmina());
+      case 'admin-reset-kod':         return odpowiedz(adminResetKod(dane));
+      case 'admin-reset-haslo':       return odpowiedz(adminResetHaslo(dane));
       case 'zamowienia-lista':        return odpowiedz(maAdminDostep(dane) ? zamowieniaLista() : bladSesjiAdmina());
       case 'zamowienie-status':       return odpowiedz(maAdminDostep(dane) ? zmienStatus(dane) : bladSesjiAdmina());
       case 'blog-zapisz':             return odpowiedz(maAdminDostep(dane) ? blogZapisz(dane) : bladSesjiAdmina());
@@ -252,8 +256,8 @@ function maKlucz(d) {
 function bladKlucza() { return { ok: false, blad: 'Brak dostępu — zły klucz.' }; }
 function maAdminDostep(d) {
   if (!maKlucz(d)) return false;
-  const t = String(d.adminSession || '');
-  return t.length >= 32 && !!CacheService.getScriptCache().get('syg-admin-session-' + t);
+  const email = adminEmailZSesji(String(d.adminSession || ''));
+  return !!email && adminAktywny(email);
 }
 function bladSesjiAdmina() { return { ok: false, blad: 'Sesja administratora wygasła. Zaloguj się ponownie.' }; }
 

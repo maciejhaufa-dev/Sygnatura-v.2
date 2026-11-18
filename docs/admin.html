@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=350">
+<link rel="stylesheet" href="assets/style.css?v=352">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -37,6 +37,27 @@
     </div>
     <div class="przyciski">
       <button class="btn" type="button" id="zaloguj">Zaloguj się</button>
+      <button class="btn outline" type="button" id="admin-odzyskaj-toggle">Nie pamiętam hasła</button>
+    </div>
+    <div id="admin-odzyskaj" style="display:none;margin-top:16px;padding:14px;border:1px solid #d7c6b4;background:#fbf7f0">
+      <b>Odzyskiwanie dostępu</b>
+      <p class="mala">Wyślemy jednorazowy kod na e-mail administratora wpisany powyżej. Kod jest ważny 10 minut.</p>
+      <div class="pole">
+        <label for="admin-reset-kod">Kod z e-maila</label>
+        <input id="admin-reset-kod" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+      </div>
+      <div class="pole">
+        <label for="admin-reset-haslo">Nowe hasło (min. 10 znaków)</label>
+        <input id="admin-reset-haslo" type="password" autocomplete="new-password">
+      </div>
+      <div class="pole">
+        <label for="admin-reset-haslo-powtorz">Powtórz nowe hasło</label>
+        <input id="admin-reset-haslo-powtorz" type="password" autocomplete="new-password">
+      </div>
+      <div class="przyciski">
+        <button class="btn outline" type="button" id="admin-reset-wyslij">Wyślij kod</button>
+        <button class="btn" type="button" id="admin-reset-zapisz">Ustaw nowe hasło</button>
+      </div>
     </div>
   </div>
 
@@ -564,6 +585,31 @@
           <button class="btn" type="button" id="zapisz-dostawe" disabled>Zapisz cennik</button>
         </div>
       </div>
+      <hr style="margin:28px 0;border:0;border-top:1px solid #d7c6b4">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Dane logowania administratora</h2>
+      <p class="mala">Możesz zmienić login (adres e-mail), hasło albo oba. Wymagane jest obecne hasło. Nowe hasło musi mieć co najmniej 10 znaków.</p>
+      <div class="forma" style="max-width:520px">
+        <div class="pole">
+          <label for="admin-zmien-login">Nowy login (e-mail, opcjonalnie)</label>
+          <input type="email" id="admin-zmien-login" autocomplete="username">
+        </div>
+        <div class="pole">
+          <label for="admin-zmien-obecne">Obecne hasło *</label>
+          <input type="password" id="admin-zmien-obecne" autocomplete="current-password">
+        </div>
+        <div class="pole">
+          <label for="admin-zmien-haslo">Nowe hasło (opcjonalnie)</label>
+          <input type="password" id="admin-zmien-haslo" autocomplete="new-password">
+        </div>
+        <div class="pole">
+          <label for="admin-zmien-haslo-powtorz">Powtórz nowe hasło</label>
+          <input type="password" id="admin-zmien-haslo-powtorz" autocomplete="new-password">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="admin-zmien-zapisz">Zmień dane logowania</button>
+        </div>
+        <div class="flash" id="admin-zmien-info" style="display:none"></div>
+      </div>
     </section>
 
     <div class="przyciski">
@@ -576,13 +622,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=350"></script>
-<script src="assets/koszyk.js?v=350"></script>
-<script src="assets/api.js?v=350"></script>
-<script src="assets/editor.js?v=350"></script>
-<script src="assets/edytor.js?v=350"></script>
-<script src="data/katalog.js?v=350"></script>
-<script src="assets/main.js?v=350"></script>
+<script src="assets/config.js?v=352"></script>
+<script src="assets/koszyk.js?v=352"></script>
+<script src="assets/api.js?v=352"></script>
+<script src="assets/editor.js?v=352"></script>
+<script src="assets/edytor.js?v=352"></script>
+<script src="data/katalog.js?v=352"></script>
+<script src="assets/main.js?v=352"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -2193,6 +2239,11 @@
 
   /* ============ ustawienia (cennik dostawy) ============ */
   async function ladujUstawienia(){
+    var loginInput = document.getElementById('admin-zmien-login');
+    try {
+      var aktualnyLogin = sessionStorage.getItem('syg-admin-email') || '';
+      if (loginInput && !loginInput.value) loginInput.value = aktualnyLogin;
+    } catch (e) {}
     var f = document.getElementById('ustawienia-info');
     try {
       var c = await SYG.ustawieniaDostawa();
@@ -2253,6 +2304,12 @@
   try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
   if (zalogowany && !SYG.TRYB_DEMO) pokazPanel();
   else logowanie.style.display = 'block';
+  window.addEventListener('syg-admin-session-expired', function(){
+    panel.style.display = 'none';
+    logowanie.style.display = 'block';
+    document.getElementById('admin-tytul').textContent = 'Logowanie do panelu';
+    komunikatLogowania('Sesja wygasła — zaloguj się ponownie. Niezapisane zmiany mogą wymagać ponownego wprowadzenia.', false);
+  });
 
   document.getElementById('pokaz-admin-haslo').addEventListener('click', function(){
     var inp = document.getElementById('admin-haslo');
@@ -2288,7 +2345,8 @@
     if (passOk){
       try {
         if (odp && odp.sessionToken) sessionStorage.setItem('syg-admin-session', odp.sessionToken);
-        else sessionStorage.removeItem('syg-admin-session'); // kompatybilność z dotychczasowym Apps Script
+        else sessionStorage.removeItem('syg-admin-session'); // kompatybilność ze starszym Apps Script
+        if (odp && odp.admin && odp.admin.email) sessionStorage.setItem('syg-admin-email', odp.admin.email);
         sessionStorage.setItem('syg-admin', '1');
       } catch(e){}
       logowanieBlad.style.display = 'none';
@@ -2303,10 +2361,93 @@
   document.getElementById('admin-login').addEventListener('keydown', function(e){ if (e.key === 'Enter') sprobujZalogowac(); });
   document.getElementById('admin-haslo').addEventListener('keydown', function(e){ if (e.key === 'Enter') sprobujZalogowac(); });
 
+  function komunikatLogowania(txt, ok){
+    logowanieBlad.textContent = txt;
+    logowanieBlad.style.display = 'block';
+    logowanieBlad.style.background = ok ? 'var(--butelkowa)' : '#8a2f1d';
+  }
+  document.getElementById('admin-odzyskaj-toggle').addEventListener('click', function(){
+    var box = document.getElementById('admin-odzyskaj');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('admin-reset-wyslij').addEventListener('click', async function(){
+    var loginReset = document.getElementById('admin-login').value.trim();
+    if (!loginReset){ komunikatLogowania('Wpisz login administratora (adres e-mail) powyżej.', false); return; }
+    var btn = this; btn.disabled = true; btn.textContent = 'Wysyłanie…';
+    try {
+      var odpReset = await SYG.wezwij('admin-reset-kod', { login: loginReset, klucz: klucz });
+      var tekstReset = odpReset && odpReset.ok
+        ? 'Jeśli ten login jest aktywny, kod wysłaliśmy na przypisany e-mail. Sprawdź też folder Spam; kod ważny 10 minut.'
+        : ((odpReset && odpReset.blad) || 'Nie udało się wysłać kodu.');
+      komunikatLogowania(tekstReset, !!(odpReset && odpReset.ok));
+    } catch (e){ komunikatLogowania('Nie udało się połączyć z serwerem. Spróbuj ponownie.', false); }
+    finally { btn.disabled = false; btn.textContent = 'Wyślij kod'; }
+  });
+  document.getElementById('admin-reset-zapisz').addEventListener('click', async function(){
+    var loginReset = document.getElementById('admin-login').value.trim();
+    var kod = document.getElementById('admin-reset-kod').value.trim();
+    var haslo1 = document.getElementById('admin-reset-haslo').value;
+    var haslo2 = document.getElementById('admin-reset-haslo-powtorz').value;
+    if (haslo1.length < 10){ komunikatLogowania('Nowe hasło musi mieć co najmniej 10 znaków.', false); return; }
+    if (haslo1 !== haslo2){ komunikatLogowania('Wpisane nowe hasła nie są takie same.', false); return; }
+    var btn = this; btn.disabled = true; btn.textContent = 'Zapisywanie…';
+    try {
+      var odpReset = await SYG.wezwij('admin-reset-haslo', {
+        login: loginReset, kod: kod, noweHaslo: haslo1, klucz: klucz
+      });
+      if (odpReset && odpReset.ok){
+        document.getElementById('admin-haslo').value = '';
+        document.getElementById('admin-reset-kod').value = '';
+        document.getElementById('admin-reset-haslo').value = '';
+        document.getElementById('admin-reset-haslo-powtorz').value = '';
+        document.getElementById('admin-odzyskaj').style.display = 'none';
+        komunikatLogowania('Hasło zmienione. Zaloguj się teraz nowym hasłem.', true);
+      } else komunikatLogowania((odpReset && odpReset.blad) || 'Nie udało się zmienić hasła.', false);
+    } catch (e){ komunikatLogowania('Nie udało się połączyć z serwerem. Spróbuj ponownie.', false); }
+    finally { btn.disabled = false; btn.textContent = 'Ustaw nowe hasło'; }
+  });
+
+  document.getElementById('admin-zmien-zapisz').addEventListener('click', async function(){
+    var loginNowy = document.getElementById('admin-zmien-login').value.trim();
+    var stare = document.getElementById('admin-zmien-obecne').value;
+    var nowe = document.getElementById('admin-zmien-haslo').value;
+    var powtorz = document.getElementById('admin-zmien-haslo-powtorz').value;
+    var infoZmiany = document.getElementById('admin-zmien-info');
+    function statusZmiany(txt, ok){
+      infoZmiany.style.display = 'block';
+      infoZmiany.style.background = ok ? 'var(--butelkowa)' : '#8a2f1d';
+      infoZmiany.style.color = '#fff';
+      infoZmiany.textContent = txt;
+    }
+    if (!stare){ statusZmiany('Wpisz obecne hasło.', false); return; }
+    if (nowe && nowe.length < 10){ statusZmiany('Nowe hasło musi mieć co najmniej 10 znaków.', false); return; }
+    if (nowe && nowe !== powtorz){ statusZmiany('Wpisane nowe hasła nie są takie same.', false); return; }
+    if (!loginNowy && !nowe){ statusZmiany('Wpisz nowy login lub nowe hasło.', false); return; }
+    var btn = this; btn.disabled = true; btn.textContent = 'Zapisywanie…';
+    try {
+      var wynik = await SYG.wezwij('admin-zmien-dane', {
+        obecneHaslo: stare, nowyLogin: loginNowy, noweHaslo: nowe
+      });
+      if (wynik && wynik.ok){
+        try {
+          if (wynik.sessionToken) sessionStorage.setItem('syg-admin-session', wynik.sessionToken);
+          if (wynik.login) sessionStorage.setItem('syg-admin-email', wynik.login);
+        } catch (e) {}
+        document.getElementById('admin-zmien-login').value = wynik.login || loginNowy;
+        document.getElementById('admin-zmien-obecne').value = '';
+        document.getElementById('admin-zmien-haslo').value = '';
+        document.getElementById('admin-zmien-haslo-powtorz').value = '';
+        statusZmiany('Dane logowania zostały zmienione.', true);
+      } else statusZmiany((wynik && wynik.blad) || 'Nie udało się zmienić danych logowania.', false);
+    } catch (e){ statusZmiany('Nie udało się połączyć z serwerem. Spróbuj ponownie.', false); }
+    finally { btn.disabled = false; btn.textContent = 'Zmień dane logowania'; }
+  });
+
   document.getElementById('wyloguj').addEventListener('click', function(){
     try {
       sessionStorage.removeItem('syg-admin');
       sessionStorage.removeItem('syg-admin-session');
+      sessionStorage.removeItem('syg-admin-email');
     } catch(e){}
     window.location.reload();
   });

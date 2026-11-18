@@ -54,6 +54,13 @@ Jednorazowa konfiguracja przez właściciela:
 
 Po zmianach akcji w silniku (w tym uploadu lub publicznego odczytu cennika) trzeba wdrożyć nową wersję Apps Script. Sam deploy GitHub Pages nie aktualizuje silnika Google.
 
+## Logowanie administratora
+- Sesje są podpisywane po stronie Apps Script i ważne 30 dni; nie opierają się już wyłącznie na krótkotrwałym `CacheService`.
+- W panelu **Ustawienia → Dane logowania administratora** można zmienić e-mail/login i/lub hasło, potwierdzając obecne hasło.
+- Na ekranie logowania „Nie pamiętam hasła” wysyła 6-cyfrowy kod na e-mail aktywnego administratora; kod wygasa po 10 minutach i ma limit prób.
+- `media-upload` i pozostałe akcje są wpisami `case` w `doPost` — nie uruchamia się ich ręcznie z listy funkcji Apps Script. Testuj je z panelu strony po wdrożeniu nowej wersji aplikacji.
+- Po zmianie plików `PLIK1.gs` lub `PLIK2.gs` w istniejącym projekcie zapisz i wybierz **Zarządzaj wdrożeniami → Edytuj → Nowa wersja → Wdróż**. Nie uruchamiaj `instaluj()`.
+
 Token ma ograniczone uprawnienia do tego repozytorium i powinien mieć termin ważności. Przy wygaśnięciu wygeneruj nowy i podmień wyłącznie wartość Script Property.
 
 ## Zasady stałe

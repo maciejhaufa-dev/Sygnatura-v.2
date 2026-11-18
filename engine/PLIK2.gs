@@ -407,20 +407,166 @@ function zapiszJsonUstawienia(klucz, d) {
 }
 
 /* ---------------- ADMIN ---------------- */
+function adminAktywny(email){
+  const szukany = String(email || '').trim().toLowerCase();
+  const dane = arkusz('Admini').getDataRange().getValues();
+  for (let i = 1; i < dane.length; i++){
+    if (String(dane[i][0] || '').trim().toLowerCase() === szukany && String(dane[i][2]) === '1') return true;
+  }
+  return false;
+}
+
+/* Sesje podpisane HMAC — CacheService może usuwać wpisy przed końcem TTL. */
+function adminSessionSecret(){
+  const props = PropertiesService.getScriptProperties();
+  let secret = props.getProperty('SYG_ADMIN_SESSION_SECRET');
+  if (!secret){
+    secret = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+    props.setProperty('SYG_ADMIN_SESSION_SECRET', secret);
+  }
+  return secret;
+}
+function adminB64Url(value){
+  return Utilities.base64EncodeWebSafe(value, Utilities.Charset.UTF_8).replace(/=+$/g, '');
+}
+function adminTokenPodpis(payload){
+  return Utilities.base64EncodeWebSafe(
+    Utilities.computeHmacSha256Signature(payload, adminSessionSecret())
+  ).replace(/=+$/g, '');
+}
+function adminNowaSesja(email){
+  const payload = adminB64Url(JSON.stringify({
+    email: String(email), exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
+    nonce: Utilities.getUuid()
+  }));
+  return payload + '.' + adminTokenPodpis(payload);
+}
+function adminBezpiecznePorownanie(a, b){
+  a = String(a || ''); b = String(b || '');
+  if (a.length !== b.length) return false;
+  let roznica = 0;
+  for (let i = 0; i < a.length; i++) roznica |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return roznica === 0;
+}
+function adminEmailZSesji(token){
+  const czesci = String(token || '').split('.');
+  if (czesci.length === 2 && adminBezpiecznePorownanie(czesci[1], adminTokenPodpis(czesci[0]))){
+    try {
+      const p = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(czesci[0])).getDataAsString('UTF-8'));
+      if (p.email && Number(p.exp) > Date.now()) return String(p.email);
+    } catch (e) {}
+  }
+  // Przez krótki czas akceptujemy sesje ze starszej wersji backendu.
+  return CacheService.getScriptCache().get('syg-admin-session-' + String(token || '')) || '';
+}
+function adminRotujSekretSesji(){
+  PropertiesService.getScriptProperties().setProperty(
+    'SYG_ADMIN_SESSION_SECRET', Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '')
+  );
+}
+
 function adminLogin(d) {
   if (!maKlucz(d)) return bladKlucza();
   const login = String(d.login || '').trim().toLowerCase();
   const dane = arkusz('Admini').getDataRange().getValues();
   for (let i = 1; i < dane.length; i++) {
-    if (String(dane[i][0] || '').toLowerCase() === login &&
+    if (String(dane[i][0] || '').trim().toLowerCase() === login &&
         String(dane[i][2]) === '1' &&
         String(dane[i][1]) === sha256(String(d.haslo || ''))) {
-      const sessionToken = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
-      CacheService.getScriptCache().put('syg-admin-session-' + sessionToken, String(dane[i][0]), 21600);
-      return { ok: true, sessionToken: sessionToken, admin: { email: String(dane[i][0]) } };
+      return { ok: true, sessionToken: adminNowaSesja(dane[i][0]), admin: { email: String(dane[i][0]) } };
     }
   }
   return { ok: false, blad: 'Nieprawidłowy e-mail lub hasło.' };
+}
+
+function adminZmienDane(d){
+  const emailSesji = adminEmailZSesji(d.adminSession);
+  if (!emailSesji) return bladSesjiAdmina();
+  const noweLogin = String(d.nowyLogin || '').trim().toLowerCase();
+  const noweHaslo = String(d.noweHaslo || '');
+  const stareHaslo = String(d.obecneHaslo || '');
+  if (!stareHaslo) return { ok: false, blad: 'Wpisz obecne hasło, aby potwierdzić zmianę.' };
+  if (!noweLogin && !noweHaslo) return { ok: false, blad: 'Podaj nowy login lub nowe hasło.' };
+  if (noweLogin && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(noweLogin)) return { ok: false, blad: 'Login musi być poprawnym adresem e-mail.' };
+  if (noweHaslo && noweHaslo.length < 10) return { ok: false, blad: 'Nowe hasło musi mieć co najmniej 10 znaków.' };
+  const sh = arkusz('Admini');
+  const dane = sh.getDataRange().getValues();
+  let row = -1;
+  for (let i = 1; i < dane.length; i++){
+    if (String(dane[i][0] || '').trim().toLowerCase() === String(emailSesji).toLowerCase() && String(dane[i][2]) === '1') { row = i; break; }
+  }
+  if (row < 0) return { ok: false, blad: 'Nie znaleziono aktywnego konta administratora.' };
+  if (String(dane[row][1]) !== sha256(stareHaslo)) return { ok: false, blad: 'Obecne hasło jest nieprawidłowe.' };
+  const loginDocelowy = noweLogin || String(dane[row][0]);
+  if (noweLogin && noweLogin !== String(dane[row][0]).toLowerCase()){
+    for (let j = 1; j < dane.length; j++){
+      if (j !== row && String(dane[j][0] || '').trim().toLowerCase() === noweLogin) return { ok: false, blad: 'Ten login jest już przypisany do innego administratora.' };
+    }
+  }
+  if (noweLogin) sh.getRange(row + 1, 1).setValue(loginDocelowy);
+  if (noweHaslo) sh.getRange(row + 1, 2).setValue(sha256(noweHaslo));
+  adminRotujSekretSesji();
+  const nowa = adminNowaSesja(loginDocelowy);
+  return { ok: true, login: loginDocelowy, sessionToken: nowa };
+}
+
+function adminResetKod(d){
+  if (!maKlucz(d)) return bladKlucza();
+  const login = String(d.login || '').trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(login)) return { ok: true };
+  const kluczEmail = sha256(login).slice(0, 32);
+  const cache = CacheService.getScriptCache();
+  const limitKey = 'syg-admin-reset-limit-' + kluczEmail;
+  if (cache.get(limitKey)) return { ok: false, blad: 'Kod wysłano niedawno. Sprawdź pocztę lub spróbuj ponownie za minutę.' };
+  const dane = arkusz('Admini').getDataRange().getValues();
+  let aktywny = false;
+  for (let i = 1; i < dane.length; i++) if (String(dane[i][0] || '').trim().toLowerCase() === login && String(dane[i][2]) === '1') aktywny = true;
+  if (!aktywny) return { ok: true }; // nie ujawniamy, czy login istnieje
+  const kod = String(Math.floor(100000 + Math.random() * 900000));
+  cache.put('syg-admin-reset-' + kluczEmail, sha256(login + '|' + kod), 600);
+  cache.remove('syg-admin-reset-' + kluczEmail + '-proby');
+  cache.put(limitKey, '1', 60);
+  try {
+    MailApp.sendEmail(login, 'Kod odzyskiwania dostępu — Studio Sygnatura',
+      'Kod do zmiany hasła administratora: ' + kod + '\n\nKod jest ważny 10 minut. Jeśli to nie Ty, zignoruj tę wiadomość.');
+  } catch (e) {
+    cache.remove('syg-admin-reset-' + kluczEmail);
+    cache.remove(limitKey);
+    console.error('Nie udało się wysłać kodu odzyskiwania: ' + e.message);
+    return { ok: false, blad: 'Nie udało się wysłać kodu. Sprawdź uprawnienia poczty Apps Script.' };
+  }
+  return { ok: true };
+}
+
+function adminResetHaslo(d){
+  if (!maKlucz(d)) return bladKlucza();
+  const login = String(d.login || '').trim().toLowerCase();
+  const kod = String(d.kod || '').trim();
+  const noweHaslo = String(d.noweHaslo || '');
+  if (!/^\d{6}$/.test(kod)) return { ok: false, blad: 'Wpisz 6-cyfrowy kod z wiadomości e-mail.' };
+  if (noweHaslo.length < 10) return { ok: false, blad: 'Nowe hasło musi mieć co najmniej 10 znaków.' };
+  const kluczEmail = sha256(login).slice(0, 32);
+  const cache = CacheService.getScriptCache();
+  const kluczResetu = 'syg-admin-reset-' + kluczEmail;
+  const probyKey = kluczResetu + '-proby';
+  const proby = Number(cache.get(probyKey) || 0);
+  if (proby >= 5) return { ok: false, blad: 'Za dużo prób. Poproś o nowy kod odzyskiwania.' };
+  const oczekiwany = cache.get(kluczResetu);
+  if (!oczekiwany || !adminBezpiecznePorownanie(oczekiwany, sha256(login + '|' + kod))){
+    cache.put(probyKey, String(proby + 1), 600);
+    return { ok: false, blad: 'Kod jest nieprawidłowy lub wygasł. Poproś o nowy.' };
+  }
+  const sh = arkusz('Admini');
+  const dane = sh.getDataRange().getValues();
+  let row = -1;
+  for (let i = 1; i < dane.length; i++) if (String(dane[i][0] || '').trim().toLowerCase() === login && String(dane[i][2]) === '1') { row = i; break; }
+  if (row < 0) return { ok: false, blad: 'Nie znaleziono aktywnego konta administratora.' };
+  sh.getRange(row + 1, 2).setValue(sha256(noweHaslo));
+  cache.remove(kluczResetu);
+  cache.remove(probyKey);
+  adminRotujSekretSesji();
+  try { MailApp.sendEmail(login, 'Hasło administratora zostało zmienione', 'Hasło do panelu Studio Sygnatura zostało zmienione. Jeśli to nie Ty, skontaktuj się z właścicielem systemu.'); } catch (e) {}
+  return { ok: true };
 }
 
 function dostawaZapisz(d) {
