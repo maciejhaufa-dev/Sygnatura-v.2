@@ -129,14 +129,15 @@
       '</a>' +
       '<nav class="menu-vert" aria-label="Menu główne"></nav>' +
       '<section class="side-contact" aria-label="Kontakt i media społecznościowe">' +
-      '<a class="side-contact-item" href="' + telHref() + '">☎ <span>' + SYG.TEL + '</span></a>' +
-      '<a class="side-contact-item side-contact-mail" href="kontakt.html" aria-label="Strona kontaktu — ' + SYG.MAIL + '">✉ <span>' + SYG.MAIL + '</span></a>' +
-      '<span class="side-social-label">Znajdź nas na:</span>' +
+      '<a class="side-contact-item" href="' + telHref() + '" aria-label="Zadzwoń: ' + SYG.TEL + '"><svg class="side-contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16.5v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 10.2 18a19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.9 3.2 2 2 0 0 1 3.9 1h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L7.8 9a16 16 0 0 0 7.2 7.2l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 1.4Z"/></svg><span>' + SYG.TEL + '</span></a>' +
+      '<a class="side-contact-item side-contact-mail" href="mailto:' + SYG.MAIL + '" aria-label="Wyślij e-mail: ' + SYG.MAIL + '"><svg class="side-contact-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="1.5"/><path d="m3 6 9 7 9-7"/></svg><span>' + SYG.MAIL + '</span></a>' +
+      '<div class="side-social-block"><span class="side-social-label">Znajdź nas na:</span>' +
       '<div class="side-social">' +
       '<a href="https://pl.pinterest.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" title="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_PIN + '</svg></a>' +
       '<a href="https://studio.youtube.com/channel/UCZRfDHMy_PM7vu0uNQLg8Yw" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_YT + '</svg></a>' +
       '<a href="https://www.instagram.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">' + SVG_IG + '</svg></a>' +
       '<a href="https://www.facebook.com/p/Studio-SygNatura-61595255863642/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_FB + '</svg></a>' +
+      '</div>' +
       '</div>' +
       '</section>' +
       '</aside>' +
@@ -155,14 +156,14 @@
       return '<span><a href="index.html">Strona główna</a><span class="sep">·</span>' +
         '<a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
         '<a href="kontakt.html">Kontakt</a></span>' +
-        '<span>© Sygnatura 2026 · wersja 28.65</span>';
+        '<span>© Sygnatura 2026 · wersja 28.66</span>';
     }
     const czesci = ['<a href="regulamin.html">Regulamin</a>', '<a href="jak-pracujemy.html">Jak pracujemy</a>'];
     STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; }).forEach(function (s) {
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.65</span>';
+      '<span>© Sygnatura 2026 · wersja 28.66</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
