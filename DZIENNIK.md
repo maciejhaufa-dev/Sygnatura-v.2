@@ -1797,3 +1797,10 @@ weryfikować z parametrem cache-busting.
 1. Usunięto warunek, który traktował publiczny klucz API jako automatyczne logowanie do `admin.html`; wejście przez `/admin` pokazuje teraz formularz.
 2. Usunięto lokalne hasła testowe (`admin/test`, `sygnatura2026` i demo z configu). W trybie produkcyjnym logowanie musi zostać potwierdzone przez akcję `admin-login` w API.
 3. Zwiększono wersję do **28.58**, cache-bust do **`?v=338`**; wdrożono kopię `www/` do `docs/`.
+
+### Sesja 30/4 (22.09.2026) — CENY PRODUKTÓW NA BANERZE I KATALOG LIVE (wersja 28.59, ?v=339)
+1. Strona główna pobiera w trybie LAUNCH zapisany układ i treść slajdów przez `strona-glowna-pobierz` (zmiana właściciela w commitach `98eaaf1`, `824dc1f`).
+2. Usunięto z kart banera warunek, który w trybie LAUNCH zawsze wpisywał „na zamówienie”; teraz wyświetlana jest zapisana cena, a etykieta zostaje tylko dla ceny pustej/zerowej.
+3. Przed renderowaniem slajdów strona pobiera aktualny katalog z publicznego API (`SYG.katalog()`), dzięki czemu ceny i dostępność zmienione w panelu są widoczne na stronie głównej; plik `data/katalog.js` pozostaje fallbackiem.
+4. Podbito cache-bust do **`?v=339`** i wersję stopki do **28.59**; skopiowano `www/` do `docs/`.
+5. Własne zdjęcia w tle nadal używają `localStorage` w przeglądarce administratora; publikacja ich dla wszystkich odwiedzających wymaga osobnego, wspólnego magazynu zdjęć i nie jest rozwiązana tą zmianą.

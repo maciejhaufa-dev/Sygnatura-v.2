@@ -467,11 +467,11 @@ html.dotyk .social{margin-top:14px}
   </footer>
 </div>
 
-<script src="data/katalog.js?v=338"></script>
-<script src="assets/koszyk.js?v=338"></script>
-<script src="assets/config.js?v=338"></script>
-<script src="assets/api.js?v=338"></script>
-<script src="assets/main.js?v=338"></script>
+<script src="data/katalog.js?v=339"></script>
+<script src="assets/koszyk.js?v=339"></script>
+<script src="assets/config.js?v=339"></script>
+<script src="assets/api.js?v=339"></script>
+<script src="assets/main.js?v=339"></script>
 <script>
 /* nagłówek strony głównej: pełny serwis (szukaj + koszyk + konto) albo
    tryb startu (napisz/zadzwoń) — wg SYG.LAUNCH */
@@ -567,15 +567,17 @@ html.dotyk .social{margin-top:14px}
     var obraz = pr.obraz && /^https?:/.test(pr.obraz) ? pr.obraz : 'assets/media/sklep/' + pr.obraz;
     var img = pr.obraz ? '<img src="' + obraz + '" alt="' + esc(pr.nazwa) + '">'
                        : '<span class="pusty">' + esc(pr.nazwa[0] || '') + '</span>';
-    if (window.SYG && window.SYG.LAUNCH){
-      var href = pr.storyId ? 'blog-wpis.html?id=' + pr.storyId : 'realizacje.html';
-      return '<a class="sl-karta" href="' + href + '">' + img +
-        '<span><span class="nazwa">' + esc(pr.nazwa) + '</span><br>' +
-        '<span class="cena">na zamówienie</span></span></a>';
-    }
-    return '<a class="sl-karta" href="sklep.html">' + img +
+    var launch = !!(window.SYG && window.SYG.LAUNCH);
+    var href = launch
+      ? (pr.storyId ? 'blog-wpis.html?id=' + pr.storyId : 'realizacje.html')
+      : 'sklep.html';
+    var cena = Number(pr.cena);
+    var cenaTekst = isFinite(cena) && cena > 0
+      ? esc(cena) + ' zł / szt.'
+      : 'na zamówienie';
+    return '<a class="sl-karta" href="' + href + '">' + img +
       '<span><span class="nazwa">' + esc(pr.nazwa) + '</span><br>' +
-      '<span class="cena">' + esc(pr.cena) + ' zł / szt.</span></span></a>';
+      '<span class="cena">' + cenaTekst + '</span></span></a>';
   }
   function placeholder(){
     return '<span class="sl-karta sl-karta-pusta"><span><span class="nazwa">Wkrótce</span><br>' +
@@ -666,7 +668,7 @@ html.dotyk .social{margin-top:14px}
     idz(0); restart();
   }
 
- async function wczytaj(){
+  async function wczytaj(){
   var L = !(window.SYG && window.SYG.LAUNCH === false);
   var domyslne = L ? DOMYS_LAUNCH : DOMYS;
   var dane = domyslne;
@@ -692,6 +694,17 @@ html.dotyk .social{margin-top:14px}
 
   var autoplayS = Number(sliderDane.autoplay);
   if (isNaN(autoplayS)) autoplayS = 4.5;
+
+  // W trybie produkcyjnym pobierz najnowsze ceny i dostępność z katalogu API.
+  // Plik katalog.js jest tylko lokalnym fallbackiem i nie zawiera zmian panelu.
+  if (window.SYG && !window.SYG.TRYB_DEMO && typeof window.SYG.katalog === 'function') {
+    try {
+      var katalogAktualny = await window.SYG.katalog();
+      if (Array.isArray(katalogAktualny)) window.SYG_KATALOG = katalogAktualny;
+    } catch (e) {
+      console.warn('Nie udało się pobrać aktualnego katalogu — używam kopii lokalnej.', e);
+    }
+  }
 
   budujSlajdy(kafle);
   uruchomSlider(autoplayS);
