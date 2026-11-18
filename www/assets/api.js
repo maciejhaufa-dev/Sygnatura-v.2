@@ -41,13 +41,17 @@
     if (k) { zapisz(KL_KACH, k); } else { try { localStorage.removeItem(KL_KACH); } catch (e) {} }
   }
 
-  /* cennik dostawy: nadpisania z panelu admina albo wartości z config.js */
-  SYG.ustawieniaDostawa = function () {
+  /* Cennik współdzielony: w produkcji zawsze pobierany z bazy, nigdy z cache lokalnego. */
+  SYG.ustawieniaDostawa = async function () {
     if (SYG.TRYB_DEMO) {
       const o = czytaj(KL.dostawa);
-      if (o && o.paczkomat && o.kurier) return o;
+      return (o && o.paczkomat && o.kurier) ? o : SYG.DOSTAWA;
     }
-    return SYG.DOSTAWA;
+    const odp = await SYG.wezwij('ustawienia-dostawa-pobierz', {});
+    if (!odp || !odp.ok || !odp.cennik || !odp.cennik.paczkomat || !odp.cennik.kurier) {
+      throw new Error((odp && odp.blad) || 'Nie udało się pobrać cennika z bazy.');
+    }
+    return odp.cennik;
   };
 
   /* nadpisania produktów z panelu admina (tryb demo) — nanoszone na katalog,

@@ -7,6 +7,21 @@
 
 ---
 
+### KONTYNUACJA — audyt trwałych zapisów (22.09.2026)
+
+**Bieżące zadanie:** właściciel wymaga, aby każda zmiana administratora trafiała do wspólnej trwałej bazy i była publiczna dla wszystkich; nie przedstawiać lokalnego zapisu jako sukcesu. Pracować wyłącznie na `arena/01a0ca92-sygnatura-v-2`.
+
+**Wprowadzone w repo (jeszcze nie potwierdzone na live):**
+- `www/admin.html`: zapis strony głównej pokazuje sukces tylko po `ok:true` z API; przy błędzie zachowuje stan niezapisany, nie czyści ostrzeżenia i blokuje zapis, jeśli nie udało się odczytać stanu z bazy. Usunięto widoczne nieaktualne opisy demo; brak API blokuje panel zamiast używać lokalnych zapisów.
+- odczyty błędów bloga/podstron są komunikowane zamiast udawać pustą listę; nieudane przełączenie widoczności/statusu jest cofane.
+- cennik dostawy panelu jest pobierany z Apps Script; dodano publiczną akcję `ustawienia-dostawa-pobierz`, a koszyk nie pozwala iść dalej z domyślną, potencjalnie nieaktualną stawką.
+- `engine/CALOSC.gs`: upload kieruje do `main/uploads/` i zwraca publiczny URL; `www/admin.html` odrzuca starszy format odpowiedzi, aby nie wyświetlić fałszywego sukcesu. To wymaga nowej wersji wdrożenia Apps Script oraz działającej Script Property `GITHUB_TOKEN` z prawem Contents write.
+- wszystkie `www/*.html` mają marker `?v=343`, `main.js` wersję `28.63`; `docs/` zsynchronizowany z `www/`.
+
+**Weryfikacja kodu:** składnia JS (assets + inline + Apps Script) przeszła; 35 literalnych akcji UI ma route w `engine/CALOSC.gs`; 125 markerów HTML ma wartość 343. To nie jest test live. Sandbox nie może połączyć się z `script.google.com`; kod Apps Script nie został wdrożony, a zachowanie produkcyjnego backendu wymaga potwierdzenia. Po push: sprawdzić Pages build przez `gh api` i live przez `fetch_page`; osobno właściciel musi wdrożyć nową wersję Apps Script. W aktualnym `www/assets/config.js` `LAUNCH:true` mimo że starsza tabela niżej opisuje `false` — nie zmieniono, bo wymaga osobnej decyzji o uruchomieniu pełnego serwisu.
+
+---
+
 ## 0. CHECKPOINT — wznowienie pracy (22.09.2026, wersja 28.37) ⭐ CZYTAJ NAJPIERW
 
 > Ten rozdział to migawka stanu na koniec rozmowy z 22.09.2026. Nowy agent: wykonaj

@@ -44,8 +44,8 @@ i wysyła maile (Gmail). Całość: HTML + CSS + JS — zero Pythona, zero serwe
    w arkuszu: haslo_sha = wynik `sha256('twoje nowe hasło')` — funkcja `sha256` jest
    w Konfig.gs; wybierz ją z listy funkcji → Uruchom).
 
-## Własne zdjęcia tła — zapis w repozytorium GitHub
-W trybie produkcyjnym przycisk „Dodaj do biblioteki” kompresuje zdjęcie do JPG (maks. 1600 px), wysyła je do Apps Script, a Apps Script zapisuje je do `www/assets/media/przeslane/` i `docs/assets/media/przeslane/` na aktywnym branchu. Klucz GitHuba **nie trafia do strony ani do przeglądarki**.
+## Własne zdjęcia tła — wspólna biblioteka GitHub
+W trybie produkcyjnym przycisk „Dodaj do biblioteki” kompresuje zdjęcie do JPG (maks. 1600 px), wysyła je do Apps Script, a Apps Script zapisuje je do `origin/main/uploads/`. Strona używa publicznego adresu pliku z `raw.githubusercontent.com`; ścieżka obrazu jest następnie zapisywana we wspólnych ustawieniach strony głównej w arkuszu. Klucz GitHuba **nie trafia do strony ani do przeglądarki**.
 
 Jednorazowa konfiguracja przez właściciela:
 1. GitHub → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
@@ -53,7 +53,9 @@ Jednorazowa konfiguracja przez właściciela:
 3. Apps Script → otwórz istniejący projekt API → **Project Settings → Script Properties** → dodaj `GITHUB_TOKEN` z wartością tokenu.
 4. Zaktualizuj backend zgodnie z `engine/Kod.gs` (akcja `media-upload`, `mediaUploadGitHub`, sesja admina) albo odpowiednimi plikami `PLIK1.gs` + `PLIK2.gs` w instalacji modułowej. Zapisz i uruchom `sprawdzKonfiguracjeGitHub`, zatwierdzając wymagane uprawnienie do połączeń zewnętrznych.
 5. **Deploy → Manage deployments → Edit → New version → Deploy**. Adres `/exec` pozostaje ten sam. Po wdrożeniu zaloguj się do panelu ponownie — backend wystawia krótką sesję administratora.
-6. Po aktualizacji strony żona wybiera plik, klika „Dodaj do biblioteki”, a potem **„Zapisz zmiany strony głównej”**. Plik trafia do GitHuba, a zapisany slajd wskazuje ścieżkę publiczną `assets/media/przeslane/...`.
+6. Po aktualizacji strony właściciel wybiera plik, klika „Dodaj do biblioteki”, a potem **„Zapisz zmiany strony głównej”**. Plik trafia do `main/uploads/`, a slajd zapisuje w bazie pełny publiczny adres obrazu.
+
+Po zmianach akcji w `engine/CALOSC.gs` (w tym uploadu lub publicznego odczytu cennika) trzeba wdrożyć nową wersję Apps Script. Sam deploy GitHub Pages nie aktualizuje silnika Google.
 
 Token ma ograniczone uprawnienia do tego repozytorium i powinien mieć termin ważności. Przy wygaśnięciu wygeneruj nowy i podmień wyłącznie wartość Script Property.
 

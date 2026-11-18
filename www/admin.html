@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=342">
+<link rel="stylesheet" href="assets/style.css?v=343">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -325,7 +325,7 @@
       <p class="mala">Po prawej lista wpisów (najnowsze na górze, najstarsze na dole) — kliknij wiersz,
       aby zobaczyć podgląd po lewej. Checkbox „widoczny" pokazuje albo ukrywa wpis na stronie.
       Wpis może jednocześnie być produktem sklepu — w trybie edycji zaznacz „Produkt w sklepie",
-      a pozycja pojawi się w zakładce Produkty. W trybie demo wpisy zapisują się w tej przeglądarce.</p>
+      a pozycja pojawi się w zakładce Produkty. Zapisane wpisy trafiają do bazy i są pobierane przez stronę realizacji.</p>
       <div class="flash" id="blog-info" style="display:none"></div>
       <div class="admin-dwie" style="grid-template-columns:1.55fr 1fr">
         <div>
@@ -427,7 +427,7 @@
       <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
       <p class="mala">Zmień cenę albo ukryj/pokaż produkt w sklepie. Produkty z wpisów bloga mają tu
       dopisany link „historia →". Możesz też dodać produkt „bez historii" (np. papierowe winietki).
-      W trybie demo zmiany zapisują się w tej przeglądarce.</p>
+      Zmiany zapisują się w katalogu współdzielonym witryny.</p>
       <div class="flash" id="produkty-info" style="display:none"></div>
       <div class="tabela-wrap">
         <table class="tabela" id="tabela-produkty">
@@ -520,8 +520,7 @@
     <section class="admin-sekcja" id="tab-ustawienia" style="display:none">
       <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Cennik dostawy</h2>
       <p class="mala">Stawki za wysyłkę wg rozmiarów paczek — używane w formularzu zamówienia
-      (InPost paczkomat i kurier). W trybie demo zapisują się w tej przeglądarce; po wdrożeniu
-      trafią do arkusza Google.</p>
+      (InPost paczkomat i kurier). Zapisane stawki są wspólne dla wszystkich klientów.</p>
       <div class="flash" id="ustawienia-info" style="display:none"></div>
       <div class="forma" style="max-width:520px">
         <div class="pole">
@@ -549,7 +548,7 @@
           <input type="number" id="u-kurier-l" step="0.01" min="0">
         </div>
         <div class="przyciski">
-          <button class="btn" type="button" id="zapisz-dostawe">Zapisz cennik</button>
+          <button class="btn" type="button" id="zapisz-dostawe" disabled>Zapisz cennik</button>
         </div>
       </div>
     </section>
@@ -564,13 +563,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=342"></script>
-<script src="assets/koszyk.js?v=342"></script>
-<script src="assets/api.js?v=342"></script>
-<script src="assets/editor.js?v=342"></script>
-<script src="assets/edytor.js?v=342"></script>
-<script src="data/katalog.js?v=342"></script>
-<script src="assets/main.js?v=342"></script>
+<script src="assets/config.js?v=343"></script>
+<script src="assets/koszyk.js?v=343"></script>
+<script src="assets/api.js?v=343"></script>
+<script src="assets/editor.js?v=343"></script>
+<script src="assets/edytor.js?v=343"></script>
+<script src="data/katalog.js?v=343"></script>
+<script src="assets/main.js?v=343"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -583,11 +582,13 @@
   var logowanieBlad = document.getElementById('logowanie-blad');
 
   if (SYG.TRYB_DEMO){
-    info.innerHTML = 'TRYB DEMO: zmiany zapisują się w tej przeglądarce (testy). ' +
-      'Po wdrożeniu Google Apps Script panel czyta i zapisuje dane w arkuszu — logowanie sprawdza baza administratorów.' +
-      (window.SYG && window.SYG.LAUNCH ? ' TRYB STARTU: strona pokazuje treści z plików — wpisy i zmiany z panelu zobaczą tylko użytkownicy TEJ przeglądarki.' : '');
+    info.textContent = 'Panel zablokowany: brak połączenia z bazą produkcyjną. Niczego nie zapisujemy lokalnie. Odśwież stronę lub zgłoś problem z konfiguracją API.';
+    info.style.cssText += ';display:block;background:#8a2f1d;color:#fff;padding:12px;border-radius:6px';
+    document.getElementById('zaloguj').disabled = true;
+    document.getElementById('admin-login').disabled = true;
+    document.getElementById('admin-haslo').disabled = true;
   } else {
-    info.textContent = 'Połączono z arkuszem Google.';
+    info.textContent = 'Panel produkcyjny — zmiany zapisują się we wspólnej bazie.';
   }
 
   var STAN_NAZWA = {
@@ -652,6 +653,7 @@
 
   /* ============ STRONA GŁÓWNA: slider (kafle) + treści ============ */
   var SG_DANE = null;   /* robocza kopia danych strony głównej (zapis TYLKO przyciskiem) */
+  var SG_BAZA_GOTOWA = !!SYG.TRYB_DEMO; /* blokuje zapis danych domyślnych, jeśli odczyt live nie powiódł się */
   var SG_EDYCJA = null; /* { id, kopia, nowy } — edytowany kafel */
   var SG_EDYTOR = null;     /* instancja EDYTORA TREŚCI (kafel) */
   var SG_EDYTOR_CTA = null; /* instancja EDYTORA TREŚCI (treść pod sliderem) */
@@ -846,6 +848,10 @@
   }
 
   async function sgZapiszWszystko(){
+    if (!SG_BAZA_GOTOWA){
+      sgInfo('Nie zapisano: najpierw trzeba poprawnie pobrać aktualne dane ze wspólnej bazy.', true);
+      return false;
+    }
     var btnGora = document.getElementById('sg-zapisz');
     var btnDol = document.getElementById('sg-zapisz-dol');
     var btnKafel = document.getElementById('sg-zapisz-kafel');
@@ -881,37 +887,34 @@
     };
     SG_DANE = dane;
 
-    /* 1. Błyskawiczny zapis lokalny i natychmiastowe zdjęcie ostrzeżenia */
-    try {
-      localStorage.setItem('syg-demo-strona-glowna', JSON.stringify(dane));
-    } catch(e){}
-    wyczyscBrudny();
     rysujKafle();
     var suk = document.getElementById('sg-sukces');
-    if (suk){
-      suk.style.display = 'block';
-      setTimeout(function(){ suk.style.display = 'none'; }, 4000);
-    }
-
-    /* 2. Zapis w chmurze (Google Sheets) w tle */
+    if (suk) suk.style.display = 'none';
+    var zapisano = false;
     try {
       var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
-      if (odp && odp.ok){
-        allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano!'; });
-      } else {
-        allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano lokalnie'; });
+      if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Serwer nie potwierdził zapisu.');
+      zapisano = true;
+      wyczyscBrudny();
+      if (suk){
+        suk.style.display = 'block';
+        setTimeout(function(){ suk.style.display = 'none'; }, 4000);
       }
+      allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano!'; });
+      sgInfo('Zmiany strony głównej zapisano w bazie.', false);
     } catch (err){
-      allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano lokalnie'; });
+      ustawBrudny();
+      allBtns.forEach(function(b){ b.innerHTML = '⚠ Nie zapisano'; });
+      sgInfo('Nie udało się zapisać w bazie. Zmiany pozostają niezapisane — spróbuj ponownie. ' + (err.message || ''), true);
     } finally {
       setTimeout(function(){
         allBtns.forEach(function(b){
           b.disabled = false;
           b.innerHTML = b.dataset.origText || '💾 Zapisz zmiany strony głównej';
         });
-      }, 2000);
+      }, 2500);
     }
-    return true;
+    return zapisano;
   }
 
   /* ---------- rysowanie paska kafli ---------- */
@@ -1210,6 +1213,10 @@
           sgInfo((odp && odp.blad) || 'Nie udało się wysłać zdjęcia na GitHub.', true);
           return;
         }
+        if (!/^https:\/\/raw\.githubusercontent\.com\/maciejhaufa-dev\/Sygnatura-v\.2\/main\/uploads\/[A-Za-z0-9._-]+\.jpg$/.test(String(odp.obraz || ''))){
+          sgInfo('Backend Apps Script wymaga aktualizacji. Zdjęcie nie zostało dodane do biblioteki produkcyjnej.', true);
+          return;
+        }
         obraz = odp.obraz;
         var gitBib = sgGitHubMediaBiblioteka();
         gitBib[nazwa] = obraz;
@@ -1226,8 +1233,8 @@
       var box = document.getElementById('sg-obraz-wgraj-box');
       if (box) box.style.display = 'none';
       sgInfo(SYG.TRYB_DEMO
-        ? 'Zdjęcie zapisane lokalnie (tryb demo).'
-        : 'Zdjęcie wysłane do GitHuba. Kliknij „Zapisz zmiany strony głównej”, aby opublikować baner.', false);
+        ? 'Zdjęcie zapisane lokalnie (tryb awaryjny).'
+        : 'Zdjęcie zapisano we wspólnej bibliotece GitHub (main/uploads). Kliknij „Zapisz zmiany strony głównej”, aby opublikować baner.', false);
     } catch (err){
       sgInfo(err.message || 'Nie udało się przygotować zdjęcia.', true);
     } finally {
@@ -1326,24 +1333,26 @@
   }
 
   async function ladujStronaGlowna(){
-    /* Natychmiastowe zasilenie danymi z pamięci lokalnej lub domyślnej — ZERO czekania, ZERO pustego ekranu */
     if (!SG_DANE){
       var lokalne = null;
-      try {
-        var raw = localStorage.getItem('syg-demo-strona-glowna');
-        if (raw) lokalne = JSON.parse(raw);
-      } catch(e){}
-      SG_DANE = sgNaprawObrazy(sgMigrujStare(lokalne) || SG_DOMYS);
+      if (SYG.TRYB_DEMO){
+        try {
+          var raw = localStorage.getItem('syg-demo-strona-glowna');
+          if (raw) lokalne = JSON.parse(raw);
+        } catch(e){}
+      }
+      SG_DANE = sgNaprawObrazy(sgMigrujStare(lokalne) || JSON.parse(JSON.stringify(SG_DOMYS)));
       if (!SG_DANE.slider) SG_DANE.slider = JSON.parse(JSON.stringify(SG_DOMYS.slider));
       if (!sgPrawidlowyHtml(SG_DANE.ctaTresc)) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
     }
     odswiezWidokStronyGlownej();
 
-    /* W tle pobierz ewentualne nowsze dane z bazy Google Sheets (tylko gdy użytkownik nie edytuje) */
     if (!SYG.TRYB_DEMO){
       try {
         var odp = await SYG.wezwij('strona-glowna-pobierz', {});
-        if (odp && odp.ok && odp.dane && odp.dane.slider && !SG_BRUDNY){
+        if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Brak odpowiedzi bazy.');
+        SG_BAZA_GOTOWA = true;
+        if (odp.dane && odp.dane.slider && !SG_BRUDNY){
           var zserwera = sgNaprawObrazy(sgMigrujStare(odp.dane));
           if (zserwera.slider && Array.isArray(zserwera.slider.kafle) && zserwera.slider.kafle.length > 0){
             SG_DANE = zserwera;
@@ -1352,7 +1361,9 @@
           }
         }
       } catch (err){
-        console.warn('Ciche pobieranie strony głównej z serwera:', err);
+        SG_BAZA_GOTOWA = false;
+        console.warn('Błąd pobierania strony głównej z serwera:', err);
+        sgInfo('Nie udało się pobrać zapisanej wersji z bazy. Sprawdź połączenie; zapisywanie jest zablokowane.', true);
       }
     }
     wyczyscBrudny();
@@ -1478,13 +1489,18 @@
         '<td><b>' + sgEsc((z.klient && z.klient.imie) || 'Klient') + ' ' + sgEsc((z.klient && z.klient.nazwisko) || '') + '</b><br><span class="mala">' + sgEsc((z.klient && z.klient.email) || '') + klientTel + '</span></td>' +
         '<td>' + (pozycje || '—') + '</td>' +
         '<td><b style="color:var(--butelkowa);font-size:14.5px">' + razem + '</b></td>' +
-        '<td><select data-syg="' + sgEsc(z.sygnatura) + '">' + opcje + '</select></td></tr>';
+        '<td><select data-syg="' + sgEsc(z.sygnatura) + '" data-stary="' + sgEsc(z.status || 'zapytanie') + '">' + opcje + '</select></td></tr>';
     }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#777">Brak zamówień w systemie. Złożone w sklepie zamówienia pojawią się w tym miejscu.</td></tr>';
 
     tbody.querySelectorAll('select').forEach(function(sel){
       sel.addEventListener('change', async function(){
+        var stary = sel.getAttribute('data-stary');
         var odp2 = await SYG.wezwij('zamowienie-status', { klucz: klucz, sygnatura: sel.getAttribute('data-syg'), status: sel.value });
-        if (!odp2.ok) alert(odp2.blad || 'Nie zapisano.');
+        if (odp2 && odp2.ok) sel.setAttribute('data-stary', sel.value);
+        else {
+          sel.value = stary;
+          alert((odp2 && odp2.blad) || 'Nie zapisano. Zmiana została cofnięta.');
+        }
       });
     });
   }
@@ -1697,7 +1713,11 @@
   async function ladujBlog(){
     await wypelnijLinkProdukty();
     var odp = await SYG.wezwij('blog-lista', {});
-    wpisyBlog = odp.ok ? (odp.wpisy || []) : [];
+    if (!odp || !odp.ok){
+      infoBlog((odp && odp.blad) || 'Nie udało się pobrać wpisów z bazy. Lista nie została zmieniona.');
+      return;
+    }
+    wpisyBlog = odp.wpisy || [];
     /* najnowsze na górze, najstarsze na dole */
     wpisyBlog.sort(function(a, b){
       var da = String(a.data || ''), db = String(b.data || '');
@@ -1738,10 +1758,11 @@
         var id = Number(ch.getAttribute('data-id'));
         var odp = await SYG.wezwij('blog-widocznosc', { id: id, widoczny: ch.checked });
         var w = wpisyBlog.find(function(x){ return Number(x.id) === id; });
-        if (odp.ok && w) w.widoczny = ch.checked;
-        infoBlog(odp.ok
+        if (odp && odp.ok && w) w.widoczny = ch.checked;
+        else ch.checked = !!(w && w.widoczny !== false);
+        infoBlog(odp && odp.ok
           ? 'Wpis „' + (w ? w.tytul : '') + '” jest teraz ' + (ch.checked ? 'WIDOCZNY na stronie.' : 'UKRYTY.')
-          : (odp.blad || 'Nie zapisano.'));
+          : ((odp && odp.blad) || 'Nie zapisano. Zmiana została cofnięta.'));
         if (Number(wybranyId) === id && !trybEdycji) pokazPodglad();
       });
     });
@@ -1842,7 +1863,11 @@
 
   document.getElementById('blog-anuluj').addEventListener('click', async function(){
     if (nowySzkic && wybranyId){
-      await SYG.wezwij('blog-usun', { id: wybranyId });
+      var usun = await SYG.wezwij('blog-usun', { id: wybranyId });
+      if (!usun || !usun.ok){
+        infoBlog((usun && usun.blad) || 'Nie udało się usunąć szkicu z bazy.');
+        return;
+      }
       wybranyId = null;
       infoBlog('Nowy wpis odrzucony.');
     }
@@ -1919,7 +1944,11 @@
 
   async function ladujStrony(){
     var odp = await SYG.wezwij('strony-lista', {});
-    var lista = odp.ok ? (odp.strony || []) : [];
+    if (!odp || !odp.ok){
+      infoStrony((odp && odp.blad) || 'Nie udało się pobrać podstron z bazy. Lista nie została zmieniona.');
+      return;
+    }
+    var lista = odp.strony || [];
     var tbody = document.querySelector('#tabela-stron tbody');
     tbody.innerHTML = lista.map(function(s){
       return '<tr>' +
@@ -1990,14 +2019,25 @@
   });
 
   /* ============ ustawienia (cennik dostawy) ============ */
-  function ladujUstawienia(){
-    var c = SYG.ustawieniaDostawa();
-    document.getElementById('u-paczkomat-s').value = c.paczkomat.S;
-    document.getElementById('u-paczkomat-m').value = c.paczkomat.M;
-    document.getElementById('u-paczkomat-l').value = c.paczkomat.L;
-    document.getElementById('u-kurier-s').value = c.kurier.S;
-    document.getElementById('u-kurier-m').value = c.kurier.M;
-    document.getElementById('u-kurier-l').value = c.kurier.L;
+  async function ladujUstawienia(){
+    var f = document.getElementById('ustawienia-info');
+    try {
+      var c = await SYG.ustawieniaDostawa();
+      document.getElementById('u-paczkomat-s').value = c.paczkomat.S;
+      document.getElementById('u-paczkomat-m').value = c.paczkomat.M;
+      document.getElementById('u-paczkomat-l').value = c.paczkomat.L;
+      document.getElementById('u-kurier-s').value = c.kurier.S;
+      document.getElementById('u-kurier-m').value = c.kurier.M;
+      document.getElementById('u-kurier-l').value = c.kurier.L;
+      f.style.display = 'none';
+      document.getElementById('zapisz-dostawe').disabled = false;
+    } catch(err){
+      document.getElementById('zapisz-dostawe').disabled = true;
+      f.style.display = 'block';
+      f.style.background = '#8a2f1d';
+      f.style.color = '#fff';
+      f.textContent = 'Nie udało się pobrać stawek z bazy. Nie zmieniaj ani nie zapisuj domyślnych wartości. ' + (err.message || '');
+    }
   }
   document.getElementById('zapisz-dostawe').addEventListener('click', async function(){
     var cennik = {
@@ -2011,7 +2051,9 @@
     var odp = await SYG.wezwij('ustawienia-dostawa-zapisz', { cennik: cennik });
     var f = document.getElementById('ustawienia-info');
     f.style.display = 'block';
-    f.textContent = odp.ok ? 'Cennik dostawy zapisany — formularz zamówienia używa nowych stawek.' : (odp.blad || 'Nie zapisano.');
+    f.style.background = odp && odp.ok ? 'var(--butelkowa)' : '#8a2f1d';
+    f.style.color = '#fff';
+    f.textContent = odp && odp.ok ? 'Cennik dostawy zapisany we wspólnej bazie.' : ((odp && odp.blad) || 'Nie zapisano.');
     setTimeout(function(){ f.style.display = 'none'; }, 4000);
   });
 
@@ -2036,7 +2078,7 @@
   // Tylko znacznik sesji po poprawnym logowaniu może otworzyć panel.
   var zalogowany = false;
   try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
-  if (zalogowany) pokazPanel();
+  if (zalogowany && !SYG.TRYB_DEMO) pokazPanel();
   else logowanie.style.display = 'block';
 
   document.getElementById('pokaz-admin-haslo').addEventListener('click', function(){

@@ -642,6 +642,7 @@ function doPost(e) {
       case 'strony-lista':            return odpowiedz(stronyLista());
       case 'strona-glowna-pobierz':   return odpowiedz({ ok: true, dane: odczytJsonUstawienia('stronaGlowna') });
       case 'strona-zamowienia-pobierz': return odpowiedz({ ok: true, dane: odczytJsonUstawienia('stronaZamowienia') });
+      case 'ustawienia-dostawa-pobierz': return odpowiedz({ ok: true, cennik: odczytJsonUstawienia('dostawa') || DOSTAWA_STARTOWA });
       /* ---------------- admin (klucz) ---------------- */
       case 'admin-login':             return odpowiedz(adminLogin(dane));
       case 'zamowienia-lista':        return odpowiedz(maAdminDostep(dane) ? zamowieniaLista() : bladSesjiAdmina());
@@ -695,32 +696,29 @@ function mediaUploadGitHub(d) {
     .replace(/[\u0300-\u036f]/g, '').toLowerCase()
     .replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 45) || 'zdjecie';
   const filename = slug + '-' + Date.now() + '-' + Utilities.getUuid().slice(0, 6) + '.jpg';
-  const rel = 'assets/media/przeslane/' + filename;
-  const paths = ['www/' + rel, 'docs/' + rel];
-  const branch = 'arena/01a0ca92-sygnatura-v-2';
-  const headers = {
-    Authorization: 'Bearer ' + token,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28'
-  };
-  for (let i = 0; i < paths.length; i++) {
-    const encodedPath = paths[i].split('/').map(encodeURIComponent).join('/');
-    const url = 'https://api.github.com/repos/maciejhaufa-dev/Sygnatura-v.2/contents/' + encodedPath;
-    const response = UrlFetchApp.fetch(url, {
-      method: 'put', contentType: 'application/json', headers: headers, muteHttpExceptions: true,
-      payload: JSON.stringify({
-        message: 'media: dodaj zdjęcie tła ' + filename,
-        content: base64,
-        branch: branch
-      })
-    });
-    const code = response.getResponseCode();
-    if (code !== 201 && code !== 200) {
-      console.error('GitHub media upload failed, HTTP ' + code + ': ' + response.getContentText().slice(0, 500));
-      return { ok: false, blad: 'GitHub odrzucił zdjęcie (HTTP ' + code + '). Sprawdź token i uprawnienie Contents: Read and write.' };
-    }
+  const rel = 'uploads/' + filename;
+  const path = rel.split('/').map(encodeURIComponent).join('/');
+  const url = 'https://api.github.com/repos/maciejhaufa-dev/Sygnatura-v.2/contents/' + path;
+  const response = UrlFetchApp.fetch(url, {
+    method: 'put', contentType: 'application/json', muteHttpExceptions: true,
+    headers: {
+      Authorization: 'Bearer ' + token,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    },
+    payload: JSON.stringify({
+      message: 'media: dodaj zdjęcie do wspólnej biblioteki ' + filename,
+      content: base64,
+      branch: 'main'
+    })
+  });
+  const code = response.getResponseCode();
+  if (code !== 201 && code !== 200) {
+    console.error('GitHub media upload failed, HTTP ' + code + ': ' + response.getContentText().slice(0, 500));
+    return { ok: false, blad: 'Nie udało się zapisać zdjęcia w origin/main/uploads (HTTP ' + code + '). Sprawdź token i uprawnienie Contents: Read and write.' };
   }
-  return { ok: true, obraz: rel, nazwa: filename };
+  const obraz = 'https://raw.githubusercontent.com/maciejhaufa-dev/Sygnatura-v.2/main/' + rel;
+  return { ok: true, obraz: obraz, nazwa: filename };
 }
 
 function sprawdzKonfiguracjeGitHub() {

@@ -25,7 +25,11 @@
   /* ---------- lista (kafle) ---------- */
   async function lista(kontener) {
     const odp = await SYG.wezwij('blog-lista', {});
-    const wpisy = (odp.ok && odp.wpisy) || [];
+    if (!odp || !odp.ok){
+      kontener.innerHTML = '<p class="mala" role="alert" style="padding:14px 0">Nie udało się pobrać realizacji. Odśwież stronę za chwilę.</p>';
+      return;
+    }
+    const wpisy = odp.wpisy || [];
     /* tylko widoczne, najnowsze na górze */
     const widoczne = wpisy.filter(function (w) { return w.widoczny !== false; })
       .sort(function (a, b) {
