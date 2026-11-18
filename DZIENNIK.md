@@ -1847,3 +1847,9 @@ weryfikować z parametrem cache-busting.
 2. Logo w lewym górnym rogu jest linkiem do strony głównej. Układ kontaktu jest dostosowany do małych ekranów.
 3. Podbito cache-bust do **`?v=345`** i stopkę do **28.65** we wszystkich HTML-ach; zsynchronizowano `docs/` (zachowano `docs/.nojekyll`).
 4. Kontrola składni JS, skryptów inline i `git diff --check` przeszła. Commit **`5c224bf`** wypchnięto na `arena/01a0ca92-sygnatura-v-2`; Pages build ma status **built**. `fetch_page` live potwierdził usunięcie górnego paska kontakt/social.
+
+### Sesja 30/8 (22.09.2026) — SUBTELNY KONTAKT I IKONY SOCIAL W LEWYM PANELU (wersja 28.66, ?v=346)
+1. Poprawiono przyczynę przerośniętych ikon: strona główna ma własny `<style>` i nie ładuje `assets/style.css`, więc dodano style układu również bezpośrednio do `www/index.html`.
+2. Ikony social mają teraz proporcjonalne rozmiary, subtelne obramowanie i jeden poziomy rząd pod etykietą „Znajdź nas na:”. Nad nimi są dwa wiersze kontaktu z małymi ikonami telefonu i koperty.
+3. Telefon jest klikalny przez `tel:`; e-mail otwiera pocztę przez `mailto:kontakt@studiosygnatura.pl`. Zmieniono analogicznie statyczną stronę główną i dynamiczny szkielet podstron.
+4. Cache-bust **`?v=346`**, stopka **28.66**, synchronizacja `docs/`; kontrola składni JS, skryptów inline i `git diff --check` przeszła. Kod wypchnięto jako **`0c57fc0`**; Pages build dla tego commita ma status **built**. `fetch_page` potwierdził publikację nowej wersji CSS i JS.
