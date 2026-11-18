@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=349">
+<link rel="stylesheet" href="assets/style.css?v=350">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -576,13 +576,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=349"></script>
-<script src="assets/koszyk.js?v=349"></script>
-<script src="assets/api.js?v=349"></script>
-<script src="assets/editor.js?v=349"></script>
-<script src="assets/edytor.js?v=349"></script>
-<script src="data/katalog.js?v=349"></script>
-<script src="assets/main.js?v=349"></script>
+<script src="assets/config.js?v=350"></script>
+<script src="assets/koszyk.js?v=350"></script>
+<script src="assets/api.js?v=350"></script>
+<script src="assets/editor.js?v=350"></script>
+<script src="assets/edytor.js?v=350"></script>
+<script src="data/katalog.js?v=350"></script>
+<script src="assets/main.js?v=350"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -1760,18 +1760,71 @@
     });
   }
 
-  document.getElementById('bf-pliki').addEventListener('change', function(){
-    var files = Array.prototype.slice.call(this.files || []);
-    files.forEach(function(f){
-      if (galeria.length >= 10){ alert('Maksymalnie 10 zdjęć.'); return; }
-      var fr = new FileReader();
-      fr.onload = function(){
-        galeria.push({ src: fr.result, glowna: galeria.length === 0 });
-        rysujMini();
-      };
-      fr.readAsDataURL(f);
+  var blogUploadWTrakcie = false;
+  var BLOG_MEDIA_URL = /^https:\/\/raw\.githubusercontent\.com\/maciejhaufa-dev\/Sygnatura-v\.2\/main\/uploads\/[A-Za-z0-9._-]+\.jpg$/;
+
+  async function blogObrazDoBiblioteki(blob, nazwa){
+    var dataUrl = await sgObrazDoJpeg(blob);
+    if (SYG.TRYB_DEMO) return dataUrl;
+    var odp = await SYG.wezwij('media-upload', {
+      nazwa: sgMediaNazwa(nazwa || 'wpis-zdjecie'),
+      base64: dataUrl.split(',')[1] || ''
     });
+    if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Nie udało się wysłać zdjęcia.');
+    if (!BLOG_MEDIA_URL.test(String(odp.obraz || ''))){
+      throw new Error('Apps Script nie zwrócił poprawnego adresu zdjęcia. Sprawdź wdrożenie akcji media-upload.');
+    }
+    return odp.obraz;
+  }
+
+  function blogBlobZDataUrl(src){
+    var m = /^data:(image\/[A-Za-z0-9.+-]+);base64,([\s\S]+)$/.exec(String(src || ''));
+    if (!m) throw new Error('Nie udało się odczytać osadzonego zdjęcia. Usuń je i dodaj ponownie jako plik.');
+    var binary = atob(m[2]);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new Blob([bytes], { type: m[1] });
+  }
+
+  async function blogZamienZdjeciaOsadzone(){
+    for (var i = 0; i < galeria.length; i++){
+      if (/^data:image\//i.test(String(galeria[i].src || ''))){
+        infoBlog('Wysyłam zdjęcie wpisu ' + (i + 1) + ' do biblioteki…');
+        galeria[i].src = await blogObrazDoBiblioteki(blogBlobZDataUrl(galeria[i].src), 'wpis-' + wybranyId + '-' + (i + 1));
+        rysujMini();
+      }
+    }
+    var kont = document.createElement('div');
+    kont.innerHTML = blogEdytor.pobierz();
+    var obrazy = Array.prototype.slice.call(kont.querySelectorAll('img[src^="data:image/"]'));
+    for (var j = 0; j < obrazy.length; j++){
+      infoBlog('Wysyłam zdjęcie osadzone w treści ' + (j + 1) + ' z ' + obrazy.length + '…');
+      obrazy[j].src = await blogObrazDoBiblioteki(blogBlobZDataUrl(obrazy[j].getAttribute('src')), 'wpis-' + wybranyId + '-tresc-' + (j + 1));
+      blogEdytor.ustaw(kont.innerHTML);
+    }
+    return blogEdytor.pobierz();
+  }
+
+  document.getElementById('bf-pliki').addEventListener('change', async function(){
+    var files = Array.prototype.slice.call(this.files || []);
     this.value = '';
+    if (!files.length) return;
+    if (blogUploadWTrakcie){ infoBlog('Poczekaj na zakończenie poprzedniego wysyłania zdjęć.'); return; }
+    blogUploadWTrakcie = true;
+    try {
+      for (var i = 0; i < files.length; i++){
+        if (galeria.length >= 10){ infoBlog('Osiągnięto limit 10 zdjęć. Reszta plików nie została dodana.'); break; }
+        infoBlog('Przygotowuję zdjęcie ' + (i + 1) + ' z ' + files.length + '…');
+        var src = await blogObrazDoBiblioteki(files[i], 'wpis-' + wybranyId + '-' + (galeria.length + 1));
+        galeria.push({ src: src, glowna: galeria.length === 0 });
+        rysujMini();
+        infoBlog('Zdjęcie dodano do wpisu' + (SYG.TRYB_DEMO ? ' (lokalnie).' : ' i biblioteki.'));
+      }
+    } catch (err){
+      infoBlog('Nie dodano zdjęcia: ' + (err.message || 'błąd wysyłania.'));
+    } finally {
+      blogUploadWTrakcie = false;
+    }
   });
 
   document.getElementById('bf-sklep').addEventListener('change', function(){
@@ -1988,12 +2041,26 @@
     var tytul = document.getElementById('bf-tytul').value.trim();
     if (!tytul){ alert('Podaj tytuł wpisu.'); return; }
     var widoczny = document.getElementById('bf-widoczny').checked;
+    if (blogUploadWTrakcie){ infoBlog('Poczekaj, aż zdjęcia zostaną wysłane.'); return; }
     var sklep = document.getElementById('bf-sklep').checked;
     var link = document.getElementById('bf-p-link').value;
     var kat = await katCache();
     var istniejacy = kat.find(function(p){ return Number(p.id) === Number(link); });
     var w = wpisWybrany() || {};
     var glowna = galeria.find(function(g){ return g.glowna; }) || galeria[0];
+    var trescWpisu;
+    var przyciskZapisu = document.getElementById('blog-zapisz');
+    przyciskZapisu.disabled = true;
+    var oryginalnyTekstZapisu = przyciskZapisu.textContent;
+    przyciskZapisu.textContent = 'Zapisywanie…';
+    try {
+      trescWpisu = await blogZamienZdjeciaOsadzone();
+    } catch (errUpload){
+      infoBlog('Nie zapisano wpisu — problem ze zdjęciem: ' + (errUpload.message || 'błąd wysyłania.'));
+      przyciskZapisu.disabled = false;
+      przyciskZapisu.textContent = oryginalnyTekstZapisu;
+      return;
+    }
     var wpis = {
       id: wybranyId,
       tytul: tytul,
@@ -2004,7 +2071,7 @@
       okladka: glowna ? glowna.src : 'assets/media/sklep/szopka.jpg',
       galeria: galeria.map(function(g){ return g.src; }),
       video: document.getElementById('bf-video').value.trim(),
-      tresc: blogEdytor.pobierz(),
+      tresc: trescWpisu,
       produkt: {
         sklep: sklep,
         id: istniejacy ? Number(link) : (w.produkt && w.produkt.id ? w.produkt.id : 0),
@@ -2013,7 +2080,17 @@
         gabaryt: document.getElementById('bf-p-gabaryt').value.trim()
       }
     };
+    var najdluzszePole = Math.max(wpis.tresc.length, JSON.stringify(wpis.galeria).length,
+      String(wpis.okladka || '').length, JSON.stringify(wpis.produkt || {}).length);
+    if (!SYG.TRYB_DEMO && najdluzszePole >= 49000){
+      infoBlog('Nie zapisano: jedno z pól wpisu nadal jest zbyt duże dla arkusza. Usuń bardzo długi tekst lub ponownie dodaj zdjęcie jako plik.');
+      przyciskZapisu.disabled = false;
+      przyciskZapisu.textContent = oryginalnyTekstZapisu;
+      return;
+    }
     var odp = await SYG.wezwij('blog-zapisz', { wpis: wpis });
+    przyciskZapisu.disabled = false;
+    przyciskZapisu.textContent = oryginalnyTekstZapisu;
     if (odp.ok){
       _katCache = null;
       wybranyId = odp.id;
