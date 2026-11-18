@@ -11,7 +11,7 @@
 
 **Bieżący zakres:** panel musi zapisywać do trwałej, wspólnej bazy; teraz wykonujemy tylko wskazane przez właściciela punkty 1–2 (linki social, proporcje zdjęć) oraz naprawiamy blokujący błąd dodawania produktu. Branch: `arena/01a0ca92-sygnatura-v-2`.
 
-**Wprowadzone w repo (Pages jeszcze nie wdrożony dla tej rundy; Apps Script też wymaga publikacji):**
+**Wdrożone w repo/Pages (Apps Script nadal wymaga publikacji):**
 - Social media podpięte w nagłówku wszystkich podstron i na stronie głównej do podanych przez właściciela adresów; otwierają się w nowej karcie.
 - Hero jest wyższy, zdjęcie tła ma `contain` (cały obraz widoczny, bez Ken Burns crop); tak samo podgląd panelu. Zdjęcia produktów, realizacji, wpisów i personalizacji mają kwadratowe kadry z `object-fit: contain`; okładka wpisu nie jest przycinana.
 - `www/admin.html`: dodanie produktu potwierdza zapis API; zdjęcie jest kompresowane i najpierw uploadowane do wspólnej biblioteki `main/uploads/`, a potem zapisywany jest URL produktu. Brak potwierdzenia nie pokazuje sukcesu.
@@ -20,7 +20,7 @@
 
 **Błąd „zły klucz”:** prawdopodobna rozbieżność wersji/`TOKEN` w wdrożonym Apps Script (stary wariant `Kod.gs` + `Konfig.gs`) względem klienta. Nie potwierdzono live przyczyną, bo POST nie jest dostępny przez narzędzie fetch. Nie przyjmować ani nie prosić o auth/sekrety. Aktualizacja i redeploy istniejącego Apps Script przez właściciela są konieczne; `GITHUB_TOKEN` w Script Properties jest wymagany do uploadu zdjęć.
 
-**Testy kodu:** składnia JS assets/inline oraz Apps Script (PLIK1–3 i CALOSC) przeszła; 35 akcji UI mapuje się na backend; wszystkie podane adresy social występują w obu headerach; 125 markerów HTML to `v344`. Po sync `docs/`, commit/push, Pages build check i `fetch_page` live.
+**Weryfikacja:** składnia JS assets/inline oraz Apps Script (PLIK1–3 i CALOSC) przeszła; 35 akcji UI mapuje się na backend; wszystkie podane adresy social występują w obu headerach; 125 markerów HTML to `v344`. Commit `69d2f9f` wypchnięty na branch; Pages build `built`. `fetch_page` dla live `index.html?v=344` potwierdził cztery linki social, dla `assets/style.css?v=344` pełne zdjęcie (`contain`) i większy hero, a `admin.html?v=344` nowy tekst i brak starych podpowiedzi o demo. Nie można w ten sposób potwierdzić runtime POST Apps Script.
 
 **Rozbieżność niezwiązana z tym zakresem:** `www/assets/config.js` ma `LAUNCH:true` mimo że starsza tabela niżej opisuje `false`; nie przełączono bez decyzji właściciela o uruchomieniu pełnego serwisu.
 
