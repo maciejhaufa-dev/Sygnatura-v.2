@@ -415,7 +415,9 @@ function adminLogin(d) {
     if (String(dane[i][0] || '').toLowerCase() === login &&
         String(dane[i][2]) === '1' &&
         String(dane[i][1]) === sha256(String(d.haslo || ''))) {
-      return { ok: true, admin: { email: String(dane[i][0]) } };
+      const sessionToken = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+      CacheService.getScriptCache().put('syg-admin-session-' + sessionToken, String(dane[i][0]), 21600);
+      return { ok: true, sessionToken: sessionToken, admin: { email: String(dane[i][0]) } };
     }
   }
   return { ok: false, blad: 'Nieprawidłowy e-mail lub hasło.' };

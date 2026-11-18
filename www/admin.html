@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=340">
+<link rel="stylesheet" href="assets/style.css?v=341">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -564,13 +564,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=340"></script>
-<script src="assets/koszyk.js?v=340"></script>
-<script src="assets/api.js?v=340"></script>
-<script src="assets/editor.js?v=340"></script>
-<script src="assets/edytor.js?v=340"></script>
-<script src="data/katalog.js?v=340"></script>
-<script src="assets/main.js?v=340"></script>
+<script src="assets/config.js?v=341"></script>
+<script src="assets/koszyk.js?v=341"></script>
+<script src="assets/api.js?v=341"></script>
+<script src="assets/editor.js?v=341"></script>
+<script src="assets/edytor.js?v=341"></script>
+<script src="data/katalog.js?v=341"></script>
+<script src="assets/main.js?v=341"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -703,16 +703,21 @@
   function sgEsc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
-  /* ---------- biblioteka własnych zdjęć (nazwa -> dataURL) ----------
-     W wersji demo biblioteka siedzi w tej przeglądarce (localStorage);
-     po wdrożeniu Google Apps Script pliki trafią do folderu sieciowego
-     assets/media/przeslane/ pod tymi samymi nazwami. */
+  /* ---------- biblioteka zdjęć ----------
+     Tryb demo używa localStorage. W trybie API zdjęcia trafiają do
+     assets/media/przeslane/ w repozytorium GitHub (przez Apps Script). */
   var SG_MEDIA_KLUCZ = 'syg-media-v1';
+  var SG_GITHUB_MEDIA_KLUCZ = 'syg-github-media-v1';
   function sgMediaBiblioteka(){
     try { return JSON.parse(localStorage.getItem(SG_MEDIA_KLUCZ) || '{}'); }
     catch (e) { return {}; }
   }
   function sgMediaZapisz(bib){ localStorage.setItem(SG_MEDIA_KLUCZ, JSON.stringify(bib)); }
+  function sgGitHubMediaBiblioteka(){
+    try { return JSON.parse(localStorage.getItem(SG_GITHUB_MEDIA_KLUCZ) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function sgGitHubMediaZapisz(bib){ localStorage.setItem(SG_GITHUB_MEDIA_KLUCZ, JSON.stringify(bib)); }
   function sgMediaRozwiaz(o){
     if (String(o).indexOf('media:') === 0){
       var d = sgMediaBiblioteka()[o.slice(6)];
@@ -757,8 +762,10 @@
   function sgObrazOpcje(wybor){
     var sel = document.getElementById('sg-obraz');
     var bib = sgMediaBiblioteka();
+    var gitBib = sgGitHubMediaBiblioteka();
     var opcje = SG_OBRAZY.slice();
-    if (wybor && opcje.indexOf(wybor) < 0 && String(wybor).indexOf('media:') !== 0) opcje.push(wybor);
+    var jestGit = Object.keys(gitBib).some(function(n){ return gitBib[n] === wybor; });
+    if (wybor && opcje.indexOf(wybor) < 0 && String(wybor).indexOf('media:') !== 0 && !jestGit) opcje.push(wybor);
     var html = opcje.map(function (o) {
       return '<option value="' + sgEsc(o) + '"' + (o === wybor ? ' selected' : '') + '>' +
         (o === 'gradient' ? 'Gradient butelkowo-brązowy (bez zdjęcia)' : sgEsc(o)) + '</option>';
@@ -766,7 +773,12 @@
     html += Object.keys(bib).sort().map(function (nazwa) {
       var val = 'media:' + nazwa;
       return '<option value="' + sgEsc(val) + '"' + (val === wybor ? ' selected' : '') +
-        '>📁 ' + sgEsc(nazwa) + ' (własne zdjęcie)</option>';
+        '>📁 ' + sgEsc(nazwa) + ' (lokalne zdjęcie)</option>';
+    }).join('');
+    html += Object.keys(gitBib).sort().map(function (nazwa) {
+      var val = gitBib[nazwa];
+      return '<option value="' + sgEsc(val) + '"' + (val === wybor ? ' selected' : '') +
+        '>☁ ' + sgEsc(nazwa) + ' (GitHub)</option>';
     }).join('');
     sel.innerHTML = html;
     sgObrazGuziki();
@@ -1146,31 +1158,82 @@
     var inpNazwa = document.getElementById('sg-obraz-nazwa');
     if (inpNazwa) inpNazwa.value = sgMediaNazwa(String(f.name).replace(/\.[^.]+$/, ''));
   });
+  function sgObrazDoJpeg(plik){
+    return new Promise(function(resolve, reject){
+      var fr = new FileReader();
+      fr.onerror = function(){ reject(new Error('Nie udało się odczytać zdjęcia.')); };
+      fr.onload = function(){
+        var img = new Image();
+        img.onerror = function(){ reject(new Error('Nieprawidłowy plik zdjęcia.')); };
+        img.onload = function(){
+          var skala = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.naturalWidth * skala));
+          canvas.height = Math.max(1, Math.round(img.naturalHeight * skala));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(function(blob){
+            if (!blob){ reject(new Error('Nie udało się przygotować zdjęcia do wysłania.')); return; }
+            var fr2 = new FileReader();
+            fr2.onerror = function(){ reject(new Error('Nie udało się przygotować zdjęcia do wysłania.')); };
+            fr2.onload = function(){ resolve(String(fr2.result)); };
+            fr2.readAsDataURL(blob);
+          }, 'image/jpeg', 0.82);
+        };
+        img.src = String(fr.result);
+      };
+      fr.readAsDataURL(plik);
+    });
+  }
+
   var btnZapiszObraz = document.getElementById('sg-obraz-zapisz');
-  if (btnZapiszObraz) btnZapiszObraz.addEventListener('click', function(){
+  if (btnZapiszObraz) btnZapiszObraz.addEventListener('click', async function(){
     var f = document.getElementById('sg-obraz-plik').files &&
             document.getElementById('sg-obraz-plik').files[0];
     var nazwa = sgMediaNazwa(document.getElementById('sg-obraz-nazwa').value);
     if (!f){ alert('Najpierw wybierz plik ze zdjęciem.'); return; }
     var bib = sgMediaBiblioteka();
-    if (bib[nazwa] && !confirm('Zdjęcie „' + nazwa + '" już jest w bibliotece. Nadpisać?')) return;
-    var fr = new FileReader();
-    fr.onload = function(){
-      bib[nazwa] = fr.result;
-      sgMediaZapisz(bib);
-      sgObrazOpcje('media:' + nazwa);
+    if (SYG.TRYB_DEMO && bib[nazwa] && !confirm('Zdjęcie „' + nazwa + '" już jest w bibliotece. Nadpisać?')) return;
+    btnZapiszObraz.disabled = true;
+    var obrazOryginalny = btnZapiszObraz.textContent;
+    btnZapiszObraz.textContent = 'Wysyłanie…';
+    try {
+      var dataUrl = await sgObrazDoJpeg(f);
+      var obraz = '';
+      if (SYG.TRYB_DEMO){
+        bib[nazwa] = dataUrl;
+        sgMediaZapisz(bib);
+        obraz = 'media:' + nazwa;
+      } else {
+        var czesc = dataUrl.split(',')[1] || '';
+        var odp = await SYG.wezwij('media-upload', { nazwa: nazwa, base64: czesc });
+        if (!odp || !odp.ok){
+          sgInfo((odp && odp.blad) || 'Nie udało się wysłać zdjęcia na GitHub.', true);
+          return;
+        }
+        obraz = odp.obraz;
+        var gitBib = sgGitHubMediaBiblioteka();
+        gitBib[nazwa] = obraz;
+        sgGitHubMediaZapisz(gitBib);
+      }
+      sgObrazOpcje(obraz);
       odswiezPodgladObrazu();
       odswiezTloEdytora();
       if (SG_EDYCJA){
         var kafle = sgKafle();
         var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
-        if (i >= 0){ kafle[i].obraz = 'media:' + nazwa; ustawBrudny(); rysujKafle(); }
+        if (i >= 0){ kafle[i].obraz = obraz; ustawBrudny(); rysujKafle(); }
       }
       var box = document.getElementById('sg-obraz-wgraj-box');
       if (box) box.style.display = 'none';
-      sgInfo('Zdjęcie zapisane w bibliotece jako „' + nazwa + '".', false);
-    };
-    fr.readAsDataURL(f);
+      sgInfo(SYG.TRYB_DEMO
+        ? 'Zdjęcie zapisane lokalnie (tryb demo).'
+        : 'Zdjęcie wysłane do GitHuba. Kliknij „Zapisz zmiany strony głównej”, aby opublikować baner.', false);
+    } catch (err){
+      sgInfo(err.message || 'Nie udało się przygotować zdjęcia.', true);
+    } finally {
+      btnZapiszObraz.disabled = false;
+      btnZapiszObraz.textContent = obrazOryginalny;
+    }
   });
   var btnZmienObraz = document.getElementById('sg-obraz-zmien');
   if (btnZmienObraz) btnZmienObraz.addEventListener('click', function(){
@@ -1972,7 +2035,10 @@
   // Nigdy nie traktuj publicznego klucza API jako dowodu zalogowania.
   // Tylko znacznik sesji po poprawnym logowaniu może otworzyć panel.
   var zalogowany = false;
-  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
+  try {
+    zalogowany = sessionStorage.getItem('syg-admin') === '1' &&
+      !!sessionStorage.getItem('syg-admin-session');
+  } catch(e){}
   if (zalogowany) pokazPanel();
   else logowanie.style.display = 'block';
 
@@ -2007,10 +2073,16 @@
       }
     }
 
-    if (passOk){
-      try { sessionStorage.setItem('syg-admin', '1'); } catch(e){}
+    if (passOk && odp && odp.sessionToken){
+      try {
+        sessionStorage.setItem('syg-admin-session', odp.sessionToken);
+        sessionStorage.setItem('syg-admin', '1');
+      } catch(e){}
       logowanieBlad.style.display = 'none';
       pokazPanel();
+    } else if (passOk){
+      logowanieBlad.textContent = 'Backend wymaga aktualizacji logowania. Odśwież po wdrożeniu Apps Script.';
+      logowanieBlad.style.display = 'block';
     } else {
       logowanieBlad.textContent = 'Nieprawidłowy login lub hasło.';
       logowanieBlad.style.display = 'block';
@@ -2022,7 +2094,10 @@
   document.getElementById('admin-haslo').addEventListener('keydown', function(e){ if (e.key === 'Enter') sprobujZalogowac(); });
 
   document.getElementById('wyloguj').addEventListener('click', function(){
-    try { sessionStorage.removeItem('syg-admin'); } catch(e){}
+    try {
+      sessionStorage.removeItem('syg-admin');
+      sessionStorage.removeItem('syg-admin-session');
+    } catch(e){}
     window.location.reload();
   });
 

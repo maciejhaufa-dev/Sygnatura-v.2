@@ -644,20 +644,21 @@ function doPost(e) {
       case 'strona-zamowienia-pobierz': return odpowiedz({ ok: true, dane: odczytJsonUstawienia('stronaZamowienia') });
       /* ---------------- admin (klucz) ---------------- */
       case 'admin-login':             return odpowiedz(adminLogin(dane));
-      case 'zamowienia-lista':        return odpowiedz(maKlucz(dane) ? zamowieniaLista() : bladKlucza());
-      case 'zamowienie-status':       return odpowiedz(maKlucz(dane) ? zmienStatus(dane) : bladKlucza());
-      case 'blog-zapisz':             return odpowiedz(maKlucz(dane) ? blogZapisz(dane) : bladKlucza());
-      case 'blog-widocznosc':         return odpowiedz(maKlucz(dane) ? blogWidocznosc(dane) : bladKlucza());
-      case 'blog-usun':               return odpowiedz(maKlucz(dane) ? blogUsun(dane) : bladKlucza());
-      case 'produkt-nowy':            return odpowiedz(maKlucz(dane) ? produktNowy(dane) : bladKlucza());
-      case 'produkty-zapisz':         return odpowiedz(maKlucz(dane) ? produktyZapisz(dane) : bladKlucza());
-      case 'strona-glowna-zapisz':    return odpowiedz(maKlucz(dane) ? zapiszJsonUstawienia('stronaGlowna', dane) : bladKlucza());
-      case 'strona-zamowienia-zapisz': return odpowiedz(maKlucz(dane) ? zapiszJsonUstawienia('stronaZamowienia', dane) : bladKlucza());
-      case 'strona-zapisz':           return odpowiedz(maKlucz(dane) ? stronaZapisz(dane) : bladKlucza());
-      case 'strona-usun':             return odpowiedz(maKlucz(dane) ? stronaUsun(dane) : bladKlucza());
-      case 'ustawienia-dostawa-zapisz': return odpowiedz(maKlucz(dane) ? dostawaZapisz(dane) : bladKlucza());
-      case 'wynajem-zapytania-lista': return odpowiedz(maKlucz(dane) ? wynajemZapytaniaLista() : bladKlucza());
-      case 'wiadomosci-lista':        return odpowiedz(maKlucz(dane) ? wiadomosciLista() : bladKlucza());
+      case 'zamowienia-lista':        return odpowiedz(maAdminDostep(dane) ? zamowieniaLista() : bladSesjiAdmina());
+      case 'zamowienie-status':       return odpowiedz(maAdminDostep(dane) ? zmienStatus(dane) : bladSesjiAdmina());
+      case 'blog-zapisz':             return odpowiedz(maAdminDostep(dane) ? blogZapisz(dane) : bladSesjiAdmina());
+      case 'blog-widocznosc':         return odpowiedz(maAdminDostep(dane) ? blogWidocznosc(dane) : bladSesjiAdmina());
+      case 'blog-usun':               return odpowiedz(maAdminDostep(dane) ? blogUsun(dane) : bladSesjiAdmina());
+      case 'produkt-nowy':            return odpowiedz(maAdminDostep(dane) ? produktNowy(dane) : bladSesjiAdmina());
+      case 'media-upload':             return odpowiedz(maAdminDostep(dane) ? mediaUploadGitHub(dane) : bladSesjiAdmina());
+      case 'produkty-zapisz':         return odpowiedz(maAdminDostep(dane) ? produktyZapisz(dane) : bladSesjiAdmina());
+      case 'strona-glowna-zapisz':    return odpowiedz(maAdminDostep(dane) ? zapiszJsonUstawienia('stronaGlowna', dane) : bladSesjiAdmina());
+      case 'strona-zamowienia-zapisz': return odpowiedz(maAdminDostep(dane) ? zapiszJsonUstawienia('stronaZamowienia', dane) : bladSesjiAdmina());
+      case 'strona-zapisz':           return odpowiedz(maAdminDostep(dane) ? stronaZapisz(dane) : bladSesjiAdmina());
+      case 'strona-usun':             return odpowiedz(maAdminDostep(dane) ? stronaUsun(dane) : bladSesjiAdmina());
+      case 'ustawienia-dostawa-zapisz': return odpowiedz(maAdminDostep(dane) ? dostawaZapisz(dane) : bladSesjiAdmina());
+      case 'wynajem-zapytania-lista': return odpowiedz(maAdminDostep(dane) ? wynajemZapytaniaLista() : bladSesjiAdmina());
+      case 'wiadomosci-lista':        return odpowiedz(maAdminDostep(dane) ? wiadomosciLista() : bladSesjiAdmina());
       default:                        return odpowiedz({ ok: false, blad: 'Nieznana akcja: ' + akcja });
     }
   } catch (err) {
@@ -675,6 +676,67 @@ function maKlucz(d) {
   return t !== '' && t === TOKEN && String(TOKEN).indexOf('WSTAW_TU') !== 0;
 }
 function bladKlucza() { return { ok: false, blad: 'Brak dostępu — zły klucz.' }; }
+function maAdminDostep(d) {
+  if (!maKlucz(d)) return false;
+  const t = String(d.adminSession || '');
+  return t.length >= 32 && !!CacheService.getScriptCache().get('syg-admin-session-' + t);
+}
+function bladSesjiAdmina() { return { ok: false, blad: 'Sesja administratora wygasła. Zaloguj się ponownie.' }; }
+
+/* Własne zdjęcia z panelu → repo GitHub (token wyłącznie w Script Properties). */
+function mediaUploadGitHub(d) {
+  const token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
+  if (!token) return { ok: false, blad: 'Brak konfiguracji GITHUB_TOKEN w ustawieniach Apps Script.' };
+  const base64 = String(d.base64 || '').replace(/^data:image\/jpeg;base64,/, '');
+  if (!base64 || base64.length > 8 * 1024 * 1024 || !/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) {
+    return { ok: false, blad: 'Nieprawidłowe zdjęcie albo plik jest za duży. Wybierz zdjęcie o mniejszej rozdzielczości.' };
+  }
+  const slug = String(d.nazwa || 'zdjecie').normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 45) || 'zdjecie';
+  const filename = slug + '-' + Date.now() + '-' + Utilities.getUuid().slice(0, 6) + '.jpg';
+  const rel = 'assets/media/przeslane/' + filename;
+  const paths = ['www/' + rel, 'docs/' + rel];
+  const branch = 'arena/01a0ca92-sygnatura-v-2';
+  const headers = {
+    Authorization: 'Bearer ' + token,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+  for (let i = 0; i < paths.length; i++) {
+    const encodedPath = paths[i].split('/').map(encodeURIComponent).join('/');
+    const url = 'https://api.github.com/repos/maciejhaufa-dev/Sygnatura-v.2/contents/' + encodedPath;
+    const response = UrlFetchApp.fetch(url, {
+      method: 'put', contentType: 'application/json', headers: headers, muteHttpExceptions: true,
+      payload: JSON.stringify({
+        message: 'media: dodaj zdjęcie tła ' + filename,
+        content: base64,
+        branch: branch
+      })
+    });
+    const code = response.getResponseCode();
+    if (code !== 201 && code !== 200) {
+      console.error('GitHub media upload failed, HTTP ' + code + ': ' + response.getContentText().slice(0, 500));
+      return { ok: false, blad: 'GitHub odrzucił zdjęcie (HTTP ' + code + '). Sprawdź token i uprawnienie Contents: Read and write.' };
+    }
+  }
+  return { ok: true, obraz: rel, nazwa: filename };
+}
+
+function sprawdzKonfiguracjeGitHub() {
+  const token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
+  if (!token) throw new Error('Brak Script Property GITHUB_TOKEN.');
+  const response = UrlFetchApp.fetch('https://api.github.com/repos/maciejhaufa-dev/Sygnatura-v.2', {
+    method: 'get',
+    headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28' },
+    muteHttpExceptions: true
+  });
+  const code = response.getResponseCode();
+  Logger.log('GitHub API HTTP ' + code + (code === 200 ? ' — token działa.' : ' — sprawdź token i dostęp do repozytorium.'));
+  if (code !== 200) throw new Error('GitHub API HTTP ' + code + '.');
+}
+
 
 /* te same obliczenia co w demo (api.js) — deterministyczny hash djb2, 32 bity */
 function hashDemo(str) {
@@ -1278,7 +1340,9 @@ function adminLogin(d) {
     if (String(dane[i][0] || '').toLowerCase() === login &&
         String(dane[i][2]) === '1' &&
         String(dane[i][1]) === sha256(String(d.haslo || ''))) {
-      return { ok: true, admin: { email: String(dane[i][0]) } };
+      const sessionToken = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+      CacheService.getScriptCache().put('syg-admin-session-' + sessionToken, String(dane[i][0]), 21600);
+      return { ok: true, sessionToken: sessionToken, admin: { email: String(dane[i][0]) } };
     }
   }
   return { ok: false, blad: 'Nieprawidłowy e-mail lub hasło.' };

@@ -681,17 +681,21 @@
     dane = dane || {};
     /* Akcje zapisu administratora wymagają klucza API. Podpinamy go tutaj,
        aby każdy przycisk w panelu przekazywał go spójnie. */
-    const ADMIN_AKCJE_ZAPISU = [
-      'zamowienie-status', 'blog-zapisz', 'blog-widocznosc', 'blog-usun',
-      'produkt-nowy', 'produkty-zapisz', 'strona-glowna-zapisz',
+    const ADMIN_AKCJE = [
+      'zamowienia-lista', 'zamowienie-status', 'blog-zapisz', 'blog-widocznosc', 'blog-usun',
+      'produkt-nowy', 'produkty-zapisz', 'media-upload', 'strona-glowna-zapisz',
       'strona-zamowienia-zapisz', 'strona-zapisz', 'strona-usun',
-      'ustawienia-dostawa-zapisz'
+      'ustawienia-dostawa-zapisz', 'wynajem-zapytania-lista', 'wiadomosci-lista'
     ];
-    if (ADMIN_AKCJE_ZAPISU.indexOf(akcja) !== -1 && !dane.klucz) {
+    if (ADMIN_AKCJE.indexOf(akcja) !== -1) {
       try {
+        const dodaj = {};
         const kluczAdmina = sessionStorage.getItem('syg-admin-klucz');
-        if (kluczAdmina) dane = Object.assign({}, dane, { klucz: kluczAdmina });
-      } catch (e) { /* bez storage API zwróci standardowy błąd klucza */ }
+        const sesjaAdmina = sessionStorage.getItem('syg-admin-session');
+        if (!dane.klucz && kluczAdmina) dodaj.klucz = kluczAdmina;
+        if (!dane.adminSession && sesjaAdmina) dodaj.adminSession = sesjaAdmina;
+        if (Object.keys(dodaj).length) dane = Object.assign({}, dane, dodaj);
+      } catch (e) { /* API zwróci standardowy błąd dostępu */ }
     }
     /* akcje konta: podajemy e-mail sesji (strony go nie przesyłają) */
     if (String(akcja).indexOf('konto-') === 0 &&

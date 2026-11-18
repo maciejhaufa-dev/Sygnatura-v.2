@@ -1809,3 +1809,11 @@ weryfikować z parametrem cache-busting.
 1. Zdiagnozowano komunikat „Brak dostępu — zły klucz” przy zapisie ceny: akcje `produkty-zapisz` nie przekazywały `klucz` wymaganego przez API.
 2. W `www/assets/api.js` dodano wspólne dołączanie klucza sesji dla wszystkich mutujących akcji administratora, także bloga, produktów, podstron i ustawień. Dotychczas poprawnie przekazane klucze pozostają bez zmian.
 3. Podbito cache-bust do **`?v=340`**, wersję stopki do **28.60**, skopiowano źródło do `docs/`.
+
+### Sesja 30/6 (22.09.2026) — WŁASNE TŁA ZAPISYWANE DO GITHUBA (wersja 28.61, ?v=341)
+1. Diagnoza: przesłane zdjęcia były przechowywane jako dataURL w `localStorage` administratora; zapis strony przechowywał jedynie `media:nazwa`, więc inne przeglądarki nie miały pliku.
+2. Panel kompresuje zdjęcia do JPEG (maks. 1600 px, jakość 82%), wywołuje akcję `media-upload` po uwierzytelnieniu sesją admina i zapisuje publiczną ścieżkę w ustawieniach slajdu.
+3. Apps Script zapisuje obraz do `www/assets/media/przeslane/` oraz `docs/assets/media/przeslane/` przez GitHub Contents API. Token jest wymagany w Script Properties jako `GITHUB_TOKEN`; nigdy nie trafia do HTML/JS.
+4. Backend wydaje sesję admina w CacheService po prawidłowym loginie/haśle; wszystkie operacje panelu są weryfikowane tą sesją oraz kluczem API. Jednorazowa konfiguracja i redeploy Apps Script opisana w `engine/README.md`.
+5. Po wgraniu zdjęcia żona musi jeszcze kliknąć „Zapisz zmiany strony głównej”.
+5. Podbito wersję do **28.61**, cache-bust do **`?v=341`**, zsynchronizowano `docs/`.
