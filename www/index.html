@@ -96,19 +96,23 @@ a{text-decoration:none;color:inherit}
 
 .brand-blok{color:inherit;text-decoration:none}
 .brand-blok:focus-visible{outline:2px solid var(--zloty);outline-offset:5px}
-.side-contact{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:20px;padding-top:14px;
-  border-top:1px solid rgba(196,165,130,.42);font-family:var(--sans);width:100%}
-.side-contact-item{display:flex;align-items:center;gap:8px;min-width:0;color:rgba(251,247,240,.94);font-size:12px;line-height:1.4;text-decoration:none;white-space:nowrap}
-.side-contact-item:hover{color:var(--zloty)}
-.side-contact-icon{display:block;width:14px;height:14px;flex:0 0 14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--zloty)}
+.side-contact{display:flex;flex-direction:column;align-items:stretch;gap:7px;margin-top:20px;padding-top:15px;
+  border-top:1px solid rgba(196,165,130,.48);font-family:var(--sans);width:100%}
+.side-contact-item{display:flex;align-items:center;gap:9px;width:100%;min-height:38px;padding:6px 8px;
+  border:1px solid rgba(196,165,130,.35);background:rgba(251,247,240,.035);border-radius:2px;
+  color:rgba(251,247,240,.98);font-size:15px;font-weight:600;line-height:1.35;text-decoration:none;white-space:nowrap;transition:all .2s}
+.side-contact-item:hover{color:var(--zloty);border-color:rgba(196,165,130,.78);background:rgba(196,165,130,.10)}
+.side-contact-mail{font-size:clamp(12.5px,.95vw,14px)}
+.side-contact-icon{display:block;width:17px;height:17px;flex:0 0 17px;fill:none;stroke:var(--zloty);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .side-contact-item span{min-width:0}
-.side-social-block{margin-top:7px}
-.side-social-label{display:block;font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:rgba(196,165,130,.88)}
-.side-social{display:flex;align-items:center;gap:6px;margin-top:5px}
-.side-social a{width:28px;height:28px;flex:0 0 28px;border:1px solid rgba(196,165,130,.42);border-radius:50%;color:var(--zloty);display:grid;place-items:center;transition:all .2s}
-.side-social a:hover{background:var(--zloty);color:var(--butelkowa)}
-.side-social svg{display:block;width:14px;height:14px;max-width:14px;max-height:14px}
-@media (max-width:760px){.side-contact{align-items:center;text-align:center;margin-top:18px;padding-top:13px}.side-social-block{text-align:center}.side-social{justify-content:center}}
+.side-social-block{width:100%;margin-top:11px;text-align:center}
+.side-social-label{display:block;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(220,201,172,.98)}
+.side-social{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;gap:8px;width:100%;margin-top:9px;padding:0 3px}
+.side-social a{display:grid;place-items:center;width:100%;height:40px;border:1px solid rgba(196,165,130,.5);border-radius:3px;
+  background:rgba(251,247,240,.035);color:var(--zloty);transition:all .2s}
+.side-social a:hover{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}
+.side-social svg{display:block;width:20px;height:20px;max-width:20px;max-height:20px}
+@media (max-width:760px){.side-contact{margin-top:18px;padding-top:13px}.side-social{gap:7px}}
 
 
 /* --- nagłówek głównej kolumny: wyszukiwarka + koszyk/panel, pod spodem TYTUŁ STRONY --- */
@@ -475,15 +479,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="index.html">Strona główna</a><span class="sep">·</span><a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span><a href="kontakt.html">Kontakt</a></span>
-    <span>© Sygnatura 2026 · wersja 28.66</span>
+    <span>© Sygnatura 2026 · wersja 28.67</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=346"></script>
-<script src="assets/koszyk.js?v=346"></script>
-<script src="assets/config.js?v=346"></script>
-<script src="assets/api.js?v=346"></script>
-<script src="assets/main.js?v=346"></script>
+<script src="data/katalog.js?v=347"></script>
+<script src="assets/koszyk.js?v=347"></script>
+<script src="assets/config.js?v=347"></script>
+<script src="assets/api.js?v=347"></script>
+<script src="assets/main.js?v=347"></script>
 <script>
 /* nagłówek strony głównej: pełny serwis (szukaj + koszyk + konto) albo
    tryb startu (napisz/zadzwoń) — wg SYG.LAUNCH */
@@ -500,7 +504,7 @@ html.dotyk .social{margin-top:14px}
         '<span><a href="index.html">Strona główna</a><span class="sep">·</span>' +
         '<a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
         '<a href="kontakt.html">Kontakt</a></span>' +
-        '<span>© Sygnatura 2026 · wersja 28.66</span>';
+        '<span>© Sygnatura 2026 · wersja 28.67</span>';
     }
   } catch (e) {}
 })();
