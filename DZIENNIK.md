@@ -1782,3 +1782,13 @@ weryfikować z parametrem cache-busting.
    - Dodano plik `CNAME` z domeną `studiosygnatura.pl` do `www/` i `docs/`.
 4. Wersja podbita do **28.56**, cache-bust zasobów zaktualizowany we wszystkich plikach HTML do **`?v=336`**.
 5. Wykonano pełny deploy do `docs/`, zachowano `CNAME`, `404.html` i `.nojekyll`.
+
+---
+
+### Sesja 30/2 (22.09.2026) — AKTUALIZACJA NUMERU KONTAKTOWEGO (538 124 538) I WSPARCIE DNS DLA WWW (wersja 28.57, ?v=337)
+
+1. Zaktualizowano numer telefonu w całym serwisie na **538 124 538** (`config.js`, `index.html`, `kontakt.html`, `konto.html`, `ulotka-a6.svg`).
+2. Domena `studiosygnatura.pl` działa poprawnie i kieruje na GitHub Pages.
+3. Zdiagnozowano problem z `www.studiosygnatura.pl`: pozostałość starego rekordu TXT `"1|www.studiosygnatura.pl"` z przekierowania OVH, który powodował błąd 500 w silniku OpenResty OVH. Przekazano instrukcję usunięcia tego wpisu w OVH.
+4. Podbicie wersji do **28.57**, cache-bust **`?v=337`**.
+5. Pełny deploy do `docs/`, push na gałąź produkcyjną.

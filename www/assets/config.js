@@ -15,7 +15,7 @@ window.SYG = {
   // dane firmy
   NAZWA: 'Studio Sygnatura',
   MAIL: 'kontakt@studiosygnatura.pl',
-  TEL: '510 767 076',
+  TEL: '538 124 538',
 
   // kaucja zwrotna przy wynajmie (zł)
   KAUCJA: 300,
