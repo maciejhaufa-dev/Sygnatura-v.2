@@ -1858,3 +1858,8 @@ weryfikować z parametrem cache-busting.
 1. Zwiększono i poprawiono kontrast dwóch pełnoszerokich, klikalnych wierszy kontaktu; większe ikony telefonu i koperty ułatwiają szybkie rozpoznanie akcji.
 2. „Znajdź nas na:” jest wycentrowane; cztery równe pola social rozciągają się w jednym rzędzie na szerokość kolumny z zachowaniem bocznych odstępów, a znaki serwisów mają proporcjonalny rozmiar.
 3. Cache-bust **`?v=347`**, stopka **28.67**, synchronizacja `docs/`. Kontrola składni JS, skryptów inline i `git diff --check` przeszła. Commit **`0469e93`** wypchnięty; Pages build status **built**; `fetch_page` potwierdził nowe style CSS/JS.
+
+### Sesja 30/10 (22.09.2026) — PEŁNOEKRANOWY SLIDER NA STRONIE GŁÓWNEJ (wersja 28.68, ?v=348)
+1. Usunięto pusty pasek nagłówka (CSS respektuje ukryty `#hg-actions`), a na stronie głównej ukryto blok „Jak działamy” oraz poziomą wstążkę i stopkę.
+2. Na desktopie prawa kolumna rozciąga się do wysokości viewportu; hero-slider wypełnia całą dostępną przestrzeń. Karty produktów w slajdach „Nowości” i „Bestsellery” pozostają widoczne. Na telefonach zachowano układ przepływowy strony.
+3. Cache-bust **`?v=348`**, stopka **28.68**, synchronizacja `docs/`; kontrola składni JS, skryptów inline i `git diff --check` przeszła. Commit **`70c9d5a`**; Pages build **built**; `fetch_page` potwierdził publikację nowej strony.
