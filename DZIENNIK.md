@@ -1766,3 +1766,19 @@ weryfikować z parametrem cache-busting.
    - Nagłówek: przyciski `Koszyk` i `Panel użytkownika` mają teraz widoczne czytelne etykiety również na urządzeniach mobilnych (`.hp-etyk`).
 3. Podbicie do wersji **28.41**, znacznik zasobów podbity do **`?v=321`** (121 wystąpień w 21 plikach HTML).
 4. Deploy do `docs/` z zachowaniem `admin.html`. Wypchnięte na gałąź produkcyjną.
+
+---
+
+### Sesja 30 (22.09.2026) — AWARYJNY TRYB PORTFOLIO POD WYSYŁKĘ I DOMENĘ STUDIOSYGNATURA.PL (wersja 28.56, ?v=336)
+
+1. Sprzedaż pierwszej szopki na OLX i wysyłka paczki z ulotką kierującą na `studiosygnatura.pl` wymusiła natychmiastowe uruchomienie eleganckiego, niezawodnego trybu portfolio minimum.
+2. Konfiguracja trybu startu:
+   - `LAUNCH: true` w `assets/config.js`.
+   - Nawigacja serwisu ograniczona do 3 aktywnych stron: **Strona główna** (`index.html`), **Nasze realizacje** (`realizacje.html`), **Kontakt** (`kontakt.html`).
+   - Wszystkie przyciski zamówień, rezerwacji i wycen kierują bezpośrednio do formularza kontaktowego (`kontakt.html`) lub kontaktu telefonicznego.
+   - Podstrony sklepu, koszyka, kont i kreatora zabezpieczone spójnym banerem informującym o indywidualnej realizacji na zamówienie z przyciskami do kontaktu i portfolio.
+   - W formularzu kontaktowym dodano obsługę parametru `?projekt=`, automatycznie uzupełniającego treść zapytania nazwą oglądanego dzieła z realizacji.
+3. Konfiguracja domeny własnej:
+   - Dodano plik `CNAME` z domeną `studiosygnatura.pl` do `www/` i `docs/`.
+4. Wersja podbita do **28.56**, cache-bust zasobów zaktualizowany we wszystkich plikach HTML do **`?v=336`**.
+5. Wykonano pełny deploy do `docs/`, zachowano `CNAME`, `404.html` i `.nojekyll`.

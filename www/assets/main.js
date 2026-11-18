@@ -25,8 +25,13 @@
     if (dotyk) document.documentElement.classList.add('dotyk');
   })();
 
-  /* Menu główne serwisu (pełny serwis — wszystkie podstrony aktywne) */
-  const MENU = [
+  /* Menu główne serwisu (tryb startu/portfolio: strona główna, realizacje, kontakt;
+     pełny serwis: sklep, zamówienia, wynajem itd.) */
+  const MENU = (SYG && SYG.LAUNCH) ? [
+    ['index.html', 'Strona główna'],
+    ['realizacje.html', 'Nasze realizacje'],
+    ['kontakt.html', 'Kontakt']
+  ] : [
     ['index.html', 'Strona główna'],
     ['sklep.html', 'Sklep'],
     ['zamowienia.html', 'Zamówienia'],
@@ -52,20 +57,24 @@
   }
   async function ladujPozycjeMenu(){
     try {
-      const odp = await SYG.wezwij('strony-lista', {});
-      STRONY_MENU = (odp.ok && odp.strony) || [];
-      POZYCJE_MENU = MENU.concat(
-        widocznePodstrony().map(function (s) { return ['podstrona.html?s=' + encodeURIComponent(s.slug), s.tytul]; })
-      );
+      if (!SYG || !SYG.LAUNCH) {
+        const odp = await SYG.wezwij('strony-lista', {});
+        STRONY_MENU = (odp.ok && odp.strony) || [];
+        POZYCJE_MENU = MENU.concat(
+          widocznePodstrony().map(function (s) { return ['podstrona.html?s=' + encodeURIComponent(s.slug), s.tytul]; })
+        );
+      }
     } catch (e) { /* brak danych — zostaje menu stałe */ }
     document.querySelectorAll('.menu-vert').forEach(function (nav) {
       nav.innerHTML = pozycjeHtml(document.body.getAttribute('data-strona') || '');
     });
-    document.querySelectorAll('.foot-podstrony').forEach(function (el) {
-      el.innerHTML = widocznePodstrony().map(function (s2) {
-        return '<span class="sep">·</span><a href="podstrona.html?s=' + encodeURIComponent(s2.slug) + '">' + s2.tytul + '</a>';
-      }).join('');
-    });
+    if (!SYG || !SYG.LAUNCH) {
+      document.querySelectorAll('.foot-podstrony').forEach(function (el) {
+        el.innerHTML = widocznePodstrony().map(function (s2) {
+          return '<span class="sep">·</span><a href="podstrona.html?s=' + encodeURIComponent(s2.slug) + '">' + s2.tytul + '</a>';
+        }).join('');
+      });
+    }
   }
   function pozycjeHtml(aktywna){
     return POZYCJE_MENU.map(function (m) {
@@ -97,9 +106,9 @@
     var headGora;
     if (SYG.LAUNCH){
       headGora = '<div class="head-gora"><div class="head-przyciski">' +
-        '<a class="head-przycisk" href="mailto:' + SYG.MAIL + '" title="Napisz do nas">' +
-        '<span class="hp-ico">✉</span><span class="hp-etyk">Napisz do nas</span></a>' +
-        '<a class="head-przycisk" href="' + telHref() + '" title="Zadzwoń">' +
+        '<a class="head-przycisk" href="kontakt.html" title="Napisz do nas / Zamówienie">' +
+        '<span class="hp-ico">✉</span><span class="hp-etyk">Napisz / Zamówienie</span></a>' +
+        '<a class="head-przycisk" href="' + telHref() + '" title="Zadzwoń do nas">' +
         '<span class="hp-ico">☎</span><span class="hp-etyk">' + SYG.TEL + '</span></a>' +
         '</div></div>';
     } else {
@@ -153,18 +162,17 @@
 
   function stopka() {
     if (SYG.LAUNCH){
-      return '<span><a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
-        '<a href="pracownia.html">Pracownia</a><span class="sep">·</span>' +
-        '<a href="jak-pracujemy.html">Jak zamówić</a><span class="sep">·</span>' +
+      return '<span><a href="index.html">Strona główna</a><span class="sep">·</span>' +
+        '<a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
         '<a href="kontakt.html">Kontakt</a></span>' +
-        '<span>© Sygnatura 2026</span>';
+        '<span>© Sygnatura 2026 · wersja 28.56</span>';
     }
     const czesci = ['<a href="regulamin.html">Regulamin</a>', '<a href="jak-pracujemy.html">Jak pracujemy</a>'];
     STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; }).forEach(function (s) {
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.55</span>';
+      '<span>© Sygnatura 2026 · wersja 28.56</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -225,22 +233,22 @@
     shell.appendChild(stopkaNode);
     document.body.appendChild(shell);
 
-    /* TRYB STARTU: wybrane strony pokazują komunikat „w budowie" — oryginalna treść
+    /* TRYB STARTU: wybrane strony pokazują komunikat portfolio — oryginalna treść
        zostaje w pliku (i w skryptach) i wróci po przestawieniu SYG.LAUNCH na false */
     if (SYG.LAUNCH){
       var BUDOWA = ['zamowienia.html','sklep.html','personalizacja.html','koszyk.html','dane.html',
-        'podsumowanie.html','dziekuje.html','wynajem.html','konto.html','wspolpraca.html','szukaj.html','regulamin.html'];
+        'podsumowanie.html','dziekuje.html','wynajem.html','konto.html','wspolpraca.html','szukaj.html','regulamin.html','pracownia.html','jak-pracujemy.html'];
       var plik = (window.location.pathname.split('/').pop() || 'index.html').split('?')[0].toLowerCase();
       if (BUDOWA.indexOf(plik) >= 0){
         document.body.classList.add('launch-budowa');
         var box = document.createElement('div');
         box.className = 'budowa-box';
-        box.innerHTML = '<span class="tag">Zapraszamy niebawem</span>' +
-          '<h2>Ta część strony jest w budowie</h2>' +
-          '<p>Dopracowujemy ją — tymczasem zobacz nasze realizacje albo skontaktuj się z nami bezpośrednio:</p>' +
+        box.innerHTML = '<span class="tag">Zamówienia i Wyceny</span>' +
+          '<h2>Złóż zamówienie lub zapytaj o realizację</h2>' +
+          '<p>Wszystkie zamówienia i projekty personalizowane realizujemy bezpośrednio — napisz do nas przez formularz kontaktowy, podając szczegóły lub zadzwoń:</p>' +
           '<div class="przyciski" style="justify-content:flex-start">' +
-          '<a class="btn" href="realizacje.html">Zobacz realizacje</a>' +
-          '<a class="btn outline" href="mailto:' + SYG.MAIL + '">✉ Napisz do nas</a>' +
+          '<a class="btn" href="kontakt.html">✉ Formularz kontaktowy i wycena</a>' +
+          '<a class="btn outline" href="realizacje.html">Zobacz nasze realizacje</a>' +
           '<a class="btn outline" href="' + telHref() + '">☎ ' + SYG.TEL + '</a></div>';
         tresc.insertBefore(box, tresc.firstChild);
       }

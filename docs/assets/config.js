@@ -9,8 +9,8 @@ window.SYG = {
 
   // TRYB STARTU (launch): true = strona-portfolio (realizacje + kontakt e-mail/tel),
   // podstrony sklepu/wynajmu/kont pokazują komunikat „w budowie". false = pełny
-  // serwis (koszyk, konta, kreator zamówień) — od 23.09 pełny (testy u znajomych).
-  LAUNCH: false,
+  // serwis (koszyk, konta, kreator zamówień).
+  LAUNCH: true,
 
   // dane firmy
   NAZWA: 'Studio Sygnatura',

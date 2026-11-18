@@ -134,17 +134,15 @@
     const film = vId ? '<div class="wpis-film"><div class="edytor-video"><iframe width="560" height="315" ' +
       'src="https://www.youtube.com/embed/' + vId + '" frameborder="0" allowfullscreen loading="lazy"></iframe></div></div>' : '';
 
-    /* blok produktu — w trybie startu każda realizacja ma przycisk e-mail */
+    /* blok produktu — w trybie startu każda realizacja ma przycisk e-mail / kontakt */
     let produktBlok = '';
     if (SYG.LAUNCH) {
       const telC = String(SYG.TEL || '').replace(/\D/g, '');
-      const temat = encodeURIComponent('Zapytanie: ' + (w.tytul || 'projekt'));
-      const trescMail = encodeURIComponent('Dzień dobry,\n\ninteresuje mnie projekt „' + (w.tytul || '') + '”. Proszę o wycenę i termin.\n\nPozdrawiam');
       produktBlok = '<div class="wpis-produkt">' +
         '<div><h2>Podoba Ci się ten projekt?</h2>' +
         '<p class="mala" style="margin:6px 0 14px">Wykonamy taki sam — albo z Twoim napisem, imionami i datą. Napisz lub zadzwoń:</p>' +
         '<div class="przyciski" style="flex-wrap:wrap">' +
-        '<a class="btn" href="mailto:' + SYG.MAIL + '?subject=' + temat + '&body=' + trescMail + '">ZAMÓW JUŻ DZIŚ!</a>' +
+        '<a class="btn" href="kontakt.html?projekt=' + encodeURIComponent(w.tytul || '') + '">Napisz / Zamówienie</a>' +
         '<a class="btn outline" href="tel:+' + (telC.length === 9 ? '48' + telC : telC) + '">☎ ' + esc(SYG.TEL) + '</a>' +
         '</div></div></div>';
     } else if (w.produkt && w.produkt.sklep) {
@@ -161,7 +159,7 @@
     }
 
     kontener.innerHTML =
-      '<a class="powrot" href="blog.html">← wszystkie realizacje</a>' +
+      '<a class="powrot" href="realizacje.html">← wszystkie realizacje</a>' +
       '<span class="tag">' + esc(w.kategoria) + '</span>' +
       '<h1>' + esc(w.tytul) + '</h1>' +
       '<p class="sub">' + dzien(w.data) + (!SYG.LAUNCH && w.produkt && w.produkt.sklep ? ' · dostępny w sklepie' : '') + '</p>' +
