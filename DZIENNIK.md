@@ -1853,3 +1853,8 @@ weryfikować z parametrem cache-busting.
 2. Ikony social mają teraz proporcjonalne rozmiary, subtelne obramowanie i jeden poziomy rząd pod etykietą „Znajdź nas na:”. Nad nimi są dwa wiersze kontaktu z małymi ikonami telefonu i koperty.
 3. Telefon jest klikalny przez `tel:`; e-mail otwiera pocztę przez `mailto:kontakt@studiosygnatura.pl`. Zmieniono analogicznie statyczną stronę główną i dynamiczny szkielet podstron.
 4. Cache-bust **`?v=346`**, stopka **28.66**, synchronizacja `docs/`; kontrola składni JS, skryptów inline i `git diff --check` przeszła. Kod wypchnięto jako **`0c57fc0`**; Pages build dla tego commita ma status **built**. `fetch_page` potwierdził publikację nowej wersji CSS i JS.
+
+### Sesja 30/9 (22.09.2026) — WIĘKSZY KONTAKT I SOCIAL NA CAŁĄ SZEROKOŚĆ PANELU (wersja 28.67, ?v=347)
+1. Zwiększono i poprawiono kontrast dwóch pełnoszerokich, klikalnych wierszy kontaktu; większe ikony telefonu i koperty ułatwiają szybkie rozpoznanie akcji.
+2. „Znajdź nas na:” jest wycentrowane; cztery równe pola social rozciągają się w jednym rzędzie na szerokość kolumny z zachowaniem bocznych odstępów, a znaki serwisów mają proporcjonalny rozmiar.
+3. Cache-bust **`?v=347`**, stopka **28.67**, synchronizacja `docs/`. Kontrola składni JS, skryptów inline i `git diff --check` przeszła. Commit **`0469e93`** wypchnięty; Pages build status **built**; `fetch_page` potwierdził nowe style CSS/JS.
