@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=348">
+<link rel="stylesheet" href="assets/style.css?v=349">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -199,6 +199,19 @@
                 </div>
                 <button class="btn" type="button" id="sg-obraz-zapisz" style="padding:7px 14px;background:#1C3A27;color:#FFF;font-weight:700">Dodaj do biblioteki</button>
               </div>
+              <div id="sg-obraz-upload-info" role="status" aria-live="polite" style="display:none;margin-top:10px;padding:9px 12px;border-radius:4px;font-size:13px"></div>
+            </div>
+            <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;background:#24272A;color:#FFF;border-bottom:1px solid #444">
+              <strong style="font-size:12px">Kadrowanie tła:</strong>
+              <label style="display:flex;gap:8px;align-items:center;font-size:12px">Powiększenie
+                <input type="range" id="sg-tlo-zoom" min="100" max="200" step="1" value="100" style="width:140px">
+                <output id="sg-tlo-zoom-wartosc">100%</output>
+              </label>
+              <label style="display:flex;gap:8px;align-items:center;font-size:12px">Pionowo (− w górę, + w dół)
+                <input type="range" id="sg-tlo-y" min="-100" max="100" step="1" value="0" style="width:140px">
+                <output id="sg-tlo-y-wartosc">0%</output>
+              </label>
+              <span style="font-size:11px;color:#BBB">Zakres przesunięcia pozwala wysunąć zdjęcie poza kadr.</span>
             </div>
 
             <!-- Edytor treści ze wstążką i podglądem na żywo -->
@@ -563,13 +576,13 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=348"></script>
-<script src="assets/koszyk.js?v=348"></script>
-<script src="assets/api.js?v=348"></script>
-<script src="assets/editor.js?v=348"></script>
-<script src="assets/edytor.js?v=348"></script>
-<script src="data/katalog.js?v=348"></script>
-<script src="assets/main.js?v=348"></script>
+<script src="assets/config.js?v=349"></script>
+<script src="assets/koszyk.js?v=349"></script>
+<script src="assets/api.js?v=349"></script>
+<script src="assets/editor.js?v=349"></script>
+<script src="assets/edytor.js?v=349"></script>
+<script src="data/katalog.js?v=349"></script>
+<script src="assets/main.js?v=349"></script>
 <script>
 (function(){
   var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
@@ -658,6 +671,7 @@
   var SG_EDYTOR = null;     /* instancja EDYTORA TREŚCI (kafel) */
   var SG_EDYTOR_CTA = null; /* instancja EDYTORA TREŚCI (treść pod sliderem) */
   var SG_BRUDNY = false;/* czy są niezapisane zmiany */
+  var SG_GITHUB_MEDIA_SESJA = {};
 
   function ustawBrudny(){
     SG_BRUDNY = true;
@@ -716,10 +730,16 @@
   }
   function sgMediaZapisz(bib){ localStorage.setItem(SG_MEDIA_KLUCZ, JSON.stringify(bib)); }
   function sgGitHubMediaBiblioteka(){
-    try { return JSON.parse(localStorage.getItem(SG_GITHUB_MEDIA_KLUCZ) || '{}'); }
-    catch (e) { return {}; }
+    var bib = {};
+    try { bib = JSON.parse(localStorage.getItem(SG_GITHUB_MEDIA_KLUCZ) || '{}') || {}; }
+    catch (e) { /* Safari/prywatny tryb może blokować localStorage */ }
+    return Object.assign(bib, SG_GITHUB_MEDIA_SESJA);
   }
-  function sgGitHubMediaZapisz(bib){ localStorage.setItem(SG_GITHUB_MEDIA_KLUCZ, JSON.stringify(bib)); }
+  function sgGitHubMediaZapisz(bib){
+    SG_GITHUB_MEDIA_SESJA = Object.assign({}, SG_GITHUB_MEDIA_SESJA, bib || {});
+    try { localStorage.setItem(SG_GITHUB_MEDIA_KLUCZ, JSON.stringify(SG_GITHUB_MEDIA_SESJA)); }
+    catch (e) { /* zdjęcie nadal jest dostępne w tej sesji */ }
+  }
   function sgMediaRozwiaz(o){
     if (String(o).indexOf('media:') === 0){
       var d = sgMediaBiblioteka()[o.slice(6)];
@@ -1087,7 +1107,34 @@
     var sel = document.getElementById('sg-obraz');
     var v = sel ? sel.value : 'assets/media/sklep/szyld.jpg';
     var bg = document.getElementById('sg-tresc-bg');
-    if (bg) bg.style.backgroundImage = kafelObrazCss(v);
+    if (bg){
+      bg.style.backgroundImage = kafelObrazCss(v);
+      bg.style.backgroundSize = 'cover';
+      bg.style.backgroundRepeat = 'no-repeat';
+      bg.style.backgroundPosition = 'center';
+    }
+    var kafel = null;
+    if (SG_EDYCJA) kafel = sgKafle().find(function(k){ return String(k.id) === SG_EDYCJA.id; });
+    var zoom = Math.max(100, Math.min(200, Number(kafel && kafel.zoomTla) || 100));
+    var y = Math.max(-100, Math.min(100, Number(kafel && kafel.przesuniecieTla) || 0));
+    var zoomEl = document.getElementById('sg-tlo-zoom');
+    var yEl = document.getElementById('sg-tlo-y');
+    if (zoomEl) zoomEl.value = zoom;
+    if (yEl) yEl.value = y;
+    if (bg){ bg.style.transformOrigin = 'center center'; bg.style.transform = 'translateY(' + y + '%) scale(' + (zoom / 100) + ')'; }
+    var zoomTxt = document.getElementById('sg-tlo-zoom-wartosc');
+    var yTxt = document.getElementById('sg-tlo-y-wartosc');
+    if (zoomTxt) zoomTxt.textContent = zoom + '%';
+    if (yTxt) yTxt.textContent = y + '%';
+  }
+
+  function sgUploadInfo(tresc, blad){
+    var el = document.getElementById('sg-obraz-upload-info');
+    if (!el) return;
+    el.style.display = 'block';
+    el.style.background = blad ? '#8a2f1d' : '#1C3A27';
+    el.style.color = '#fff';
+    el.textContent = tresc;
   }
 
   /* ODRZUĆ ZMIANY W SLAJDZIE */
@@ -1152,7 +1199,14 @@
   var btnWgraj = document.getElementById('sg-obraz-wgraj');
   if (btnWgraj) btnWgraj.addEventListener('click', function(){
     var box = document.getElementById('sg-obraz-wgraj-box');
-    if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    if (box){
+      var otwieram = box.style.display === 'none';
+      box.style.display = otwieram ? 'block' : 'none';
+      if (otwieram){
+        var statusUpload = document.getElementById('sg-obraz-upload-info');
+        if (statusUpload) statusUpload.style.display = 'none';
+      }
+    }
   });
   var inpPlik = document.getElementById('sg-obraz-plik');
   if (inpPlik) inpPlik.addEventListener('change', function(){
@@ -1193,12 +1247,16 @@
     var f = document.getElementById('sg-obraz-plik').files &&
             document.getElementById('sg-obraz-plik').files[0];
     var nazwa = sgMediaNazwa(document.getElementById('sg-obraz-nazwa').value);
-    if (!f){ alert('Najpierw wybierz plik ze zdjęciem.'); return; }
+    if (!f){
+      sgUploadInfo('Wybierz plik ze zdjęciem, a potem ponownie kliknij „Dodaj do biblioteki”.', true);
+      return;
+    }
     var bib = sgMediaBiblioteka();
     if (SYG.TRYB_DEMO && bib[nazwa] && !confirm('Zdjęcie „' + nazwa + '" już jest w bibliotece. Nadpisać?')) return;
     btnZapiszObraz.disabled = true;
     var obrazOryginalny = btnZapiszObraz.textContent;
     btnZapiszObraz.textContent = 'Wysyłanie…';
+    sgUploadInfo('Przygotowuję zdjęcie do wysłania…', false);
     try {
       var dataUrl = await sgObrazDoJpeg(f);
       var obraz = '';
@@ -1210,11 +1268,15 @@
         var czesc = dataUrl.split(',')[1] || '';
         var odp = await SYG.wezwij('media-upload', { nazwa: nazwa, base64: czesc });
         if (!odp || !odp.ok){
-          sgInfo((odp && odp.blad) || 'Nie udało się wysłać zdjęcia na GitHub.', true);
+          var bladUpload = (odp && odp.blad) || 'Serwer nie potwierdził zapisu zdjęcia.';
+          sgUploadInfo('Błąd: ' + bladUpload, true);
+          sgInfo(bladUpload, true);
           return;
         }
         if (!/^https:\/\/raw\.githubusercontent\.com\/maciejhaufa-dev\/Sygnatura-v\.2\/main\/uploads\/[A-Za-z0-9._-]+\.jpg$/.test(String(odp.obraz || ''))){
-          sgInfo('Backend Apps Script wymaga aktualizacji. Zdjęcie nie zostało dodane do biblioteki produkcyjnej.', true);
+          var bladOdp = 'Apps Script zwrócił nieprawidłowy adres zdjęcia. Sprawdź, czy wdrożona wersja obsługuje media-upload.';
+          sgUploadInfo('Błąd: ' + bladOdp, true);
+          sgInfo(bladOdp, true);
           return;
         }
         obraz = odp.obraz;
@@ -1230,13 +1292,15 @@
         var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
         if (i >= 0){ kafle[i].obraz = obraz; ustawBrudny(); rysujKafle(); }
       }
-      var box = document.getElementById('sg-obraz-wgraj-box');
-      if (box) box.style.display = 'none';
-      sgInfo(SYG.TRYB_DEMO
-        ? 'Zdjęcie zapisane lokalnie (tryb awaryjny).'
-        : 'Zdjęcie zapisano we wspólnej bibliotece GitHub (main/uploads). Kliknij „Zapisz zmiany strony głównej”, aby opublikować baner.', false);
+      var sukcesUpload = SYG.TRYB_DEMO
+        ? 'Zdjęcie dodano. Jest już wybrane i widoczne na liście zdjęć.'
+        : 'Zdjęcie dodano do GitHub i wybrano w liście. Kliknij „Zapisz zmiany strony głównej”, aby opublikować baner.';
+      sgUploadInfo('✓ ' + sukcesUpload, false);
+      sgInfo(sukcesUpload, false);
     } catch (err){
-      sgInfo(err.message || 'Nie udało się przygotować zdjęcia.', true);
+      var bladNieoczekiwany = err && err.message ? err.message : 'Nie udało się przygotować zdjęcia.';
+      sgUploadInfo('Błąd: ' + bladNieoczekiwany, true);
+      sgInfo(bladNieoczekiwany, true);
     } finally {
       btnZapiszObraz.disabled = false;
       btnZapiszObraz.textContent = obrazOryginalny;
@@ -1280,6 +1344,20 @@
     odswiezTloEdytora();
     rysujKafle();
     sgInfo('Zdjęcie „' + nazwa + '" usunięte z biblioteki.', false);
+  });
+  ['sg-tlo-zoom', 'sg-tlo-y'].forEach(function(id){
+    var kontrolka = document.getElementById(id);
+    if (!kontrolka) return;
+    kontrolka.addEventListener('input', function(){
+      if (!SG_EDYCJA) return;
+      var kafle = sgKafle();
+      var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (i < 0) return;
+      kafle[i].zoomTla = Number(document.getElementById('sg-tlo-zoom').value) || 100;
+      kafle[i].przesuniecieTla = Number(document.getElementById('sg-tlo-y').value) || 0;
+      odswiezTloEdytora();
+      ustawBrudny();
+    });
   });
   var selObraz = document.getElementById('sg-obraz');
   if (selObraz) selObraz.addEventListener('change', function(){

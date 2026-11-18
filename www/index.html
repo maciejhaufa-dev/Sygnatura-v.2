@@ -185,9 +185,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 }
 .sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
 .sl-slide{flex:0 0 100%;position:relative;display:flex;align-items:flex-end;overflow:hidden}
-.sl-bg{position:absolute;inset:0;background-size:cover;background-position:center}
-.sl-slide.akt .sl-bg{animation:kenburns 14s ease-in-out infinite alternate}
-@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.08)}}
+.sl-bg{position:absolute;inset:0;background-size:cover;background-position:center;transform-origin:center center}
+/* Keep background transform available for saved per-slide crop controls. */
 .sl-cien{position:absolute;inset:0;background:linear-gradient(200deg,rgba(14,14,12,.25) 0%,rgba(14,14,12,.78) 72%)}
 .sl-tresc{position:relative;z-index:2;width:100%;padding:clamp(20px,4vw,46px);color:var(--krem)}
 .sl-tag{display:inline-block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);
@@ -489,15 +488,15 @@ html.dotyk .social{margin-top:14px}
 
   <footer class="foot">
     <span><a href="index.html">Strona główna</a><span class="sep">·</span><a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span><a href="kontakt.html">Kontakt</a></span>
-    <span>© Sygnatura 2026 · wersja 28.68</span>
+    <span>© Sygnatura 2026 · wersja 28.69</span>
   </footer>
 </div>
 
-<script src="data/katalog.js?v=348"></script>
-<script src="assets/koszyk.js?v=348"></script>
-<script src="assets/config.js?v=348"></script>
-<script src="assets/api.js?v=348"></script>
-<script src="assets/main.js?v=348"></script>
+<script src="data/katalog.js?v=349"></script>
+<script src="assets/koszyk.js?v=349"></script>
+<script src="assets/config.js?v=349"></script>
+<script src="assets/api.js?v=349"></script>
+<script src="assets/main.js?v=349"></script>
 <script>
 /* nagłówek strony głównej: pełny serwis (szukaj + koszyk + konto) albo
    tryb startu (napisz/zadzwoń) — wg SYG.LAUNCH */
@@ -514,7 +513,7 @@ html.dotyk .social{margin-top:14px}
         '<span><a href="index.html">Strona główna</a><span class="sep">·</span>' +
         '<a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
         '<a href="kontakt.html">Kontakt</a></span>' +
-        '<span>© Sygnatura 2026 · wersja 28.68</span>';
+        '<span>© Sygnatura 2026 · wersja 28.69</span>';
     }
   } catch (e) {}
 })();
@@ -634,8 +633,11 @@ html.dotyk .social{margin-top:14px}
       var tlo = ob === 'gradient'
         ? 'background-image:linear-gradient(135deg,#1F3A32,#6B4530)'
         : "background-image:url('" + String(ob || '').replace(/'/g, '%27') + "')";
+      var zoomTla = Math.max(100, Math.min(200, Number(k.zoomTla) || 100));
+      var przesuniecieTla = Math.max(-100, Math.min(100, Number(k.przesuniecieTla) || 0));
+      var stylTla = tlo + ';transform:translateY(' + przesuniecieTla + '%) scale(' + (zoomTla / 100) + ');transform-origin:center center';
       return '<div class="sl-slide" data-sl="' + esc(k.id || '') + '">' +
-        '<div class="sl-bg" style="' + tlo + '"></div>' +
+        '<div class="sl-bg" style="' + stylTla + '"></div>' +
         '<div class="sl-cien"></div>' +
         '<div class="sl-tresc">' + (k.tresc || '') +
         (k.karty ? '<div class="sl-karty"' + (k.karty === 'odwrotnie' ? ' data-odw="1"' : '') + '></div>' : '') +
