@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Produkt — Studio Sygnatura</title>
+<meta name="description" content="Szczegóły produktu z pracowni Studio Sygnatura: wymiary, materiał i sposób zamówienia.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="naglowek"></div>
+
+<main id="tresc">
+  <nav class="crumbs" aria-label="Ścieżka">
+    <a href="index.html">Start</a> &nbsp;/&nbsp; <a href="sklep.html">Sklep</a> &nbsp;/&nbsp; <span id="okruszek">Produkt</span>
+  </nav>
+
+  <!-- treść wstawia assets/produkt.js; dla osób bez JS zostaje komunikat poniżej -->
+  <div id="produkt" aria-live="polite">
+    <div class="srodek-strony">
+      <h1>Ten produkt wymaga włączonego JavaScriptu</h1>
+      <p>Dane produktu wczytujemy z pliku <code>data/dane.js</code>. Włącz JavaScript albo napisz do nas — odpowiemy z ceną i terminem.</p>
+      <a class="btn" href="kontakt.html">Napisz do nas</a>
+    </div>
+  </div>
+
+  <section class="section alt" id="inne" hidden aria-labelledby="inne-tytul">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="eyebrow">Zobacz też</span>
+          <h2 id="inne-tytul">Pozostałe rzeczy z pracowni</h2>
+        </div>
+        <a class="link-arrow" href="sklep.html">Cały sklep
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+      </div>
+      <div class="grid-prod" id="inne-produkty"></div>
+    </div>
+  </section>
+</main>
+
+<div id="stopka"></div>
+
+<script src="data/dane.js"></script>
+<script src="assets/ui.js"></script>
+<script src="assets/produkt.js"></script>
+<script src="assets/formularz.js"></script>
+</body>
+</html>

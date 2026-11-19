@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sklep — Studio Sygnatura</title>
+<meta name="description" content="Szopka warstwowa z podświetleniem, szyld powitalny i grawer okolicznościowy — produkty Studio Sygnatura z cenami.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="naglowek"></div>
+
+<main id="tresc">
+  <div class="page-head">
+    <span class="eyebrow">Sklep</span>
+    <h1>Rzeczy, które robimy na zamówienie</h1>
+    <p class="lead">Każda pozycja powstaje w naszej pracowni pod zamówienie. Cena jest ustalona — personalizacja (napis, imię, data) wchodzi w jej zakres. Zamówienie składasz przez formularz zapytania: odpowiadamy z terminem i danymi do przelewu.</p>
+  </div>
+
+  <section class="section sec-tight" aria-labelledby="lista-tytul">
+    <div class="wrap">
+      <h2 id="lista-tytul" class="sr">Produkty</h2>
+      <div class="grid-prod" data-produkty data-ile="0"></div>
+
+      <div class="pusty-bestseller mt-24">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r=".9" fill="currentColor" stroke="none"/></svg>
+        <div>
+          <h3>Kolejność kart: nowość, bestseller, okolicznościowy</h3>
+          <p>Nowość to pierwsza pozycja w katalogu, okolicznościowy — grawer na komunię, jubileusz albo rocznicę. Odznaki „bestseller” nie używamy, dopóki nie mamy potwierdzonych danych o najczęściej zamawianych rzeczach.</p>
+        </div>
+      </div>
+
+      <div class="pusty-bestseller mt-14">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6.5h18l-1.6 12a2 2 0 0 1-2 1.7H6.6a2 2 0 0 1-2-1.7Z"/><path d="M8.5 10.2V6.9a3.5 3.5 0 0 1 7 0v3.3"/></svg>
+        <div>
+          <h3>Koszyk i konto klienta — jeszcze nie działają</h3>
+          <p>W tej wersji nie pokazujemy koszyka ani panelu klienta, bo nie są podłączone do prawdziwych zamówień. Zamówienie składasz przez formularz kontaktowy albo telefon — tak samo, jak działa pracownia dziś.</p>
+          <a class="btn ghost" href="kontakt.html?temat=sklep">Zapytaj o zamówienie</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Nie ma tego, czego szukasz?</span>
+        <h2>Zrobimy rzecz pod Twój pomysł.</h2>
+        <p>Krzyżówka z imionami, numeracja pokoi, tabliczka z dedykacją, deska z grawerem — jeśli widziałeś to w realizacjach, możemy zrobić Twoją wersję.</p>
+      </div>
+      <div class="cta-box">
+        <a class="duzy" href="kontakt.html?temat=projekt">Opisz, co chcesz zrobić</a>
+        <a class="duzy" href="tel:+48538124538">538 124 538</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="stopka"></div>
+
+<script src="data/dane.js"></script>
+<script src="assets/ui.js"></script>
+</body>
+</html>

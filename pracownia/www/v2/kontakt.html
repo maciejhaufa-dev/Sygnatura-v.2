@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontakt — Studio Sygnatura, Poznań</title>
+<meta name="description" content="Napisz do Studio Sygnatura w Poznaniu: formularz zapytania, telefon 538 124 538 i e-mail kontakt@studiosygnatura.pl.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="naglowek"></div>
+
+<main id="tresc">
+  <div class="page-head">
+    <span class="eyebrow">Kontakt</span>
+    <h1>Napisz, co ma powstać</h1>
+    <p class="lead">Opisz pomysł, podaj orientacyjny wymiar i termin. Odpowiadamy w ciągu 1–2 dni roboczych — z ceną i realnym terminem realizacji.</p>
+  </div>
+
+  <section class="section sec-tight">
+    <div class="kontakt-grid">
+      <div class="forma">
+        <h2>Formularz zapytania</h2>
+        <p class="lead">Pola z * są wymagane. Wiadomość trafia bezpośrednio do naszej skrzynki.</p>
+
+        <div class="form-msg" id="komunikaty" aria-live="polite"></div>
+
+        <form id="formularz" data-zapytanie data-komunikaty="komunikaty" novalidate>
+          <div class="pola">
+            <div class="pole full">
+              <label for="temat">Temat</label>
+              <select id="temat" name="temat">
+                <option value="projekt">Zapytanie o projekt spersonalizowany</option>
+                <option value="sklep">Sklep i zamówienie produktu</option>
+                <option value="wynajem">Wynajem dekoracji</option>
+                <option value="wspolpraca">Współpraca (firmy, organizatorzy)</option>
+                <option value="inne">Inne</option>
+              </select>
+            </div>
+            <div class="pole full">
+              <label for="opis">Opis pomysłu *</label>
+              <textarea id="opis" name="tresc" placeholder="Co ma powstać, gdzie ma wisieć, jaki napis lub imiona, na kiedy…"></textarea>
+              <span class="blad"></span>
+            </div>
+            <div class="pole">
+              <label for="imie">Imię i nazwisko *</label>
+              <input id="imie" name="imie" type="text" autocomplete="name">
+              <span class="blad"></span>
+            </div>
+            <div class="pole">
+              <label for="email">E-mail *</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="adres@poczta.pl">
+              <span class="blad"></span>
+            </div>
+            <div class="pole full">
+              <label for="telefon">Telefon (opcjonalnie)</label>
+              <input id="telefon" name="telefon" type="tel" autocomplete="tel" placeholder="np. 600 000 000">
+              <span class="blad"></span>
+            </div>
+            <div class="honeypot" aria-hidden="true">
+              <label for="strona_www">Zostaw puste</label>
+              <input id="strona_www" name="strona_www" type="text" tabindex="-1" autocomplete="off">
+            </div>
+          </div>
+
+          <label class="zgoda" for="zgoda">
+            <input id="zgoda" name="zgoda" type="checkbox">
+            <span>Wyrażam zgodę na kontakt w sprawie tego zapytania. Danych nie wykorzystujemy do niczego innego i nie przekazujemy dalej. *</span>
+          </label>
+
+          <div class="stopka-formy">
+            <p class="small muted">Po wysłaniu zobaczysz potwierdzenie albo konkretny powód błędu — nic nie ginie po cichu.</p>
+            <button class="btn" type="submit">Wyślij zapytanie</button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="kontakt-bok" aria-label="Dane kontaktowe">
+        <div class="kbox">
+          <h3>Zadzwoń</h3>
+          <p>Najszybciej, gdy chcesz od razu omówić projekt.</p>
+          <a class="duzy" href="tel:+48538124538">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 16.2v2.6a2 2 0 0 1-2.2 2 18.6 18.6 0 0 1-8.1-2.9 18.3 18.3 0 0 1-5.6-5.6A18.6 18.6 0 0 1 1.7 4.1 2 2 0 0 1 3.7 1.9h2.6a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L7.3 9.5a14.8 14.8 0 0 0 6.6 6.6l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2Z"/></svg>
+            538 124 538</a>
+        </div>
+
+        <div class="kbox">
+          <h3>Napisz e-mail</h3>
+          <p>Dobrze, gdy chcesz dołączyć zdjęcie albo rysunek.</p>
+          <a class="duzy" href="mailto:kontakt@studiosygnatura.pl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="1.6"/><path d="m3 6.2 9 6.8 9-6.8"/></svg>
+            kontakt@studiosygnatura.pl</a>
+        </div>
+
+        <div class="kbox dark">
+          <h3>Gdzie jesteśmy</h3>
+          <p>Pracownia w Poznaniu i okolicach, woj. wielkopolskie. Odbiór osobisty albo spotkanie — wyłącznie po wcześniejszym uzgodnieniu terminu. Wysyłka w całej Polsce.</p>
+          <p class="small mt-12">Nie podajemy tu adresu do odwiedzin bez zapowiedzi — pracownia nie jest showroomem.</p>
+        </div>
+
+        <div class="kbox">
+          <h3>Zanim napiszesz</h3>
+          <p>Sprawdź realizacje — może coś podobnego już robiliśmy. To skraca ustalenia.</p>
+          <a class="btn ghost" href="realizacje.html" class="btn ghost mt-12">Zobacz realizacje</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div id="stopka"></div>
+
+<script src="data/dane.js"></script>
+<script src="assets/ui.js"></script>
+<script src="assets/formularz.js"></script>
+</body>
+</html>

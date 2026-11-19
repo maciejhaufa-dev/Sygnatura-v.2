@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szukaj — Studio Sygnatura</title>
+<meta name="description" content="Szukaj produktów i realizacji Studio Sygnatura po nazwie, opisie lub kategorii.">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div id="naglowek"></div>
+
+<main id="tresc">
+  <div class="szukaj-strona">
+    <span class="eyebrow">Szukaj</span>
+    <h1>Znajdź rzecz z pracowni</h1>
+    <p class="lead">Szukamy w nazwach, opisach i kategoriach produktów oraz realizacji. Wpisz np. „szopka”, „szyld”, „grawer”, „krzyżówka”.</p>
+
+    <form class="szukaj-forma" action="szukaj.html" method="get" role="search">
+      <label class="sr" for="q">Szukana fraza</label>
+      <input id="q" type="search" name="q" minlength="2" placeholder="np. szopka, szyld, grawer…" autocomplete="off" autofocus>
+      <button class="btn" type="submit">Szukaj</button>
+    </form>
+
+    <p class="wyniki-info" id="info" role="status"></p>
+    <div class="lista-wynikow" id="wyniki"></div>
+
+    <div id="pusto" hidden>
+      <div class="pusty-bestseller mt-18">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r=".9" fill="currentColor" stroke="none"/></svg>
+        <div>
+          <h3 id="pusto-tytul">Nic nie znaleźliśmy</h3>
+          <p id="pusto-opis">Nie mamy rzeczy o takiej nazwie. Opisz, czego szukasz — zrobimy to na zamówienie.</p>
+          <a class="btn ghost" href="kontakt.html?temat=projekt">Opisz swój pomysł</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="data/dane.js"></script>
+<script src="assets/ui.js"></script>
+<script src="assets/szukaj.js"></script>
+</body>
+</html>
