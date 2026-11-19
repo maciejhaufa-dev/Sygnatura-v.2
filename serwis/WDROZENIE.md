@@ -13,7 +13,7 @@
 ## Plan wdrożenia (krok po kroku)
 
 ### Etap 0 — test na telefonie (teraz)
-Otwórz podgląd (link wyżej) na telefonie. Sprawdź: /wynajem/, formularz, /admin/ (hasło startowe `sygnatura-2026`).
+Otwórz podgląd (link wyżej) na telefonie. Sprawdź: /wynajem/, formularz i /admin/ (hasło skonfigurowane prywatnie, bez wartości domyślnej w kodzie).
 Poprawki responsywne już weszły (kalendarze, tabele admina przewijane poziomo, przyciski pełnej szerokości).
 
 ### Etap 1 — „żywy organizm" do testów: PythonAnywhere (DARMOWY, zalecany)

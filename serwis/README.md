@@ -42,7 +42,7 @@ Otwórz w przeglądarce:
 | http://127.0.0.1:8000/personalizacja/ | produkty spersonalizowane (jednorazówki) |
 | http://127.0.0.1:8000/admin/ | **panel administracyjny** |
 
-**Hasło startowe do panelu: `sygnatura-2026`** — zmień od razu w zakładce *Ustawienia*.
+**Brak wbudowanego hasła.** Przy nowej bazie ustaw `SYG_ADMIN_BOOTSTRAP_PASSWORD` w środowisku serwera przed pierwszym uruchomieniem; potem zmień hasło w panelu.
 
 **Logowanie działa też bez ciasteczek:** po zalogowaniu panel dostaje token w adresie (`/admin/?klucz=...`),
 który dokleja się do wszystkich linków panelu. Dzięki temu panel działa także w podglądach w ramce

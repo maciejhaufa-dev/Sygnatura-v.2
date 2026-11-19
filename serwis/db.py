@@ -348,15 +348,18 @@ SZABLONY_MAILI = [
 ]
 
 def domyslne_ustawienia():
-    """Wartości startowe zakładki Ustawienia w panelu admina."""
+    """Wartości startowe; hasło admina pochodzi wyłącznie ze środowiska procesu."""
     from werkzeug.security import generate_password_hash
+    bootstrap = os.environ.get('SYG_ADMIN_BOOTSTRAP_PASSWORD', '')
+    if len(bootstrap) < 16:
+        raise RuntimeError('Ustaw SYG_ADMIN_BOOTSTRAP_PASSWORD w środowisku przed inicjalizacją nowej bazy.')
     return {
         'kontakt_email': 'kontakt@studiosygnatura.pl',
         'nadawca': 'Studio Sygnatura <kontakt@studiosygnatura.pl>',
         'smtp_host': '', 'smtp_port': '587', 'smtp_user': '', 'smtp_haslo': '', 'smtp_ssl': '0',
         'sheets_url': '',  # URL webhooka Google Sheets (Apps Script) — skonfigurujemy później
         'kody_rabatowe': '',  # kody rabatowe, KAŻDY W OSOBNEJ LINII: KOD:procent (np. WESELE5:5)
-        'admin_hash': generate_password_hash('sygnatura-2026'),  # HASŁO STARTOWE — ZMIEŃ W USTAWIENIACH
+        'admin_hash': generate_password_hash(bootstrap),
         'licznik_sygnatur': '0',
         'dokumenty': json.dumps([
             {'nazwa': 'Procedura rezerwacji i kaucji', 'plik': ''},
@@ -482,6 +485,7 @@ def inicjuj(sciezka=None):
     db.commit()
 
     if db.execute('SELECT COUNT(*) FROM kategorie').fetchone()[0] == 0:
+        ustawienia_startowe = domyslne_ustawienia()  # fail closed, zanim powstaną dane startowe
         for i, (nazwa, opis) in enumerate(KATEGORIE):
             db.execute('INSERT INTO kategorie (nazwa, opis, kolejnosc) VALUES (?,?,?)', (nazwa, opis, i))
         for nazwa, kat_id, opis, cena in PRODUKTY:
@@ -490,7 +494,7 @@ def inicjuj(sciezka=None):
         for ev, nazwa, opis, cena, cena_liczba, tier, pozycje in PAKIETY:
             db.execute('INSERT INTO pakiety (ev, nazwa, opis, cena, cena_liczba, tier, pozycje) VALUES (?,?,?,?,?,?,?)',
                        (ev, nazwa, opis, cena, cena_liczba, tier, pozycje))
-        for klucz, wartosc in domyslne_ustawienia().items():
+        for klucz, wartosc in ustawienia_startowe.items():
             db.execute('INSERT OR IGNORE INTO ustawienia (klucz, wartosc) VALUES (?,?)', (klucz, wartosc))
         db.commit()
 

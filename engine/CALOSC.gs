@@ -16,10 +16,8 @@
 // ID arkusza Google (z adresu: docs.google.com/spreadsheets/d/<TEN_FRAGMENT>/edit)
 const ARKUSZ_ID = 'WSTAW_TU_ID_ARKUSZA';
 
-// klucz dostępu do panelu (długi, wymyśl własny: litery + cyfry).
-// Właściciel otwiera panel pod adresem:  admin.html?klucz=TEN_KLUCZ
-// (w trybie z bazą logowanie admin/test z config.js przestaje działać).
-const TOKEN = 'f255094c5fe76e5ce8b7c429';
+// Wyłącznie dla starszego wariantu; sekret nigdy nie jest zapisany w źródle.
+const LEGACY_ADMIN_API_TOKEN_PROPERTY = 'LEGACY_ADMIN_API_TOKEN';
 
 // gdzie mają przychodzić powiadomienia o zamówieniach, wiadomościach,
 // zapytaniach o termin i rejestracjach
@@ -31,10 +29,13 @@ const DOMENA_MAIL = 'kontakt@studiosygnatura.pl';
 // nazwa nadawcy w stopce maili
 const NADAWCA_NAZWA = 'Studio Sygnatura';
 
-// hasło administratora do PIERWSZEGO logowania (zakładka Admini) — po wdrożeniu
-// ZMIEŃ je: w zakładce Admini podmień haslo_sha na wynik sha256('twoje nowe hasło')
-// (funkcja sha256 jest w tym pliku — wybierz ją z listy funkcji → Uruchom).
-const ADMIN_HASLO_STARTOWE = 'sygnatura-2026';
+// Hasło inicjalizacyjne jest pobierane jednorazowo z Script Properties.
+const ADMIN_BOOTSTRAP_PROPERTY = 'SYG_ADMIN_BOOTSTRAP_PASSWORD';
+function pobierzHasloBootstrapAdmina_(){
+  const haslo = String(PropertiesService.getScriptProperties().getProperty(ADMIN_BOOTSTRAP_PROPERTY) || '');
+  if (haslo.length < 16) throw new Error('Ustaw Script Property SYG_ADMIN_BOOTSTRAP_PASSWORD na unikalne hasło (min. 16 znaków).');
+  return haslo;
+}
 
 // cennik dostawy startowy (nadpisuje go panel: Ustawienia → cennik)
 const DOSTAWA_STARTOWA = {
@@ -150,11 +151,12 @@ function instaluj() {
   const adm = arkusz('Admini');
   if (adm.getLastRow() === 0) {
     adm.getRange(1, 1, 1, 3).setValues([['email', 'haslo_sha', 'aktywny']]);
-    adm.appendRow([MAIL_STUDIO, sha256(ADMIN_HASLO_STARTOWE), 1]);
+    const hasloBootstrap = pobierzHasloBootstrapAdmina_();
+    adm.appendRow([MAIL_STUDIO, sha256(hasloBootstrap), 1]);
+    PropertiesService.getScriptProperties().deleteProperty(ADMIN_BOOTSTRAP_PROPERTY);
   }
 
-  Logger.log('GOTOWE. Administrator: ' + MAIL_STUDIO +
-    ' (hasło startowe: ' + ADMIN_HASLO_STARTOWE + ' — ZMIEŃ je w zakładce Admini).');
+  Logger.log('GOTOWE. Hasło administratora nie jest zapisane w kodzie.');
   Logger.log('Teraz: Wdróż → Nowe wdrożenie → Aplikacja internetowa ' +
     '(wykonuj jako: ja; dostęp: każdy). URL wklej do www/assets/config.js → SYG.API.');
 }
@@ -673,8 +675,9 @@ function odpowiedz(ob) {
 }
 
 function maKlucz(d) {
+  const expected = PropertiesService.getScriptProperties().getProperty('LEGACY_ADMIN_API_TOKEN') || '';
   const t = String(d.klucz || '');
-  return t !== '' && t === TOKEN && String(TOKEN).indexOf('WSTAW_TU') !== 0;
+  return !!expected && t !== '' && t === expected;
 }
 function bladKlucza() { return { ok: false, blad: 'Brak dostępu — zły klucz.' }; }
 function maAdminDostep(d) {

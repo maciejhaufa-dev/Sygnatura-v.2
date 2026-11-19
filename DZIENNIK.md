@@ -46,7 +46,7 @@ git status --short | wc -l      # oczekiwane: 0
 | HEAD | `a532b2f` (lub nowszy, jeśli checkpoint dopisany) — worktree czysty |
 | Źródło Pages | gałąź `arena/01a0ca92-sygnatura-v-2`, folder `/docs` (przełączono 22.09 — user w Ustawieniach; bot ma 403) |
 | Treść live | **wersja 28.41, marker `?v=321`** (121 markerów), **`LAUNCH: false` = pełny serwis**, **`API: WPIĘTE (Google Sheets/Apps Script)`**; wszystkie podstrony aktywne (Sklep, Wynajem, Zamówienia w menu), formularz kontaktowy aktywny, admin.html aktywny na Pages |
-| Silnik (baza) | **WDROŻONY I POŁĄCZONY NA ŻYWO (23.09.2026)!** URL `/exec` wpięty w `config.js`; baza Google Sheets (SYGNATURA-BAZA) odbiera zamówienia, konta, wynajem i formularz kontaktowy. Panel admin.html?klucz=f255094c5fe76e5ce8b7c429 wdrożony na Pages. |
+| Silnik (baza) | **WDROŻONY I POŁĄCZONY NA ŻYWO (23.09.2026)!** URL `/exec` wpięty w `config.js`; baza Google Sheets (SYGNATURA-BAZA) odbiera zamówienia, konta, wynajem i formularz kontaktowy. Panel admin.html (logowanie loginem i hasłem) wdrożony na Pages. |
 | Domena | `studiosygnatura.pl` → GitHub Pages (custom domain); OVH DNS: `@` = 4×A `185.199.108/109/110/111.153`, `www` = CNAME `maciejhaufa-dev.github.io` — krok usera (23.09); MX/SPF/DKIM NIE TYKAĆ |
 | PR | #1 OPEN (Serwis: kreator Zamówienia A/B/C) — nie ruszać bez polecenia |
 | `origin/main` | `80efcca` (zrzut 18 zdjęć + folder pracownia/ + re-uploady) |
@@ -103,7 +103,7 @@ git fetch origin arena/01a0ca92-sygnatura-v-2 && git reset --mixed FETCH_HEAD
 # 2. doinstaluj brakujące pakiety (reset kasuje pip):
 pip install --break-system-packages flask pillow
 # 3. uruchom serwis (baza tworzy się sama; usunięcie data/serwis.db = reset do seeda):
-cd serwis && python3 app.py     # -> http://127.0.0.1:8000  (admin: /admin/, hasło startowe sygnatura-2026)
+cd serwis && python3 app.py     # -> http://127.0.0.1:8000  (admin: /admin/, hasło ustawiane prywatnie przed inicjalizacją)
 ```
 
 Gałąź pracy: **`arena/01a0ca92-sygnatura-v-2`** (tylko na niej commitujemy; zmiana 22.09, stara `01a056f0` = historia). Remote: `maciejhaufa-dev/Sygnatura-v.2`.
@@ -267,7 +267,7 @@ Uwagi techniczne:
 
 **Data:** 2026-09-08 · **Gałąź:** `arena/01a056f0-sygnatura-v-2` · **HEAD:** `f211ebc` (wypchnięty; origin = HEAD, tree czysty)
 **PR:** #1 OPEN (base main, head arena/01a056f0-sygnatura-v-2, 41 commitów, ~170 plików, +18k linii — obejmuje całą historię, bo main = „Add files via upload").
-**Serwis lokalnie:** Flask 127.0.0.1:8000 (start: `cd serwis && /home/user/Sygnatura-v.2/.venv/bin/python app.py`), admin `/admin/` hasło `sygnatura-2026`.
+**Serwis lokalnie:** Flask 127.0.0.1:8000 (start: `cd serwis && /home/user/Sygnatura-v.2/.venv/bin/python app.py`), admin `/admin/` — hasło konfigurowane prywatnie.
 
 ## ⚠️ PROCEDURA ODTWORZENIA PO RESECIE SANDBOXA (zdarzył się 2× w sesji 19 — bez paniki, wszystko jest w repo)
 Sandbox resetuje: git cofa HEAD do `2284074`, usuwa `.venv`, czasem zabija proces Flask. PLIKI W KATALOGU ROBOCZYM ZOSTAJĄ.
@@ -1726,7 +1726,7 @@ WYKONANE (wersja 28.39, ?v=319, 121 markerów):
    stronaZamowienia = JSON); `blog-zapisz` z `syncProdukt` (normalizuje obraz — ściąga
    prefiks `assets/media/sklep/`; bug latentny z demo); `produkty-zapisz`/`produkt-nowy`/
    `ustawienia-dostawa-zapisz`; `admin-login` = TOKEN + e-mail/hasło z `Admini`
-   (domyślnie kontakt@studiosygnatura.pl / `sygnatura-2026` — ZMIEŃ).
+   (logowanie aktywnym kontem; hasło zmieniane z poziomu panelu).
 5. `engine/Konfig.gs`: 9 zakładek (Ustawienia, Katalog, Wiadomosci, Zamowienia, Wynajem,
    Konta, Blog, Strony, Admini), `instaluj()` (nagłówki + seedy + admin), `sha256()`,
    `DOSTAWA_STARTOWA`; `engine/SEED.gs` wygenerowany z seedy klienta
@@ -1776,7 +1776,7 @@ weryfikować z parametrem cache-busting.
 ### Sesja 29/5 — PEŁNE PRZYWRÓCENIE PODSTRON I PANELU ADMINA (wersja 28.41, ?v=321)
 
 1. Rozwiązano problem z panelem admina: plik `docs/admin.html` był omyłkowo usuwany ze skryptu deployu (stąd błąd 404 / przekierowanie na stronę główną przy próbie wejścia przez link). Przywrócono `admin.html` do katalogu `docs/`. Panel logowania jest teraz w 100% dostępny pod:
-   `https://maciejhaufa-dev.github.io/Sygnatura-v.2/admin.html?klucz=f255094c5fe76e5ce8b7c429`
+   `https://maciejhaufa-dev.github.io/Sygnatura-v.2/admin.html (logowanie loginem i hasłem)`
 2. Przywrócono pełną aktywność wszystkich podstron i nawigacji (usunięcie pozostałości trybu startu):
    - `kontakt.html`: przywrócono interaktywny formularz kontaktowy (walidacja, anty-spam, wysyłka przez `wezwij('wiadomosc')` do zakładki `Wiadomosci` w Google Sheets + powiadomienie e-mail).
    - `jak-pracujemy.html`: przywrócono pełną treść procesu (Krok 1: zamówienie online/kreator, Krok 2: wycena i sygnatura, Krok 3: kaucja i rezerwacja, Krok 4: montaż i odbiór, Krok 5: zwrot kaucji, Personalizacja, Sklep).

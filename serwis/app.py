@@ -1945,6 +1945,6 @@ if __name__ == '__main__':
     print('=' * 60)
     print('Studio Sygnatura — serwis lokalny')
     print('  strona:  http://127.0.0.1:8000')
-    print('  panel:   http://127.0.0.1:8000/admin/  (hasło startowe: sygnatura-2026)')
+    print('  panel:   http://127.0.0.1:8000/admin/  (hasło admina skonfigurowane poza kodem)')
     print('=' * 60)
     app.run(host='0.0.0.0', port=8000, debug=True)

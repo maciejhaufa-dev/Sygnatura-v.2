@@ -38,7 +38,7 @@ from app import app as application
 Otwórz w przeglądarce (też na telefonie żony):
 
 - **Strona:** `https://TWOJ_LOGIN.pythonanywhere.com/`
-- **Panel:** `https://TWOJ_LOGIN.pythonanywhere.com/admin/` — hasło startowe: `sygnatura-2026`
+- **Panel:** `https://TWOJ_LOGIN.pythonanywhere.com/admin/` — hasło konfigurowane poza kodem; brak wbudowanego hasła
 
 ## Krok 5 — po testach (ważne!)
 1. **Zmień hasło** panelu: Ustawienia (w panelu).

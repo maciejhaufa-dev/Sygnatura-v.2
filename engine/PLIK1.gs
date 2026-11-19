@@ -22,10 +22,13 @@ const DOMENA_MAIL = 'kontakt@studiosygnatura.pl';
 // nazwa nadawcy w stopce maili
 const NADAWCA_NAZWA = 'Studio Sygnatura';
 
-// hasło administratora do PIERWSZEGO logowania (zakładka Admini) — po wdrożeniu
-// ZMIEŃ je: w zakładce Admini podmień haslo_sha na wynik sha256('twoje nowe hasło')
-// (funkcja sha256 jest w tym pliku — wybierz ją z listy funkcji → Uruchom).
-const ADMIN_HASLO_STARTOWE = 'sygnatura-2026';
+// Jednorazowe hasło startowe/resetujące jest pobierane wyłącznie z Script Properties.
+const ADMIN_BOOTSTRAP_PROPERTY = 'SYG_ADMIN_BOOTSTRAP_PASSWORD';
+function pobierzHasloBootstrapAdmina_(){
+  const haslo = String(PropertiesService.getScriptProperties().getProperty(ADMIN_BOOTSTRAP_PROPERTY) || '');
+  if (haslo.length < 16) throw new Error('Ustaw Script Property SYG_ADMIN_BOOTSTRAP_PASSWORD na unikalne hasło (min. 16 znaków).');
+  return haslo;
+}
 
 // cennik dostawy startowy (nadpisuje go panel: Ustawienia → cennik)
 const DOSTAWA_STARTOWA = {
@@ -139,13 +142,13 @@ function instaluj() {
   }
 
   const adm = arkusz('Admini');
-  if (adm.getLastRow() === 0) {
-    adm.getRange(1, 1, 1, 3).setValues([['email', 'haslo_sha', 'aktywny']]);
-    adm.appendRow([MAIL_STUDIO, sha256(ADMIN_HASLO_STARTOWE), 1]);
+  if (adm.getLastRow() === 0) adm.getRange(1, 1, 1, 3).setValues([['email', 'haslo_sha', 'aktywny']]);
+  if (adm.getLastRow() === 1) {
+    const hasloBootstrap = pobierzHasloBootstrapAdmina_();
+    adm.appendRow([MAIL_STUDIO, sha256(hasloBootstrap), 1]);
+    PropertiesService.getScriptProperties().deleteProperty(ADMIN_BOOTSTRAP_PROPERTY);
   }
-
-  Logger.log('GOTOWE. Administrator: ' + MAIL_STUDIO +
-    ' (hasło startowe: ' + ADMIN_HASLO_STARTOWE + ' — ZMIEŃ je w zakładce Admini).');
+  Logger.log('GOTOWE. Konto administratora inicjalizowane bez hasła w kodzie.');
   Logger.log('Teraz: Wdróż → Nowe wdrożenie → Aplikacja internetowa ' +
     '(wykonuj jako: ja; dostęp: każdy). URL wklej do www/assets/config.js → SYG.API.');
 }

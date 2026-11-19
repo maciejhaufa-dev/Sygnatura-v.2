@@ -36,10 +36,7 @@ Jeśli pojawi się błąd uploadu zdjęcia o braku `GITHUB_TOKEN`, ustaw go w Ap
 5. **Wynajem**: kalendarz (dni na żywo) → zapytanie o termin → zakładka `Wynajem`.
    **Po wpłacie** zmień status w arkuszu na `zarezerwowany` — dzień i pakiet
    zablokują się w kalendarzu (zapytania samych zapytań NIE blokują).
-6. **Panel**: otwórz `admin.html` → logowanie
-   `kontakt@studiosygnatura.pl` / `sygnatura-2026` → **ZMIEŃ HASŁO** (zakładka `Admini`
-   w arkuszu: haslo_sha = wynik `sha256('twoje nowe hasło')` — funkcja `sha256` jest
-   w PLIK1.gs; wybierz ją z listy funkcji → Uruchom).
+6. **Panel**: otwórz `admin.html`, zaloguj się istniejącym kontem i zmieniaj hasło z poziomu panelu. Nie edytuj ręcznie hashy ani danych w arkuszu.
 
 ## Własne zdjęcia tła — wspólna biblioteka GitHub
 W trybie produkcyjnym przycisk „Dodaj do biblioteki” kompresuje zdjęcie do JPG (maks. 1600 px), wysyła je do Apps Script, a Apps Script zapisuje je do `origin/main/uploads/`. Strona używa publicznego adresu pliku z `raw.githubusercontent.com`; ścieżka obrazu jest następnie zapisywana we wspólnych ustawieniach strony głównej w arkuszu. Klucz GitHuba **nie trafia do strony ani do przeglądarki**.
@@ -58,7 +55,7 @@ Po zmianach akcji w silniku (w tym uploadu lub publicznego odczytu cennika) trze
 - Sesje są podpisywane po stronie Apps Script i ważne 30 dni; nie opierają się już wyłącznie na krótkotrwałym `CacheService`.
 - W panelu **Ustawienia → Dane logowania administratora** można zmienić e-mail/login i/lub hasło, potwierdzając obecne hasło.
 - Na ekranie logowania „Nie pamiętam hasła” wysyła 6-cyfrowy kod na e-mail aktywnego administratora; kod wygasa po 10 minutach i ma limit prób. Jeśli backend zgłosi brak zgody poczty, uruchom ręcznie `autoryzujPoczteAdmina()` i zaakceptuj zgodę.
-- Awaryjnie, jeśli mail odzyskiwania nie działa: w edytorze Apps Script uruchom `przywrocHasloStartoweAdmina()`. Funkcja zmienia hash wyłącznie istniejącego, aktywnego konta `MAIL_STUDIO` na hash `ADMIN_HASLO_STARTOWE`; nie tworzy arkusza ani konta. Po zalogowaniu od razu ustaw własne hasło w panelu.
+- Awaryjny reset istniejącego konta: w **Script Properties** ustaw tymczasowe `SYG_ADMIN_BOOTSTRAP_PASSWORD` (unikalne, min. 16 znaków), zaktualizuj istniejący deployment PLIK1–3, a następnie uruchom `przywrocHasloStartoweAdmina()`. Funkcja zmienia hash wyłącznie istniejącego aktywnego konta `MAIL_STUDIO` i automatycznie usuwa właściwość po użyciu. Zaloguj się hasłem tymczasowym i od razu zmień je w panelu. Nie używaj ani nie zmieniaj `GITHUB_TOKEN` — służy wyłącznie do uploadu zdjęć.
 - `media-upload` i pozostałe akcje są wpisami `case` w `doPost` — nie uruchamia się ich ręcznie z listy funkcji Apps Script. Testuj je z panelu strony po wdrożeniu nowej wersji aplikacji.
 - Po zmianie plików `PLIK1.gs` lub `PLIK2.gs` w istniejącym projekcie zapisz i wybierz **Zarządzaj wdrożeniami → Edytuj → Nowa wersja → Wdróż**. Nie uruchamiaj `instaluj()`.
 
@@ -71,3 +68,13 @@ Token ma ograniczone uprawnienia do tego repozytorium i powinien mieć termin wa
 - Cennik dostawy, strona główna, podstrony, produkty, blog — edycja w panelu `admin.html`
    (zapisy lądują w arkuszu od razu; nic się nie czyści, nie ma „resetu danych”).
 - Hasła kont: SHA-256 w arkuszu (zakładka `Konta`, kolumna `haslo_sha`) — samo hasło nigdzie nie leży.
+
+### Inicjalizacja hasła administratora bez sekretu w kodzie
+
+Kod nie zawiera domyślnego hasła. Przy pierwszym tworzeniu konta ustaw najpierw `SYG_ADMIN_BOOTSTRAP_PASSWORD` w Apps Script → Project Settings → Script Properties; po inicjalizacji wartość jest automatycznie usuwana. Istniejący projekt nie wymaga `instaluj()` — do rotacji hasła użyj jednorazowego resetu opisanego powyżej.
+
+### Ważne: brak domyślnego hasła administratora
+
+W aktualnym kodzie nie ma hasła startowego. Przy nowej inicjalizacji lub awaryjnym resecie ustaw w **Apps Script → Project Settings → Script Properties** osobną właściwość `SYG_ADMIN_BOOTSTRAP_PASSWORD` z własnym, unikalnym hasłem o długości co najmniej 16 znaków. Po użyciu do inicjalizacji/resetu skrypt automatycznie usuwa tę właściwość. Następnie zaloguj się i ustaw docelowe hasło w panelu.
+
+`SYG_ADMIN_BOOTSTRAP_PASSWORD` nie jest `GITHUB_TOKEN`: drugi służy wyłącznie do uploadu zdjęć. Nie kopiuj wartości między tymi właściwościami. Nie uruchamiaj `instaluj()` na istniejącym arkuszu.

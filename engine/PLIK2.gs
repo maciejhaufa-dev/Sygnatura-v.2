@@ -467,9 +467,10 @@ function adminRotujSekretSesji(){
   );
 }
 
-/* Awaryjne odtworzenie pierwszego hasła — uruchamiać ręcznie jako właściciel skryptu.
-   Nie tworzy konta ani arkusza; aktualizuje wyłącznie istniejący, aktywny wiersz MAIL_STUDIO. */
+/* Jednorazowy reset: hasło tymczasowe pochodzi z Script Property i jest kasowane po użyciu.
+   Aktualizuje wyłącznie istniejące, aktywne konto MAIL_STUDIO. */
 function przywrocHasloStartoweAdmina(){
+  const hasloBootstrap = pobierzHasloBootstrapAdmina_();
   const email = String(MAIL_STUDIO || '').trim().toLowerCase();
   const ss = SpreadsheetApp.openById(ARKUSZ_ID);
   const sh = ss.getSheetByName('Admini');
@@ -480,11 +481,12 @@ function przywrocHasloStartoweAdmina(){
     if (String(dane[i][0] || '').trim().toLowerCase() === email && String(dane[i][2]) === '1') { row = i; break; }
   }
   if (row < 0) throw new Error('Nie znaleziono aktywnego konta administratora MAIL_STUDIO — niczego nie zmieniono.');
-  sh.getRange(row + 1, 2).setValue(sha256(ADMIN_HASLO_STARTOWE));
+  sh.getRange(row + 1, 2).setValue(sha256(hasloBootstrap));
+  PropertiesService.getScriptProperties().deleteProperty(ADMIN_BOOTSTRAP_PROPERTY);
   CacheService.getScriptCache().remove('syg-admin-login-' + sha256(email).slice(0, 32));
   adminRotujSekretSesji();
-  Logger.log('Hasło startowe przywrócone dla istniejącego, aktywnego administratora.');
-  return 'Hasło startowe przywrócone. Zaloguj się i od razu ustaw własne hasło w panelu.';
+  Logger.log('Hasło administratora odświeżone; jednorazowa właściwość została usunięta.');
+  return 'Hasło tymczasowe ustawiono i usunięto z Script Properties. Zaloguj się, a następnie od razu ustaw własne hasło w panelu.';
 }
 
 function adminLogin(d) {

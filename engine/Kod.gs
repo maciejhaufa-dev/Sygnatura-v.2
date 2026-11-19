@@ -7,7 +7,7 @@
  *   wynajem-zapytanie, terminy-zajete, pakiet-dostepny,
  *   blog-lista, blog-pobierz, strony-lista,
  *   strona-glowna-pobierz, strona-zamowienia-pobierz
- * ADMIN (klucz = TOKEN z Konfig.gs; właściciel otwiera
+ * ADMIN (starszy wariant: LEGACY_ADMIN_API_TOKEN w Script Properties; właściciel otwiera
  *   admin.html?klucz=… i klucz idzie w każdej prośbie):
  *   admin-login, zamowienia-lista, zamowienie-status,
  *   blog-zapisz, blog-widocznosc, blog-usun, produkt-nowy,
@@ -87,8 +87,9 @@ function odpowiedz(ob) {
 }
 
 function maKlucz(d) {
+  const expected = PropertiesService.getScriptProperties().getProperty('LEGACY_ADMIN_API_TOKEN') || '';
   const t = String(d.klucz || '');
-  return t !== '' && t === TOKEN && String(TOKEN).indexOf('WSTAW_TU') !== 0;
+  return !!expected && t !== '' && t === expected;
 }
 function bladKlucza() { return { ok: false, blad: 'Brak dostępu — zły klucz.' }; }
 function maAdminDostep(d) {
