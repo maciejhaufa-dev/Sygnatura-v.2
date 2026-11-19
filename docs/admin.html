@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=354">
+<link rel="stylesheet" href="assets/style.css?v=355">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -622,20 +622,15 @@
 
 <div id="stopka"></div>
 
-<script src="assets/config.js?v=354"></script>
-<script src="assets/koszyk.js?v=354"></script>
-<script src="assets/api.js?v=354"></script>
-<script src="assets/editor.js?v=354"></script>
-<script src="assets/edytor.js?v=354"></script>
-<script src="data/katalog.js?v=354"></script>
-<script src="assets/main.js?v=354"></script>
+<script src="assets/config.js?v=355"></script>
+<script src="assets/koszyk.js?v=355"></script>
+<script src="assets/api.js?v=355"></script>
+<script src="assets/editor.js?v=355"></script>
+<script src="assets/edytor.js?v=355"></script>
+<script src="data/katalog.js?v=355"></script>
+<script src="assets/main.js?v=355"></script>
 <script>
 (function(){
-  var MASTER_KLUCZ = 'f255094c5fe76e5ce8b7c429';
-  // Ten panel ma jeden klucz zgodny z backendem. Ignoruj stare klucze
-  // z URL i sessionStorage, które mogły pozostać po wcześniejszych wersjach.
-  var klucz = MASTER_KLUCZ;
-  try { sessionStorage.setItem('syg-admin-klucz', klucz); } catch(e){}
   var info = document.getElementById('tryb-info');
   var bled = document.getElementById('bled');
   var logowanie = document.getElementById('logowanie');
@@ -694,9 +689,9 @@
       suma = zam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
     } else {
       try {
-        var odpZam = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
-        var odpWiad = await SYG.wezwij('wiadomosci-lista', { klucz: klucz });
-        var odpZap = await SYG.wezwij('wynajem-zapytania-lista', { klucz: klucz });
+        var odpZam = await SYG.wezwij('zamowienia-lista', {});
+        var odpWiad = await SYG.wezwij('wiadomosci-lista', {});
+        var odpZap = await SYG.wezwij('wynajem-zapytania-lista', {});
         var listaZam = (odpZam && odpZam.ok && odpZam.zamowienia) ? odpZam.zamowienia : [];
         var listaWiad = (odpWiad && odpWiad.ok && odpWiad.wiadomosci) ? odpWiad.wiadomosci : [];
         var listaZap = (odpZap && odpZap.ok && odpZap.zapytania) ? odpZap.zapytania : [];
@@ -960,7 +955,7 @@
     if (suk) suk.style.display = 'none';
     var zapisano = false;
     try {
-      var odp = await SYG.wezwij('strona-glowna-zapisz', { klucz: klucz, dane: dane });
+      var odp = await SYG.wezwij('strona-glowna-zapisz', {dane: dane });
       if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Serwer nie potwierdził zapisu.');
       zapisano = true;
       wyczyscBrudny();
@@ -1574,7 +1569,7 @@
     szCzyscBrudny();
   }
   async function szZapisz(){
-    var odp = await SYG.wezwij('strona-zamowienia-zapisz', { klucz: klucz, dane: { tresc: SZ_EDYTOR.pobierz() } });
+    var odp = await SYG.wezwij('strona-zamowienia-zapisz', {dane: { tresc: SZ_EDYTOR.pobierz() } });
     if (odp.ok){ szCzyscBrudny(); szInfo('Strona Zamówienia zapisana.', false); }
     else szInfo(odp.blad || 'Nie udało się zapisać.', true);
     return odp.ok;
@@ -1593,9 +1588,9 @@
 
   /* ============ zamówienia ============ */
   async function ladujZamowienia(){
-    var odp = await SYG.wezwij('zamowienia-lista', { klucz: klucz });
+    var odp = await SYG.wezwij('zamowienia-lista', {});
     if (!odp.ok){
-      bled.textContent = odp.blad || 'Brak dostępu (zły klucz?).';
+      bled.textContent = odp.blad || 'Brak dostępu lub wygasła sesja.';
       bled.style.display = 'block';
       return;
     }
@@ -1621,7 +1616,7 @@
     tbody.querySelectorAll('select').forEach(function(sel){
       sel.addEventListener('change', async function(){
         var stary = sel.getAttribute('data-stary');
-        var odp2 = await SYG.wezwij('zamowienie-status', { klucz: klucz, sygnatura: sel.getAttribute('data-syg'), status: sel.value });
+        var odp2 = await SYG.wezwij('zamowienie-status', {sygnatura: sel.getAttribute('data-syg'), status: sel.value });
         if (odp2 && odp2.ok) sel.setAttribute('data-stary', sel.value);
         else {
           sel.value = stary;
@@ -1645,9 +1640,9 @@
       zap = SYG.demoDb.wynajemZapytania();
     } else {
       try {
-        var odpW = await SYG.wezwij('wiadomosci-lista', { klucz: klucz });
+        var odpW = await SYG.wezwij('wiadomosci-lista', {});
         if (odpW && odpW.ok && Array.isArray(odpW.wiadomosci)) wiadomosci = odpW.wiadomosci;
-        var odpZ = await SYG.wezwij('wynajem-zapytania-lista', { klucz: klucz });
+        var odpZ = await SYG.wezwij('wynajem-zapytania-lista', {});
         if (odpZ && odpZ.ok && Array.isArray(odpZ.zapytania)) zap = odpZ.zapytania;
       } catch (err){
         console.warn('Błąd ładowania wiadomości z serwera:', err);
@@ -2300,8 +2295,7 @@
     ladujStronaGlowna();
   }
 
-  // Nigdy nie traktuj publicznego klucza API jako dowodu zalogowania.
-  // Tylko znacznik sesji po poprawnym logowaniu może otworzyć panel.
+  // Tylko znacznik po poprawnym loginie i podpisana sesja otwierają panel.
   var zalogowany = false;
   try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
   if (zalogowany && !SYG.TRYB_DEMO) pokazPanel();
@@ -2332,7 +2326,7 @@
     var passOk = false;
     if (!SYG.TRYB_DEMO){
       try {
-        var odp = await SYG.wezwij('admin-login', { login: l, haslo: h, klucz: klucz });
+        var odp = await SYG.wezwij('admin-login', { login: l, haslo: h });
         if (odp && odp.ok) passOk = true;
         else if (odp && odp.blad) {
           logowanieBlad.textContent = odp.blad;
@@ -2377,7 +2371,7 @@
     if (!loginReset){ komunikatLogowania('Wpisz login administratora (adres e-mail) powyżej.', false); return; }
     var btn = this; btn.disabled = true; btn.textContent = 'Wysyłanie…';
     try {
-      var odpReset = await SYG.wezwij('admin-reset-kod', { login: loginReset, klucz: klucz });
+      var odpReset = await SYG.wezwij('admin-reset-kod', { login: loginReset });
       var tekstReset = odpReset && odpReset.ok
         ? 'Jeśli ten login jest aktywny, kod wysłaliśmy na przypisany e-mail. Sprawdź też folder Spam; kod ważny 10 minut.'
         : ((odpReset && odpReset.blad) || 'Nie udało się wysłać kodu.');
@@ -2395,7 +2389,7 @@
     var btn = this; btn.disabled = true; btn.textContent = 'Zapisywanie…';
     try {
       var odpReset = await SYG.wezwij('admin-reset-haslo', {
-        login: loginReset, kod: kod, noweHaslo: haslo1, klucz: klucz
+        login: loginReset, kod: kod, noweHaslo: haslo1
       });
       if (odpReset && odpReset.ok){
         document.getElementById('admin-haslo').value = '';

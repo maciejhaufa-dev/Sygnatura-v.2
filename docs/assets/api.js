@@ -683,8 +683,8 @@
     if (SYG.TRYB_DEMO) return demo(akcja, dane);
 
     dane = dane || {};
-    /* Akcje zapisu administratora wymagają klucza API. Podpinamy go tutaj,
-       aby każdy przycisk w panelu przekazywał go spójnie. */
+    /* Akcje administratora uwierzytelnia podpisana sesja; nie używamy
+       statycznego klucza osadzonego w publicznym kodzie strony. */
     const ADMIN_AKCJE = [
       'zamowienia-lista', 'zamowienie-status', 'blog-zapisz', 'blog-widocznosc', 'blog-usun',
       'admin-zmien-dane', 'produkt-nowy', 'produkty-zapisz', 'media-upload', 'strona-glowna-zapisz',
@@ -694,9 +694,7 @@
     if (ADMIN_AKCJE.indexOf(akcja) !== -1) {
       try {
         const dodaj = {};
-        const kluczAdmina = sessionStorage.getItem('syg-admin-klucz');
         const sesjaAdmina = sessionStorage.getItem('syg-admin-session');
-        if (!dane.klucz && kluczAdmina) dodaj.klucz = kluczAdmina;
         if (!dane.adminSession && sesjaAdmina) dodaj.adminSession = sesjaAdmina;
         if (Object.keys(dodaj).length) dane = Object.assign({}, dane, dodaj);
       } catch (e) { /* API zwróci standardowy błąd dostępu */ }

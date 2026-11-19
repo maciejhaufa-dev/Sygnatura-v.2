@@ -479,22 +479,29 @@ function przywrocHasloStartoweAdmina(){
   }
   if (row < 0) throw new Error('Nie znaleziono aktywnego konta administratora MAIL_STUDIO — niczego nie zmieniono.');
   sh.getRange(row + 1, 2).setValue(sha256(ADMIN_HASLO_STARTOWE));
+  CacheService.getScriptCache().remove('syg-admin-login-' + sha256(email).slice(0, 32));
   adminRotujSekretSesji();
   Logger.log('Hasło startowe przywrócone dla istniejącego, aktywnego administratora.');
   return 'Hasło startowe przywrócone. Zaloguj się i od razu ustaw własne hasło w panelu.';
 }
 
 function adminLogin(d) {
-  if (!maKlucz(d)) return bladKlucza();
   const login = String(d.login || '').trim().toLowerCase();
+  if (!login) return { ok: false, blad: 'Wpisz login administratora.' };
+  const cache = CacheService.getScriptCache();
+  const probyKey = 'syg-admin-login-' + sha256(login).slice(0, 32);
+  const proby = Number(cache.get(probyKey) || 0);
+  if (proby >= 5) return { ok: false, blad: 'Za dużo nieudanych prób. Odczekaj 15 minut i spróbuj ponownie.' };
   const dane = arkusz('Admini').getDataRange().getValues();
   for (let i = 1; i < dane.length; i++) {
     if (String(dane[i][0] || '').trim().toLowerCase() === login &&
         String(dane[i][2]) === '1' &&
         String(dane[i][1]) === sha256(String(d.haslo || ''))) {
+      cache.remove(probyKey);
       return { ok: true, sessionToken: adminNowaSesja(dane[i][0]), admin: { email: String(dane[i][0]) } };
     }
   }
+  cache.put(probyKey, String(proby + 1), 900);
   return { ok: false, blad: 'Nieprawidłowy e-mail lub hasło.' };
 }
 
@@ -537,7 +544,6 @@ function autoryzujPoczteAdmina(){
 }
 
 function adminResetKod(d){
-  if (!maKlucz(d)) return bladKlucza();
   const login = String(d.login || '').trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(login)) return { ok: true };
   const kluczEmail = sha256(login).slice(0, 32);
@@ -565,7 +571,6 @@ function adminResetKod(d){
 }
 
 function adminResetHaslo(d){
-  if (!maKlucz(d)) return bladKlucza();
   const login = String(d.login || '').trim().toLowerCase();
   const kod = String(d.kod || '').trim();
   const noweHaslo = String(d.noweHaslo || '');

@@ -12,11 +12,6 @@
 // ID arkusza Google (z adresu: docs.google.com/spreadsheets/d/<TEN_FRAGMENT>/edit)
 const ARKUSZ_ID = 'WSTAW_TU_ID_ARKUSZA';
 
-// klucz dostępu do panelu (długi, wymyśl własny: litery + cyfry).
-// Właściciel otwiera panel pod adresem:  admin.html?klucz=TEN_KLUCZ
-// (w trybie z bazą logowanie admin/test z config.js przestaje działać).
-const TOKEN = 'f255094c5fe76e5ce8b7c429';
-
 // gdzie mają przychodzić powiadomienia o zamówieniach, wiadomościach,
 // zapytaniach o termin i rejestracjach
 const MAIL_STUDIO = 'kontakt@studiosygnatura.pl';
@@ -165,8 +160,7 @@ function instaluj() {
  *   wynajem-zapytanie, terminy-zajete, pakiet-dostepny,
  *   blog-lista, blog-pobierz, strony-lista,
  *   strona-glowna-pobierz, strona-zamowienia-pobierz
- * ADMIN (klucz = TOKEN skonfigurowany w PLIK1.gs; właściciel otwiera
- *   admin.html?klucz=… i klucz idzie w każdej prośbie):
+ * ADMIN: login i hasło tworzą podpisaną sesję; pozostałe akcje wymagają tej sesji.
  *   admin-login, admin-zmien-dane, admin-reset-kod, admin-reset-haslo,
  *   zamowienia-lista, zamowienie-status, blog-zapisz, blog-widocznosc,
  *   blog-usun, produkt-nowy,
@@ -217,7 +211,7 @@ function doPost(e) {
       case 'strona-glowna-pobierz':   return odpowiedz({ ok: true, dane: odczytJsonUstawienia('stronaGlowna') });
       case 'strona-zamowienia-pobierz': return odpowiedz({ ok: true, dane: odczytJsonUstawienia('stronaZamowienia') });
       case 'ustawienia-dostawa-pobierz': return odpowiedz({ ok: true, cennik: odczytJsonUstawienia('dostawa') || DOSTAWA_STARTOWA });
-      /* ---------------- admin (klucz) ---------------- */
+      /* ---------------- admin (hasło + podpisana sesja) ---------------- */
       case 'admin-login':             return odpowiedz(adminLogin(dane));
       case 'admin-zmien-dane':        return odpowiedz(maAdminDostep(dane) ? adminZmienDane(dane) : bladSesjiAdmina());
       case 'admin-reset-kod':         return odpowiedz(adminResetKod(dane));
@@ -249,13 +243,7 @@ function odpowiedz(ob) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function maKlucz(d) {
-  const t = String(d.klucz || '');
-  return t !== '' && t === TOKEN && String(TOKEN).indexOf('WSTAW_TU') !== 0;
-}
-function bladKlucza() { return { ok: false, blad: 'Brak dostępu — zły klucz.' }; }
 function maAdminDostep(d) {
-  if (!maKlucz(d)) return false;
   const email = adminEmailZSesji(String(d.adminSession || ''));
   return !!email && adminAktywny(email);
 }
