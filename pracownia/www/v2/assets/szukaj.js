@@ -37,7 +37,8 @@
   const trafienia = [];
 
   (D.produkty || []).forEach(p => {
-    const hay = norm([p.nazwa, p.opis, p.kategoria, (p.cechy || []).join(' ')].join(' '));
+    if (!p || p.dostepny === false) return;
+    const hay = norm([p.nazwa, p.opis, p.kategoria, p.tagi || '', p.gabaryt || '', (p.cechy || []).join(' ')].join(' '));
     if (slowa.every(s => hay.includes(s))) {
       trafienia.push({
         typ: 'Produkt', nazwa: p.nazwa, kategoria: p.kategoria, opis: p.opis,
@@ -48,6 +49,7 @@
   });
 
   (D.realizacje || []).forEach(r => {
+    if (!r || r.widoczna === false) return;
     const hay = norm([r.tytul, r.opis, r.kategoria].join(' '));
     if (slowa.every(s => hay.includes(s))) {
       trafienia.push({

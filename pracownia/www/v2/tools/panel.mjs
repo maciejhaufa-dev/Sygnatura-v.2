@@ -13,26 +13,34 @@
    Użycie:  node tools/panel.mjs [port]
    ============================================================ */
 import http from 'node:http';
-import { readFile, writeFile, mkdir, stat } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, stat, readdir, unlink } from 'node:fs/promises';
 import { join, dirname, extname, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DANE = join(ROOT, 'admin', 'panele');
+const UPLOADY = join(DANE, 'uploady');
 const PLIK_DANYCH = join(DANE, 'dane.json');
 const PLIK_HASLA = join(DANE, '.haslo');
 const PLIK_NAKLADKI = join(DANE, 'dane.js');   // to samo, ale jako skrypt dla strony
 const PLIK_SESJI = join(DANE, '.sesje.json');
+const PLIK_HISTORII = join(DANE, '.historia.json');
+const PLIK_BAZY = join(ROOT, 'data', 'dane.js');
 const PORT = Number(process.argv[2] || process.env.PORT || 8003);
 const HOST = process.env.HOST || '0.0.0.0';
 
 /* ---------- hasło: generowane, nie zapisane w kodzie ---------- */
 const sha = (t) => createHash('sha256').update(String(t)).digest('hex');
+let haslo = '';
+
+function pustyStan() {
+  return { produkty: [], ustawienia: {}, wiadomosci: [] };
+}
 
 async function przygotuj() {
   await mkdir(DANE, { recursive: true });
-  let haslo;
+  await mkdir(UPLOADY, { recursive: true });
   try {
     haslo = (await readFile(PLIK_HASLA, 'utf8')).trim();
   } catch {
@@ -40,7 +48,7 @@ async function przygotuj() {
     await writeFile(PLIK_HASLA, haslo, { mode: 0o600 });
   }
   try { await stat(PLIK_DANYCH); }
-  catch { await writeFile(PLIK_DANYCH, JSON.stringify({ produkty: [], ustawienia: {}, wiadomosci: [] }, null, 2)); }
+  catch { await writeFile(PLIK_DANYCH, JSON.stringify(pustyStan(), null, 2)); }
   // nakładka dla strony musi istnieć także po sklonowaniu repo / restarcie
   try { await stat(PLIK_NAKLADKI); }
   catch { await zapiszDane(await czytajDane()); }
@@ -118,9 +126,9 @@ function ciasteczkoSesji(req, wartosc, maxAge) {
   return `syg_sesja=${wartosc}; HttpOnly; ${atrybuty}; Path=/; Max-Age=${maxAge}`;
 }
 
-async function cialo(req) {
+async function cialo(req, limit = 16e6) {
   let d = '';
-  for await (const k of req) { d += k; if (d.length > 5e6) throw new Error('za duże'); }
+  for await (const k of req) { d += k; if (d.length > limit) throw new Error('za duże'); }
   const ct = String(req.headers['content-type'] || '').toLowerCase();
   if (ct.includes('application/x-www-form-urlencoded')) {
     return Object.fromEntries(new URLSearchParams(d));
@@ -130,7 +138,7 @@ async function cialo(req) {
 
 async function czytajDane() {
   try { return JSON.parse(await readFile(PLIK_DANYCH, 'utf8')); }
-  catch { return { produkty: [], ustawienia: {}, wiadomosci: [] }; }
+  catch { return pustyStan(); }
 }
 async function zapiszDane(d) {
   await writeFile(PLIK_DANYCH, JSON.stringify(d, null, 2));
@@ -141,14 +149,69 @@ async function zapiszDane(d) {
     'window.SYG_PANEL = ' + JSON.stringify(d) + ';\n');
 }
 
+async function czytajHistorie() {
+  try {
+    const h = JSON.parse(await readFile(PLIK_HISTORII, 'utf8'));
+    return Array.isArray(h) ? h : [];
+  } catch { return []; }
+}
+async function odlozDoHistorii(stan, opis) {
+  const h = await czytajHistorie();
+  h.unshift({ czas: new Date().toISOString(), opis: opis || 'Zmiana w panelu', stan });
+  if (h.length > 15) h.length = 15;
+  await writeFile(PLIK_HISTORII, JSON.stringify(h), { mode: 0o600 }).catch(() => {});
+}
+
+async function czytajBazeDomyslna() {
+  let baza = { firma: {}, produkty: [], realizacje: [], kolejnosc: [], odznaki: {} };
+  try {
+    const txt = await readFile(PLIK_BAZY, 'utf8');
+    const idx = txt.indexOf('window.SYG_DANE = ');
+    if (idx >= 0) {
+      const jsonStr = txt.slice(idx + 'window.SYG_DANE = '.length).replace(/;\s*$/, '');
+      baza = JSON.parse(jsonStr);
+    }
+  } catch { /* ignoruj */ }
+
+  let obrazyStudia = [];
+  try {
+    const pliki = await readdir(join(ROOT, 'assets', 'img'));
+    obrazyStudia = pliki
+      .filter((f) => /\.(jpe?g|png|webp|gif)$/i.test(f))
+      .sort()
+      .map((f) => 'assets/img/' + f);
+  } catch { /* ignoruj */ }
+
+  return {
+    firma: baza.firma || {},
+    produkty: Array.isArray(baza.produkty) ? baza.produkty : [],
+    realizacje: Array.isArray(baza.realizacje) ? baza.realizacje : [],
+    kolejnosc: Array.isArray(baza.kolejnosc) ? baza.kolejnosc : [],
+    odznaki: baza.odznaki || {},
+    obrazyStudia
+  };
+}
+
+function bezpiecznaNazwaPliku(nazwa) {
+  const mapa = { 'ą':'a','ć':'c','ę':'e','ł':'l','ń':'n','ó':'o','ś':'s','ź':'z','ż':'z',
+                 'Ą':'a','Ć':'c','Ę':'e','Ł':'l','Ń':'n','Ó':'o','Ś':'s','Ź':'z','Ż':'z' };
+  return String(nazwa || 'obraz')
+    .replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (c) => mapa[c] || c)
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'obraz';
+}
+
 const TYPY = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
-  '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png',
-  '.webp': 'image/webp', '.json': 'application/json; charset=utf-8'
+  '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif',
+  '.ico': 'image/x-icon', '.json': 'application/json; charset=utf-8'
 };
 
-const haslo = await przygotuj();
+haslo = await przygotuj();
 await wczytajSesje();
 
 http.createServer(async (req, res) => {
@@ -216,7 +279,12 @@ http.createServer(async (req, res) => {
       const ok = sesjaOK(req, d);
       console.log(`[api] ${req.method} /api/stan -> ${ok ? 200 : 401} (${skrotNaglowkow(req, d)})`);
       if (!ok) return json(res, 401, { ok: false, blad: 'Zaloguj się.' });
-      return json(res, 200, { ok: true, ...(await czytajDane()) });
+      const [dane, domyslne, historia] = await Promise.all([
+        czytajDane(),
+        czytajBazeDomyslna(),
+        czytajHistorie()
+      ]);
+      return json(res, 200, { ok: true, ...dane, domyslne, historiaIle: historia.length });
     }
 
     if (req.method === 'OPTIONS' && p.startsWith('/api/')) {
@@ -236,24 +304,252 @@ http.createServer(async (req, res) => {
       const ok = sesjaOK(req, d);
       console.log(`[api] POST /api/zapisz -> ${ok ? 200 : 401} (${skrotNaglowkow(req, d)})`);
       if (!ok) return json(res, 401, { ok: false, blad: 'Sesja wygasła — zaloguj się ponownie.' });
+
       const stan = await czytajDane();
       const kopia = JSON.stringify(stan);
-      // zwykły zapis z panelu przysyła całe listy; tryb klik-w-element
-      // przysyła jedno pole — wtedy tylko je podmieniamy
-      if (d.produkty) {
-        if (d.produkty.length === 1 && d.produkty[0].id) {
+      await odlozDoHistorii(JSON.parse(kopia), d.opisZmiany || 'Zapis z panelu');
+
+      // zwykły zapis z panelu przysyła pełne listy (z flagą pelneProdukty);
+      // tryb klik-w-element przysyła jeden produkt — wtedy scal po id
+      if (Array.isArray(d.produkty)) {
+        if (!d.pelneProdukty && d.produkty.length === 1 && d.produkty[0] && d.produkty[0].id) {
           const z = d.produkty[0];
-          const i = (stan.produkty || []).findIndex((p) => p.id === z.id);
+          const i = (stan.produkty || []).findIndex((x) => x.id === z.id);
           if (i >= 0) stan.produkty[i] = { ...stan.produkty[i], ...z };
           else { stan.produkty = stan.produkty || []; stan.produkty.push(z); }
         } else {
           stan.produkty = d.produkty;
+          if (d.pelneProdukty) stan.produktyPelna = true;
         }
       }
-      if (d.ustawienia) stan.ustawienia = { ...stan.ustawienia, ...d.ustawienia };
+
+      if (Array.isArray(d.realizacje)) {
+        if (!d.pelneRealizacje && d.realizacje.length === 1 && d.realizacje[0] && d.realizacje[0].id != null) {
+          const r = d.realizacje[0];
+          const i = (stan.realizacje || []).findIndex((x) => String(x.id) === String(r.id));
+          if (i >= 0) stan.realizacje[i] = { ...stan.realizacje[i], ...r };
+          else { stan.realizacje = stan.realizacje || []; stan.realizacje.push(r); }
+        } else {
+          stan.realizacje = d.realizacje;
+          if (d.pelneRealizacje) stan.realizacjePelna = true;
+        }
+      }
+
+      if (d.stronaGlowna && typeof d.stronaGlowna === 'object') {
+        stan.stronaGlowna = d.zastapStroneGlowna
+          ? d.stronaGlowna
+          : { ...(stan.stronaGlowna || {}), ...d.stronaGlowna };
+      }
+
+      if (d.menu !== undefined) {
+        if (d.menu === null) delete stan.menu;
+        else if (Array.isArray(d.menu)) stan.menu = d.menu;
+      }
+
+      if (Array.isArray(d.podstrony_wlasne)) {
+        stan.podstrony_wlasne = d.podstrony_wlasne;
+      }
+
+      if (d.podstrony_wbudowane && typeof d.podstrony_wbudowane === 'object') {
+        stan.podstrony_wbudowane = { ...(stan.podstrony_wbudowane || {}), ...d.podstrony_wbudowane };
+      }
+
+      if (d.elementy && typeof d.elementy === 'object') {
+        stan.elementy = stan.elementy || {};
+        for (const [klucz, wartosc] of Object.entries(d.elementy)) {
+          if (wartosc === null) delete stan.elementy[klucz];
+          else stan.elementy[klucz] = wartosc;
+        }
+      }
+
+      if (d.ustawienia && typeof d.ustawienia === 'object') {
+        stan.ustawienia = { ...(stan.ustawienia || {}), ...d.ustawienia };
+      }
+
+      if (Array.isArray(d.wiadomosci)) {
+        stan.wiadomosci = d.wiadomosci;
+      }
+      if (d.wiadomoscAktualizuj && d.wiadomoscAktualizuj.id) {
+        stan.wiadomosci = stan.wiadomosci || [];
+        const wi = stan.wiadomosci.findIndex((w) => String(w.id) === String(d.wiadomoscAktualizuj.id));
+        if (wi >= 0) stan.wiadomosci[wi] = { ...stan.wiadomosci[wi], ...d.wiadomoscAktualizuj };
+      }
+      if (d.usunWiadomoscId) {
+        stan.wiadomosci = (stan.wiadomosci || []).filter((w) => String(w.id) !== String(d.usunWiadomoscId));
+      }
+
       stan.wersja = Date.now();   // strona po tym poznaje, że są nowe dane
       await zapiszDane(stan);
-      return json(res, 200, { ok: true, wersja: stan.wersja, cofnij: kopia.slice(0, 200000) });
+      const historia = await czytajHistorie();
+      return json(res, 200, { ok: true, wersja: stan.wersja, historiaIle: historia.length, cofnij: kopia.slice(0, 200000) });
+    }
+
+    if (p === '/api/upload' && req.method === 'POST') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const d = await cialo(req);
+      const ok = sesjaOK(req, d);
+      console.log(`[api] POST /api/upload -> ${ok ? 200 : 401}`);
+      if (!ok) return json(res, 401, { ok: false, blad: 'Sesja wygasła — zaloguj się ponownie.' });
+
+      const raw = String(d.dataUrl || d.base64 || '');
+      let mime = 'image/jpeg';
+      let b64 = raw;
+      const m = /^data:(image\/(?:jpeg|jpg|png|webp|gif));base64,([\s\S]+)$/i.exec(raw);
+      if (m) {
+        mime = m[1].toLowerCase() === 'image/jpg' ? 'image/jpeg' : m[1].toLowerCase();
+        b64 = m[2];
+      } else if (raw.startsWith('data:')) {
+        return json(res, 400, { ok: false, blad: 'Obsługiwane formaty zdjęć: JPG, PNG, WEBP, GIF.' });
+      }
+      const buf = Buffer.from(b64, 'base64');
+      if (!buf.length || buf.length > 10 * 1024 * 1024) {
+        return json(res, 400, { ok: false, blad: 'Plik jest pusty albo przekracza 10 MB.' });
+      }
+
+      const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : mime === 'image/gif' ? 'gif' : 'jpg';
+      const nazwaBazowa = bezpiecznaNazwaPliku(d.nazwa || 'zdjecie');
+      const skrot = randomBytes(3).toString('hex');
+      const plikNazwa = `${nazwaBazowa}-${skrot}.${ext}`;
+      const pelnaSciezka = join(UPLOADY, plikNazwa);
+      await writeFile(pelnaSciezka, buf);
+
+      const sciezka = `admin/panele/uploady/${plikNazwa}`;
+      const stan = await czytajDane();
+      stan.media = Array.isArray(stan.media) ? stan.media : [];
+      const wpis = {
+        id: 'med-' + Date.now() + '-' + skrot,
+        nazwa: String(d.nazwa || nazwaBazowa).trim() || nazwaBazowa,
+        sciezka,
+        dodano: new Date().toISOString()
+      };
+      stan.media.unshift(wpis);
+      stan.wersja = Date.now();
+      await zapiszDane(stan);
+      return json(res, 200, { ok: true, sciezka, wpis, media: stan.media, wersja: stan.wersja });
+    }
+
+    if (p === '/api/media-zmien' && req.method === 'POST') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const d = await cialo(req);
+      if (!sesjaOK(req, d)) return json(res, 401, { ok: false, blad: 'Sesja wygasła.' });
+      const stan = await czytajDane();
+      stan.media = Array.isArray(stan.media) ? stan.media : [];
+      const i = stan.media.findIndex((m) => String(m.id) === String(d.id) || m.sciezka === d.sciezka);
+      if (i < 0) return json(res, 404, { ok: false, blad: 'Nie znaleziono zdjęcia w bibliotece.' });
+      if (d.akcja === 'usun') {
+        const usuwane = stan.media.splice(i, 1)[0];
+        if (usuwane && usuwane.sciezka && usuwane.sciezka.startsWith('admin/panele/uploady/')) {
+          const plik = normalize(join(ROOT, usuwane.sciezka));
+          if (plik.startsWith(UPLOADY)) await unlink(plik).catch(() => {});
+        }
+      } else if (d.akcja === 'zmien' && d.nazwa) {
+        stan.media[i].nazwa = String(d.nazwa).trim().slice(0, 80);
+      }
+      stan.wersja = Date.now();
+      await zapiszDane(stan);
+      return json(res, 200, { ok: true, media: stan.media, wersja: stan.wersja });
+    }
+
+    if (p === '/api/wiadomosc' && req.method === 'POST') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const d = await cialo(req, 500000);
+      if (d.bot) return json(res, 200, { ok: true }); // honeypot
+      const imie = String(d.imie || '').trim();
+      const email = String(d.email || '').trim();
+      const tresc = String(d.tresc || '').trim();
+      if (imie.length < 2 || !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email) || tresc.length < 4) {
+        return json(res, 400, { ok: false, blad: 'Podaj imię, poprawny e-mail i treść wiadomości.' });
+      }
+      const stan = await czytajDane();
+      stan.wiadomosci = Array.isArray(stan.wiadomosci) ? stan.wiadomosci : [];
+      const wpis = {
+        id: 'w-' + Date.now() + '-' + randomBytes(2).toString('hex'),
+        sygnatura: 'TEST-' + String(stan.wiadomosci.length + 1).padStart(4, '0'),
+        data: new Date().toISOString(),
+        temat: String(d.temat || 'inne').slice(0, 60),
+        imie: imie.slice(0, 120),
+        email: email.slice(0, 160),
+        telefon: String(d.telefon || '').slice(0, 40),
+        produkt: String(d.produkt || '').slice(0, 160),
+        tresc: tresc.slice(0, 4000),
+        status: 'nowa',
+        notatka: '',
+        zrodlo: d.zrodlo === 'panel' ? 'panel' : 'formularz-testowy'
+      };
+      stan.wiadomosci.unshift(wpis);
+      stan.wersja = Date.now();
+      await zapiszDane(stan);
+      console.log('[api] POST /api/wiadomosc -> 200 (' + wpis.sygnatura + ')');
+      return json(res, 200, { ok: true, wpis, sygnatura: wpis.sygnatura, testowy: true });
+    }
+
+    if (p === '/api/cofnij' && req.method === 'POST') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const d = await cialo(req);
+      if (!sesjaOK(req, d)) return json(res, 401, { ok: false, blad: 'Sesja wygasła.' });
+      const historia = await czytajHistorie();
+      if (!historia.length) return json(res, 400, { ok: false, blad: 'Brak wcześniejszej wersji do cofnięcia.' });
+      const ostatni = historia.shift();
+      await writeFile(PLIK_HISTORII, JSON.stringify(historia), { mode: 0o600 }).catch(() => {});
+      const przywrocony = { ...ostatni.stan, wersja: Date.now() };
+      await zapiszDane(przywrocony);
+      return json(res, 200, { ok: true, stan: przywrocony, historiaIle: historia.length });
+    }
+
+    if (p === '/api/reset' && req.method === 'POST') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const d = await cialo(req);
+      if (!sesjaOK(req, d)) return json(res, 401, { ok: false, blad: 'Sesja wygasła.' });
+      const stan = await czytajDane();
+      await odlozDoHistorii(JSON.parse(JSON.stringify(stan)), 'Przed resetem (' + (d.sekcja || 'wszystko') + ')');
+      const sekcja = d.sekcja || 'wszystko';
+      if (sekcja === 'wszystko') {
+        const czysty = { ...pustyStan(), wersja: Date.now() };
+        await zapiszDane(czysty);
+        return json(res, 200, { ok: true, stan: czysty });
+      }
+      if (sekcja === 'stronaGlowna') delete stan.stronaGlowna;
+      if (sekcja === 'produkty') { stan.produkty = []; delete stan.produktyPelna; }
+      if (sekcja === 'realizacje') { delete stan.realizacje; delete stan.realizacjePelna; }
+      if (sekcja === 'menu') delete stan.menu;
+      if (sekcja === 'podstrony') { delete stan.podstrony_wlasne; delete stan.podstrony_wbudowane; }
+      if (sekcja === 'elementy') delete stan.elementy;
+      if (sekcja === 'ustawienia') stan.ustawienia = {};
+      if (sekcja.startsWith('strona:')) {
+        const pref = sekcja.slice(7) + '.';
+        if (stan.elementy) {
+          for (const k of Object.keys(stan.elementy)) {
+            if (k.startsWith(pref)) delete stan.elementy[k];
+          }
+        }
+      }
+      stan.wersja = Date.now();
+      await zapiszDane(stan);
+      return json(res, 200, { ok: true, stan });
+    }
+
+    if (p === '/api/haslo' && req.method === 'POST') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const d = await cialo(req);
+      if (!sesjaOK(req, d)) return json(res, 401, { ok: false, blad: 'Sesja wygasła.' });
+      const obecne = Buffer.from(sha(String(d.obecne || '').trim()));
+      const wzor = Buffer.from(sha(haslo));
+      if (obecne.length !== wzor.length || !timingSafeEqual(obecne, wzor)) {
+        return json(res, 400, { ok: false, blad: 'Obecne hasło jest nieprawidłowe.' });
+      }
+      const nowe = String(d.nowe || '').trim();
+      if (nowe.length < 8) {
+        return json(res, 400, { ok: false, blad: 'Nowe hasło musi mieć co najmniej 8 znaków.' });
+      }
+      haslo = nowe;
+      await writeFile(PLIK_HASLA, haslo, { mode: 0o600 });
+      return json(res, 200, { ok: true });
     }
 
     /* ---------- pliki ---------- */
@@ -262,11 +558,10 @@ http.createServer(async (req, res) => {
     const plik = normalize(join(ROOT, s));
     if (!plik.startsWith(ROOT)) return res.writeHead(403).end('403');
     if (p === '/admin') { res.writeHead(302, { Location: '/admin/' }); return res.end(); }
-    // „/admin” bez ukośnika → przekierowanie na „/admin/”, inaczej 404
     if (s === '/admin') { res.writeHead(302, { Location: '/admin/' }); return res.end(); }
     const info = await stat(plik).catch(() => null);
     if (!info || info.isDirectory()) return res.writeHead(404).end('404');
-    res.writeHead(200, { 'Content-Type': TYPY[extname(plik)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+    res.writeHead(200, { 'Content-Type': TYPY[extname(plik).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
     res.end(await readFile(plik));
   } catch (e) {
     json(res, 500, { ok: false, blad: 'Błąd serwera: ' + e.message });

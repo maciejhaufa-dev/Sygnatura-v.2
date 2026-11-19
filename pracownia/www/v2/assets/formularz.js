@@ -97,7 +97,29 @@
       const mailto = `mailto:${F.mail}?subject=${encodeURIComponent('Zapytanie: ' + dane.temat)}`
         + `&body=${encodeURIComponent(dane.tresc + '\n\n' + dane.imie + '\n' + dane.email + (dane.telefon ? '\n' + dane.telefon : ''))}`;
 
+      const panelTestowy = !!(window.SYG_PANEL && window.SYG_PANEL.ustawienia && window.SYG_PANEL.ustawienia.tryb_testowy_formularza);
+
       try {
+        if (panelTestowy) {
+          const odp = await fetch('/api/wiadomosc', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dane),
+            signal: ctrl.signal
+          });
+          clearTimeout(timer);
+          const json = await odp.json().catch(() => null);
+          if (json && json.ok) {
+            form.hidden = true;
+            pokazKomunikat(box, 'ok',
+              `<b>Zapisano w skrzynce testowej panelu (${escapeHtml(json.sygnatura || 'TEST')}).</b><br>Wiadomość jest widoczna w panelu pracowni w zakładce „Wiadomości”.`);
+            box.setAttribute('role', 'status');
+            try { if (box.scrollIntoView) box.scrollIntoView({ block: 'center' }); } catch (_) {}
+            return;
+          }
+          throw new Error((json && json.blad) || 'Serwer testowy nie przyjął wiadomości.');
+        }
+
         const odp = await fetch(API + '?akcja=' + encodeURIComponent(AKZJA_SAFE()), {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -114,7 +136,7 @@
             `<b>Dziękujemy — zapytanie poszło.</b><br>Odpowiemy na adres <b>${escapeHtml(dane.email)}</b> w ciągu 1–2 dni roboczych.`
             + (dane.telefon ? ' Jeśli sprawa jest pilna, zadzwoń: <a href="' + escapeHtml(F.telHref) + '">' + escapeHtml(F.tel) + '</a>.' : ''));
           box.setAttribute('role', 'status');
-          box.scrollIntoView({ block: 'center' });
+          try { if (box.scrollIntoView) box.scrollIntoView({ block: 'center' }); } catch (_) {}
         } else {
           throw new Error((json && json.blad) || 'Serwer nie potwierdził wysyłki.');
         }
@@ -126,8 +148,35 @@
         pokazKomunikat(box, 'err',
           `<b>${powod}</b> Nic nie zostało wysłane. Spróbuj ponownie albo napisz bezpośrednio: `
           + `<a href="${escapeHtml(mailto)}">${escapeHtml(F.mail)}</a> lub zadzwoń `
-          + `<a href="${escapeHtml(F.telHref)}">${escapeHtml(F.tel)}</a>.`);
+          + `<a href="${escapeHtml(F.telHref)}">${escapeHtml(F.tel)}</a>.`
+          + ` <button type="button" class="btn ghost mt-12" data-wyslij-do-panelu>Zapisz w skrzynce testowej panelu</button>`);
         box.setAttribute('role', 'alert');
+        const btnTest = box.querySelector('[data-wyslij-do-panelu]');
+        if (btnTest) {
+          btnTest.addEventListener('click', async () => {
+            btnTest.disabled = true;
+            btnTest.textContent = 'Zapisuję w panelu…';
+            try {
+              const r = await fetch('/api/wiadomosc', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dane)
+              });
+              const j = await r.json().catch(() => null);
+              if (r.ok && j && j.ok) {
+                form.hidden = true;
+                pokazKomunikat(box, 'ok',
+                  `<b>Zapisano w skrzynce testowej panelu (${escapeHtml(j.sygnatura || 'TEST')}).</b><br>Otwórz panel admina → zakładka „Wiadomości”, żeby zobaczyć treść i zmienić status.`);
+              } else {
+                btnTest.disabled = false;
+                btnTest.textContent = 'Nie udało się — serwer panelu nie odpowiada';
+              }
+            } catch (_) {
+              btnTest.disabled = false;
+              btnTest.textContent = 'Brak połączenia z lokalnym panelem';
+            }
+          });
+        }
       } finally {
         btn.disabled = false;
         btn.textContent = etykieta;

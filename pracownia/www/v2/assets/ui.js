@@ -1,58 +1,115 @@
 /* ============================================================
    Studio Sygnatura v2 — wspólny układ (pasek, nagłówek, stopka, karty)
-   Układ wg makiety strony głównej, ale bez elementów, których nie ma:
-   - brak konta i koszyka (nie działają) — zamiast nich telefon,
-     e-mail i przycisk „Zapytaj o wycenę”,
-   - wszystkie dane (telefon, e-mail, produkty, ceny, zdjęcia) pochodzą
-     z data/dane.js, czyli z plików produkcyjnych,
-   - gdy zdjęcia nie ma w danych, renderuje się szary placeholder,
-     nigdy wymyślona grafika.
+   Układ wg makiety strony głównej, z pełnym wsparciem nakładki panelu
+   (window.SYG_PANEL): strona główna, produkty, realizacje, menu,
+   własne podstrony, ustawienia oraz dowolne elementy podstron.
    ============================================================ */
 (function () {
   'use strict';
   const D = window.SYG_DANE || {};
-
-  /* ---------- nakładka z panelu (window.SYG_PANEL) ----------
-     Panel zapisuje w admin/panele/dane.json to, co operator zmienił.
-     Strona czyta ten plik jako window.SYG_PANEL i nakłada zmiany na dane
-     produkcyjne (data/dane.js). Nie ma pliku → strona działa jak dotąd.
-     Produkty: puste pole w panelu NIE kasuje wartości produkcyjnej;
-     nowe produkty (id „nowy-…") dokładają się na końcu listy. */
   const P = window.SYG_PANEL || {};
   const PU = P.ustawienia || {};
-  function nalozPanel() {
-    if (!P || (!P.produkty && !P.ustawienia)) return;
+  const SG = P.stronaGlowna || {};
+  const Q = new URLSearchParams(location.search);
+  const biezaca = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
 
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const zl = (n) => String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' zł';
+
+  function bezpiecznyHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = String(html == null ? '' : html);
+    tmp.querySelectorAll('script,style,object,embed,link,meta,base,form').forEach((n) => n.remove());
+    tmp.querySelectorAll('iframe').forEach((fr) => {
+      const src = String(fr.getAttribute('src') || '');
+      if (!/^https:\/\/(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.be)\//i.test(src)) fr.remove();
+    });
+    tmp.querySelectorAll('*').forEach((el) => {
+      for (const attr of Array.from(el.attributes)) {
+        const n = attr.name.toLowerCase();
+        const v = String(attr.value || '').trim();
+        if (n.startsWith('on')) el.removeAttribute(attr.name);
+        else if ((n === 'href' || n === 'src') && /^\s*(javascript:|vbscript:|data:(?!image\/))/i.test(v)) {
+          el.removeAttribute(attr.name);
+        }
+      }
+    });
+    return tmp.innerHTML;
+  }
+
+  function formatujTekst(tekst) {
+    return esc(tekst).replace(/\n/g, '<br>');
+  }
+
+  /* ---------- nakładka z panelu (window.SYG_PANEL) ---------- */
+  function nalozPanel() {
+    if (!P || typeof P !== 'object') return;
+
+    if (PU.nazwa_firmy) {
+      D.firma = D.firma || {};
+      D.firma.nazwa = PU.nazwa_firmy;
+    }
     if (PU.telefon) {
       D.firma = D.firma || {};
       D.firma.tel = PU.telefon;
-      D.firma.telHref = 'tel:' + String(PU.telefon).replace(/[^\d+]/g, '');
+      const cyfry = String(PU.telefon).replace(/[^\d+]/g, '');
+      D.firma.telHref = 'tel:' + (cyfry.length === 9 && !cyfry.startsWith('+') ? '+48' + cyfry : cyfry);
     }
-    if (PU.mail) { D.firma = D.firma || {}; D.firma.mail = PU.mail; D.firma.mailHref = 'mailto:' + PU.mail; }
+    if (PU.mail) {
+      D.firma = D.firma || {};
+      D.firma.mail = PU.mail;
+      D.firma.mailHref = 'mailto:' + PU.mail;
+    }
     if (PU.obszar) { D.firma = D.firma || {}; D.firma.obszar = PU.obszar; }
+    if (PU.odpowiedz) { D.firma = D.firma || {}; D.firma.odpowiedz = PU.odpowiedz; }
 
     if (Array.isArray(P.produkty)) {
-      const wgId = new Map((D.produkty || []).map((p) => [p.id, p]));
-      P.produkty.forEach((z) => {
-        if (wgId.has(z.id)) {
-          const cel = wgId.get(z.id);
-          ['nazwa', 'cena', 'kategoria', 'opis', 'foto', 'fotoMala', 'jednostka', 'dostepny', 'kolejnosc']
-            .forEach((k) => { if (z[k] !== '' && z[k] != null) cel[k] = z[k]; });
-        } else if (z.nazwa) {
-          D.produkty = D.produkty || [];
-          D.produkty.push({ ...z, kolejnosc: z.kolejnosc != null ? z.kolejnosc : 999 });
-        }
-      });
+      if (P.produktyPelna) {
+        D.produkty = P.produkty.map((p, idx) => ({ ...p, kolejnosc: p.kolejnosc != null ? p.kolejnosc : idx + 1 }));
+      } else {
+        const wgId = new Map((D.produkty || []).map((p) => [p.id, p]));
+        P.produkty.forEach((z) => {
+          if (wgId.has(z.id)) {
+            const cel = wgId.get(z.id);
+            ['nazwa', 'cena', 'kategoria', 'opis', 'foto', 'fotoMala', 'galeria', 'cechy', 'gabaryt', 'tagi', 'jednostka', 'dostepny', 'kolejnosc', 'realizacja']
+              .forEach((k) => {
+                if (z[k] !== undefined && z[k] !== '' && z[k] !== null) cel[k] = z[k];
+                else if (k === 'dostepny' && typeof z[k] === 'boolean') cel[k] = z[k];
+                else if (k === 'cena' && z[k] === null && 'cena' in z) cel[k] = null;
+              });
+          } else if (z.nazwa) {
+            D.produkty = D.produkty || [];
+            D.produkty.push({ ...z, kolejnosc: z.kolejnosc != null ? z.kolejnosc : 999 });
+          }
+        });
+      }
+    }
+
+    if (Array.isArray(P.realizacje)) {
+      if (P.realizacjePelna) {
+        D.realizacje = P.realizacje.slice();
+      } else {
+        const wgId = new Map((D.realizacje || []).map((r) => [String(r.id), r]));
+        P.realizacje.forEach((z) => {
+          if (wgId.has(String(z.id))) {
+            const cel = wgId.get(String(z.id));
+            Object.keys(z).forEach((k) => { if (z[k] !== undefined) cel[k] = z[k]; });
+          } else if (z.tytul) {
+            D.realizacje = D.realizacje || [];
+            D.realizacje.unshift(z);
+          }
+        });
+      }
+    }
+
+    if (SG && SG.odznaki && typeof SG.odznaki === 'object') {
+      D.odznaki = { ...(D.odznaki || {}), ...SG.odznaki };
     }
   }
   nalozPanel();
 
   const F = D.firma || {};
-  const Q = new URLSearchParams(location.search);
-
-  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
-    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const zl = (n) => String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' zł';
 
   const I = {
     tel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 16.2v2.6a2 2 0 0 1-2.2 2 18.6 18.6 0 0 1-8.1-2.9 18.3 18.3 0 0 1-5.6-5.6A18.6 18.6 0 0 1 1.7 4.1 2 2 0 0 1 3.7 1.9h2.6a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L7.3 9.5a14.8 14.8 0 0 0 6.6 6.6l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2Z"/></svg>',
@@ -86,42 +143,30 @@
     pin2: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg>'
   };
 
-  /* Każda pozycja prowadzi do istniejącej strony albo do konkretnej
-     sekcji (anchor) — nie tworzymy linków „w pustkę” ani pustych stron. */
-  /* Etykiety i kolejność 1:1 z makiety. Każda pozycja prowadzi do
-     istniejącej strony albo do konkretnej sekcji na stronie. */
-  /* Kanały społecznościowe. Trzeci element = adres; pusty = nie pokazujemy
-     ikony, żeby nie prowadziła donikąd. Wpisujemy tu prawdziwy link do
-     kanału YouTube, gdy będzie — ikona pojawi się sama.
-     Facebook / Instagram / Pinterest: adresy z profilu firmy. */
-  // adresy z księgi znaku; pusty adres = ikona widoczna, ale nieklikalna.
-  // Panel może nadpisać każdy adres przez SYG_PANEL.ustawienia.<fb|ig|pin|yt>.
   const POLE_SOCIAL = ['fb', 'ig', 'pin', 'youtube'];
   const SOCIAL = [
-    ['Facebook', 'fb', PU.fb || 'https://www.facebook.com/p/Studio-SygNatura-61595255863642/'],
-    ['Instagram', 'ig', PU.ig || 'https://www.instagram.com/studiosygnatura/'],
-    ['Pinterest', 'pin2', PU.pin || 'https://pl.pinterest.com/studiosygnatura/'],
+    ['Facebook', 'fb', PU.fb !== undefined ? PU.fb : 'https://www.facebook.com/p/Studio-SygNatura-61595255863642/'],
+    ['Instagram', 'ig', PU.ig !== undefined ? PU.ig : 'https://www.instagram.com/studiosygnatura/'],
+    ['Pinterest', 'pin2', PU.pin !== undefined ? PU.pin : 'https://pl.pinterest.com/studiosygnatura/'],
     ['YouTube', 'yt', PU.youtube || '']
   ];
 
-  /* Pola, które operator może zmienić klikając w element na stronie.
-     Te same nazwy co w panelu; edytor (admin/edytor.js) ich używa. */
   const POLA = {
-    hero_tytul: { etykieta: 'Nagłówek na stronie głównej', typ: 'wielo' },
-    hero_lead: { etykieta: 'Podtytuł pod nagłówkiem', typ: 'wielo' },
-    hero_przycisk: { etykieta: 'Napis na przycisku', typ: 'krotkie' },
-    sekcja_tytul: { etykieta: 'Tytuł sekcji z produktami', typ: 'krotkie' },
-    telefon: { etykieta: 'Telefon', typ: 'krotkie' },
-    mail: { etykieta: 'E-mail', typ: 'krotkie' },
-    obszar: { etykieta: 'Obszar działania', typ: 'krotkie' },
-    youtube: { etykieta: 'Adres kanału YouTube', typ: 'krotkie' },
-    fb: { etykieta: 'Adres Facebooka', typ: 'krotkie' },
-    ig: { etykieta: 'Adres Instagrama', typ: 'krotkie' },
-    pin: { etykieta: 'Adres Pinterest', typ: 'krotkie' }
+    hero_tytul: { etykieta: 'Nagłówek na stronie głównej', typ: 'wielo', sekcja: 'stronaGlowna' },
+    hero_lead: { etykieta: 'Podtytuł pod nagłówkiem', typ: 'wielo', sekcja: 'stronaGlowna' },
+    hero_przycisk: { etykieta: 'Przycisk w sekcji powitalnej', typ: 'przycisk', sekcja: 'stronaGlowna', linkKlucz: 'hero_link' },
+    sekcja_tytul: { etykieta: 'Tytuł sekcji z produktami', typ: 'krotkie', sekcja: 'stronaGlowna' },
+    telefon: { etykieta: 'Telefon', typ: 'krotkie', sekcja: 'ustawienia' },
+    mail: { etykieta: 'E-mail', typ: 'krotkie', sekcja: 'ustawienia' },
+    obszar: { etykieta: 'Obszar działania', typ: 'krotkie', sekcja: 'ustawienia' },
+    youtube: { etykieta: 'Adres kanału YouTube', typ: 'krotkie', sekcja: 'ustawienia' },
+    fb: { etykieta: 'Adres Facebooka', typ: 'krotkie', sekcja: 'ustawienia' },
+    ig: { etykieta: 'Adres Instagrama', typ: 'krotkie', sekcja: 'ustawienia' },
+    pin: { etykieta: 'Adres Pinterest', typ: 'krotkie', sekcja: 'ustawienia' }
   };
   window.SYG_POLA = POLA;
 
-  const MENU = [
+  const DOMYSLNE_MENU = [
     ['sklep.html', 'Produkty', true],
     ['realizacje.html', 'Szopki'],
     ['wspolpraca.html#okazje', 'Dekoracje okolicznościowe'],
@@ -131,22 +176,35 @@
     ['kontakt.html', 'Kontakt']
   ];
 
-  const biezaca = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  function budujMenu() {
+    let lista;
+    if (Array.isArray(P.menu) && P.menu.length) {
+      lista = P.menu
+        .filter((m) => m && m.widoczne !== false && m.etykieta && m.href)
+        .map((m) => [m.href, m.etykieta, !!m.rozwijane]);
+    } else {
+      lista = DOMYSLNE_MENU.slice();
+    }
+    const wlasne = Array.isArray(P.podstrony_wlasne) ? P.podstrony_wlasne : [];
+    const istniejaceHref = new Set(lista.map((m) => m[0]));
+    wlasne
+      .filter((s) => s && s.menu !== false && s.widoczna !== false && s.slug && s.tytul)
+      .sort((a, b) => (Number(a.kol) || 10) - (Number(b.kol) || 10))
+      .forEach((s) => {
+        const href = 'podstrona.html?s=' + encodeURIComponent(s.slug);
+        if (!istniejaceHref.has(href)) lista.push([href, s.tytul, false]);
+      });
+    return lista;
+  }
+  const MENU = budujMenu();
+
   const telHref = F.telHref || 'tel:+48538124538';
 
-
-  /* ---------- koszyk i konto: czytamy PRAWDZIWE klucze produkcyjne ----------
-     Koszyk produkcji trzyma dane w localStorage pod 'syg-koszyk-v1'
-     (patrz docs/assets/koszyk.js), a konto w 'syg-konto' (docs/assets/api.js).
-     Nic tu nie zapisujemy — tylko odczyt, żeby licznik i podpis w nagłówku
-     pokazywały rzeczywisty stan, a nie zmyśloną liczbę. */
   const KLUCZ_KOSZYKA = 'syg-koszyk-v1';
   const KLUCZ_KONTA = 'syg-konto';
-
   function czytajLS(klucz) {
     try { return JSON.parse(localStorage.getItem(klucz) || 'null'); } catch (e) { return null; }
   }
-
   function stanKoszyka() {
     const k = czytajLS(KLUCZ_KOSZYKA) || {};
     const pozycje = Array.isArray(k.pozycje) ? k.pozycje : [];
@@ -154,7 +212,6 @@
     const sztuk = pozycje.reduce((s, p) => s + Number(p.ile || p.ilosc || 1), 0);
     return { sztuk, suma };
   }
-
   function stanKonta() {
     const k = czytajLS(KLUCZ_KONTA);
     if (!k || !k.email) return null;
@@ -162,7 +219,6 @@
     return { podpis: imie ? imie : 'Moje konto', email: k.email };
   }
 
-  /* plaik: szary placeholder, gdy zdjęcia nie ma w danych */
   function foto(klasa, src, alt, szer, wys, atrybuty) {
     if (src) {
       return `<img class="${klasa}" src="${esc(src)}" alt="${esc(alt)}"${szer ? ` width="${szer}" height="${wys}"` : ''} ${atrybuty || 'loading="lazy" decoding="async"'}>`;
@@ -170,19 +226,6 @@
     return `<span class="ph-brak ${klasa}" role="img" aria-label="Brak zdjęcia: ${esc(alt)}">${I.ramka}zdjęcie w przygotowaniu</span>`;
   }
 
-
-  /* ---------- znak wg księgi znaku ----------
-     Nazwa to SYGNATURA. Logotyp z księgi znaku ma SYG kreskowane
-     (ok. 211 kresek w pliku) i NATURA lite (9 kresek) — dlatego SYG jest
-     z natury jaśniejsze. Wzmacniamy to kryciem 50% (klasa .syg / --krycie),
-     żeby akcent położyć na NATURA. Pod spodem „STUDIO ARTYSTYCZNE" złotem
-     — zgodnie z ustaleniem, że wyjaśnia ono, skąd „Studio" w nazwie.
-     Znak jest w jednym kolorze (brąz #6B4530 na kremie, biel na ciemnym tle). */
-  /* Układy znaku:
-       'poziomo'  — sygnet obok nazwy (nagłówek); podpis rozciągnięty
-                    na szerokość napisu SYGNATURA
-       'pionowo'  — sygnet u góry, pod nim nazwa i podpis (stopka);
-                    podpis również na szerokość napisu */
   function znak(odmiana, uklad) {
     const ciemny = odmiana === 'ciemny';
     const c = ciemny ? '-bialy' : '';
@@ -200,13 +243,6 @@
     </span>`;
   }
 
-
-  /* ---------- podpis na szerokość napisu SYGNATURA ----------
-     Mierzy realną szerokość napisu (SYG + NATURA razem) i podpisu,
-     a potem dobiera odstęp liter tak, żeby podpis kończył się dokładnie
-     pod ostatnią literą A. Działa po wczytaniu obrazków i po zmianie
-     rozmiaru okna. Jeśli pomiar jest niemożliwy (np. brak layoutu),
-     zostaje wartość z CSS — strona się nie psuje. */
   function dopasujPodpisy() {
     document.querySelectorAll('.znak').forEach((z) => {
       const nazwa = z.querySelector('.znak-nazwa');
@@ -214,17 +250,11 @@
       const syg = z.querySelector('.syg');
       const natura = z.querySelector('.natura');
       if (!nazwa || !podpis || !syg || !natura) return;
-
-      // szerokość napisu = suma szerokości obu obrazków (są w jednej linii, gap:0)
       const szerNapis = syg.getBoundingClientRect().width + natura.getBoundingClientRect().width;
       if (!szerNapis) return;
-
-      // najpierw zerujemy odstęp, żeby zmierzyć „goły" tekst
       podpis.style.letterSpacing = '0px';
       const szerTekstu = podpis.getBoundingClientRect().width;
       if (!szerTekstu) return;
-
-      // ile brakuje i na ile przerw między literami to rozłożyć
       const liter = podpis.textContent.trim().length;
       const przerw = Math.max(1, liter - 1);
       const odstep = (szerNapis - szerTekstu) / przerw;
@@ -234,7 +264,6 @@
 
   function pilnujPodpisow() {
     dopasujPodpisy();
-    // obrazki SVG mogą doładować się po pierwszym pomiarze
     document.querySelectorAll('.znak-nazwa img').forEach((img) => {
       if (!img.complete) img.addEventListener('load', dopasujPodpisy, { once: true });
     });
@@ -247,11 +276,12 @@
   }
 
   function naglowek() {
+    const aktywnySlug = biezaca === 'podstrona.html' ? ('podstrona.html?s=' + encodeURIComponent(Q.get('s') || '')) : '';
     const menu = MENU.map(([href, etykieta, rozwijane], i) => {
       const plik = href.split('#')[0];
-      const pierwszy = MENU.findIndex(m => m[0].split('#')[0] === plik);
-      const aktywna = plik === biezaca && pierwszy === i;
-      return `<a href="${href}"${aktywna ? ' aria-current="page"' : ''}>${etykieta}`
+      const pierwszy = MENU.findIndex((m) => m[0].split('#')[0] === plik);
+      const aktywna = (aktywnySlug && href === aktywnySlug) || (plik === biezaca && pierwszy === i && biezaca !== 'podstrona.html');
+      return `<a href="${esc(href)}"${aktywna ? ' aria-current="page"' : ''}>${esc(etykieta)}`
         + (rozwijane ? `<span class="nav-strzalka" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9.5 6 6 6-6"/></svg></span>` : '')
         + '</a>';
     }).join('');
@@ -299,6 +329,21 @@
   }
 
   function stopka() {
+    const oNas = PU.stopka_o_nas || 'Studio Sygnatura to mała pracownia z pasji do drewna i detalu.\n      Tworzymy rzeczy, które mają znaczenie.';
+    const domyslneLinki = [
+      { tekst: 'Jak zamawiać', href: 'sklep.html' },
+      { tekst: 'Czas realizacji i dostawa', href: 'pracownia.html' },
+      { tekst: 'Zwroty i reklamacje', href: 'kontakt.html' },
+      { tekst: 'FAQ', href: 'kontakt.html#faq' }
+    ];
+    let linki = Array.isArray(PU.stopka_linki) && PU.stopka_linki.length ? PU.stopka_linki.slice() : domyslneLinki.slice();
+    const wlasneStopka = (Array.isArray(P.podstrony_wlasne) ? P.podstrony_wlasne : [])
+      .filter((s) => s && s.stopka && s.widoczna !== false && s.slug && s.tytul);
+    wlasneStopka.forEach((s) => {
+      const h = 'podstrona.html?s=' + encodeURIComponent(s.slug);
+      if (!linki.some((l) => l.href === h)) linki.push({ tekst: s.tytul, href: h });
+    });
+
     return `
 <footer class="site-foot">
   <div class="foot-main wrap">
@@ -308,17 +353,13 @@
 
     <div>
       <h4>O nas</h4>
-      <p class="foot-about">Studio Sygnatura to mała pracownia z pasji do drewna i detalu.
-      Tworzymy rzeczy, które mają znaczenie.</p>
+      <p class="foot-about" data-syg-id="global.foot_about">${formatujTekst(oNas)}</p>
     </div>
 
     <div>
       <h4>Przydatne linki</h4>
       <ul>
-        <li><a href="sklep.html">Jak zamawiać</a></li>
-        <li><a href="pracownia.html">Czas realizacji i dostawa</a></li>
-        <li><a href="kontakt.html">Zwroty i reklamacje</a></li>
-        <li><a href="kontakt.html#faq">FAQ</a></li>
+        ${linki.map((l, i) => `<li><a href="${esc(l.href || '#')}" data-syg-id="global.foot_link.${i}">${esc(l.tekst || '')}</a></li>`).join('')}
       </ul>
     </div>
 
@@ -344,34 +385,32 @@
       <ul class="foot-contact">
         <li>${I.tel}<a href="${esc(telHref)}">${esc(F.tel)}</a></li>
         <li>${I.mail}<a href="mailto:${esc(F.mail)}" data-pole="mail">${esc(F.mail)}</a></li>
-        <li>${I.pin}<span data-pole="obszar">Studio Sygnatura, ${esc(F.obszar)}</span></li>
+        <li>${I.pin}<span data-pole="obszar">${esc(PU.obszar ? PU.obszar : 'Studio Sygnatura, ' + (F.obszar || ''))}</span></li>
       </ul>
     </div>
   </div>
 </footer>`;
   }
 
-  /* ---------- odznaki: tylko to, co potwierdzają dane ---------- */
   function odznakaProduktu(p) {
     const o = D.odznaki || {};
-    if (o.bestseller && o.bestseller.produkt === p.id) return ['Bestseller', 'bestseller'];
-    if (o.nowosc && o.nowosc.produkt === p.id) return ['Nowość', 'nowosc'];
-    if (o.okolicznosciowy && o.okolicznosciowy.produkt === p.id) return ['Okolicznościowy', 'okolicznosciowy'];
+    if (o.bestseller && o.bestseller.produkt === p.id) return [o.bestseller.tekst || 'Bestseller', 'bestseller'];
+    if (o.nowosc && o.nowosc.produkt === p.id) return [o.nowosc.tekst || 'Nowość', 'nowosc'];
+    if (o.okolicznosciowy && o.okolicznosciowy.produkt === p.id) return [o.okolicznosciowy.tekst || 'Okolicznościowy', 'okolicznosciowy'];
     return null;
   }
 
-  /* karta produktu wg makiety: zdjęcie + kolumna z opisem i ceną */
   function kartaProduktu(p) {
     const od = odznakaProduktu(p);
-    const badge = od ? `<span class="badge ${od[1]}">${od[0]}</span>` : '';
+    const badge = od ? `<span class="badge ${od[1]}">${esc(od[0])}</span>` : '';
     const href = 'produkt.html?id=' + encodeURIComponent(p.id);
+    const ukryty = p.dostepny === false;
     return `
-<article class="pcard">
+<article class="pcard${ukryty ? ' pcard-ukryta' : ''}" data-prod-id="${esc(p.id)}">
   <a class="pcard-foto" href="${href}" aria-label="${esc(p.nazwa)} — szczegóły">
     ${badge}
     ${p.fotoMala || p.foto
-      ? `<img src="${esc(p.fotoMala || p.foto)}" srcset="${esc(p.fotoMala || p.foto)} 420w, ${esc(p.foto || p.fotoMala)} 700w"
-             sizes="(max-width:1020px) 40vw, 14vw" alt="${esc(p.nazwa)}" loading="lazy" decoding="async" width="420" height="525">`
+      ? `<img src="${esc(p.fotoMala || p.foto)}"${p.foto && p.fotoMala && p.foto !== p.fotoMala ? ` srcset="${esc(p.fotoMala)} 420w, ${esc(p.foto)} 700w" sizes="(max-width:1020px) 40vw, 14vw"` : ''} alt="${esc(p.nazwa)}" loading="lazy" decoding="async" width="420" height="525">`
       : `<span class="ph-brak" role="img" aria-label="Brak zdjęcia: ${esc(p.nazwa)}">${I.ramka}zdjęcie w przygotowaniu</span>`}
   </a>
   <div class="pcard-body">
@@ -390,9 +429,9 @@
     const href = r.produkt
       ? `produkt.html?id=${encodeURIComponent(r.produkt)}`
       : `kontakt.html?temat=projekt&projekt=${encodeURIComponent(r.tytul)}`;
-    const kotwica = biezaca === 'realizacje.html' ? ` id="${esc(r.slug || '')}"` : '';
+    const kotwica = biezaca === 'realizacje.html' ? ` id="${esc(r.slug || ('realizacja-' + r.id))}"` : '';
     return `
-<a class="rcard"${kotwica} href="${href}">
+<a class="rcard"${kotwica} href="${href}" data-real-id="${esc(r.id)}">
   ${foto('', r.foto, r.tytul, 620, 465)}
   <div class="rcard-body">
     <span class="rcard-cat">${esc(r.kategoria)}</span>
@@ -404,7 +443,252 @@
 </a>`;
   }
 
-  /* ---------- newsletter: bez zmyślonego „zapisano” ---------- */
+  /* ---------- strona główna: ustawienia z panelu ---------- */
+  function nalozStroneGlowna() {
+    if (biezaca !== 'index.html' && biezaca !== '') return;
+
+    const heroSec = document.querySelector('section.hero');
+    const prodSec = document.getElementById('produkty');
+    const stripSec = document.querySelector('section.strip');
+
+    if (heroSec && SG.hero_widoczne === false) heroSec.hidden = true;
+    if (prodSec && SG.sekcja_widoczna === false) prodSec.hidden = true;
+    if (stripSec && SG.pasek_widoczny === false) stripSec.hidden = true;
+
+    // Przycisk Hero (tekst + link)
+    const heroBtn = document.querySelector('[data-pole="hero_przycisk"]');
+    if (heroBtn) {
+      const tekstBtn = SG.hero_przycisk || PU.hero_przycisk;
+      if (tekstBtn) {
+        const svg = heroBtn.querySelector('svg');
+        heroBtn.textContent = tekstBtn + ' ';
+        if (svg) heroBtn.appendChild(svg);
+      }
+      if (SG.hero_link) heroBtn.setAttribute('href', SG.hero_link);
+    }
+
+    // Zdjęcie Hero + kadrowanie
+    const heroImg = document.querySelector('.hero-kadr img');
+    if (heroImg) {
+      if (SG.hero_foto) {
+        heroImg.setAttribute('src', SG.hero_foto);
+        heroImg.removeAttribute('srcset');
+      }
+      const zoom = Number(SG.hero_foto_zoom);
+      const x = SG.hero_foto_x != null ? Number(SG.hero_foto_x) : 50;
+      const y = SG.hero_foto_y != null ? Number(SG.hero_foto_y) : 50;
+      if ((zoom && zoom !== 100) || x !== 50 || y !== 50) {
+        const figura = heroImg.closest('.hero-kadr');
+        if (figura) figura.style.overflow = 'hidden';
+        heroImg.style.objectFit = 'cover';
+        heroImg.style.objectPosition = `${x}% ${y}%`;
+        if (zoom && zoom !== 100) heroImg.style.transform = `scale(${(zoom / 100).toFixed(2)})`;
+      }
+    }
+
+    // 3 atuty w Hero
+    if (Array.isArray(SG.hero_atuty)) {
+      const atutyLi = document.querySelectorAll('.hero-atuty li');
+      SG.hero_atuty.forEach((a, i) => {
+        if (!atutyLi[i] || !a) return;
+        const b = atutyLi[i].querySelector('b');
+        const sp = atutyLi[i].querySelector('span');
+        if (b && a.tytul != null) b.textContent = a.tytul;
+        if (sp && a.opis != null) sp.textContent = a.opis;
+      });
+    }
+
+    // Ilość kart produktów na stronie głównej
+    const gridProd = document.querySelector('#produkty [data-produkty]');
+    if (gridProd && SG.produkty_ile != null && Number(SG.produkty_ile) > 0) {
+      gridProd.setAttribute('data-ile', String(Number(SG.produkty_ile)));
+    }
+
+    // Pasek zaufania pod produktami
+    if (Array.isArray(SG.pasek_elementy)) {
+      const stripLi = document.querySelectorAll('.strip li');
+      SG.pasek_elementy.forEach((el, i) => {
+        if (!stripLi[i] || !el) return;
+        const b = stripLi[i].querySelector('b');
+        const sp = stripLi[i].querySelector('span');
+        if (b && el.tytul != null) b.textContent = el.tytul;
+        if (sp && el.opis != null) sp.innerHTML = formatujTekst(el.opis);
+      });
+    }
+
+    // Dodatkowe sekcje własne na stronie głównej
+    if (Array.isArray(SG.dodatkowe_sekcje) && SG.dodatkowe_sekcje.length) {
+      const main = document.getElementById('tresc');
+      if (main) {
+        SG.dodatkowe_sekcje.forEach((sek, idx) => {
+          if (!sek || sek.widoczna === false) return;
+          const klasa = sek.tlo === 'ciemne' ? 'cta-band' : (sek.tlo === 'krem' ? 'section alt' : 'section');
+          const sec = document.createElement('section');
+          sec.className = klasa + ' sekcja-dodatkowa';
+          sec.setAttribute('data-dodatkowa-sekcja', String(sek.id || idx));
+          const btnHtml = sek.przyciskTekst && sek.przyciskLink
+            ? `<div class="akcje mt-18"><a class="btn${sek.tlo === 'ciemne' ? '' : ''}" href="${esc(sek.przyciskLink)}">${esc(sek.przyciskTekst)}</a></div>`
+            : '';
+          const fotoHtml = sek.foto
+            ? `<figure class="sekcja-foto"><img src="${esc(sek.foto)}" alt="${esc(sek.tytul || '')}" loading="lazy"></figure>`
+            : '';
+          sec.innerHTML = `
+<div class="wrap ${fotoHtml ? 'o-nas' : ''}">
+  <div>
+    ${sek.eyebrow ? `<span class="eyebrow">${esc(sek.eyebrow)}</span>` : ''}
+    ${sek.tytul ? `<h2>${esc(sek.tytul)}</h2>` : ''}
+    ${sek.tresc ? `<div class="wysiwyg-tresc mt-14">${bezpiecznyHtml(sek.tresc)}</div>` : ''}
+    ${btnHtml}
+  </div>
+  ${fotoHtml}
+</div>`;
+          main.appendChild(sec);
+        });
+      }
+    }
+  }
+
+  /* ---------- podstrona własna (podstrona.html?s=slug) ---------- */
+  function renderujWlasnaPodstrone() {
+    if (biezaca !== 'podstrona.html') return;
+    const slug = Q.get('s') || '';
+    const lista = Array.isArray(P.podstrony_wlasne) ? P.podstrony_wlasne : [];
+    const znaleziona = lista.find((s) => s && s.slug === slug && s.widoczna !== false)
+      || (!slug ? lista.find((s) => s && s.widoczna !== false) : null);
+
+    const h1 = document.getElementById('podstrona-tytul');
+    const okr = document.getElementById('okruszek-podstrona');
+    const kat = document.getElementById('podstrona-kategoria');
+    const lead = document.getElementById('podstrona-lead');
+    const tresc = document.getElementById('podstrona-tresc');
+
+    if (!znaleziona) {
+      if (slug) {
+        document.title = 'Nie ma takiej podstrony — Studio Sygnatura';
+        if (h1) h1.textContent = 'Nie znaleziono podstrony';
+        if (okr) okr.textContent = 'Brak podstrony';
+        if (kat) kat.textContent = 'Informacja';
+        if (lead) lead.textContent = `Podstrona „${slug}” została ukryta albo jeszcze nie została utworzona w panelu.`;
+        if (tresc) tresc.innerHTML = `<div class="akcje"><a class="btn" href="index.html">Strona główna</a><a class="btn ghost" href="sklep.html">Sklep</a></div>`;
+      }
+      return;
+    }
+
+    document.title = (znaleziona.tytul || 'Podstrona') + ' — Studio Sygnatura';
+    if (h1) h1.textContent = znaleziona.tytul || 'Podstrona';
+    if (okr) okr.textContent = znaleziona.tytul || 'Podstrona';
+    if (kat) kat.textContent = znaleziona.eyebrow || 'Z pracowni';
+    if (lead) {
+      if (znaleziona.lead) { lead.textContent = znaleziona.lead; lead.hidden = false; }
+      else lead.hidden = true;
+    }
+    if (tresc) {
+      tresc.innerHTML = znaleziona.tresc ? bezpiecznyHtml(znaleziona.tresc) : '<p class="muted">Brak treści.</p>';
+    }
+  }
+
+  /* ---------- podstrona kontakt: dodatkowe FAQ ---------- */
+  function renderujDodatkoweFaq() {
+    if (biezaca !== 'kontakt.html') return;
+    const konf = P.podstrony_wbudowane && P.podstrony_wbudowane.kontakt;
+    if (!konf || !Array.isArray(konf.faqDodane) || !konf.faqDodane.length) return;
+    const faq = document.querySelector('#faq .faq');
+    if (!faq) return;
+    konf.faqDodane.forEach((f, idx) => {
+      if (!f || !f.pytanie) return;
+      const div = document.createElement('div');
+      div.className = 'faq-item';
+      div.setAttribute('data-dodane-faq', String(idx));
+      div.innerHTML = `<h3>${esc(f.pytanie)}</h3><p>${formatujTekst(f.odpowiedz || '')}</p>`;
+      faq.appendChild(div);
+    });
+  }
+
+  /* ---------- oznaczanie i nakładanie zmian dla każdego elementu każdej podstrony ---------- */
+  function oznaczElementyStrony() {
+    const strona = (biezaca || 'index.html').replace(/\.html$/, '');
+    const main = document.getElementById('tresc');
+    if (main) {
+      const reg = [
+        ['sec', 'section'],
+        ['eyebrow', '.page-head .eyebrow, .sec-head .eyebrow'],
+        ['h1', 'h1'],
+        ['h2', 'h2'],
+        ['h3', 'h3:not(.pcard h3):not(.rcard h3)'],
+        ['lead', '.lead'],
+        ['p', 'p:not(.lead):not(.eyebrow):not(.blad):not(.pcard-opis):not(.rcard p):not(.small.muted):not(.form-msg)'],
+        ['li', '.o-nas ul li, .cechy li'],
+        ['btn', 'a.btn, .cta-box a'],
+        ['img', 'img:not(.pcard img):not(.rcard img):not(.miniatury img)'],
+        ['box', '.krok-karta, .faq-item, .kbox, .pusty-bestseller']
+      ];
+      reg.forEach(([typ, sel]) => {
+        let i = 0;
+        main.querySelectorAll(sel).forEach((el) => {
+          if (el.hasAttribute('data-pole') || el.hasAttribute('data-syg-id')) return;
+          // dla nagłówka sekcji hero nie nadpisujemy jeśli jest data-pole na nim lub wewnątrz
+          el.setAttribute('data-syg-id', `${strona}.${typ}.${i++}`);
+        });
+      });
+    }
+    document.querySelectorAll('.head-nav a').forEach((a, i) => {
+      if (!a.hasAttribute('data-syg-id')) a.setAttribute('data-syg-id', `global.nav.${i}`);
+    });
+  }
+
+  function nalozElementy() {
+    const mapa = P.elementy;
+    if (!mapa || typeof mapa !== 'object') return;
+    document.querySelectorAll('[data-syg-id], [data-pole]').forEach((el) => {
+      const id = el.getAttribute('data-syg-id') || ('pole.' + el.getAttribute('data-pole'));
+      const ov = mapa[id];
+      if (!ov || typeof ov !== 'object') return;
+
+      if (ov.ukryty === true) {
+        el.hidden = true;
+        el.setAttribute('data-syg-ukryty', '1');
+      } else if (ov.ukryty === false) {
+        el.hidden = false;
+        el.removeAttribute('data-syg-ukryty');
+      }
+
+      if (el.tagName === 'IMG') {
+        if (ov.src) { el.setAttribute('src', ov.src); el.removeAttribute('srcset'); }
+        if (ov.alt != null) el.setAttribute('alt', ov.alt);
+        const zoom = ov.zoom != null ? Number(ov.zoom) : 100;
+        const x = ov.x != null ? Number(ov.x) : 50;
+        const y = ov.y != null ? Number(ov.y) : 50;
+        if (zoom !== 100 || x !== 50 || y !== 50) {
+          if (el.parentElement) el.parentElement.style.overflow = 'hidden';
+          el.style.objectFit = 'cover';
+          el.style.objectPosition = `${x}% ${y}%`;
+          if (zoom !== 100) el.style.transform = `scale(${(zoom / 100).toFixed(2)})`;
+        }
+      } else {
+        if (ov.html != null && ov.html !== '') {
+          const svg = el.tagName === 'A' ? el.querySelector('svg') : null;
+          el.innerHTML = bezpiecznyHtml(ov.html);
+          if (svg) el.appendChild(svg);
+        } else if (ov.tekst != null && ov.tekst !== '') {
+          const svg = el.tagName === 'A' ? el.querySelector('svg') : null;
+          el.innerHTML = formatujTekst(ov.tekst);
+          if (svg) el.appendChild(svg);
+        }
+        if (el.tagName === 'A' && ov.href) {
+          el.setAttribute('href', ov.href);
+        }
+      }
+
+      if (ov.wyr) el.style.textAlign = ov.wyr;
+      if (ov.skala && Number(ov.skala) !== 100) el.style.fontSize = Number(ov.skala) + '%';
+      if (el.tagName === 'SECTION' && ov.tlo) {
+        el.classList.remove('alt', 'sekcja-ciemna', 'sekcja-krem');
+        if (ov.tlo === 'krem') el.classList.add('alt');
+        if (ov.tlo === 'ciemne') el.classList.add('sekcja-ciemna');
+      }
+    });
+  }
+
   function podepnijNewsletter() {
     const f = document.querySelector('[data-newsletter]');
     if (!f) return;
@@ -418,8 +702,6 @@
         f.querySelector('[name="email"]').focus();
         return;
       }
-      /* Nie mamy jeszcze podłączonej listy mailingowej — mówimy to wprost
-         i dajemy działającą drogę: e-mail z prośbą o dopisanie. */
       const href = `mailto:${D.firma.mail}?subject=${encodeURIComponent('Prośba o dopisanie do listy')}`
         + `&body=${encodeURIComponent('Proszę dopisać mnie do listy informacji o nowych rzeczach: ' + mail.trim())}`;
       if (info) {
@@ -456,45 +738,63 @@
       if (pole) pole.value = q;
     }
 
-    document.querySelectorAll('[data-produkty]').forEach(el => {
-      const ile = Number(el.getAttribute('data-ile')) || 0; // 0 = wszystkie
-      const lista = (D.produkty || [])
-        .slice()
-        .sort((a, b) => (a.kolejnosc || 0) - (b.kolejnosc || 0))
-        .slice(0, ile > 0 ? ile : undefined);
+    renderujWlasnaPodstrone();
+    renderujDodatkoweFaq();
+    nalozStroneGlowna();
+
+    document.querySelectorAll('[data-produkty]').forEach((el) => {
+      const ile = Number(el.getAttribute('data-ile')) || 0;
+      let lista = (D.produkty || []).filter((p) => p && p.dostepny !== false);
+      if (biezaca === 'index.html' && Array.isArray(SG.produkty_kolejnosc) && SG.produkty_kolejnosc.length) {
+        const pos = new Map(SG.produkty_kolejnosc.map((id, idx) => [String(id), idx]));
+        lista = lista.slice().sort((a, b) => {
+          const ia = pos.has(String(a.id)) ? pos.get(String(a.id)) : 999;
+          const ib = pos.has(String(b.id)) ? pos.get(String(b.id)) : 999;
+          return ia - ib || (a.kolejnosc || 0) - (b.kolejnosc || 0);
+        });
+      } else {
+        lista = lista.slice().sort((a, b) => (a.kolejnosc || 0) - (b.kolejnosc || 0));
+      }
+      lista = lista.slice(0, ile > 0 ? ile : undefined);
       el.innerHTML = lista.map(kartaProduktu).join('');
     });
 
-    /* dłuższe teksty z panelu dostają mniejszy stopień pisma,
-       żeby hero nadal mieściło się w swojej kolumnie bez nachodzenia na zdjęcie */
     [['#hero-tytul', 'hero_tytul', 46], ['.hero-lead', 'hero_lead', 96]].forEach(([sel, pole, limit]) => {
       const el = document.querySelector(sel);
-      if (el && PU[pole] && String(PU[pole]).length > limit) el.classList.add('male');
+      const val = SG[pole] || PU[pole];
+      if (el && val && String(val).length > limit) el.classList.add('male');
     });
 
-    document.querySelectorAll('[data-realizacje]').forEach(el => {
+    document.querySelectorAll('[data-realizacje]').forEach((el) => {
       const ile = Number(el.getAttribute('data-ile')) || 0;
-      const lista = (D.realizacje || []).slice(0, ile > 0 ? ile : undefined);
+      const lista = (D.realizacje || [])
+        .filter((r) => r && r.widoczna !== false)
+        .slice(0, ile > 0 ? ile : undefined);
       el.innerHTML = lista.map(kartaRealizacji).join('');
     });
 
-    /* treści strony z panelu: [selektor, pole] — podmieniamy tylko wtedy,
-       gdy operator coś wpisał, żeby puste pole nie wyczyściło tekstu */
+    // pola strony głównej z SG lub PU
     [['#hero-tytul', 'hero_tytul', true], ['.hero-lead', 'hero_lead', true],
      ['#produkty-tytul', 'sekcja_tytul', false]].forEach(([sel, pole, wielolinia]) => {
       const el = document.querySelector(sel);
-      const tekst = PU[pole];
+      const tekst = SG[pole] || PU[pole];
       if (!el || !tekst) return;
-      if (wielolinia) el.innerHTML = esc(tekst).replace(/\n/g, '<br>');
+      if (wielolinia) el.innerHTML = formatujTekst(tekst);
       else el.textContent = tekst;
     });
+
+    oznaczElementyStrony();
+    nalozElementy();
 
     podepnijNewsletter();
     pilnujPodpisow();
     document.dispatchEvent(new CustomEvent('sygnatura:gotowe'));
   }
 
-  window.SYG_UI = { esc, zl, I, IKONA: I, kartaProduktu, kartaRealizacji, odznakaProduktu, MENU, foto, POLA };
+  window.SYG_UI = {
+    esc, zl, I, IKONA: I, kartaProduktu, kartaRealizacji, odznakaProduktu,
+    MENU, foto, POLA, bezpiecznyHtml, biezaca, oznaczElementyStrony
+  };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montuj);
   else montuj();
 })();

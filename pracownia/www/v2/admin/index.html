@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#6B4530">
-<title>Panel — Sygnatura</title>
+<title>Panel pracowni — Studio Sygnatura</title>
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="panel.css">
 </head>
@@ -16,7 +16,7 @@
   <div class="logowanie-box">
     <img class="logowanie-znak" src="../assets/sygnet-braz.svg" alt="" width="64" height="64">
     <h1>Panel pracowni</h1>
-    <p class="logowanie-opis">Zaloguj się, żeby zmieniać ceny, zdjęcia i teksty na stronie.</p>
+    <p class="logowanie-opis">Zaloguj się, żeby edytować stronę główną, podstrony, produkty, realizacje, menu i ustawienia.</p>
 
     <form id="forma-logowania" method="post" action="/api/logowanie" novalidate autocomplete="on">
       <label for="haslo">Hasło</label>
@@ -31,7 +31,7 @@
     </form>
 
     <p class="logowanie-stopka">
-      Wersja testowa. Hasło jest jednorazowe na czas testów — po wdrożeniu
+      Wersja testowa. Hasło jest tymczasowe na czas testów — po wdrożeniu
       logowanie przejdzie na konto w Apps Script, a to zniknie.
     </p>
   </div>
@@ -43,60 +43,393 @@
   <header class="pasek">
     <div class="pasek-znak">
       <img src="../assets/sygnet-braz.svg" alt="" width="30" height="30">
-      <b>Panel</b>
+      <div>
+        <b>Panel pracowni</b>
+        <span class="pasek-podpis">Studio Sygnatura</span>
+      </div>
     </div>
     <div class="pasek-akcje">
       <span id="stan-zapisu" class="stan" role="status" aria-live="polite"></span>
-      <a class="btn-ikona" href="../index.html?edycja=1">Na stronie ✎</a>
+      <button type="button" id="przycisk-cofnij" class="btn-ikona" title="Cofnij ostatni zapis" disabled>↩ Cofnij</button>
+      <a class="btn-ikona btn-zielony" href="../index.html?edycja=1">Na stronie ✎</a>
       <button type="button" id="przycisk-wyloguj" class="btn-ikona" aria-label="Wyloguj">Wyloguj</button>
     </div>
   </header>
 
+  <nav class="zakladki" id="zakladki" aria-label="Sekcje panelu">
+    <button type="button" class="zakladka aktywna" data-tab="podsumowanie">Podsumowanie</button>
+    <button type="button" class="zakladka" data-tab="strona">Strona główna</button>
+    <button type="button" class="zakladka" data-tab="produkty">Produkty</button>
+    <button type="button" class="zakladka" data-tab="realizacje">Realizacje</button>
+    <button type="button" class="zakladka" data-tab="strony">Podstrony i Menu</button>
+    <button type="button" class="zakladka" data-tab="media">Zdjęcia</button>
+    <button type="button" class="zakladka" data-tab="wiadomosci">Wiadomości</button>
+    <button type="button" class="zakladka" data-tab="ustawienia">Ustawienia</button>
+  </nav>
+
   <main class="tresc">
 
-    <!-- ---------- PRODUKTY ---------- -->
-    <section class="karta" id="sekcja-produkty">
-      <div class="karta-naglowek">
-        <h2>Produkty</h2>
-        <button type="button" class="btn" id="nowy-produkt">+ Dodaj</button>
+    <div id="pasek-brudny" class="pasek-brudny" hidden>
+      <span>Masz <b>niezapisane zmiany</b> — kliknij „Zapisz zmiany”, aby opublikować je na stronie.</span>
+      <div class="pasek-brudny-akcje">
+        <button type="button" class="btn btn-sm" id="odrzuc-niezapisane">Odrzuć</button>
+        <button type="button" class="btn btn-glowny btn-sm" id="zapisz-gora">Zapisz zmiany</button>
       </div>
-      <p class="podpowiedz">Dotknij produktu, żeby zmienić nazwę, cenę albo zdjęcie.
-        Kolejność na stronie ustawiasz strzałkami.</p>
-      <ul id="lista-produktow" class="lista"></ul>
+    </div>
+
+    <!-- ---------- 1. PODSUMOWANIE ---------- -->
+    <section class="tab-panel" id="tab-podsumowanie">
+      <div class="karty-stat" id="karty-stat">
+        <div class="stat-karta"><span class="stat-nr">01</span><h3>Produkty</h3><b id="st-produkty">0</b><p id="st-produkty-opis">—</p></div>
+        <div class="stat-karta"><span class="stat-nr">02</span><h3>Realizacje</h3><b id="st-realizacje">0</b><p id="st-realizacje-opis">—</p></div>
+        <div class="stat-karta"><span class="stat-nr">03</span><h3>Podstrony i menu</h3><b id="st-strony">0</b><p id="st-strony-opis">—</p></div>
+        <div class="stat-karta"><span class="stat-nr">04</span><h3>Wiadomości</h3><b id="st-wiadomosci">0</b><p id="st-wiadomosci-opis">—</p></div>
+      </div>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Edytuj na żywo bezpośrednio na stronie</h2>
+            <p class="podpowiedz">Otwórz dowolną stronę z włączonym trybem edycji — kliknij w każdy nagłówek, akapit, przycisk, zdjęcie, sekcję, kartę produktu lub realizacji.</p>
+          </div>
+          <a class="btn btn-zielony-fill" href="../index.html?edycja=1">Edytuj stronę główną ✎</a>
+        </div>
+        <div class="skroty-strony" id="skroty-strony"></div>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <h2>Szybkie skróty</h2>
+        </div>
+        <div class="skroty-akcje">
+          <button type="button" class="btn" data-skok-tab="produkty" data-akcja="nowy-produkt">+ Dodaj produkt</button>
+          <button type="button" class="btn" data-skok-tab="realizacje" data-akcja="nowa-realizacja">+ Dodaj realizację</button>
+          <button type="button" class="btn" data-skok-tab="strony" data-akcja="nowa-strona">+ Nowa własna podstrona</button>
+          <button type="button" class="btn" data-skok-tab="media">Biblioteka zdjęć</button>
+          <button type="button" class="btn btn-ghost" id="eksport-json">Pobierz kopię JSON</button>
+        </div>
+      </section>
     </section>
 
-    <!-- ---------- STRONA GŁÓWNA ---------- -->
-    <section class="karta" id="sekcja-strona">
-      <div class="karta-naglowek">
-        <h2>Strona główna</h2>
-      </div>
-      <p class="podpowiedz">Teksty widoczne na stronie głównej. Zmiany widać od razu po zapisaniu.</p>
-      <div class="pola" id="pola-strony"></div>
+    <!-- ---------- 2. STRONA GŁÓWNA ---------- -->
+    <section class="tab-panel" id="tab-strona" hidden>
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>1. Sekcja powitalna (Hero)</h2>
+            <p class="podpowiedz">Teksty, przycisk i główne zdjęcie na górze strony głównej.</p>
+          </div>
+          <label class="przelacznik"><input type="checkbox" id="sg-hero-wid" checked> Widoczna</label>
+        </div>
+        <div class="siatka-hero-admin">
+          <div>
+            <div class="pola" id="pola-strony"></div>
+            <div class="pola mt-12">
+              <div class="pole">
+                <label for="sg-hero-link">Dokąd prowadzi przycisk</label>
+                <div class="pole-z-wyborem">
+                  <input id="sg-hero-link" type="text" placeholder="sklep.html">
+                  <select id="sg-hero-link-wybor" aria-label="Wybierz podstronę docelową"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-foto-box">
+            <label class="etykieta-sekcji">Zdjęcie główne i kadrowanie</label>
+            <div class="kadr-podglad" id="sg-kadr-podglad" title="Przeciągnij zdjęcie, aby zmienić kadr">
+              <img id="sg-hero-img" src="../assets/img/hero-szyld-1600.jpg" alt="" draggable="false">
+            </div>
+            <div class="kadr-suwaki">
+              <label>Powiększenie: <b id="sg-zoom-val">100%</b>
+                <input type="range" id="sg-hero-zoom" min="50" max="200" step="5" value="100">
+              </label>
+              <label>Poziom (X): <b id="sg-x-val">50%</b>
+                <input type="range" id="sg-hero-x" min="0" max="100" step="1" value="50">
+              </label>
+              <label>Pion (Y): <b id="sg-y-val">50%</b>
+                <input type="range" id="sg-hero-y" min="0" max="100" step="1" value="50">
+              </label>
+            </div>
+            <div class="kadr-narzedzia">
+              <select id="sg-hero-bib" aria-label="Zdjęcie z biblioteki"></select>
+              <label class="btn">+ Wgraj zdjęcie<input type="file" id="sg-hero-plik" accept="image/*" hidden></label>
+              <button type="button" class="btn btn-ghost" id="sg-hero-kadr-reset">Reset kadru</button>
+            </div>
+          </div>
+        </div>
+        <h3 class="podnaglowek mt-16">Trzy atuty pod przyciskiem</h3>
+        <div class="atuty-admin" id="sg-atuty"></div>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>2. Sekcja produktów („Wybrane dla Ciebie”)</h2>
+            <p class="podpowiedz">Kolejność produktów na stronie głównej, liczba kart oraz odznaki (Nowość, Bestseller, Okolicznościowy).</p>
+          </div>
+          <label class="przelacznik"><input type="checkbox" id="sg-sekcja-wid" checked> Widoczna</label>
+        </div>
+        <div class="pole-dwa mt-12">
+          <div class="pole">
+            <label for="sg-ile-kart">Liczba wyświetlanych kart</label>
+            <input type="number" id="sg-ile-kart" min="1" max="12" value="3">
+          </div>
+          <div class="pole">
+            <label for="sg-odznaka-nowosc">Odznaka „Nowość”</label>
+            <select id="sg-odznaka-nowosc"></select>
+          </div>
+        </div>
+        <div class="pole-dwa mt-12">
+          <div class="pole">
+            <label for="sg-odznaka-bestseller">Odznaka „Bestseller”</label>
+            <select id="sg-odznaka-bestseller"></select>
+          </div>
+          <div class="pole">
+            <label for="sg-odznaka-okolicznosciowy">Odznaka „Okolicznościowy”</label>
+            <select id="sg-odznaka-okolicznosciowy"></select>
+          </div>
+        </div>
+        <h3 class="podnaglowek mt-16">Kolejność produktów na stronie głównej</h3>
+        <ul class="lista-prosta" id="sg-kolejnosc-produktow"></ul>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>3. Pasek zaufania (dolny pasek 5 kafelków)</h2>
+            <p class="podpowiedz">Edytuj wszystkie 5 kafelków na dole strony głównej (w tym złoty kafel „Tworzymy z sercem”).</p>
+          </div>
+          <label class="przelacznik"><input type="checkbox" id="sg-pasek-wid" checked> Widoczny</label>
+        </div>
+        <div class="pasek-admin" id="sg-pasek-elementy"></div>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>4. Dodatkowe bloki na stronie głównej</h2>
+            <p class="podpowiedz">Dodaj własne sekcje informacyjne, promocje sezonowe lub banery pod paskiem zaufania.</p>
+          </div>
+          <button type="button" class="btn" id="sg-dodaj-sekcje">+ Dodaj blok</button>
+        </div>
+        <ul class="lista-prosta mt-12" id="sg-dodatkowe-sekcje"></ul>
+      </section>
     </section>
 
-    <!-- ---------- KONTAKT ---------- -->
-    <section class="karta" id="sekcja-kontakt">
-      <div class="karta-naglowek">
-        <h2>Kontakt i stopka</h2>
-      </div>
-      <div class="pola" id="pola-kontaktu"></div>
+    <!-- ---------- 3. PRODUKTY ---------- -->
+    <section class="tab-panel" id="tab-produkty" hidden>
+      <section class="karta" id="sekcja-produkty">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Produkty w katalogu</h2>
+            <p class="podpowiedz">Dotknij produktu, żeby zmienić nazwę, cenę, tagi, opis, cechy, galerię zdjęć lub widoczność w sklepie.</p>
+          </div>
+          <button type="button" class="btn" id="nowy-produkt">+ Dodaj produkt</button>
+        </div>
+        <div class="filtr-pasek">
+          <input type="search" id="filtr-produkty" placeholder="Szukaj w katalogu produktów…" aria-label="Filtruj produkty">
+        </div>
+        <ul id="lista-produktow" class="lista"></ul>
+      </section>
+    </section>
+
+    <!-- ---------- 4. REALIZACJE ---------- -->
+    <section class="tab-panel" id="tab-realizacje" hidden>
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Nasze realizacje</h2>
+            <p class="podpowiedz">Zarządzaj wszystkimi wpisami realizacji: zmieniaj kolejność, ukrywaj lub pokazuj na stronie, dodawaj zdjęcia albo zamień realizację w produkt sklepu.</p>
+          </div>
+          <button type="button" class="btn" id="nowa-realizacja">+ Dodaj realizację</button>
+        </div>
+        <div class="filtr-pasek">
+          <input type="search" id="filtr-realizacje" placeholder="Szukaj po tytule lub kategorii…" aria-label="Filtruj realizacje">
+        </div>
+        <ul id="lista-realizacji" class="lista"></ul>
+      </section>
+    </section>
+
+    <!-- ---------- 5. PODSTRONY I MENU ---------- -->
+    <section class="tab-panel" id="tab-strony" hidden>
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Menu główne strony</h2>
+            <p class="podpowiedz">Kolejność, nazwy i adresy pozycji w górnej nawigacji całego serwisu.</p>
+          </div>
+          <div class="akcje-rzad">
+            <button type="button" class="btn btn-ghost btn-sm" id="menu-reset">Domyślne</button>
+            <button type="button" class="btn btn-sm" id="menu-dodaj">+ Pozycja menu</button>
+          </div>
+        </div>
+        <ul class="lista-menu mt-12" id="lista-menu"></ul>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Edycja podstron serwisu</h2>
+            <p class="podpowiedz">Wybierz podstronę, aby edytować każdy jej nagłówek, akapit, przycisk, zdjęcie, sekcję lub pytania FAQ.</p>
+          </div>
+          <div class="akcje-rzad">
+            <a class="btn btn-zielony-fill btn-sm" id="podstrona-otworz-edycje" href="../sklep.html?edycja=1">Edytuj na żywo ✎</a>
+            <button type="button" class="btn btn-ghost btn-sm" id="podstrona-reset">Przywróć oryginał</button>
+          </div>
+        </div>
+        <div class="wybor-podstron" id="wybor-podstron"></div>
+        <div id="edytor-podstrony-elementy" class="mt-14"></div>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Własne podstrony</h2>
+            <p class="podpowiedz">Twórz nowe podstrony z pełnym formatowaniem tekstu, zdjęciami i przyciskami (dostępne pod adresem <code>podstrona.html?s=…</code>).</p>
+          </div>
+          <button type="button" class="btn" id="nowa-wlasna-strona">+ Nowa podstrona</button>
+        </div>
+        <ul class="lista-prosta mt-12" id="lista-wlasnych-stron"></ul>
+      </section>
+    </section>
+
+    <!-- ---------- 6. ZDJĘCIA (MEDIA) ---------- -->
+    <section class="tab-panel" id="tab-media" hidden>
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Wgraj nowe zdjęcie</h2>
+            <p class="podpowiedz">Zdjęcie jest automatycznie zmniejszane i zapisywane w bibliotece — możesz użyć go na stronie głównej, podstronach, w produktach i realizacjach.</p>
+          </div>
+        </div>
+        <div class="upload-box">
+          <div class="pole">
+            <label for="media-nazwa">Nazwa zdjęcia</label>
+            <input id="media-nazwa" type="text" placeholder="np. szopka-zblizenie">
+          </div>
+          <div class="pole">
+            <label for="media-plik">Wybierz plik z urządzenia</label>
+            <input id="media-plik" type="file" accept="image/*">
+          </div>
+          <button type="button" class="btn btn-glowny" id="media-wgraj-btn">Dodaj do biblioteki</button>
+        </div>
+        <p class="podpowiedz mt-8" id="media-status" role="status"></p>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek"><h2>Wgrane zdjęcia</h2></div>
+        <div class="siatka-mediow mt-12" id="media-wgrane"></div>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek"><h2>Zdjęcia pracowni (wbudowane)</h2></div>
+        <div class="siatka-mediow mt-12" id="media-studio"></div>
+      </section>
+    </section>
+
+    <!-- ---------- 7. WIADOMOŚCI ---------- -->
+    <section class="tab-panel" id="tab-wiadomosci" hidden>
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Skrzynka wiadomości i zapytań</h2>
+            <p class="podpowiedz">Wiadomości zapisane z formularza testowego na <code>kontakt.html</code> lub dodane ręcznie.</p>
+          </div>
+          <button type="button" class="btn" id="nowa-wiadomosc">+ Dodaj zapytanie testowe</button>
+        </div>
+        <label class="przelacznik mt-12">
+          <input type="checkbox" id="u-tryb-testowy-form">
+          <span>Kieruj formularz na <code>kontakt.html</code> prosto do tej skrzynki panelu (tryb testów offline)</span>
+        </label>
+        <div class="lista-wiadomosci mt-14" id="lista-wiadomosci"></div>
+      </section>
+    </section>
+
+    <!-- ---------- 8. USTAWIENIA ---------- -->
+    <section class="tab-panel" id="tab-ustawienia" hidden>
+      <section class="karta" id="sekcja-kontakt">
+        <div class="karta-naglowek">
+          <h2>Dane firmy, kontakt i social media</h2>
+        </div>
+        <div class="pola" id="pola-kontaktu"></div>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Stopka strony</h2>
+            <p class="podpowiedz">Tekst „O nas” oraz linki w kolumnie „Przydatne linki”.</p>
+          </div>
+          <button type="button" class="btn btn-sm" id="stopka-link-dodaj">+ Dodaj link</button>
+        </div>
+        <div class="pola mt-12">
+          <div class="pole">
+            <label for="u-stopka_o_nas">Tekst „O nas” w stopce</label>
+            <textarea id="u-stopka_o_nas" rows="3"></textarea>
+          </div>
+        </div>
+        <h3 class="podnaglowek mt-16">Przydatne linki w stopce</h3>
+        <ul class="lista-prosta mt-8" id="lista-stopka-linki"></ul>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek"><h2>Hasło dostępu do panelu</h2></div>
+        <div class="pola mt-12">
+          <div class="pole">
+            <label for="h-obecne">Obecne hasło</label>
+            <input id="h-obecne" type="password" autocomplete="current-password">
+          </div>
+          <div class="pole-dwa">
+            <div class="pole">
+              <label for="h-nowe">Nowe hasło (min. 8 znaków)</label>
+              <input id="h-nowe" type="password" autocomplete="new-password">
+            </div>
+            <div class="pole">
+              <label for="h-powtorz">Powtórz nowe hasło</label>
+              <input id="h-powtorz" type="password" autocomplete="new-password">
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn" id="zmien-haslo">Zmień hasło</button>
+            <span class="podpowiedz ml-8" id="haslo-status" role="status"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="karta">
+        <div class="karta-naglowek">
+          <div>
+            <h2>Reset i kopia bezpieczeństwa</h2>
+            <p class="podpowiedz">Przywróć domyślne dane wybranej sekcji albo całego podglądu.</p>
+          </div>
+        </div>
+        <div class="skroty-akcje mt-12">
+          <button type="button" class="btn btn-ghost" data-reset="stronaGlowna">Reset: Strona główna</button>
+          <button type="button" class="btn btn-ghost" data-reset="produkty">Reset: Produkty</button>
+          <button type="button" class="btn btn-ghost" data-reset="realizacje">Reset: Realizacje</button>
+          <button type="button" class="btn btn-ghost" data-reset="elementy">Reset: Edycje podstron</button>
+          <button type="button" class="btn btn-niebezpieczny" data-reset="wszystko">Przywróć wszystko do czystego stanu</button>
+        </div>
+      </section>
     </section>
 
   </main>
 
-  <!-- belka zapisu — zawsze pod ręką na telefonie -->
+  <!-- belka zapisu -->
   <div class="belka-zapisu">
-    <button type="button" class="btn-duzy" id="zapisz">Zapisz zmiany</button>
+    <div class="belka-zapisu-wew">
+      <button type="button" class="btn-duzy" id="zapisz">Zapisz zmiany</button>
+    </div>
   </div>
 </div>
 
-<!-- arkusz edycji produktu -->
+<!-- uniwersalny arkusz / modal edycji -->
 <div id="arkusz" class="arkusz" hidden>
   <div class="arkusz-tlo" data-zamknij></div>
   <div class="arkusz-tresc" role="dialog" aria-modal="true" aria-labelledby="arkusz-tytul">
     <div class="arkusz-uchwyt" aria-hidden="true"></div>
     <div class="arkusz-naglowek">
-      <h2 id="arkusz-tytul">Produkt</h2>
+      <h2 id="arkusz-tytul">Edycja</h2>
       <button type="button" class="btn-ikona" data-zamknij aria-label="Zamknij">Zamknij</button>
     </div>
     <div class="arkusz-pola" id="arkusz-pola"></div>

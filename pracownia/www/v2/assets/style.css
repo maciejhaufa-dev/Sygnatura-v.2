@@ -798,40 +798,116 @@ ul{margin:0;padding:0;list-style:none}
 }
 
 /* ============================================================
-   TRYB EDYCJI (klik-w-element) — panel na dole ekranu
-   Widoczny tylko po uruchomieniu edytora (admin/edytor.js).
-   Kolory z księgi znaku: butelkowa zieleń + złoto.
+   WŁASNE PODSTRONY / DODATKOWE SEKCJE (WYSIWYG)
+   ============================================================ */
+.wysiwyg-tresc{font-size:15.5px;line-height:1.72;color:var(--orzech);max-width:780px}
+.wysiwyg-tresc h2{font-family:var(--serif);font-size:28px;color:var(--czern);margin:26px 0 10px}
+.wysiwyg-tresc h3{font-size:18px;color:var(--czern);margin:20px 0 8px}
+.wysiwyg-tresc p{margin:0 0 14px}
+.wysiwyg-tresc ul,.wysiwyg-tresc ol{margin:0 0 16px;padding-left:22px}
+.wysiwyg-tresc li{margin-bottom:6px}
+.wysiwyg-tresc blockquote{margin:16px 0;padding:12px 18px;border-left:3px solid var(--miod);background:#F7F2E8;font-style:italic}
+.wysiwyg-tresc img{max-width:100%;height:auto;border-radius:8px;margin:14px 0}
+.wysiwyg-tresc a{color:var(--czern);text-decoration:underline;text-underline-offset:3px}
+.wysiwyg-tresc a.btn{text-decoration:none;color:#fff}
+.sekcja-dodatkowa .sekcja-foto img{width:100%;height:auto;border-radius:10px;object-fit:cover}
+.sekcja-ciemna{background:#1E4534;color:#F2EADD;padding:42px 0}
+.sekcja-ciemna h2,.sekcja-ciemna h3{color:#fff}
+.sekcja-ciemna .eyebrow{color:#DCC39A}
+.sekcja-ciemna p,.sekcja-ciemna li{color:#E6DEC9}
+
+/* ============================================================
+   TRYB EDYCJI (klik-w-element) — pełny edytor na każdej stronie
    ============================================================ */
 .syg-edycja{outline:2px dashed rgba(201,162,39,.85) !important;outline-offset:3px;cursor:pointer !important}
-.syg-edycja:hover{outline-style:solid;background:rgba(201,162,39,.10) !important}
-body.syg-tryb [data-pole]:not(.syg-edycja){cursor:pointer}
+.syg-edycja:hover{outline-style:solid;background:rgba(201,162,39,.09) !important}
+.syg-edycja-aktywny{outline:3px solid #C9A227 !important;background:rgba(201,162,39,.14) !important}
+body.syg-tryb [data-pole]:not(.syg-edycja),
+body.syg-tryb [data-syg-id]:not(.syg-edycja){cursor:pointer}
+body.syg-tryb [data-syg-ukryty="1"]{
+  display:block !important;opacity:.45;position:relative;outline:2px dotted #B4483A !important;
+}
+body.syg-tryb [data-syg-ukryty="1"]::before{
+  content:"UKRYTY ELEMENT (kliknij, aby odkryć)";display:inline-block;
+  background:#B4483A;color:#fff;font:600 10px/1.2 var(--sans);letter-spacing:.08em;
+  padding:3px 7px;border-radius:4px;margin-bottom:4px;
+}
+body.syg-tryb section[data-syg-id]{position:relative}
+.syg-sekcja-uchwyt{
+  position:absolute;top:8px;right:12px;z-index:200;
+  appearance:none;background:#1E4534;color:#F2EADD;border:1px solid var(--miod);
+  border-radius:999px;padding:5px 11px;font:600 11px/1.2 var(--sans);
+  cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.22);
+}
+.syg-sekcja-uchwyt:hover{background:#2A5C46}
+
+#syg-belka{
+  position:fixed;left:12px;right:12px;top:10px;z-index:2147482998;
+  max-width:960px;margin:0 auto;
+  background:rgba(30,69,52,.97);color:#F2EADD;
+  border:1px solid var(--miod);border-radius:12px;
+  padding:8px 12px;display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.28);font-family:var(--sans);font-size:13px;
+}
+#syg-belka[hidden]{display:none !important}
+.syg-belka-tytul{font-weight:700;color:#fff;white-space:nowrap}
+.syg-belka-tytul small{font-weight:400;color:#DCC39A;margin-left:4px}
+.syg-belka-nav{
+  background:#153326;color:#fff;border:1px solid rgba(201,174,132,.45);
+  border-radius:7px;padding:6px 10px;font:inherit;font-size:12.5px;min-height:36px;max-width:210px;
+}
+.syg-belka-akcje{margin-left:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.syg-belka-btn{
+  display:inline-flex;align-items:center;gap:5px;text-decoration:none;
+  padding:6px 11px;border-radius:7px;border:1px solid rgba(201,174,132,.45);
+  background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:12.5px;font-weight:600;
+  cursor:pointer;min-height:36px;white-space:nowrap;
+}
+.syg-belka-btn.zloty{background:var(--miod);color:#241D12;border-color:var(--miod)}
 
 #syg-panel{
   position:fixed;left:0;right:0;bottom:0;z-index:2147483000;
   background:#1E4534;color:#F2EADD;
-  box-shadow:0 -8px 30px rgba(0,0,0,.28);
+  box-shadow:0 -8px 30px rgba(0,0,0,.32);
   padding:14px 16px calc(14px + env(safe-area-inset-bottom));
   font-family:var(--sans);font-size:14px;
   display:grid;gap:10px;
-  max-height:70vh;overflow-y:auto;
+  max-height:78vh;overflow-y:auto;
   border-top:3px solid var(--miod);
 }
-#syg-panel[hidden]{display:none}
+#syg-panel[hidden]{display:none !important}
 .syg-wiersz{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .syg-etykieta{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#C9AE84;flex:1 1 auto;min-width:0}
 .syg-etykieta b{color:#fff;letter-spacing:0;text-transform:none;font-size:13px;display:block;margin-top:2px}
-#syg-panel textarea,#syg-panel input{
-  width:100%;font:inherit;font-size:16px; /* 16px = brak auto-zoomu na iPhonie */
-  padding:11px 12px;border-radius:6px;border:1px solid rgba(201,174,132,.45);
+#syg-panel textarea,#syg-panel input[type=text],#syg-panel input[type=number],#syg-panel input[type=url],#syg-panel select{
+  width:100%;font:inherit;font-size:16px;
+  padding:10px 12px;border-radius:6px;border:1px solid rgba(201,174,132,.45);
   background:#FFFDF9;color:#2C2A26;resize:vertical;
 }
 #syg-panel textarea{min-height:84px;line-height:1.45}
 #syg-panel input[type=number]{max-width:140px}
+#syg-panel input[type=checkbox]{width:18px;height:18px;accent-color:var(--miod);margin-right:6px;vertical-align:middle}
+#syg-panel label.syg-check{display:flex;align-items:center;font-size:13px;color:#F2EADD;cursor:pointer}
+.syg-siatka-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.syg-siatka-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.syg-format{display:flex;gap:6px;flex-wrap:wrap}
+.syg-fbtn{
+  appearance:none;border:1px solid rgba(201,174,132,.45);border-radius:6px;
+  background:rgba(255,255,255,.1);color:#F2EADD;padding:6px 10px;font:600 12.5px/1 var(--sans);
+  cursor:pointer;min-height:34px;
+}
+.syg-fbtn:hover{background:rgba(255,255,255,.2)}
+.syg-foto-podglad{
+  display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.22);padding:10px;border-radius:8px;
+}
+.syg-foto-podglad img{width:76px;height:76px;object-fit:cover;border-radius:6px;background:#2C2A26;flex:none}
+.syg-suwak{display:grid;gap:4px;font-size:12px;color:#DCC39A}
+.syg-suwak input[type=range]{width:100%;accent-color:var(--miod)}
 .syg-przyciski{display:flex;gap:8px;flex-wrap:wrap}
 .syg-b{
   appearance:none;border:0;border-radius:6px;padding:11px 16px;
   font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
-  min-height:44px; /* wygodne dla palca */
+  min-height:44px;
 }
 .syg-b.glowny{background:var(--miod);color:#241D12}
 .syg-b.poboczny{background:rgba(255,255,255,.12);color:#F2EADD}
@@ -847,7 +923,9 @@ body.syg-tryb [data-pole]:not(.syg-edycja){cursor:pointer}
   box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;min-height:44px;
 }
 #syg-przycisk b{color:var(--miod);font-size:15px}
-@media (max-width:520px){
+@media (max-width:600px){
+  .syg-siatka-2,.syg-siatka-3{grid-template-columns:1fr}
   #syg-przycisk{padding:9px 13px;font-size:12px}
   .syg-b{flex:1 1 auto}
 }
+

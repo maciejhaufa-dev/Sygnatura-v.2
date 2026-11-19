@@ -4,5 +4,6 @@
 # Hasła i dane sesji NIGDY do repozytorium
 pracownia/www/v2/admin/panele/*.json
 pracownia/www/v2/admin/panele/.haslo
+pracownia/www/v2/admin/panele/uploady/
 pracownia/www/v2/.env
 .arena/

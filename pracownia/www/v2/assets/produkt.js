@@ -34,14 +34,19 @@
     document.title = p.nazwa + ' — Studio Sygnatura';
     if (okruszek) okruszek.textContent = p.nazwa;
 
-    const galeria = [p.foto].concat(p.galeria || []);
+    const galeria = [p.foto].concat(Array.isArray(p.galeria) ? p.galeria : []).filter(Boolean)
+      .map(src => (/^(assets\/|admin\/|https?:\/\/)/i.test(src) ? src : 'assets/img/' + src));
     const mini = galeria.length > 1
       ? `<div class="miniatury" role="group" aria-label="Zdjęcia produktu">` +
         galeria.map((src, i) => `<button type="button" aria-pressed="${i === 0}" data-src="${esc(src)}">
           <img src="${esc(src)}" alt="Zdjęcie ${i + 1} z ${galeria.length}" loading="lazy" width="200" height="200"></button>`).join('') + `</div>`
       : '';
 
-    const cechy = (p.cechy || []).map(c => `<li>
+    const cechyLista = Array.isArray(p.cechy) ? p.cechy.slice() : [];
+    if (p.gabaryt && !cechyLista.some(c => String(c).includes(p.gabaryt))) {
+      cechyLista.unshift('Wymiar / gabaryt: ' + p.gabaryt);
+    }
+    const cechy = cechyLista.map(c => `<li>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 6.9"/></svg>
       <span>${esc(c)}</span></li>`).join('');
 
@@ -85,7 +90,7 @@
     });
 
     // pozostałe produkty
-    const inne = (D.produkty || []).filter(x => x.id !== p.id).slice(0, 3);
+    const inne = (D.produkty || []).filter(x => x.id !== p.id && x.dostepny !== false).slice(0, 3);
     const sekcja = document.getElementById('inne');
     if (inne.length && sekcja) {
       sekcja.hidden = false;
