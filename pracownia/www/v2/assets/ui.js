@@ -36,6 +36,14 @@
     zamknij: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
     dzwonek: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4 1.5 5.5 1.5 5.5H5s1.5-1.5 1.5-5.5Z"/><path d="M10 18.5a2 2 0 0 0 4 0"/></svg>',
     ramka: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="m4 16 5-5 4 4 3-3 4 4"/><circle cx="9" cy="9" r="1.4"/></svg>',
+    konto: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2c.6-3.6 3.6-5.7 7.2-5.7s6.6 2.1 7.2 5.7"/></svg>',
+    koszyk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.4 7.8h15.2l-1.4 11.4a1.7 1.7 0 0 1-1.7 1.5H7.5a1.7 1.7 0 0 1-1.7-1.5Z"/><path d="M8.9 10.4V7.2a3.1 3.1 0 0 1 6.2 0v3.2"/></svg>',
+    kalendarz: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.6" y="5.4" width="16.8" height="15" rx="1.6"/><path d="M3.6 9.8h16.8M8.4 3.6v3.4M15.6 3.6v3.4"/></svg>',
+    ciezarowka: '<svg viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h14v11H2z"/><path d="M16 8.5h6.2l4.3 4.2v3.3H16z"/><circle cx="7.6" cy="18.4" r="2.2"/><circle cx="21.6" cy="18.4" r="2.2"/><path d="M4.4 2.4h8M3 9.2h9"/></svg>',
+    medal: '<svg viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="9" r="6.2"/><path d="m13.2 13.6-.9 7.4 3.7-2 3.7 2-.9-7.4"/><path d="m13.6 9 1.9 1.9 3.2-3.4"/></svg>',
+    czat: '<svg viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.4h24v13.4H12.4L6.6 22v-4.2H4z"/><circle cx="12" cy="11" r="1.05" fill="currentColor" stroke="none"/><circle cx="16" cy="11" r="1.05" fill="currentColor" stroke="none"/><circle cx="20" cy="11" r="1.05" fill="currentColor" stroke="none"/></svg>',
+    koperta: '<svg viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4" width="26.8" height="16" rx="1.4"/><path d="m3.4 5.4 12.6 9 12.6-9"/></svg>',
+    serce2: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4S3.5 15 3.5 9.3A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 2.7c0 5.7-8.5 11.1-8.5 11.1Z"/></svg>',
     fb: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg>',
     ig: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" stroke="none"/></svg>',
     pin2: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg>'
@@ -43,18 +51,48 @@
 
   /* Każda pozycja prowadzi do istniejącej strony albo do konkretnej
      sekcji (anchor) — nie tworzymy linków „w pustkę” ani pustych stron. */
+  /* Etykiety i kolejność 1:1 z makiety. Każda pozycja prowadzi do
+     istniejącej strony albo do konkretnej sekcji na stronie. */
   const MENU = [
-    ['index.html', 'Start'],
-    ['sklep.html', 'Sklep'],
-    ['realizacje.html', 'Realizacje'],
-    ['wspolpraca.html#okazje', 'Okazje'],
+    ['sklep.html', 'Produkty', true],
+    ['realizacje.html', 'Szopki'],
+    ['wspolpraca.html#okazje', 'Dekoracje okolicznościowe'],
     ['wspolpraca.html#firmy', 'Dla firm'],
-    ['pracownia.html', 'Pracownia'],
+    ['realizacje.html', 'Inspiracje'],
+    ['pracownia.html', 'O nas'],
     ['kontakt.html', 'Kontakt']
   ];
 
   const biezaca = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const telHref = F.telHref || 'tel:+48538124538';
+
+
+  /* ---------- koszyk i konto: czytamy PRAWDZIWE klucze produkcyjne ----------
+     Koszyk produkcji trzyma dane w localStorage pod 'syg-koszyk-v1'
+     (patrz docs/assets/koszyk.js), a konto w 'syg-konto' (docs/assets/api.js).
+     Nic tu nie zapisujemy — tylko odczyt, żeby licznik i podpis w nagłówku
+     pokazywały rzeczywisty stan, a nie zmyśloną liczbę. */
+  const KLUCZ_KOSZYKA = 'syg-koszyk-v1';
+  const KLUCZ_KONTA = 'syg-konto';
+
+  function czytajLS(klucz) {
+    try { return JSON.parse(localStorage.getItem(klucz) || 'null'); } catch (e) { return null; }
+  }
+
+  function stanKoszyka() {
+    const k = czytajLS(KLUCZ_KOSZYKA) || {};
+    const pozycje = Array.isArray(k.pozycje) ? k.pozycje : [];
+    const suma = pozycje.reduce((s, p) => s + (Number(p.cena || 0) * Number(p.ile || p.ilosc || 1)), 0);
+    const sztuk = pozycje.reduce((s, p) => s + Number(p.ile || p.ilosc || 1), 0);
+    return { sztuk, suma };
+  }
+
+  function stanKonta() {
+    const k = czytajLS(KLUCZ_KONTA);
+    if (!k || !k.email) return null;
+    const imie = String(k.imie || '').trim();
+    return { podpis: imie ? imie : 'Moje konto', email: k.email };
+  }
 
   /* plaik: szary placeholder, gdy zdjęcia nie ma w danych */
   function foto(klasa, src, alt, szer, wys, atrybuty) {
@@ -65,45 +103,56 @@
   }
 
   function naglowek() {
-    const menu = MENU.map(([href, etykieta], i) => {
+    const menu = MENU.map(([href, etykieta, rozwijane], i) => {
       const plik = href.split('#')[0];
       const pierwszy = MENU.findIndex(m => m[0].split('#')[0] === plik);
       const aktywna = plik === biezaca && pierwszy === i;
-      return `<a href="${href}"${aktywna ? ' aria-current="page"' : ''}>${etykieta}</a>`;
+      return `<a href="${href}"${aktywna ? ' aria-current="page"' : ''}>${etykieta}`
+        + (rozwijane ? `<span class="nav-strzalka" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9.5 6 6 6-6"/></svg></span>` : '')
+        + '</a>';
     }).join('');
+
+    const koszyk = stanKoszyka();
+    const konto = stanKonta();
+    const badge = koszyk.sztuk > 0 ? `<span class="ha-badge">${koszyk.sztuk}</span>` : '';
 
     return `
 <a class="skip" href="#tresc">Przejdź do treści</a>
-<div class="pasek-info">
-  <div class="wrap">${I.dzwonek}<span>Wycena i termin realizacji po ustaleniu projektu — <a href="kontakt.html">napisz do nas</a></span></div>
-</div>
 <header class="site-head">
   <div class="head-top">
     <a class="brand" href="index.html" aria-label="Studio Sygnatura — strona główna">
-      <img src="assets/logo-zloty.svg" alt="" width="46" height="46">
-      <span class="brand-text"><b>Studio Sygnatura</b><span>drewno · detal · emocje</span></span>
+      <img src="assets/logo-zloty.svg" alt="" width="60" height="60">
+      <span class="brand-text"><b>Studio<br>Sygnatura</b><span>drewno. detal. emocje.</span></span>
     </a>
 
     <form class="search" action="szukaj.html" method="get" role="search">
-      <label class="sr" for="q-head">Szukaj produktu, kategorii, inspiracji</label>
-      <input id="q-head" type="search" name="q" minlength="2" placeholder="Szukaj produktu, kategorii, inspiracji…" autocomplete="off">
-      <button type="submit" aria-label="Szukaj">${I.szukaj}</button>
+      <label class="sr" for="q-head">Szukaj produktów, kategorii, inspiracji</label>
+      ${I.szukaj}
+      <input id="q-head" type="search" name="q" minlength="2" placeholder="Szukaj produktów, kategorii, inspiracji..." autocomplete="off">
+      <button type="submit" aria-label="Szukaj">Szukaj</button>
     </form>
 
     <div class="head-akcje">
       <a class="ha-item tel" href="${esc(telHref)}">
-        ${I.tel}<div><b>${esc(F.tel)}</b><span>${esc(F.odpowiedz || '')}</span></div>
+        ${I.tel}<div><b>${esc(F.tel)}</b><span>Odpowiedź 1–2 dni robocze</span></div>
       </a>
       <span class="ha-sep" aria-hidden="true"></span>
-      <a class="ha-item" href="mailto:${esc(F.mail)}">
-        ${I.mail}<div><b>Napisz e-mail</b><span>${esc(F.mail)}</span></div>
+      <a class="ha-item konto" href="konto.html">
+        ${I.konto}<div><b>${esc(konto ? konto.podpis : 'Moje konto')}</b><span>${konto ? 'Panel klienta' : 'Zaloguj się'}</span></div>
       </a>
-      <a class="ha-cta" href="kontakt.html">Zapytaj o wycenę ${I.strzalka}</a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-glowna" aria-label="Menu">${I.menu}</button>
+      <span class="ha-sep" aria-hidden="true"></span>
+      <a class="ha-item koszyk" href="koszyk.html">
+        <span class="ha-ikona">${I.koszyk}${badge}</span>
+        <div><b>Koszyk</b><span>${koszyk.suma > 0 ? zl(koszyk.suma) : '0,00 zł'}</span></div>
+      </a>
     </div>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-glowna" aria-label="Menu">${I.menu}</button>
   </div>
+
   <nav class="head-nav" aria-label="Menu główne">
     <div class="nav-inner" id="nav-glowna">${menu}</div>
+    <a class="nav-czas" href="${esc(telHref)}">${I.tel}<span>${esc(F.tel)}</span></a>
   </nav>
 </header>`;
   }
@@ -111,23 +160,30 @@
   function stopka() {
     return `
 <footer class="site-foot">
-  <div class="foot-main">
-    <div>
+  <div class="foot-main wrap">
+    <div class="foot-brand">
       <a class="brand" href="index.html">
-        <img src="assets/logo-krem.svg" alt="" width="52" height="52">
-        <span class="brand-text"><b>Studio Sygnatura</b><span>drewno · detal · emocje</span></span>
+        <img src="assets/logo-krem.svg" alt="" width="60" height="60">
+        <span class="brand-text"><b>Studio<br>Sygnatura</b><span>drewno. detal. emocje.</span></span>
       </a>
-      <p class="foot-about">Studio Sygnatura to mała pracownia z pasji do drewna i detalu. Tworzymy rzeczy, które mają znaczenie — na zamówienie, ręcznie, w Poznaniu.</p>
     </div>
+
+    <div>
+      <h4>O nas</h4>
+      <p class="foot-about">Studio Sygnatura to mała pracownia z pasji do drewna i detalu.
+      Tworzymy rzeczy, które mają znaczenie.</p>
+    </div>
+
     <div>
       <h4>Przydatne linki</h4>
       <ul>
-        <li><a href="sklep.html">Jak zamawiamy</a></li>
-        <li><a href="realizacje.html">Czas realizacji i inspiracje</a></li>
+        <li><a href="sklep.html">Jak zamawiać</a></li>
+        <li><a href="pracownia.html">Czas realizacji i dostawa</a></li>
         <li><a href="kontakt.html">Zwroty i reklamacje</a></li>
-        <li><a href="kontakt.html">Kontakt i wycena</a></li>
+        <li><a href="kontakt.html#faq">FAQ</a></li>
       </ul>
     </div>
+
     <div>
       <h4>Bądźmy w kontakcie</h4>
       <div class="social">
@@ -135,28 +191,22 @@
         <a href="https://www.instagram.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">${I.ig}</a>
         <a href="https://pl.pinterest.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" title="Pinterest">${I.pin2}</a>
       </div>
+      <p class="social-label">Zapisz się do newslettera</p>
       <form class="newsletter" data-newsletter novalidate>
         <label class="sr" for="news-mail">Adres e-mail do newslettera</label>
         <input id="news-mail" type="email" name="email" placeholder="Twój adres e-mail" autocomplete="email">
-        <button type="submit" aria-label="Zapisz się">${I.strzalka}</button>
+        <button type="submit" aria-label="Zapisz się do newslettera">${I.strzalka}</button>
       </form>
-      <p class="newsletter-note" data-newsletter-info>Zapisujemy tylko adres e-mail. Wysyłamy rzadko — nowe rzeczy i terminy.</p>
+      <p class="newsletter-note" data-newsletter-info></p>
     </div>
+
     <div>
       <h4>Kontakt</h4>
       <ul class="foot-contact">
         <li>${I.tel}<a href="${esc(telHref)}">${esc(F.tel)}</a></li>
         <li>${I.mail}<a href="mailto:${esc(F.mail)}">${esc(F.mail)}</a></li>
-        <li>${I.pin}<span>${esc(F.obszar)}</span></li>
-        <li>${I.zegar}<span>${esc(F.odpowiedz)}</span></li>
+        <li>${I.pin}<span>Studio Sygnatura<br>${esc(F.obszar)}</span></li>
       </ul>
-      <p class="newsletter-note mt-14">Odbiór osobisty i spotkanie w pracowni — po wcześniejszym uzgodnieniu terminu.</p>
-    </div>
-  </div>
-  <div class="foot-bottom">
-    <div>
-      <span>© ${new Date().getFullYear()} Studio Sygnatura · Poznań</span>
-      <span>Wszystkie prace powstają w naszej pracowni. Podgląd testowy — wersja nieprodukcyjna.</span>
     </div>
   </div>
 </footer>`;
