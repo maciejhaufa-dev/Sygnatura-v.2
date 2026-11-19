@@ -14,6 +14,7 @@
 <meta property="og:image" content="assets/img/hero-szyld-1600.jpg">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 
+<link rel="preload" as="image" href="assets/img/hero-szyld-1600.jpg">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -46,12 +47,12 @@
       </ul>
     </div>
 
-    <!-- Miejsce na zdjęcie hero. Makieta ma tu kompozycję trzech rzeczy
-         (szopka + tablica z grawerem + tabliczka numeru). Takiego zdjęcia nie
-         mamy, więc stoi szary placeholder z wymiarami — bez wymyślonej grafiki.
-         Podmiana: wstaw plik i zmień atrybut src poniżej. -->
+    <!-- Prawdziwe zdjęcie z pracowni. Makieta ma tu kompozycję trzech rzeczy
+         (szopka + tablica z grawerem + tabliczka numeru) — takiego zdjęcia nie
+         mamy, więc jest nasze własne, najlepiej pasujące do kadru.
+         Podmiana: wstaw plik i zmień src poniżej. -->
     <figure class="hero-kadr">
-      <img src="assets/hero-miejsce.svg" alt="Miejsce na zdjęcie hero — kompozycja produktów z pracowni" width="1180" height="600">
+      <img src="assets/img/hero-szyld-1600.jpg" alt="Drewniany napis „Cześć!” z frezowanego drewna na przezroczystej pleksi, w podwójnej ramie na jasnej ścianie" width="1600" height="900" fetchpriority="high">
     </figure>
   </section>
 

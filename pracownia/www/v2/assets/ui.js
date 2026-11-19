@@ -114,6 +114,30 @@
     return `<span class="ph-brak ${klasa}" role="img" aria-label="Brak zdjęcia: ${esc(alt)}">${I.ramka}zdjęcie w przygotowaniu</span>`;
   }
 
+
+  /* ---------- znak wg księgi znaku ----------
+     Nazwa to SYGNATURA. Logotyp z księgi znaku ma SYG kreskowane
+     (ok. 211 kresek w pliku) i NATURA lite (9 kresek) — dlatego SYG jest
+     z natury jaśniejsze. Wzmacniamy to kryciem 50% (klasa .syg / --krycie),
+     żeby akcent położyć na NATURA. Pod spodem „STUDIO ARTYSTYCZNE" złotem
+     — zgodnie z ustaleniem, że wyjaśnia ono, skąd „Studio" w nazwie.
+     Znak jest w jednym kolorze (brąz #6B4530 na kremie, biel na ciemnym tle). */
+  function znak(odmiana) {
+    const c = odmiana === 'ciemny' ? '-bialy' : '';
+    const podpisZloty = odmiana === 'ciemny' ? ' znak-podpis-zloty' : '';
+    return `
+    <span class="znak znak-${odmiana || 'jasny'}">
+      <img class="znak-sygnet" src="assets/sygnet-${odmiana === 'ciemny' ? 'bialy' : 'braz'}.svg" alt="" width="60" height="60">
+      <span class="znak-tekst">
+        <span class="znak-nazwa">
+          <img class="syg" src="assets/logotyp-syg${c}.svg" alt="SYG" height="34">
+          <img class="natura" src="assets/logotyp-natura${c}.svg" alt="NATURA" height="34">
+        </span>
+        <span class="znak-podpis${podpisZloty}">Studio artystyczne</span>
+      </span>
+    </span>`;
+  }
+
   function naglowek() {
     const menu = MENU.map(([href, etykieta, rozwijane], i) => {
       const plik = href.split('#')[0];
@@ -132,10 +156,7 @@
 <a class="skip" href="#tresc">Przejdź do treści</a>
 <header class="site-head">
   <div class="head-top">
-    <a class="brand" href="index.html" aria-label="Studio Sygnatura — strona główna">
-      <img src="assets/logo-zloty.svg" alt="" width="60" height="60">
-      <span class="brand-text"><b>Studio<br>Sygnatura</b><span>drewno. detal. emocje.</span></span>
-    </a>
+    <a class="brand" href="index.html" aria-label="Sygnatura — strona główna">${znak('jasny')}</a>
 
     <form class="search" action="szukaj.html" method="get" role="search">
       <label class="sr" for="q-head">Szukaj produktów, kategorii, inspiracji</label>
@@ -174,10 +195,7 @@
 <footer class="site-foot">
   <div class="foot-main wrap">
     <div class="foot-brand">
-      <a class="brand" href="index.html">
-        <img src="assets/logo-krem.svg" alt="" width="60" height="60">
-        <span class="brand-text"><b>Studio<br>Sygnatura</b><span>drewno. detal. emocje.</span></span>
-      </a>
+      <a class="brand" href="index.html" aria-label="Sygnatura — strona główna">${znak('ciemny')}</a>
     </div>
 
     <div>

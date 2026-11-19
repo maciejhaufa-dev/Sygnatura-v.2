@@ -9,7 +9,14 @@
    ============================================================ */
 
 :root{
-  --butelkowa:#1F3A32;
+  /* KOLORY WG KSIĘGI ZNAKU (v1.0) — używamy tych, nie własnych */
+  --czern:#6B4530;        /* „czerń podstawowa" znaku i tekstu */
+  --orzech:#4A3728;       /* wypał, bejca ciemna */
+  --miod:#C9A227;         /* sklejka, akcent */
+  --biel-ciepla:#FAF8F5;  /* tła, ramy bielone */
+  --szalwia:#8A9A7B;      /* liście w produktach */
+  --terakota:#B07D5C;     /* liście w produktach */
+  --butelkowa:#6B4530;    /* zastąpione przez --czern (zgodność ze starym kodem) */
   --butelkowa-2:#162B25;
   --butelkowa-3:#24443A;
   --brunatny:#6B4530;
@@ -114,6 +121,25 @@ ul{margin:0;padding:0;list-style:none}
   background:var(--krem);box-shadow:0 1px 3px rgba(42,33,28,.06), 0 12px 40px rgba(42,33,28,.07);
 }
 @media (max-width:1440px){ .papier{margin:0;box-shadow:none} }
+
+/* ============================================================
+   ZNAK (sygnet + SYGNATURA dwumaterialowo + podpis)
+   ============================================================ */
+.znak{display:inline-flex;align-items:center;gap:13px;min-width:0}
+.znak-sygnet{width:auto;height:56px;flex:none}
+.znak-tekst{display:flex;flex-direction:column;min-width:0}
+.znak-nazwa{display:flex;align-items:baseline;gap:0;min-width:0}
+/* SYG z księgi znaku jest kreskowany — dodatkowo 50% krycia, NATURA lita 100% */
+.znak-nazwa .syg{height:30px;width:auto;opacity:.5;flex:none}
+.znak-nazwa .natura{height:30px;width:auto;flex:none}
+.znak-podpis{
+  font-family:var(--sans);font-size:9px;font-weight:500;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--miod);margin-top:7px;white-space:nowrap;
+}
+/* na ciemnym tle: znak biały, podpis złoty jaśniejszy */
+.znak-ciemny .znak-nazwa .syg{opacity:.5}
+.znak-ciemny .znak-podpis{color:var(--miod)}
+.znak-jasny .znak-podpis{color:var(--miod)}
 
 /* ============================================================
    NAGŁÓWEK — wymiary 1:1 z makiety (1505 px szerokości odniesienia)
@@ -571,9 +597,9 @@ ul{margin:0;padding:0;list-style:none}
 @media (max-width:1180px){
   .grid-real{grid-template-columns:repeat(3,minmax(0,1fr))}
   .head-top{gap:clamp(14px,2vw,28px)}
-  .brand img{height:52px}
-  .brand-text b{font-size:21px}
-  .brand-text > span{font-size:8px}
+  .znak-sygnet{height:48px}
+  .znak-nazwa .syg,.znak-nazwa .natura{height:26px}
+  .znak-podpis{font-size:8px;letter-spacing:.2em}
   .search{max-width:380px}
   .head-akcje{gap:clamp(10px,1.4vw,18px)}
   .ha-item b{font-size:11.5px}
@@ -607,9 +633,9 @@ ul{margin:0;padding:0;list-style:none}
     row-gap:12px;padding:12px var(--pad);
   }
   .brand{grid-area:brand}
-  .brand img{height:46px}
-  .brand-text b{font-size:19px;letter-spacing:.13em}
-  .brand-text > span{font-size:8px}
+  .znak-sygnet{height:42px}
+  .znak-nazwa .syg,.znak-nazwa .natura{height:23px}
+  .znak-podpis{font-size:7.5px;letter-spacing:.18em;margin-top:5px}
   .head-akcje{grid-area:tools;justify-self:end;gap:12px}
   /* ikony kontaktu zostają (makieta ma trzy), chowamy tylko podpisy */
   .head-akcje .ha-item div{display:none}
@@ -653,9 +679,9 @@ ul{margin:0;padding:0;list-style:none}
 @media (max-width:640px){
   body{font-size:15px}
   .pasek-info .wrap{font-size:10.5px;min-height:32px}
-  .brand img{height:34px}
-  .brand-text b{font-size:17px;letter-spacing:.1em}
-  .brand-text > span{display:none}
+  .znak-sygnet{height:36px}
+  .znak-nazwa .syg,.znak-nazwa .natura{height:20px}
+  .znak{gap:10px}
   .head-akcje .ha-item.tel,.head-akcje .ha-item.konto{width:38px;height:38px}
   .head-akcje .ha-item.koszyk{width:auto}
   .head-akcje .ha-item.koszyk div{display:none}
@@ -690,9 +716,9 @@ ul{margin:0;padding:0;list-style:none}
 /* najwęższe telefony (np. 360–430 px): znak i dwa przyciski muszą zmieścić się w jednym rzędzie */
 @media (max-width:430px){
   :root{--pad:16px}
-  .brand img{height:42px}
-  .brand{gap:10px}
-  .brand-text b{font-size:16px;letter-spacing:.1em}
+  .znak-sygnet{height:34px}
+  .znak-nazwa .syg,.znak-nazwa .natura{height:18px}
+  .znak{gap:8px}
   .head-akcje{gap:10px}
   .head-akcje .ha-item.tel{width:40px;height:40px}
   .head-akcje .ha-item.konto{display:none}   /* miejsce na telefon, konto i koszyk */

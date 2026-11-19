@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#6B4530">
+<title>Panel — Sygnatura</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+<!-- ================= EKRAN LOGOWANIA ================= -->
+<section id="ekran-logowania" class="logowanie">
+  <div class="logowanie-box">
+    <img class="logowanie-znak" src="../assets/sygnet-braz.svg" alt="" width="64" height="64">
+    <h1>Panel pracowni</h1>
+    <p class="logowanie-opis">Zaloguj się, żeby zmieniać ceny, zdjęcia i teksty na stronie.</p>
+
+    <form id="forma-logowania" novalidate autocomplete="on">
+      <label for="haslo">Hasło</label>
+      <div class="pole-haslo">
+        <input id="haslo" name="haslo" type="password" autocomplete="current-password"
+               inputmode="text" autocapitalize="off" spellcheck="false" required
+               placeholder="wpisz hasło z pliku admin/panele/.haslo">
+        <button type="button" id="pokaz" class="pokaz" aria-label="Pokaż hasło">Pokaż</button>
+      </div>
+      <p id="blad-logowania" class="blad" role="alert" aria-live="polite"></p>
+      <button type="submit" class="btn-duzy">Wejdź</button>
+    </form>
+
+    <p class="logowanie-stopka">
+      Wersja testowa. Hasło jest jednorazowe na czas testów — po wdrożeniu
+      logowanie przejdzie na konto w Apps Script, a to zniknie.
+    </p>
+  </div>
+</section>
+
+<!-- ================= PANEL ================= -->
+<div id="panel" class="panel" hidden>
+
+  <header class="pasek">
+    <div class="pasek-znak">
+      <img src="../assets/sygnet-braz.svg" alt="" width="30" height="30">
+      <b>Panel</b>
+    </div>
+    <div class="pasek-akcje">
+      <span id="stan-zapisu" class="stan" role="status" aria-live="polite"></span>
+      <button type="button" id="przycisk-wyloguj" class="btn-ikona" aria-label="Wyloguj">Wyloguj</button>
+    </div>
+  </header>
+
+  <main class="tresc">
+
+    <!-- ---------- PRODUKTY ---------- -->
+    <section class="karta" id="sekcja-produkty">
+      <div class="karta-naglowek">
+        <h2>Produkty</h2>
+        <button type="button" class="btn" id="nowy-produkt">+ Dodaj</button>
+      </div>
+      <p class="podpowiedz">Dotknij produktu, żeby zmienić nazwę, cenę albo zdjęcie.
+        Kolejność na stronie ustawiasz strzałkami.</p>
+      <ul id="lista-produktow" class="lista"></ul>
+    </section>
+
+    <!-- ---------- STRONA GŁÓWNA ---------- -->
+    <section class="karta" id="sekcja-strona">
+      <div class="karta-naglowek">
+        <h2>Strona główna</h2>
+      </div>
+      <p class="podpowiedz">Teksty widoczne na stronie głównej. Zmiany widać od razu po zapisaniu.</p>
+      <div class="pola" id="pola-strony"></div>
+    </section>
+
+    <!-- ---------- KONTAKT ---------- -->
+    <section class="karta" id="sekcja-kontakt">
+      <div class="karta-naglowek">
+        <h2>Kontakt i stopka</h2>
+      </div>
+      <div class="pola" id="pola-kontaktu"></div>
+    </section>
+
+  </main>
+
+  <!-- belka zapisu — zawsze pod ręką na telefonie -->
+  <div class="belka-zapisu">
+    <button type="button" class="btn-duzy" id="zapisz">Zapisz zmiany</button>
+  </div>
+</div>
+
+<!-- arkusz edycji produktu -->
+<div id="arkusz" class="arkusz" hidden>
+  <div class="arkusz-tlo" data-zamknij></div>
+  <div class="arkusz-tresc" role="dialog" aria-modal="true" aria-labelledby="arkusz-tytul">
+    <div class="arkusz-uchwyt" aria-hidden="true"></div>
+    <div class="arkusz-naglowek">
+      <h2 id="arkusz-tytul">Produkt</h2>
+      <button type="button" class="btn-ikona" data-zamknij aria-label="Zamknij">Zamknij</button>
+    </div>
+    <div class="arkusz-pola" id="arkusz-pola"></div>
+    <div class="arkusz-stopka">
+      <button type="button" class="btn btn-ghost" id="usun-produkt">Usuń</button>
+      <button type="button" class="btn-duzy" id="gotowe">Gotowe</button>
+    </div>
+  </div>
+</div>
+
+<script src="panel.js"></script>
+</body>
+</html>
