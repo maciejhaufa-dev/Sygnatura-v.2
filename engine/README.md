@@ -77,4 +77,4 @@ Kod nie zawiera domyślnego hasła. Przy pierwszym tworzeniu konta ustaw najpier
 
 W aktualnym kodzie nie ma hasła startowego. Przy nowej inicjalizacji lub awaryjnym resecie ustaw w **Apps Script → Project Settings → Script Properties** osobną właściwość `SYG_ADMIN_BOOTSTRAP_PASSWORD` z własnym, unikalnym hasłem o długości co najmniej 16 znaków. Po użyciu do inicjalizacji/resetu skrypt automatycznie usuwa tę właściwość. Następnie zaloguj się i ustaw docelowe hasło w panelu.
 
-`SYG_ADMIN_BOOTSTRAP_PASSWORD` nie jest `GITHUB_TOKEN`: drugi służy wyłącznie do uploadu zdjęć. Nie kopiuj wartości między tymi właściwościami. Nie uruchamiaj `instaluj()` na istniejącym arkuszu.
+`SYG_ADMIN_BOOTSTRAP_PASSWORD` nie jest `GITHUB_TOKEN`: drugi służy wyłącznie do uploadu zdjęć. Nie kopiuj wartości między tymi właściwościami. Starsze, alternatywne pliki `Kod.gs`/`Konfig.gs` używające klucza URL wymagają osobnej Script Property `LEGACY_ADMIN_API_TOKEN`; ta właściwość nie zastępuje `GITHUB_TOKEN` ani nie jest potrzebna zestawowi PLIK1–3. Nie uruchamiaj `instaluj()` na istniejącym arkuszu.
