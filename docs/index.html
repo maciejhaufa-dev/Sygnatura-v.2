@@ -172,16 +172,22 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 
 /* --- strona główna: czysty, pełnoekranowy hero --- */
 #hg-actions[hidden]{display:none!important}
-#cta-sekcja,.listwa-poziom,.foot{display:none!important}
+.listwa-poziom,.foot{display:none!important}
+body.cta-hidden #cta-sekcja{display:none!important}
+body.has-home-cta #cta-sekcja{display:block!important}
 .main{width:100%;padding:8px clamp(12px,1.5vw,20px) 0}
+.home-search{display:flex;gap:0;max-width:740px;width:min(100%,740px);margin:10px auto 12px;border:1px solid rgba(107,69,48,.38);background:#fff;box-shadow:0 5px 16px rgba(31,58,50,.08);flex:none}
+.home-search input{flex:1;min-width:0;border:0;background:transparent;padding:12px 16px;font:inherit;font-size:16px;outline:none}
+.home-search button{border:0;background:var(--butelkowa);color:var(--zloty);padding:0 22px;font:inherit;font-weight:700;letter-spacing:.06em;cursor:pointer}
+.home-search button:hover{background:var(--brunatny)}
 .slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
   background:var(--butelkowa);width:100%;max-width:none;margin:0 auto;aspect-ratio:16/8.6;max-height:600px}
 @media (min-width:761px){
   .page{height:auto;min-height:100vh;min-height:100dvh;overflow:visible}
   .srodek{flex:1 0 auto;min-height:100vh;min-height:100dvh}
   .prawa{min-height:100vh;min-height:100dvh}
-  .main{display:flex;flex:1 0 auto;min-height:72vh;padding:0}
-  .slider{flex:1 1 auto;height:auto;min-height:72vh;max-height:none;aspect-ratio:auto;margin:0;border:0}
+  .main{display:flex;flex-direction:column;flex:1 0 auto;min-height:72vh;padding:0}
+  .slider{flex:1 1 auto;height:auto;min-height:58vh;max-height:none;aspect-ratio:auto;margin:0;border:0}
   .sl-track,.sl-slide{height:100%;min-height:100%}
 }
 .sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
@@ -423,6 +429,10 @@ html.dotyk .social{margin-top:14px}
   </div>
 
   <main class="main">
+    <form class="home-search" action="szukaj.html" method="get" role="search" aria-label="Szukaj produktów">
+      <input type="search" name="q" placeholder="Szukaj produktu, np. szopka, szyld, prezent…" aria-label="Szukaj produktów po nazwie, opisie lub tagu" minlength="2">
+      <button type="submit">Szukaj</button>
+    </form>
     <div class="slider" id="slider" aria-label="Najważniejsze informacje — przewijane slajdy">
       <div class="sl-track" id="sl-track">
 
@@ -514,11 +524,11 @@ html.dotyk .social{margin-top:14px}
   </footer>
 </div>
 
-<script src="data/katalog.js?v=355"></script>
-<script src="assets/koszyk.js?v=355"></script>
-<script src="assets/config.js?v=355"></script>
-<script src="assets/api.js?v=355"></script>
-<script src="assets/main.js?v=355"></script>
+<script src="data/katalog.js?v=356"></script>
+<script src="assets/koszyk.js?v=356"></script>
+<script src="assets/config.js?v=356"></script>
+<script src="assets/api.js?v=356"></script>
+<script src="assets/main.js?v=356"></script>
 <script>
 /* nagłówek strony głównej: pełny serwis (szukaj + koszyk + konto) albo
    tryb startu (napisz/zadzwoń) — wg SYG.LAUNCH */
@@ -655,9 +665,7 @@ html.dotyk .social{margin-top:14px}
       var tlo = ob === 'gradient'
         ? 'background-image:linear-gradient(135deg,#1F3A32,#6B4530)'
         : "background-image:url('" + String(ob || '').replace(/'/g, '%27') + "')";
-      var zoomTla = Math.max(100, Math.min(200, Number(k.zoomTla) || 100));
-      var przesuniecieTla = Math.max(-100, Math.min(100, Number(k.przesuniecieTla) || 0));
-      var stylTla = tlo + ';transform:translateY(' + przesuniecieTla + '%) scale(' + (zoomTla / 100) + ');transform-origin:center center';
+      var stylTla = tlo + ';background-size:cover;background-position:center center;background-repeat:no-repeat';
       return '<div class="sl-slide" data-sl="' + esc(k.id || '') + '">' +
         '<div class="sl-bg" style="' + stylTla + '"></div>' +
         '<div class="sl-cien"></div>' +
@@ -665,6 +673,29 @@ html.dotyk .social{margin-top:14px}
         (k.karty ? '<div class="sl-karty"' + (k.karty === 'odwrotnie' ? ' data-odw="1"' : '') + '></div>' : '') +
         '</div></div>';
     }).join('');
+    track.querySelectorAll('.sl-slide').forEach(function(slide,idx){
+      var k=kafle[idx]||{}, bg=slide.querySelector('.sl-bg'), src=slMediaRozwiaz(k.obraz||'');
+      if(!bg||!src||src==='gradient')return;
+      var im=new Image();
+      im.onload=function(){
+        function applyCrop(){
+          var box=bg.getBoundingClientRect();if(!box.width||!box.height)return;
+          var zoom=Math.max(50,Math.min(200,Number(k.zoomTla)||100));
+          var minZoom=Math.max(50,box.width/im.naturalWidth*100,box.height/im.naturalHeight*100);
+          var actual=Math.max(zoom,minZoom),iw=im.naturalWidth*actual/100,ih=im.naturalHeight*actual/100;
+          var mx=Math.max(0,(iw-box.width)/2),my=Math.max(0,(ih-box.height)/2);
+          var x=Math.max(-100,Math.min(100,Number(k.przesuniecieTlaX)||0));
+          var legacyY=k.przesuniecieTlaY!=null?k.przesuniecieTlaY:k.przesuniecieTla;
+          var y=Math.max(-100,Math.min(100,Number(legacyY)||0));
+          bg.style.backgroundSize=iw+'px '+ih+'px';
+          bg.style.backgroundPosition='calc(50% + '+(mx*x/100)+'px) calc(50% + '+(my*y/100)+'px)';
+        }
+        applyCrop();
+        if(window.ResizeObserver){var ro=new ResizeObserver(applyCrop);ro.observe(bg);}
+        else window.addEventListener('resize',applyCrop);
+      };
+      im.src=src;
+    });
     track.querySelectorAll('.sl-karty').forEach(function(el){
       var lista = el.hasAttribute('data-odw') ? kat.slice().reverse().slice(0, 3) : kat.slice(0, 3);
       var html = lista.map(karta).join('');
@@ -765,6 +796,11 @@ html.dotyk .social{margin-top:14px}
     box.innerHTML =
       dane.ctaTresc || domyslne.ctaTresc || DOMYS.ctaTresc;
   }
+  var ctaSekcja = document.getElementById('cta-sekcja');
+  var pokazJak = dane.ctaWidoczny !== false; // stare ustawienia bez przełącznika domyślnie pokazują sekcję
+  if (ctaSekcja) ctaSekcja.style.display = pokazJak ? '' : 'none';
+  document.body.classList.toggle('has-home-cta', pokazJak);
+  document.body.classList.toggle('cta-hidden', !pokazJak);
 }
   wczytaj();
 })();
