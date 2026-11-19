@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=355">
+<link rel="stylesheet" href="assets/style.css?v=356">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -224,15 +224,11 @@
             </div>
             <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;background:#24272A;color:#FFF;border-bottom:1px solid #444">
               <strong style="font-size:12px">Kadrowanie tła:</strong>
-              <label style="display:flex;gap:8px;align-items:center;font-size:12px">Powiększenie
-                <input type="range" id="sg-tlo-zoom" min="100" max="200" step="1" value="100" style="width:140px">
+              <label style="display:flex;gap:8px;align-items:center;font-size:12px">Rozmiar zdjęcia
+                <input type="range" id="sg-tlo-zoom" min="50" max="200" step="1" value="100" style="width:140px">
                 <output id="sg-tlo-zoom-wartosc">100%</output>
               </label>
-              <label style="display:flex;gap:8px;align-items:center;font-size:12px">Pionowo (− w górę, + w dół)
-                <input type="range" id="sg-tlo-y" min="-100" max="100" step="1" value="0" style="width:140px">
-                <output id="sg-tlo-y-wartosc">0%</output>
-              </label>
-              <span style="font-size:11px;color:#BBB">Zakres przesunięcia pozwala wysunąć zdjęcie poza kadr.</span>
+              <span style="font-size:11px;color:#BBB">Chwyć zdjęcie w podglądzie i przeciągnij. Kadr przytnie brzegi; nie odsłonisz tła.</span>
             </div>
 
             <!-- Edytor treści ze wstążką i podglądem na żywo -->
@@ -278,6 +274,9 @@
       <div class="admin-card">
         <h3 style="font-size:17px;color:var(--butelkowa);margin:0 0 4px">2. Sekcja pod sliderem („Jak działamy”)</h3>
         <p class="mala" style="margin:0 0 14px">Sekcja z trzema krokami i przyciskami zamówień. Kliknij i edytuj treść bezpośrednio na podglądzie poniżej.</p>
+        <label style="display:flex;align-items:center;gap:8px;margin:0 0 12px;font-weight:700;color:var(--butelkowa)">
+          <input type="checkbox" id="sg-cta-widoczny" style="width:auto"> Pokaż sekcję „Jak działamy” na stronie głównej
+        </label>
         <div id="sg-cta-edytor">
           <div class="jak" style="border:1px solid #D5C4B1;border-radius:0 0 8px 8px;border-top:none;margin:0">
             <div id="sg-cta-pole" contenteditable="true" style="outline:none;cursor:text">
@@ -459,13 +458,11 @@
     <!-- PRODUKTY -->
     <section class="admin-sekcja" id="tab-produkty" style="display:none">
       <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
-      <p class="mala">Zmień cenę albo ukryj/pokaż produkt w sklepie. Produkty z wpisów bloga mają tu
-      dopisany link „historia →". Możesz też dodać produkt „bez historii" (np. papierowe winietki).
-      Zmiany zapisują się w katalogu współdzielonym witryny.</p>
+      <p class="mala">Zmień cenę i widoczność. W polu „Tagi do wyszukiwarki” wpisz słowa oddzielone przecinkami — klienci znajdą produkt po nazwie, opisie lub tagu.</p>
       <div class="flash" id="produkty-info" style="display:none"></div>
       <div class="tabela-wrap">
         <table class="tabela" id="tabela-produkty">
-          <thead><tr><th>Produkt</th><th>Cena (zł)</th><th>W sklepie</th><th></th></tr></thead>
+          <thead><tr><th>Produkt</th><th>Cena (zł)</th><th>W sklepie</th><th>Tagi do wyszukiwarki</th><th></th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -741,6 +738,7 @@
           tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="kontakt.html">Zapytaj o szopkę →</a>' }
       ]
     },
+    ctaWidoczny: false,
     ctaTresc: '<h2>Jak działamy</h2><p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>' +
       '<div class="kroki">' +
       '<div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>' +
@@ -940,13 +938,15 @@
     }
     var ctaVal = SG_EDYTOR_CTA ? SG_EDYTOR_CTA.pobierz() : (SG_DANE ? SG_DANE.ctaTresc : '');
     if (!sgPrawidlowyHtml(ctaVal)) ctaVal = SG_DOMYS.ctaTresc;
+    var ctaWidoczny = !!document.getElementById('sg-cta-widoczny').checked;
 
     var autoplayVal = Number(document.getElementById('sg-autoplay').value);
     if (isNaN(autoplayVal) || autoplayVal <= 0) autoplayVal = 4.5;
 
     var dane = {
       slider: { autoplay: autoplayVal, kafle: sgKafle() },
-      ctaTresc: ctaVal
+      ctaTresc: ctaVal,
+      ctaWidoczny: ctaWidoczny
     };
     SG_DANE = dane;
 
@@ -1003,7 +1003,8 @@
         '</div></div>';
     });
     html += '<button type="button" class="sg-dodaj-btn" id="sg-dodaj-kafel"><span style="font-size:28px;line-height:1">+</span>' +
-      '<span>Nowy slajd</span></button>';
+      '<span>Nowy slajd</span></button>' +
+      '<button type="button" class="sg-dodaj-btn" id="sg-dodaj-wkrotce"><span style="font-size:22px;line-height:1">↗</span><span>Dodaj slajd „Wkrótce”</span></button>';
     pasek.innerHTML = html;
 
     pasek.querySelectorAll('.sg-slajd-karta').forEach(function(el, i){
@@ -1063,6 +1064,12 @@
       });
     });
 
+    var dodajWkrotce = document.getElementById('sg-dodaj-wkrotce');
+    if (dodajWkrotce) dodajWkrotce.addEventListener('click', function(){
+      var nowy={id:'wkrotce-'+Date.now(),obraz:'assets/hero.jpg',karty:false,
+        tresc:'<p class="sl-tag">Wkrótce</p><h2>Już niedługo</h2><p>Pracujemy nad nowym projektem. Zostaw nam wiadomość, aby zapytać o przedsprzedaż i dostępność.</p><a class="sl-btn" href="kontakt.html?temat=przedsprzedaz">Zapytaj o przedsprzedaż →</a>'};
+      sgKafle().push(nowy); ustawBrudny(); rysujKafle(); otworzEdycje(nowy,sgKafle().length-1,true);
+    });
     var dodaj = document.getElementById('sg-dodaj-kafel');
     if (dodaj) dodaj.addEventListener('click', function(){
       var nowyKafel = {
@@ -1431,6 +1438,8 @@
       SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
         document.getElementById('sg-cta-edytor'), document.getElementById('sg-cta-pole'));
     }
+    var ctaToggle = document.getElementById('sg-cta-widoczny');
+    if (ctaToggle) ctaToggle.checked = SG_DANE.ctaWidoczny === true;
     var ctaHtml = (SG_DANE && sgPrawidlowyHtml(SG_DANE.ctaTresc))
       ? SG_DANE.ctaTresc
       : SG_DOMYS.ctaTresc;
@@ -1494,6 +1503,8 @@
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', ustawBrudny);
   });
+  var ctaToggle = document.getElementById('sg-cta-widoczny');
+  if (ctaToggle) ctaToggle.addEventListener('change', function(){ if (SG_DANE) SG_DANE.ctaWidoczny=this.checked; ustawBrudny(); });
   var ctaPole = document.getElementById('sg-cta-pole');
   if (ctaPole) ctaPole.addEventListener('input', function(){
     if (SG_DANE && SG_EDYTOR_CTA) SG_DANE.ctaTresc = SG_EDYTOR_CTA.pobierz();
@@ -1687,16 +1698,18 @@
         '</span></td>' +
         '<td><input type="number" step="0.01" min="0" class="p-cena" data-id="' + p.id + '" value="' + p.cena + '" style="width:110px"></td>' +
         '<td><label style="cursor:pointer;font-size:14px"><input type="checkbox" class="p-dost" data-id="' + p.id + '"' + (p.dostepny ? ' checked' : '') + '> widoczny</label></td>' +
+        '<td><input type="text" class="p-tagi" data-id="' + p.id + '" value="' + sgEsc(p.tagi || '') + '" placeholder="np. drewno, ślub, prezent" style="min-width:210px"></td>' +
         '<td><button class="btn outline" type="button" style="padding:8px 16px" data-id="' + p.id + '">Zapisz</button></td>' +
       '</tr>';
-    }).join('') || '<tr><td colspan="4">Brak produktów.</td></tr>';
+    }).join('') || '<tr><td colspan="5">Brak produktów.</td></tr>';
 
     tbody.querySelectorAll('button[data-id]').forEach(function(b){
       b.addEventListener('click', async function(){
         var id = Number(b.getAttribute('data-id'));
         var cena = Number(tbody.querySelector('.p-cena[data-id="' + id + '"]').value) || 0;
         var dost = tbody.querySelector('.p-dost[data-id="' + id + '"]').checked ? 1 : 0;
-        var odp = await SYG.wezwij('produkty-zapisz', { id: id, cena: cena, dostepny: dost });
+        var tagi = tbody.querySelector('.p-tagi[data-id="' + id + '"]').value;
+        var odp = await SYG.wezwij('produkty-zapisz', { id: id, cena: cena, dostepny: dost, tagi: tagi });
         var f = document.getElementById('produkty-info');
         f.style.display = 'block';
         f.textContent = odp.ok ? 'Zapisano: produkt #' + id + ' (' + cena + ' zł, ' + (dost ? 'widoczny' : 'ukryty') + ').' : (odp.blad || 'Nie zapisano.');

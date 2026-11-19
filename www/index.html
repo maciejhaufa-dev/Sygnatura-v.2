@@ -171,17 +171,25 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 
 /* --- strona główna: czysty, pełnoekranowy hero --- */
 #hg-actions[hidden]{display:none!important}
-#cta-sekcja,.listwa-poziom,.foot{display:none!important}
+.listwa-poziom,.foot{display:none!important}
+body.has-home-cta #cta-sekcja{display:block!important}
 .main{width:100%;padding:8px clamp(12px,1.5vw,20px) 0}
+.home-search{display:flex;gap:0;max-width:740px;width:min(100%,740px);margin:10px auto 12px;border:1px solid rgba(107,69,48,.38);background:#fff;box-shadow:0 5px 16px rgba(31,58,50,.08)}
+.home-search input{flex:1;min-width:0;border:0;background:transparent;padding:12px 16px;font:inherit;font-size:16px;outline:none}
+.home-search button{border:0;background:var(--butelkowa);color:var(--zloty);padding:0 22px;font:inherit;font-weight:700;letter-spacing:.06em;cursor:pointer}
+.home-search button:hover{background:var(--brunatny)}
 .slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
   background:var(--butelkowa);width:100%;max-width:none;margin:0 auto;aspect-ratio:16/8.6;max-height:600px}
 @media (min-width:761px){
   .page{height:100vh;height:100dvh;overflow:hidden}
   .srodek{flex:1 1 auto;min-height:0}
   .prawa{min-height:0}
-  .main{display:flex;flex:1 1 auto;min-height:0;padding:0}
+  .main{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;padding:0}
   .slider{flex:1 1 auto;height:100%;min-height:0;max-height:none;aspect-ratio:auto;margin:0;border:0}
   .sl-track,.sl-slide{height:100%;min-height:100%}
+  body.has-home-cta .page{height:auto;min-height:100vh;overflow:visible}
+  body.has-home-cta .srodek{flex:0 0 auto;min-height:100vh}
+  body.has-home-cta .prawa{min-height:100vh}
 }
 .sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
 .sl-slide{flex:0 0 100%;position:relative;display:flex;align-items:flex-end;overflow:hidden}
@@ -406,6 +414,10 @@ html.dotyk .social{margin-top:14px}
   </div>
 
   <main class="main">
+    <form class="home-search" action="szukaj.html" method="get" role="search" aria-label="Szukaj produktów">
+      <input type="search" name="q" placeholder="Szukaj produktu po nazwie lub tagu…" aria-label="Nazwa lub tag produktu" minlength="2">
+      <button type="submit">Szukaj</button>
+    </form>
     <div class="slider" id="slider" aria-label="Najważniejsze informacje — przewijane slajdy">
       <div class="sl-track" id="sl-track">
 
@@ -466,7 +478,7 @@ html.dotyk .social{margin-top:14px}
     </div>
   </main>
 
-  <section class="cta" id="cta-sekcja">
+  <section class="cta" id="cta-sekcja" style="display:none">
     <div class="jak" id="cta-tresc-box">
       <h2>Jak zamówić</h2>
       <p class="pod">Trzy kroki do dekoracji z naszą sygnaturą — bezpośrednio i na wymiar.</p>
@@ -633,9 +645,7 @@ html.dotyk .social{margin-top:14px}
       var tlo = ob === 'gradient'
         ? 'background-image:linear-gradient(135deg,#1F3A32,#6B4530)'
         : "background-image:url('" + String(ob || '').replace(/'/g, '%27') + "')";
-      var zoomTla = Math.max(100, Math.min(200, Number(k.zoomTla) || 100));
-      var przesuniecieTla = Math.max(-100, Math.min(100, Number(k.przesuniecieTla) || 0));
-      var stylTla = tlo + ';transform:translateY(' + przesuniecieTla + '%) scale(' + (zoomTla / 100) + ');transform-origin:center center';
+      var stylTla = tlo + ';background-repeat:no-repeat;background-position:center;background-size:cover';
       return '<div class="sl-slide" data-sl="' + esc(k.id || '') + '">' +
         '<div class="sl-bg" style="' + stylTla + '"></div>' +
         '<div class="sl-cien"></div>' +
@@ -643,6 +653,26 @@ html.dotyk .social{margin-top:14px}
         (k.karty ? '<div class="sl-karty"' + (k.karty === 'odwrotnie' ? ' data-odw="1"' : '') + '></div>' : '') +
         '</div></div>';
     }).join('');
+    track.querySelectorAll('.sl-slide').forEach(function(slide,idx){
+      var k=kafle[idx]||{}, bg=slide.querySelector('.sl-bg'), src=slMediaRozwiaz(k.obraz||'');
+      if(!bg||!src||src==='gradient')return;
+      var im=new Image(); im.onload=function(){
+        function applyCrop(){
+          var box=bg.getBoundingClientRect();if(!box.width||!box.height)return;
+          var zoom=Math.max(50,Math.min(200,Number(k.zoomTla)||100));
+          var minZoom=Math.max(50,box.width/im.naturalWidth*100,box.height/im.naturalHeight*100);
+          var actual=Math.max(zoom,minZoom),iw=im.naturalWidth*actual/100,ih=im.naturalHeight*actual/100;
+          var mx=Math.max(0,(iw-box.width)/2),my=Math.max(0,(ih-box.height)/2);
+          var x=Math.max(-100,Math.min(100,Number(k.przesuniecieTlaX)||0));
+          var y=Math.max(-100,Math.min(100,Number(k.przesuniecieTlaY)||0));
+          bg.style.backgroundSize=iw+'px '+ih+'px';
+          bg.style.backgroundPosition='calc(50% + '+(mx*x/100)+'px) calc(50% + '+(my*y/100)+'px)';
+        }
+        applyCrop();
+        if(window.ResizeObserver){var ro=new ResizeObserver(applyCrop);ro.observe(bg);}
+        else window.addEventListener('resize',applyCrop);
+      }; im.src=src;
+    });
     track.querySelectorAll('.sl-karty').forEach(function(el){
       var lista = el.hasAttribute('data-odw') ? kat.slice().reverse().slice(0, 3) : kat.slice(0, 3);
       var html = lista.map(karta).join('');
@@ -739,10 +769,11 @@ html.dotyk .social{margin-top:14px}
   uruchomSlider(autoplayS);
 
   var box = document.getElementById('cta-tresc-box');
-  if (box) {
-    box.innerHTML =
-      dane.ctaTresc || domyslne.ctaTresc || DOMYS.ctaTresc;
-  }
+  if (box) box.innerHTML = dane.ctaTresc || domyslne.ctaTresc || DOMYS.ctaTresc;
+  var ctaSekcja = document.getElementById('cta-sekcja');
+  var pokazJak = dane.ctaWidoczny === true;
+  if (ctaSekcja) ctaSekcja.style.display = pokazJak ? '' : 'none';
+  document.body.classList.toggle('has-home-cta', pokazJak);
 }
   wczytaj();
 })();
