@@ -156,14 +156,14 @@
       return '<span><a href="index.html">Strona główna</a><span class="sep">·</span>' +
         '<a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
         '<a href="kontakt.html">Kontakt</a></span>' +
-        '<span>© Sygnatura 2026 · wersja 28.72</span>';
+        '<span>© Sygnatura 2026 · wersja 28.73</span>';
     }
     const czesci = ['<a href="regulamin.html">Regulamin</a>', '<a href="jak-pracujemy.html">Jak pracujemy</a>'];
     STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; }).forEach(function (s) {
       czesci.push('<a href="podstrona.html?s=' + encodeURIComponent(s.slug) + '">' + s.tytul + '</a>');
     });
     return '<span>' + czesci.join('<span class="sep">·</span>') + '</span>' +
-      '<span>© Sygnatura 2026 · wersja 28.72</span>';
+      '<span>© Sygnatura 2026 · wersja 28.73</span>';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
