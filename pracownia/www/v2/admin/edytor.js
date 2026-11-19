@@ -39,14 +39,31 @@
      który panel zapisał przy logowaniu. Token ratuje sytuację, gdy proxy
      podglądu gubi ciasteczka. */
   function token() {
-    try { return localStorage.getItem('syg-token') || ''; } catch (_) { return ''; }
+    try { const t = localStorage.getItem(KLUCZ_TOKENU); if (t) return t; } catch (_) {}
+    try { const s = sessionStorage.getItem(KLUCZ_TOKENU); if (s) return s; } catch (_) {}
+    return '';
   }
   function api(droga, opcje) {
     const o = Object.assign({ credentials: 'include' }, opcje || {});
     o.headers = Object.assign({}, o.headers || {});
     const t = token();
-    if (t) o.headers.Authorization = 'Bearer ' + t;
+    if (t) {
+      o.headers.Authorization = 'Bearer ' + t;
+      o.headers['X-Syg-Token'] = t;
+    }
     return fetch(ADRES_API + droga, o);
+  }
+  async function pobierzStan() {
+    let odp = await api('/api/stan');
+    const t = token();
+    if (odp.status === 401 && t) {
+      odp = await api('/api/stan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: t })
+      });
+    }
+    return odp;
   }
 
   function komunikat(tekst, blad) {
@@ -59,7 +76,7 @@
   /* ---------- pobranie danych produktu do edycji ---------- */
   async function daneProduktu(id) {
     try {
-      const odp = await api('/api/stan');
+      const odp = await pobierzStan();
       if (!odp.ok) return null;
       const d = await odp.json();
       return (d.produkty || []).find((p) => p.id === id) || null;
@@ -70,6 +87,8 @@
   async function zapiszPole(klucz, wartosc) {
     const cialo = { ustawienia: {} };
     cialo.ustawienia[klucz] = wartosc;
+    const t = token();
+    if (t) cialo.token = t;
     const odp = await api('/api/zapisz', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -83,10 +102,13 @@
   }
 
   async function zapiszProdukt(zmiany) {
+    const cialo = { produkty: [Object.assign({ id: produkt.id }, zmiany)] };
+    const t = token();
+    if (t) cialo.token = t;
     const odp = await api('/api/zapisz', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ produkty: [Object.assign({ id: produkt.id }, zmiany)] })
+      body: JSON.stringify(cialo)
     });
     if (!odp.ok) {
       const d = await odp.json().catch(() => ({}));
@@ -315,7 +337,7 @@
      odpowiedzi — 200 z „ok:false" to jeszcze nie sesja. */
   async function czyZalogowany() {
     try {
-      const odp = await api('/api/stan');
+      const odp = await pobierzStan();
       if (!odp.ok) return false;
       const d = await odp.json().catch(() => ({}));
       return d.ok === true;

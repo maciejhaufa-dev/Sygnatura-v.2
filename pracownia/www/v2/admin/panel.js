@@ -20,20 +20,41 @@
      i w localStorage (na wypadek trybu prywatnego lub blokady iframe). */
   function token() {
     if (pamiecToken) return pamiecToken;
-    try { return localStorage.getItem(KLUCZ_TOKENU) || ''; } catch (_) { return ''; }
+    try { const t = localStorage.getItem(KLUCZ_TOKENU); if (t) return t; } catch (_) {}
+    try { const s = sessionStorage.getItem(KLUCZ_TOKENU); if (s) return s; } catch (_) {}
+    return '';
   }
   function zapamietajToken(t) {
     pamiecToken = t || '';
     try {
       t ? localStorage.setItem(KLUCZ_TOKENU, t) : localStorage.removeItem(KLUCZ_TOKENU);
-    } catch (_) { /* tryb prywatny — zostaje pamiecToken + ciasteczko */ }
+    } catch (_) { /* tryb prywatny — zostaje pamiecToken + sessionStorage + ciasteczko */ }
+    try {
+      t ? sessionStorage.setItem(KLUCZ_TOKENU, t) : sessionStorage.removeItem(KLUCZ_TOKENU);
+    } catch (_) {}
   }
   function zapytanie(droga, opcje) {
     const o = Object.assign({ credentials: 'same-origin' }, opcje || {});
     o.headers = Object.assign({}, o.headers || {});
     const t = token();
-    if (t) o.headers.Authorization = 'Bearer ' + t;
+    if (t) {
+      o.headers.Authorization = 'Bearer ' + t;
+      o.headers['X-Syg-Token'] = t;
+    }
     return fetch(API + droga, o);
+  }
+  async function pobierzStan() {
+    let odp = await zapytanie('/api/stan');
+    const t = token();
+    if (odp.status === 401 && t) {
+      // jeśli proxy wycięło ciasteczko i nagłówki, dosyłamy token w treści POST
+      odp = await zapytanie('/api/stan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: t })
+      });
+    }
+    return odp;
   }
   const el = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g,
@@ -129,7 +150,7 @@
   async function start() {
     let odp;
     try {
-      odp = await zapytanie('/api/stan');
+      odp = await pobierzStan();
     } catch (_) {
       const b = el('#blad-logowania');
       if (b) b.textContent = 'Brak połączenia z serwerem panelu. Odśwież stronę.';
@@ -313,10 +334,13 @@
     przycisk.disabled = true;
     komunikat('Zapisuję…');
     try {
+      const t = token();
+      const cialoZapisu = { produkty: stan.produkty, ustawienia };
+      if (t) cialoZapisu.token = t;
       const odp = await zapytanie('/api/zapisz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ produkty: stan.produkty, ustawienia })
+        body: JSON.stringify(cialoZapisu)
       });
       const d = await odp.json().catch(() => ({}));
       if (odp.ok && d.ok) {
@@ -335,7 +359,12 @@
 
   /* ---------- wylogowanie ---------- */
   el('#przycisk-wyloguj').addEventListener('click', async () => {
-    await zapytanie('/api/wyloguj', { method: 'POST' }).catch(() => {});
+    const t = token();
+    await zapytanie('/api/wyloguj', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(t ? { token: t } : {})
+    }).catch(() => {});
     zapamietajToken('');
     location.reload();
   });
@@ -350,6 +379,6 @@
   /* ---------- próba wejścia, gdy sesja już jest ---------- */
   if (typeof fetch === 'function') {
     // przy wejściu: jeśli token/ciasteczko wciąż ważne, wchodzimy bez pytania o hasło
-    zapytanie('/api/stan').then((o) => { if (o.ok) start(); }).catch(() => {});
+    pobierzStan().then((o) => { if (o.ok) start(); }).catch(() => {});
   }
 })();

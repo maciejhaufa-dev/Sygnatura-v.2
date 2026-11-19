@@ -23,6 +23,7 @@ const DANE = join(ROOT, 'admin', 'panele');
 const PLIK_DANYCH = join(DANE, 'dane.json');
 const PLIK_HASLA = join(DANE, '.haslo');
 const PLIK_NAKLADKI = join(DANE, 'dane.js');   // to samo, ale jako skrypt dla strony
+const PLIK_SESJI = join(DANE, '.sesje.json');
 const PORT = Number(process.argv[2] || process.env.PORT || 8003);
 const HOST = process.env.HOST || '0.0.0.0';
 
@@ -46,28 +47,62 @@ async function przygotuj() {
   return haslo;
 }
 
-/* ---------- sesje w pamięci (gasną po restarcie) ---------- */
+/* ---------- sesje (pamięć + dysk, żeby restart nie wyrzucał) ---------- */
 const sesje = new Map();
-function nowaSesja() {
+async function wczytajSesje() {
+  try {
+    const lista = JSON.parse(await readFile(PLIK_SESJI, 'utf8'));
+    const teraz = Date.now();
+    for (const [k, wygasa] of Object.entries(lista || {})) {
+      if (typeof wygasa === 'number' && wygasa > teraz) sesje.set(k, wygasa);
+    }
+  } catch { /* brak pliku sesji przy pierwszym uruchomieniu */ }
+}
+async function zapiszSesje() {
+  const teraz = Date.now();
+  const obj = {};
+  for (const [k, wygasa] of sesje.entries()) {
+    if (wygasa > teraz) obj[k] = wygasa;
+    else sesje.delete(k);
+  }
+  await writeFile(PLIK_SESJI, JSON.stringify(obj), { mode: 0o600 }).catch(() => {});
+}
+async function nowaSesja() {
   const t = randomBytes(24).toString('hex');
   sesje.set(t, Date.now() + 1000 * 60 * 60 * 8); // 8 h
+  await zapiszSesje();
   return t;
 }
-function tokenZ(req) {
-  // 1) ciasteczko (działa, gdy przeglądarka je zachowa),
-  // 2) nagłówek Authorization: Bearer … (działa zawsze — także za proxy,
-  //    które gubi ciasteczka; token leży w localStorage przeglądarki)
-  const zCookie = (req.headers.cookie || '').match(/(?:^|;\s*)syg_sesja=([a-f0-9]+)/)?.[1];
-  if (zCookie) return zCookie;
-  const zNaglowka = (req.headers.authorization || '').match(/^Bearer\s+([a-f0-9]+)$/i)?.[1];
-  return zNaglowka || null;
+function wszystkieTokenyZ(req, body) {
+  const lista = [];
+  const xSyg = String(req.headers['x-syg-token'] || '').match(/^[a-f0-9]+$/i)?.[0];
+  if (xSyg) lista.push(xSyg);
+  const zNaglowka = String(req.headers.authorization || '').match(/^Bearer\s+([a-f0-9]+)$/i)?.[1];
+  if (zNaglowka) lista.push(zNaglowka);
+  const zCiala = body && typeof body.token === 'string' ? body.token.match(/^[a-f0-9]+$/i)?.[0] : null;
+  if (zCiala) lista.push(zCiala);
+  const ciastko = String(req.headers.cookie || '');
+  for (const m of ciastko.matchAll(/(?:^|;\s*)syg_sesja=([a-f0-9]+)/g)) {
+    if (m[1]) lista.push(m[1]);
+  }
+  return [...new Set(lista)];
 }
-function sesjaOK(req) {
-  const t = tokenZ(req);
-  if (!t) return false;
-  const wygasa = sesje.get(t);
-  if (!wygasa || wygasa < Date.now()) { sesje.delete(t); return false; }
-  return true;
+function sesjaOK(req, body) {
+  const kandydaci = wszystkieTokenyZ(req, body);
+  const teraz = Date.now();
+  for (const t of kandydaci) {
+    const wygasa = sesje.get(t);
+    if (wygasa && wygasa >= teraz) return true;
+    if (wygasa && wygasa < teraz) sesje.delete(t);
+  }
+  return false;
+}
+function skrotNaglowkow(req, body) {
+  const c = req.headers.cookie ? 'tak' : 'nie';
+  const a = req.headers.authorization ? 'tak' : 'nie';
+  const x = req.headers['x-syg-token'] ? 'tak' : 'nie';
+  const b = body && body.token ? 'tak' : 'nie';
+  return `cookie=${c} auth=${a} xsyg=${x} body=${b}`;
 }
 
 const json = (res, kod, obj) => {
@@ -76,7 +111,9 @@ const json = (res, kod, obj) => {
 };
 
 function ciasteczkoSesji(req, wartosc, maxAge) {
-  const https = String(req.headers['x-forwarded-proto'] || '').toLowerCase() === 'https';
+  const proto = String(req.headers['x-forwarded-proto'] || '').toLowerCase();
+  const origin = String(req.headers.origin || req.headers.referer || '').toLowerCase();
+  const https = proto === 'https' || origin.startsWith('https://');
   const atrybuty = https ? 'SameSite=None; Secure' : 'SameSite=Lax';
   return `syg_sesja=${wartosc}; HttpOnly; ${atrybuty}; Path=/; Max-Age=${maxAge}`;
 }
@@ -112,6 +149,7 @@ const TYPY = {
 };
 
 const haslo = await przygotuj();
+await wczytajSesje();
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -127,7 +165,7 @@ http.createServer(async (req, res) => {
       const podane = Buffer.from(sha(String(d.haslo || '').trim()));
       const wzor = Buffer.from(sha(haslo));
       if (podane.length === wzor.length && timingSafeEqual(podane, wzor)) {
-        const t = nowaSesja();
+        const t = await nowaSesja();
         console.log('[api] POST /api/logowanie -> 200' + (formularz ? ' (formularz)' : ''));
         if (formularz) {
           res.writeHead(303, {
@@ -161,19 +199,22 @@ http.createServer(async (req, res) => {
     if (p === '/api/wyloguj' && req.method === 'POST') {
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
-      const t = tokenZ(req);
-      if (t) sesje.delete(t);
+      const d = await cialo(req);
+      for (const t of wszystkieTokenyZ(req, d)) sesje.delete(t);
+      await zapiszSesje();
       res.writeHead(200, { 'Content-Type': 'application/json', 'Set-Cookie': ciasteczkoSesji(req, '', 0) });
       res.end('{"ok":true}');
       return;
     }
 
-    if (p === '/api/stan') {
-      // tryb klik-w-element czyta ten adres prosto ze strony (inny port)
+    if (p === '/api/stan' && (req.method === 'GET' || req.method === 'POST')) {
+      // tryb klik-w-element czyta ten adres prosto ze strony (inny port);
+      // POST jest zapasem, gdyby proxy wycinało nagłówki i ciasteczka w GET
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
-      const ok = sesjaOK(req);
-      console.log('[api] GET /api/stan -> ' + (ok ? 200 : 401));
+      const d = req.method === 'POST' ? await cialo(req) : null;
+      const ok = sesjaOK(req, d);
+      console.log(`[api] ${req.method} /api/stan -> ${ok ? 200 : 401} (${skrotNaglowkow(req, d)})`);
       if (!ok) return json(res, 401, { ok: false, blad: 'Zaloguj się.' });
       return json(res, 200, { ok: true, ...(await czytajDane()) });
     }
@@ -182,7 +223,7 @@ http.createServer(async (req, res) => {
       res.writeHead(204, {
         'Access-Control-Allow-Origin': req.headers.origin || '*',
         'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Syg-Token',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
       });
       return res.end();
@@ -191,10 +232,10 @@ http.createServer(async (req, res) => {
     if (p === '/api/zapisz' && req.method === 'POST') {
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
-      const ok = sesjaOK(req);
-      console.log('[api] POST /api/zapisz -> ' + (ok ? 200 : 401));
-      if (!ok) return json(res, 401, { ok: false, blad: 'Sesja wygasła — zaloguj się ponownie.' });
       const d = await cialo(req);
+      const ok = sesjaOK(req, d);
+      console.log(`[api] POST /api/zapisz -> ${ok ? 200 : 401} (${skrotNaglowkow(req, d)})`);
+      if (!ok) return json(res, 401, { ok: false, blad: 'Sesja wygasła — zaloguj się ponownie.' });
       const stan = await czytajDane();
       const kopia = JSON.stringify(stan);
       // zwykły zapis z panelu przysyła całe listy; tryb klik-w-element
