@@ -200,19 +200,25 @@ ul{margin:0;padding:0;list-style:none}
   position:relative;background:var(--krem);
   display:grid;grid-template-columns:minmax(0,41fr) minmax(0,59fr);
   align-items:stretch;min-height:clamp(300px,30.8vw,470px);
+  isolation:isolate;          /* tekst i zdjęcie w osobnych warstwach */
 }
 .hero-lewa{
+  position:relative;z-index:2;container-type:inline-size;
   padding:clamp(26px,3.4vw,50px) clamp(22px,2.4vw,44px) clamp(24px,3vw,44px) var(--pad);
-  display:flex;flex-direction:column;justify-content:center;
+  display:flex;flex-direction:column;justify-content:center;min-width:0;
 }
+/* Rozmiar pisma zależy od szerokości KOLUMNY (cqw), nie okna — dzięki temu
+   „Osobiste detale,” / „które zostają na lata” zawsze mieszczą się w dwóch
+   liniach i nigdy nie wchodzą na zdjęcie (10,35 em ≈ 9,7cqw). */
 .hero h1{
-  color:var(--butelkowa-makieta);max-width:16ch;
-  font-size:clamp(28px,3.55vw,53px);font-weight:500;line-height:1.1;letter-spacing:-.004em;
+  color:var(--butelkowa-makieta);
+  font-size:clamp(23px,9.7cqw,53px);font-weight:500;line-height:1.12;letter-spacing:-.004em;
+  overflow-wrap:break-word;hyphens:none;
 }
 .hero h1 em{font-style:normal;color:inherit}
 .hero .hero-lead{
-  margin-top:clamp(12px,1.5vw,22px);max-width:32ch;
-  font-size:clamp(13px,1.02vw,15.5px);color:#5E5B56;line-height:1.6;
+  margin-top:clamp(10px,1.4vw,20px);max-width:34ch;
+  font-size:clamp(12.5px,0.98vw,15px);color:#5E5B56;line-height:1.6;
 }
 .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(18px,2.3vw,32px)}
 .hero-actions .btn{
@@ -222,16 +228,18 @@ ul{margin:0;padding:0;list-style:none}
 }
 .hero-actions .btn:hover{background:#0F2A20;border-color:#0F2A20}
 .hero-atuty{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.1vw,16px);
-  margin-top:clamp(20px,2.8vw,40px);
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(6px,0.9vw,14px);
+  margin-top:clamp(18px,2.6vw,38px);
 }
+.hero-atuty li{min-width:0}
+.hero-atuty b,.hero-atuty span{overflow-wrap:break-word}
 .hero-atuty li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start}
 .hero-atuty svg{width:24px;height:24px;color:var(--zloty-makieta);margin-top:1px}
 .hero-atuty b{display:block;font-size:11px;font-weight:600;color:var(--butelkowa-makieta);line-height:1.3}
 .hero-atuty span{display:block;font-size:10px;color:#6F6A62;line-height:1.32;margin-top:3px}
 
 /* kadr: jedno prawdziwe zdjęcie, dociśnięte do prawej krawędzi */
-.hero-kadr{margin:0;position:relative;overflow:hidden;background:var(--krem-3)}
+.hero-kadr{margin:0;position:relative;overflow:hidden;background:var(--krem-3);min-width:0;z-index:1}
 .hero-kadr img{width:100%;height:100%;object-fit:cover;object-position:62% 50%}
 
 /* braki w danych — wyraźny placeholder zamiast wymyślonego zdjęcia */
@@ -395,13 +403,18 @@ ul{margin:0;padding:0;list-style:none}
 .foot-main{
   max-width:var(--max);margin:0 auto;padding:clamp(28px,3.2vw,42px) var(--pad) clamp(26px,3vw,38px);
   display:grid;
-  grid-template-columns:minmax(0,230fr) minmax(0,230fr) minmax(0,215fr) minmax(0,270fr) minmax(0,265fr);
-  gap:clamp(20px,3vw,44px);align-items:start;
+  /* pięć elementów w jednym rzędzie: znak | O nas | linki | social+newsletter | kontakt */
+  grid-template-columns:
+    minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.25fr) minmax(0,1.1fr);
+  gap:clamp(14px,2vw,30px);align-items:start;
 }
+.foot-main > *{min-width:0}
+.foot-main .brand-text{min-width:0}
+.foot-main .brand-text b{white-space:normal;overflow-wrap:anywhere}
 .foot-brand{display:flex;align-items:flex-start}
 .foot-main .brand{margin:0}
-.foot-main .brand img{height:62px}
-.foot-main .brand-text b{color:#F2EADD;font-size:21px;letter-spacing:.15em;line-height:1.14}
+.foot-main .brand img{height:54px}
+.foot-main .brand-text b{color:#F2EADD;font-size:19px;letter-spacing:.12em;line-height:1.16}
 .foot-main .brand-text > span{color:#C9AE84;font-size:8.5px;margin-top:7px}
 .foot-about{font-size:12.5px;color:#CFC5B6;max-width:30ch;line-height:1.62}
 .foot-main h4{
@@ -409,7 +422,8 @@ ul{margin:0;padding:0;list-style:none}
   color:#F2EADD;margin:4px 0 14px;
 }
 .foot-main ul{display:grid;gap:9px}
-.foot-main a{font-size:12.5px;color:#CFC5B6}
+.foot-main a{font-size:12.5px;color:#CFC5B6;overflow-wrap:anywhere}
+.foot-main li,.foot-contact span{overflow-wrap:anywhere}
 .foot-main a:hover{color:#fff;text-decoration:underline;text-decoration-color:var(--zloty-makieta);text-underline-offset:3px}
 .foot-contact li{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:#CFC5B6}
 .foot-contact svg{width:15px;height:15px;flex:none;color:#C9AE84;margin-top:2px}
@@ -632,7 +646,7 @@ ul{margin:0;padding:0;list-style:none}
   .hero{grid-template-columns:1fr;min-height:0}
   .hero-kadr{order:-1;min-height:clamp(200px,46vw,300px)}
   .hero-lewa{padding:clamp(22px,5vw,30px) var(--pad) clamp(24px,5vw,32px)}
-  .hero h1{max-width:none;font-size:clamp(27px,7vw,34px)}
+  .hero h1{max-width:none;font-size:clamp(25px,7.2vw,34px)}
   .hero .hero-lead{max-width:none}
 }
 
@@ -684,7 +698,7 @@ ul{margin:0;padding:0;list-style:none}
   .head-akcje .ha-item.konto{display:none}   /* miejsce na telefon, konto i koszyk */
   .nav-toggle{width:40px;height:40px}
   .search input{height:42px;font-size:13px}
-  .hero h1{font-size:clamp(26px,7.8vw,32px)}
+  .hero h1{font-size:clamp(24px,7.4vw,31px)}
   .pcard-cena{font-size:19px}
   .cta-box{padding:16px}
   .cta-box a.duzy{font-size:18px}

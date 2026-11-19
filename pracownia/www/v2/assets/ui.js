@@ -46,6 +46,7 @@
     serce2: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4S3.5 15 3.5 9.3A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 2.7c0 5.7-8.5 11.1-8.5 11.1Z"/></svg>',
     fb: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/></svg>',
     ig: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" stroke="none"/></svg>',
+    yt: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.4a2.5 2.5 0 0 0-1.8-1.8C18.2 5.2 12 5.2 12 5.2s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.4C2 9 2 12 2 12s0 3 .4 4.6a2.5 2.5 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C22 15 22 12 22 12s0-3-.4-4.6ZM10 15.2V8.8l5.2 3.2Z"/></svg>',
     pin2: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9l1.2-5s-.3-.6-.3-1.5c0-1.4.8-2.4 1.8-2.4.9 0 1.3.6 1.3 1.4 0 .9-.6 2.2-.9 3.4-.2 1 .5 1.8 1.5 1.8 1.8 0 3.2-1.9 3.2-4.7 0-2.4-1.8-4.1-4.3-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l-.3 1.1c-.1.4-.3.5-.6.3-1.1-.5-1.8-2.1-1.8-3.4 0-2.8 2-5.3 5.8-5.3 3 0 5.4 2.2 5.4 5 0 3-1.9 5.4-4.5 5.4-.9 0-1.7-.5-2-1l-.6 2.2c-.2.8-.7 1.7-1 2.3A10 10 0 1 0 12 2z"/></svg>'
   };
 
@@ -53,6 +54,17 @@
      sekcji (anchor) — nie tworzymy linków „w pustkę” ani pustych stron. */
   /* Etykiety i kolejność 1:1 z makiety. Każda pozycja prowadzi do
      istniejącej strony albo do konkretnej sekcji na stronie. */
+  /* Kanały społecznościowe. Trzeci element = adres; pusty = nie pokazujemy
+     ikony, żeby nie prowadziła donikąd. Wpisujemy tu prawdziwy link do
+     kanału YouTube, gdy będzie — ikona pojawi się sama.
+     Facebook / Instagram / Pinterest: adresy z profilu firmy. */
+  const SOCIAL = [
+    ['Facebook', 'fb', 'https://www.facebook.com/p/Studio-SygNatura-61595255863642/'],
+    ['Instagram', 'ig', 'https://www.instagram.com/studiosygnatura/'],
+    ['Pinterest', 'pin2', 'https://pl.pinterest.com/studiosygnatura/'],
+    ['YouTube', 'yt', '']
+  ];
+
   const MENU = [
     ['sklep.html', 'Produkty', true],
     ['realizacje.html', 'Szopki'],
@@ -187,9 +199,7 @@
     <div>
       <h4>Bądźmy w kontakcie</h4>
       <div class="social">
-        <a href="https://www.facebook.com/p/Studio-SygNatura-61595255863642/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">${I.fb}</a>
-        <a href="https://www.instagram.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">${I.ig}</a>
-        <a href="https://pl.pinterest.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" title="Pinterest">${I.pin2}</a>
+        ${SOCIAL.filter(s => s[2]).map(s => `<a href="${esc(s[2])}" target="_blank" rel="noopener noreferrer" aria-label="${esc(s[0])}" title="${esc(s[0])}">${I[s[1]]}</a>`).join('')}
       </div>
       <p class="social-label">Zapisz się do newslettera</p>
       <form class="newsletter" data-newsletter novalidate>
@@ -205,7 +215,7 @@
       <ul class="foot-contact">
         <li>${I.tel}<a href="${esc(telHref)}">${esc(F.tel)}</a></li>
         <li>${I.mail}<a href="mailto:${esc(F.mail)}">${esc(F.mail)}</a></li>
-        <li>${I.pin}<span>Studio Sygnatura<br>${esc(F.obszar)}</span></li>
+        <li>${I.pin}<span>Studio Sygnatura, ${esc(F.obszar)}</span></li>
       </ul>
     </div>
   </div>

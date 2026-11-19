@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 600" role="img" aria-label="Miejsce na zdjęcie z pracowni">
+  <rect width="1180" height="600" fill="#EDE4D6"/>
+  <rect x="0" y="0" width="700" height="600" fill="#E7DCCB"/>
+  <g fill="none" stroke="#C9B99F" stroke-width="2" stroke-dasharray="10 8">
+    <rect x="42" y="42" width="616" height="516" rx="3"/>
+    <rect x="746" y="42" width="392" height="516" rx="3"/>
+  </g>
+  <g fill="#A2937C" font-family="Georgia, serif" font-size="19" text-anchor="middle">
+    <text x="350" y="286">zdjęcie główne</text>
+    <text x="350" y="314" font-size="14" fill="#B2A48E">1180 × 600 px</text>
+    <text x="942" y="286">zdjęcie boczne</text>
+    <text x="942" y="314" font-size="14" fill="#B2A48E">768 × 1032 px</text>
+  </g>
+</svg>
