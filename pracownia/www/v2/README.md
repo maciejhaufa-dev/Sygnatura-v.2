@@ -7,8 +7,10 @@ tą pracą dotknięta.
 
 ```
 pracownia/www/v2/
-  index.html          strona główna: nagłówek, wyszukiwarka, wyróżniony kontakt,
-                      hero, produkty, realizacje, pasek kontaktu, o pracowni
+  index.html          strona główna wg makiety: pasek informacyjny, nagłówek
+                      z wyszukiwarką i wyeksponowanym kontaktem, hero z mozaiką
+                      prawdziwych zdjęć, „Wybrane dla Ciebie”, pasek zaufania,
+                      realizacje, pas CTA, o pracowni, stopka z newsletterem
   sklep.html          lista produktów + informacja o braku koszyka/konta
   produkt.html        karta produktu (?id=katalog-1 | katalog-2 | pers-grawer)
   realizacje.html     wszystkie realizacje z pracowni
@@ -80,6 +82,22 @@ głównej jest sprawdzana testem: musi zgadzać się z `data/dane.js`.
 - **Kategorie** produktów pochodzą z danych (Dekoracje świąteczne, Szyldy
   i tablice, Prezenty personalizowane) — nie zmieniamy ich struktury.
 
+## Układ strony głównej a makieta
+
+Strona główna odtwarza układ z dostarczonego mockupu (pasek → nagłówek z szukaniem
+→ menu → hero → 3 karty → pasek zalet → stopka). Świadome różnice, wynikające
+z braku danych albo z zasady „nie zmyślamy”:
+
+| Makieta | W tej wersji | Dlaczego |
+|---|---|---|
+| ikony konta i koszyka | telefon, e-mail, „Zapytaj o wycenę” | konto i koszyk nie działają, więc ich nie udajemy |
+| telefon 666 123 456 | 538 124 538 | numer z danych firmy (`docs/assets/config.js`) |
+| ceny 139 / 199 / 169 zł | 249 / 189 / 89 zł | ceny z katalogu produkcyjnego |
+| „Realizacja 3–7 dni roboczych” | „1–2 dni robocze na odpowiedź z wyceną” | tylko ten termin jest potwierdzony |
+| odznaka „Bestseller” | brak odznaki, sekcja wyjaśniająca | `odznaki.bestseller = null` w danych |
+| adres ulicy w stopce | „Poznań i okolice, woj. wielkopolskie” | w danych nie ma adresu |
+| zdjęcie w hero | trzy prawdziwe zdjęcia produktów | nie wstawiamy wygenerowanych grafik |
+
 ## Czego ten frontend nie rusza
 
 - `docs/` (produkcja, CNAME `studiosygnatura.pl`) — bez zmian.
@@ -107,6 +125,8 @@ Uruchamiane lokalnie na `http://127.0.0.1:8002` (jsdom, prawdziwe pliki przez HT
 - brak błędów JS na wszystkich 9 stronach,
 - kolejność i odznaki kart na stronie głównej, zgodność ceny w hero z danymi,
 - karta produktu (3 produkty + nieistniejące id), miniatury zdjęć, „zobacz też”,
+- wszystkie odnośniki i zdjęcia na 9 stronach → istniejące pliki i kotwice
+  (każda pozycja menu prowadzi do realnej strony albo sekcji),
 - formularz: walidacja pól, zgoda, błąd sieci → komunikat i awaryjny `mailto:`,
 - menu mobilne: `aria-expanded`, klasa `open`, zmiana etykiety na „Zamknij menu”,
 - wyszukiwarka: „szopka”, „krzyzowka”, „grawer”, fraza bez wyników.
