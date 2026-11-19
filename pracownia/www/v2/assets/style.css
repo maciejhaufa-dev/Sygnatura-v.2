@@ -167,15 +167,32 @@ ul{margin:0;padding:0;list-style:none}
   white-space:nowrap;width:max-content;
 }
 
-/* ---------- układ pionowy (stopka): sygnet u góry, pod nim nazwa ---------- */
+/* ---------- układ pionowy (stopka): sygnet u góry, pod nim nazwa ----------
+   W stopce znak ma WYPEŁNIĆ kolumnę, więc skaluje się od jej szerokości
+   (container query na .foot-brand), a nie od sztywnej wysokości sygnetu.
+   Sygnet zajmuje połowę szerokości kolumny, napis — całą jej szerokość,
+   podpis dostaje resztę. Dzięki temu proporcje są zawsze te same,
+   niezależnie od szerokości okna.
+   Wartości w --z-jedn zostają jako zapas dla przeglądarek bez cqw. */
 .znak-pionowo{
-  flex-direction:column;align-items:flex-start;
+  flex-direction:column;align-items:flex-start;width:100%;
   gap:calc(var(--z-jedn) * .16);
 }
 .znak-pionowo .znak-tekst{width:100%}
-.znak-pionowo .znak-sygnet{height:calc(var(--z-jedn) * .62);width:calc(var(--z-jedn) * .62)}
-.znak-pionowo .znak-nazwa .syg,
-.znak-pionowo .znak-nazwa .natura{height:calc(var(--z-jedn) * .44)}
+.znak-pionowo .znak-sygnet{
+  height:auto;width:calc(var(--z-jedn) * .62);aspect-ratio:1;
+}
+.znak-pionowo .znak-nazwa{width:100%}
+.znak-pionowo .znak-nazwa .syg{width:31.3%;height:auto}     /* 1118 / 3572 */
+.znak-pionowo .znak-nazwa .natura{width:68.7%;height:auto}  /* 2454 / 3572 */
+
+/* skala od szerokości kolumny (cqw) — pierwsza deklaracja to zapas
+   dla przeglądarek bez container queries, druga je nadpisuje */
+.znak-pionowo{gap:2.4cqw}
+.znak-pionowo .znak-sygnet{width:min(58cqw,150px)}
+/* 5,2cqw ≈ stopień pisma, przy którym odstęp liter wychodzi ~0,35 em —
+   podpis czyta się jak rozstrzelony podtytuł, a nie jak rozciągnięta masa */
+.znak-pionowo .znak-podpis{font-size:clamp(7px,5.2cqw,13px);margin-top:2.2cqw}
 
 .znak-jasny .znak-podpis{color:var(--miod)}
 .znak-ciemny .znak-podpis{color:var(--miod)}
@@ -470,14 +487,17 @@ ul{margin:0;padding:0;list-style:none}
   max-width:var(--max);margin:0 auto;padding:clamp(28px,3.2vw,42px) var(--pad) clamp(26px,3vw,38px);
   display:grid;
   /* pięć elementów w jednym rzędzie: znak | O nas | linki | social+newsletter | kontakt */
+  /* kolumna znaku jest najszersza — sygnet ma wypełniać ją swoją objętością,
+     a nie być znaczkiem obok tekstu (min. 240 px) */
   grid-template-columns:
-    minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.25fr) minmax(0,1.1fr);
+    minmax(240px,1.45fr) minmax(0,1fr) minmax(0,.95fr) minmax(0,1.2fr) minmax(0,1.05fr);
   gap:clamp(14px,2vw,30px);align-items:start;
 }
 .foot-main > *{min-width:0}
 .foot-main .brand-text{min-width:0}
 .foot-main .brand-text b{white-space:normal;overflow-wrap:anywhere}
-.foot-brand{display:flex;align-items:flex-start}
+/* kolumna znaku jest kontenerem zapytań — patrz .znak-pionowo */
+.foot-brand{display:flex;align-items:flex-start;container-type:inline-size}
 .foot-main .brand{margin:0}
 .foot-main .znak{--z-jedn:52px}
 .foot-about{font-size:12.5px;color:#CFC5B6;max-width:30ch;line-height:1.62}
@@ -652,6 +672,7 @@ ul{margin:0;padding:0;list-style:none}
   .strip li:nth-child(3n+1){border-left:0;padding-left:0}
   .strip li:nth-child(n+4){border-top:1px solid #EFE8DE}
   .foot-main{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .foot-brand{max-width:320px}   /* przy dwóch kolumnach znak nie może urosnąć ponad miarę */
 }
 
 @media (max-width:1020px){
@@ -740,6 +761,7 @@ ul{margin:0;padding:0;list-style:none}
   .strip li.zloty{background:transparent;align-items:flex-start}
   .strip li.zloty svg{margin:2px 0 0 auto}
   .foot-main{grid-template-columns:1fr;gap:24px}
+  .foot-brand{max-width:300px}   /* żeby znak nie dominował nad treścią na telefonie */
   .foot-bottom div{flex-direction:column;gap:4px}
   .pola{grid-template-columns:1fr}
   .faq{grid-template-columns:1fr}
