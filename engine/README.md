@@ -58,6 +58,7 @@ Po zmianach akcji w silniku (w tym uploadu lub publicznego odczytu cennika) trze
 - Sesje są podpisywane po stronie Apps Script i ważne 30 dni; nie opierają się już wyłącznie na krótkotrwałym `CacheService`.
 - W panelu **Ustawienia → Dane logowania administratora** można zmienić e-mail/login i/lub hasło, potwierdzając obecne hasło.
 - Na ekranie logowania „Nie pamiętam hasła” wysyła 6-cyfrowy kod na e-mail aktywnego administratora; kod wygasa po 10 minutach i ma limit prób. Jeśli backend zgłosi brak zgody poczty, uruchom ręcznie `autoryzujPoczteAdmina()` i zaakceptuj zgodę.
+- Awaryjnie, jeśli mail odzyskiwania nie działa: w edytorze Apps Script uruchom `przywrocHasloStartoweAdmina()`. Funkcja zmienia hash wyłącznie istniejącego, aktywnego konta `MAIL_STUDIO` na hash `ADMIN_HASLO_STARTOWE`; nie tworzy arkusza ani konta. Po zalogowaniu od razu ustaw własne hasło w panelu.
 - `media-upload` i pozostałe akcje są wpisami `case` w `doPost` — nie uruchamia się ich ręcznie z listy funkcji Apps Script. Testuj je z panelu strony po wdrożeniu nowej wersji aplikacji.
 - Po zmianie plików `PLIK1.gs` lub `PLIK2.gs` w istniejącym projekcie zapisz i wybierz **Zarządzaj wdrożeniami → Edytuj → Nowa wersja → Wdróż**. Nie uruchamiaj `instaluj()`.
 

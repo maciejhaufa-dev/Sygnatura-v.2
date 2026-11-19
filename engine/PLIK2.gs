@@ -465,6 +465,25 @@ function adminRotujSekretSesji(){
   );
 }
 
+/* Awaryjne odtworzenie pierwszego hasła — uruchamiać ręcznie jako właściciel skryptu.
+   Nie tworzy konta ani arkusza; aktualizuje wyłącznie istniejący, aktywny wiersz MAIL_STUDIO. */
+function przywrocHasloStartoweAdmina(){
+  const email = String(MAIL_STUDIO || '').trim().toLowerCase();
+  const ss = SpreadsheetApp.openById(ARKUSZ_ID);
+  const sh = ss.getSheetByName('Admini');
+  if (!sh) throw new Error('Nie znaleziono istniejącej zakładki Admini — niczego nie zmieniono.');
+  const dane = sh.getDataRange().getValues();
+  let row = -1;
+  for (let i = 1; i < dane.length; i++){
+    if (String(dane[i][0] || '').trim().toLowerCase() === email && String(dane[i][2]) === '1') { row = i; break; }
+  }
+  if (row < 0) throw new Error('Nie znaleziono aktywnego konta administratora MAIL_STUDIO — niczego nie zmieniono.');
+  sh.getRange(row + 1, 2).setValue(sha256(ADMIN_HASLO_STARTOWE));
+  adminRotujSekretSesji();
+  Logger.log('Hasło startowe przywrócone dla istniejącego, aktywnego administratora.');
+  return 'Hasło startowe przywrócone. Zaloguj się i od razu ustaw własne hasło w panelu.';
+}
+
 function adminLogin(d) {
   if (!maKlucz(d)) return bladKlucza();
   const login = String(d.login || '').trim().toLowerCase();
