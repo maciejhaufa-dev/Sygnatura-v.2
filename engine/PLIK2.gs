@@ -350,8 +350,10 @@ function produktyZapisz(d) {
   const dane = sh.getDataRange().getValues();
   for (let i = 1; i < dane.length; i++) {
     if (Number(dane[i][0]) === Number(d.id)) {
+      if (sh.getRange(1, 9).getValue() !== 'tagi') sh.getRange(1, 9).setValue('tagi');
       sh.getRange(i + 1, 4).setValue(Number(d.cena || 0));
       sh.getRange(i + 1, 6).setValue(d.dostepny ? 1 : 0);
+      sh.getRange(i + 1, 9).setValue(String(d.tagi || '').replace(/[\r\n]+/g, ' ').slice(0, 500));
       return { ok: true };
     }
   }

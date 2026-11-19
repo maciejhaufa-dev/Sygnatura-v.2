@@ -46,13 +46,15 @@
   var brak = document.getElementById('brak');
 
   if (q.length < 2){
-    info.textContent = 'Wpisz szukane hasło w wyszukiwarce u góry strony (min. 2 znaki).';
+    info.textContent = 'Wpisz nazwę lub tag produktu (min. 2 znaki).';
     return;
   }
-  var ql = q.toLowerCase();
+  function norm(s){return String(s||'').toLocaleLowerCase('pl-PL').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l');}
+  var ql = norm(q);
   var kat = await SYG.katalog();
   var traf = kat.filter(function(p){
-    return p.dostepny && ((p.nazwa + ' ' + p.opis).toLowerCase().indexOf(ql) !== -1);
+    var tags=p.tagi||p.tags||p.tag||p.kategoria||p.kategorie||''; if(Array.isArray(tags))tags=tags.join(' ');
+    return p.dostepny && norm([p.nazwa,p.opis,tags].join(' ')).indexOf(ql)!==-1;
   });
 
   /* komunikat z poprawną odmianą */
@@ -66,12 +68,13 @@
 
   if (!traf.length){ brak.style.display = 'block'; return; }
 
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
   var html = '';
   traf.forEach(function(p){
     var foto = (p.obraz && /^https?:/.test(p.obraz)) ? p.obraz : 'assets/media/sklep/' + (p.obraz || 'szopka.jpg');
-    html += '<article class="karta"><img class="foto" src="' + foto + '" alt="' + p.nazwa + '">' +
-      '<h2 class="nazwa">' + p.nazwa + '</h2>' +
-      '<p class="opis">' + p.opis + '</p>' +
+    html += '<article class="karta"><img class="foto" src="' + esc(foto) + '" alt="' + esc(p.nazwa) + '">' +
+      '<h2 class="nazwa">' + esc(p.nazwa) + '</h2>' +
+      '<p class="opis">' + esc(p.opis) + '</p>' +
       '<p class="cena">' + SYG.zl(p.cena) + ' / szt.</p>' +
       '<div class="przyciski"><a class="btn" href="sklep.html">Do sklepu →</a></div></article>';
   });

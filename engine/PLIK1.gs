@@ -329,7 +329,8 @@ function katalog() {
       obraz: String(r[4] || ''),
       dostepny: Number(r[5]) === 1,
       gabaryt: String(r[6] || ''),
-      storyId: Number(r[7] || 0)
+      storyId: Number(r[7] || 0),
+      tagi: String(r[8] || '')
     });
   }
   /* jak demo: zwracamy całość — klient sam filtruje dostepny */
