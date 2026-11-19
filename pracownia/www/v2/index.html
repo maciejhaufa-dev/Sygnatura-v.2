@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Studio Sygnatura — drewniane szopki, szyldy i prezenty z Poznania</title>
-<meta name="description" content="Pracownia drewna w Poznaniu. Szopki warstwowe z podświetleniem LED, szyldy z frezowanym napisem i prezenty z grawerem — robione ręcznie, na zamówienie.">
-<meta name="robots" content="noindex"><!-- podgląd testowy: nie indeksujemy, produkcja jest na studiositygnatura.pl -->
+<meta name="description" content="Osobiste detale, które zostają na lata. Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile. Pracownia w Poznaniu.">
+<meta name="robots" content="noindex"><!-- podgląd testowy: nie indeksujemy, produkcja jest na studiosygnatura.pl -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pl_PL">
 <meta property="og:site_name" content="Studio Sygnatura">
-<meta property="og:title" content="Studio Sygnatura — drewniane szopki, szyldy i prezenty">
-<meta property="og:description" content="Ręcznie robione szopki warstwowe, szyldy z napisem i prezenty z grawerem. Pracownia w Poznaniu.">
+<meta property="og:title" content="Studio Sygnatura — osobiste detale, które zostają na lata">
+<meta property="og:description" content="Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile. Pracownia w Poznaniu.">
 <meta property="og:image" content="assets/img/hero-szyld-1600.jpg">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="preload" as="image" href="assets/img/hero-szyld-1600.jpg">
+<link rel="preload" as="image" href="assets/img/prod-szopka-700.jpg">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -21,80 +21,97 @@
 
 <main id="tresc">
 
-  <!-- ================= HERO ================= -->
+  <!-- ================= HERO: tekst z lewej, kadr z prawej ================= -->
   <section class="hero" aria-labelledby="hero-tytul">
-    <div class="hero-media">
-      <img src="assets/img/hero-szyld-1600.jpg" alt="Drewniany napis „Cześć!” na przezroczystej pleksi, w podwójnej ramie na jasnej ścianie" width="1600" height="900" fetchpriority="high">
-    </div>
     <div class="hero-inner">
       <div>
-        <span class="eyebrow">Pracownia drewna · Poznań</span>
-        <h1 id="hero-tytul">Rzeczy z drewna, <em>które zostają</em> na lata.</h1>
-        <p class="hero-lead">Szopki warstwowe z podświetleniem, szyldy z frezowanym napisem i prezenty z grawerem. Projektujemy pod konkretne wnętrze i robimy ręcznie — u siebie, bez podwykonawców.</p>
+        <h1 id="hero-tytul">Osobiste detale, <em>które zostają na lata</em></h1>
+        <p class="hero-lead">Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.</p>
         <div class="hero-actions">
-          <a class="btn gold" href="sklep.html">Zobacz produkty</a>
-          <a class="btn light" href="kontakt.html">Zapytaj o wycenę</a>
+          <a class="btn" href="sklep.html">Zobacz kolekcję <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg></a>
         </div>
-        <div class="hero-facts">
-          <div><b>Ręcznie</b><span>cięcie, szlif i wykończenie</span></div>
-          <div><b>Na wymiar</b><span>napis, imiona, data</span></div>
-          <div><b>Poznań</b><span>odbiór osobisty po ustaleniu</span></div>
+        <ul class="hero-atuty">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c8 0 13-5 13-13-8 0-13 5-13 13Z"/><path d="M5 19c2.4-5 5-8 9-10"/></svg>
+            <div><b>Prawdziwe drewno</b><span>sklejka liściasta i lite drewno</span></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.2S3.6 15 3.6 9.4A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.4 2.6c0 5.6-8.4 10.8-8.4 10.8Z"/></svg>
+            <div><b>Ręczna praca</b><span>z dbałością o detal</span></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5h17v3.6h-17z"/><path d="M5 12.1h14v8.4H5z"/><path d="M12 8.5v12"/><path d="M12 8.5S10.6 3.8 8.3 3.8a2.4 2.4 0 0 0 0 4.7M12 8.5s1.4-4.7 3.7-4.7a2.4 2.4 0 0 1 0 4.7"/></svg>
+            <div><b>Personalizacja</b><span>napis, imiona, data</span></div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- kadr z prawdziwych zdjęć z pracowni — żadnych wymyślonych grafik -->
+      <figure class="hero-kadr">
+        <div class="hero-mozaika">
+          <a class="m1" href="produkt.html?id=katalog-1" aria-label="Szopka bożonarodzeniowa — zobacz produkt">
+            <img src="assets/img/prod-szopka-700.jpg" alt="Szopka warstwowa z podświetleniem LED, z przodu żłóbek i aniołowie" width="700" height="875" fetchpriority="high">
+          </a>
+          <a class="m2" href="produkt.html?id=katalog-2" aria-label="Szyld powitalny — zobacz produkt">
+            <img src="assets/img/prod-szyld-700.jpg" alt="Drewniany napis „Cześć!” na przezroczystej pleksi, w podwójnej ramie" width="700" height="875">
+          </a>
+          <a class="m3" href="produkt.html?id=pers-grawer" aria-label="Grawer okolicznościowy — zobacz produkt">
+            <img src="assets/img/prod-grawer-700.jpg" alt="Tabliczka z grawerem okolicznościowym na jubileusz" width="700" height="875">
+          </a>
+        </div>
+        <figcaption>Z pracowni: szopka warstwowa, napis na pleksi, grawer okolicznościowy</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= WYBRANE DLA CIEBIE ================= -->
+  <section class="section tytul-srodek" id="produkty" aria-labelledby="produkty-tytul">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tytul">
+          <h2 id="produkty-tytul">Wybrane dla Ciebie</h2>
+          <p class="lead">Trzy rzeczy, które robimy na zamówienie w ustalonej cenie. Każdą wykonujemy z Twoim napisem, imieniem albo datą.</p>
         </div>
       </div>
 
-      <aside class="hero-card" aria-label="Produkt z pracowni">
-        <figure>
-          <img src="assets/img/prod-szyld-700.jpg" alt="Szyld powitalny — frezowany napis „Cześć!” w ramie" width="700" height="875" loading="lazy">
-        </figure>
-        <div class="hc-body">
-          <span class="hc-tag">Z pracowni</span>
-          <h2>Szyld powitalny „Witajcie”</h2>
-          <p>Frezowany napis na pleksi, podwójna rama. 50×25×2 cm.</p>
-          <div class="hc-foot">
-            <span class="hc-price">189 zł <small>/ szt.</small></span>
-            <a class="link-arrow" href="produkt.html?id=katalog-2">Zobacz <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
-          </div>
+      <!-- kolejność: nowość → bestseller → okolicznościowy (data/dane.js) -->
+      <div class="grid-prod" data-produkty data-ile="3"></div>
+
+      <div class="pusty-bestseller mt-26">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r=".9" fill="currentColor" stroke="none"/></svg>
+        <div>
+          <h3>Bestsellerów jeszcze nie oznaczamy</h3>
+          <p>Nie mamy potwierdzonych danych o tym, co zamawiacie najczęściej, więc nie stawiamy takiej odznaki na żadnym produkcie. Kolejność kart jest stała: nowość, bestseller, okolicznościowy — bestseller pojawi się, gdy liczby z zamówień będą w arkuszu.</p>
+          <a class="link-arrow" href="sklep.html">Wszystkie produkty <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg></a>
         </div>
-      </aside>
+      </div>
     </div>
   </section>
 
   <!-- ================= PASEK ZAUFANIA ================= -->
   <section class="strip" aria-label="Jak pracujemy">
     <ul>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 11V4.6a1.6 1.6 0 0 1 3.2 0V10"/><path d="M11.2 10V3.6a1.6 1.6 0 0 1 3.2 0V10"/><path d="M14.4 10.4V5.6a1.6 1.6 0 0 1 3.2 0V14c0 4-2.6 7-6.6 7-2.6 0-4-1.1-5.3-2.9l-2-3a1.7 1.7 0 0 1 2.7-2L8 15"/></svg><span>Robione ręcznie w pracowni</span></li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c8 0 13-5 13-13-8 0-13 5-13 13Z"/><path d="M5 19c2-5 5-8 9-10"/></svg><span>Sklejka i lite drewno, olej i bejca</span></li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8 4.5 6v6c0 4.6 3.2 8 7.5 9.2 4.3-1.2 7.5-4.6 7.5-9.2V6Z"/><path d="m8.7 12 2.2 2.2 4.3-4.4"/></svg><span>Projekt i wycena przed pracą</span></li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg><span>Odpowiedź w 1–2 dni robocze</span></li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5h11v9h-11z"/><path d="M13.5 10h4l3 3v2.5h-7z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>
+        <div><b>Szybka realizacja</b><span>1–2 dni robocze na odpowiedź z wyceną</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="5.5"/><path d="m9 13.5-1 7 4-2 4 2-1-7"/><path d="m10.4 9 1.2 1.2 2.2-2.2"/></svg>
+        <div><b>Gwarancja jakości</b><span>sprawdzone drewno, ręczne wykończenie</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5a8 8 0 0 1-11.6 7.1L4 19.5l1.1-4.6A8 8 0 1 1 20.5 11.5Z"/><circle cx="9" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="12.2" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="15.4" cy="11.5" r=".9" fill="currentColor" stroke="none"/></svg>
+        <div><b>Pomoc i doradztwo</b><span>napisz lub zadzwoń: 538 124 538</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="1.4"/><path d="m3 6.4 9 6.6 9-6.6"/></svg>
+        <div><b>Zamów indywidualnie</b><span>wycena po opisie projektu</span></div>
+      </li>
+      <li class="zloty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.2S3.6 15 3.6 9.4A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.4 2.6c0 5.6-8.4 10.8-8.4 10.8Z"/></svg>
+        <div><b>Tworzymy z sercem</b><span>dla Ciebie i Twoich bliskich</span></div>
+      </li>
     </ul>
-  </section>
-
-  <!-- ================= PRODUKTY ================= -->
-  <section class="section" id="produkty" aria-labelledby="produkty-tytul">
-    <div class="wrap">
-      <div class="sec-head">
-        <div>
-          <span class="eyebrow">Sklep</span>
-          <h2 id="produkty-tytul">Gotowe do zamówienia</h2>
-          <p class="lead">Trzy rzeczy, które robimy na zamówienie w ustalonej cenie. Każdą wykonujemy z Twoim napisem, imieniem albo datą — szczegóły ustalamy przed realizacją.</p>
-        </div>
-        <a class="link-arrow" href="sklep.html">Wszystkie produkty
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
-      </div>
-
-      <!-- kolejność: nowość → bestseller → okolicznościowy (ustawiana w data/dane.js) -->
-      <div class="grid-prod" data-produkty data-ile="3"></div>
-
-      <div class="pusty-bestseller mt-22">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r=".9" fill="currentColor" stroke="none"/></svg>
-        <div>
-          <h3>Bestsellerów jeszcze nie oznaczamy</h3>
-          <p>Nie mamy potwierdzonych danych o tym, co zamawiacie najczęściej, więc nie stawiamy takiej odznaki na żadnym produkcie. Gdy liczby będą w arkuszu zamówień, oznaczymy je tutaj — kolejność kart to zawsze: nowość, bestseller, okolicznościowy.</p>
-          <a class="link-arrow" href="kontakt.html?temat=sklep">Zapytaj, co wybierają inni
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- ================= REALIZACJE ================= -->
@@ -106,8 +123,7 @@
           <h2 id="realizacje-tytul">Ostatnie realizacje</h2>
           <p class="lead">Zdjęcia naszych prac: szopki, krzyżówki z imionami, deski z grawerem, makrama. Większość z nich robimy na zamówienie — możesz zamówić podobną.</p>
         </div>
-        <a class="link-arrow" href="realizacje.html">Wszystkie realizacje
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+        <a class="link-arrow" href="realizacje.html">Wszystkie realizacje <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg></a>
       </div>
       <div class="grid-real" data-realizacje data-ile="8"></div>
     </div>
@@ -122,11 +138,11 @@
         <p>Napisz, co chcesz zrobić i na kiedy — odpowiemy z ceną i terminem. Przy trudniejszych projektach przygotujemy wstępny rysunek. Pracujemy w Poznaniu i okolicach, wysyłamy w całej Polsce.</p>
       </div>
       <div class="cta-box">
-        <a class="duzy" href="tel:+48538124538"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 16.2v2.6a2 2 0 0 1-2.2 2 18.6 18.6 0 0 1-8.1-2.9 18.3 18.3 0 0 1-5.6-5.6A18.6 18.6 0 0 1 1.7 4.1 2 2 0 0 1 3.7 1.9h2.6a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L7.3 9.5a14.8 14.8 0 0 0 6.6 6.6l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2Z"/></svg>538 124 538</a>
-        <a class="duzy" href="mailto:kontakt@studiosygnatura.pl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="1.6"/><path d="m3 6.2 9 6.8 9-6.8"/></svg>kontakt@studiosygnatura.pl</a>
+        <a class="duzy" href="tel:+48538124538"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 16.2v2.6a2 2 0 0 1-2.2 2 18.6 18.6 0 0 1-8.1-2.9 18.3 18.3 0 0 1-5.6-5.6A18.6 18.6 0 0 1 1.7 4.1 2 2 0 0 1 3.7 1.9h2.6a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L7.3 9.5a14.8 14.8 0 0 0 6.6 6.6l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2Z"/></svg>538 124 538</a>
+        <a class="duzy" href="mailto:kontakt@studiosygnatura.pl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="1.5"/><path d="m3 6.3 9 6.7 9-6.7"/></svg>kontakt@studiosygnatura.pl</a>
         <div class="cta-actions">
-          <a class="btn gold" href="kontakt.html">Formularz kontaktowy</a>
-          <a class="btn light" href="wspolpraca.html">Współpraca i okazje</a>
+          <a class="btn zloty" href="kontakt.html">Formularz kontaktowy</a>
+          <a class="btn jasny" href="wspolpraca.html">Współpraca i okazje</a>
         </div>
       </div>
     </div>
@@ -141,8 +157,8 @@
         <p class="lead mt-14">Studio Sygnatura to mała pracownia w Poznaniu. Robimy rzeczy warstwowo: cięcie, szlif, bejca i olej — aż detal zacznie się bronić sam. Każdy projekt zaczynamy od rozmowy, a kończymy gotową rzeczą do zawieszenia.</p>
         <ul>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8 4.5 6v6c0 4.6 3.2 8 7.5 9.2 4.3-1.2 7.5-4.6 7.5-9.2V6Z"/><path d="m8.7 12 2.2 2.2 4.3-4.4"/></svg><div>Projekt i wycena przed pracą<span>Najpierw wiemy, co i za ile — potem bierzemy się do drewna.</span></div></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c8 0 13-5 13-13-8 0-13 5-13 13Z"/><path d="M5 19c2-5 5-8 9-10"/></svg><div>Materiał dobrany do rzeczy<span>Sklejka liściasta i lite drewno, olejowane i bejcowane, nie lakierowane na wysoki połysk.</span></div></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 11V4.6a1.6 1.6 0 0 1 3.2 0V10"/><path d="M11.2 10V3.6a1.6 1.6 0 0 1 3.2 0V10"/><path d="M14.4 10.4V5.6a1.6 1.6 0 0 1 3.2 0V14c0 4-2.6 7-6.6 7-2.6 0-4-1.1-5.3-2.9l-2-3a1.7 1.7 0 0 1 2.7-2L8 15"/></svg><div>Personalizacja bez szablonu<span>Imiona, data, sentencja — układ tekstu projektujemy pod Twoją rzecz.</span></div></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c8 0 13-5 13-13-8 0-13 5-13 13Z"/><path d="M5 19c2.4-5 5-8 9-10"/></svg><div>Materiał dobrany do rzeczy<span>Sklejka liściasta i lite drewno, olejowane i bejcowane, nie lakierowane na wysoki połysk.</span></div></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5h17v3.6h-17z"/><path d="M5 12.1h14v8.4H5z"/><path d="M12 8.5v12"/><path d="M12 8.5S10.6 3.8 8.3 3.8a2.4 2.4 0 0 0 0 4.7M12 8.5s1.4-4.7 3.7-4.7a2.4 2.4 0 0 1 0 4.7"/></svg><div>Personalizacja bez szablonu<span>Imiona, data, sentencja — układ tekstu projektujemy pod Twoją rzecz.</span></div></li>
         </ul>
       </div>
       <figure>
