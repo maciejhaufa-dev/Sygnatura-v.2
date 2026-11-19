@@ -137,28 +137,48 @@ ul{margin:0;padding:0;list-style:none}
 .znak-sygnet{
   height:var(--z-jedn);width:var(--z-jedn);flex:none;   /* sygnet jest kwadratowy (1543×1543) */
 }
-.znak-tekst{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.znak-tekst{display:flex;flex-direction:column;justify-content:center;min-width:0;width:max-content}
 
-/* SYG + NATURA: oba obrazki dostają TĘ SAMĄ wysokość i tę samą skalę,
-   bo ich viewBoxy sumują się do pełnej szerokości oryginału
-   (1118 + 2454 = 3572), więc odstęp G–N jest naturalny. */
-.znak-nazwa{display:flex;align-items:center;gap:0;min-width:0}
+/* SYG + NATURA: oba obrazki mają TĘ SAMĄ wysokość, a ich viewBoxy sumują się
+   do pełnej szerokości oryginału (1118 + 2454 = 3572) — skala identyczna,
+   odstęp G–N naturalny (176 jednostek). */
+.znak-nazwa{display:flex;align-items:center;gap:0;min-width:0;width:max-content}
 .znak-nazwa .syg,
 .znak-nazwa .natura{
   height:calc(var(--z-jedn) * .50);width:auto;flex:none;display:block;
 }
-/* SYG z księgi znaku jest kreskowane (211 kresek vs 9 w NATURA),
-   więc dodatkowo 50% krycia — akcent pada na NATURA. */
+/* SYG jest kreskowane (211 kresek vs 9 w NATURA), więc dodatkowo 50% krycia */
 .znak-nazwa .syg{opacity:.5}
 
+/* Podpis ma dokładnie szerokość napisu SYGNATURA — rozciągamy odstępy liter,
+   nie samą czcionkę, żeby „STUDIO ARTYSTYCZNE” dochodziło do końca A.
+   text-align-last:justify + width:100% w bloku o szerokości nazwy. */
+/* Podpis ma dokładnie szerokość napisu SYGNATURA.
+   Wartość odstępu liczy assets/ui.js (dopasujPodpisy) — mierzy realną
+   szerokość napisu i podpisu w przeglądarce, więc działa niezależnie od
+   tego, czy Montserrat się wczytał i na jakim systemie strona stoi.
+   Poniższe letter-spacing to tylko wartość startowa, zanim JS zmierzy. */
 .znak-podpis{
+  display:block;
   font-family:var(--sans);font-weight:600;
   font-size:calc(var(--z-jedn) * .125);
-  letter-spacing:.18em;text-transform:uppercase;
-  color:var(--miod);margin-top:calc(var(--z-jedn) * .16);
-  white-space:nowrap;
+  letter-spacing:.10em;text-transform:uppercase;
+  color:var(--miod);margin-top:calc(var(--z-jedn) * .14);
+  white-space:nowrap;width:max-content;
 }
+
+/* ---------- układ pionowy (stopka): sygnet u góry, pod nim nazwa ---------- */
+.znak-pionowo{
+  flex-direction:column;align-items:flex-start;
+  gap:calc(var(--z-jedn) * .16);
+}
+.znak-pionowo .znak-tekst{width:100%}
+.znak-pionowo .znak-sygnet{height:calc(var(--z-jedn) * .62);width:calc(var(--z-jedn) * .62)}
+.znak-pionowo .znak-nazwa .syg,
+.znak-pionowo .znak-nazwa .natura{height:calc(var(--z-jedn) * .44)}
+
 .znak-jasny .znak-podpis{color:var(--miod)}
+.znak-ciemny .znak-podpis{color:var(--miod)}
 .znak-ciemny .znak-podpis{color:var(--miod)}
 
 /* ============================================================

@@ -122,20 +122,72 @@
      żeby akcent położyć na NATURA. Pod spodem „STUDIO ARTYSTYCZNE" złotem
      — zgodnie z ustaleniem, że wyjaśnia ono, skąd „Studio" w nazwie.
      Znak jest w jednym kolorze (brąz #6B4530 na kremie, biel na ciemnym tle). */
-  function znak(odmiana) {
-    const c = odmiana === 'ciemny' ? '-bialy' : '';
-    const podpisZloty = odmiana === 'ciemny' ? ' znak-podpis-zloty' : '';
+  /* Układy znaku:
+       'poziomo'  — sygnet obok nazwy (nagłówek); podpis rozciągnięty
+                    na szerokość napisu SYGNATURA
+       'pionowo'  — sygnet u góry, pod nim nazwa i podpis (stopka);
+                    podpis również na szerokość napisu */
+  function znak(odmiana, uklad) {
+    const ciemny = odmiana === 'ciemny';
+    const c = ciemny ? '-bialy' : '';
+    const pionowo = uklad === 'pionowo';
     return `
-    <span class="znak znak-${odmiana || 'jasny'}">
-      <img class="znak-sygnet" src="assets/sygnet-${odmiana === 'ciemny' ? 'bialy' : 'braz'}.svg" alt="" width="60" height="60">
+    <span class="znak znak-${ciemny ? 'ciemny' : 'jasny'}${pionowo ? ' znak-pionowo' : ''}">
+      <img class="znak-sygnet" src="assets/sygnet-${ciemny ? 'bialy' : 'braz'}.svg" alt="" width="60" height="60">
       <span class="znak-tekst">
         <span class="znak-nazwa" role="img" aria-label="SYGNATURA">
           <img class="syg" src="assets/logotyp-syg${c}.svg" alt="" aria-hidden="true">
           <img class="natura" src="assets/logotyp-natura${c}.svg" alt="" aria-hidden="true">
         </span>
-        <span class="znak-podpis${podpisZloty}">Studio artystyczne</span>
+        <span class="znak-podpis">Studio artystyczne</span>
       </span>
     </span>`;
+  }
+
+
+  /* ---------- podpis na szerokość napisu SYGNATURA ----------
+     Mierzy realną szerokość napisu (SYG + NATURA razem) i podpisu,
+     a potem dobiera odstęp liter tak, żeby podpis kończył się dokładnie
+     pod ostatnią literą A. Działa po wczytaniu obrazków i po zmianie
+     rozmiaru okna. Jeśli pomiar jest niemożliwy (np. brak layoutu),
+     zostaje wartość z CSS — strona się nie psuje. */
+  function dopasujPodpisy() {
+    document.querySelectorAll('.znak').forEach((z) => {
+      const nazwa = z.querySelector('.znak-nazwa');
+      const podpis = z.querySelector('.znak-podpis');
+      const syg = z.querySelector('.syg');
+      const natura = z.querySelector('.natura');
+      if (!nazwa || !podpis || !syg || !natura) return;
+
+      // szerokość napisu = suma szerokości obu obrazków (są w jednej linii, gap:0)
+      const szerNapis = syg.getBoundingClientRect().width + natura.getBoundingClientRect().width;
+      if (!szerNapis) return;
+
+      // najpierw zerujemy odstęp, żeby zmierzyć „goły" tekst
+      podpis.style.letterSpacing = '0px';
+      const szerTekstu = podpis.getBoundingClientRect().width;
+      if (!szerTekstu) return;
+
+      // ile brakuje i na ile przerw między literami to rozłożyć
+      const liter = podpis.textContent.trim().length;
+      const przerw = Math.max(1, liter - 1);
+      const odstep = (szerNapis - szerTekstu) / przerw;
+      if (odstep > -2) podpis.style.letterSpacing = odstep.toFixed(2) + 'px';
+    });
+  }
+
+  function pilnujPodpisow() {
+    dopasujPodpisy();
+    // obrazki SVG mogą doładować się po pierwszym pomiarze
+    document.querySelectorAll('.znak-nazwa img').forEach((img) => {
+      if (!img.complete) img.addEventListener('load', dopasujPodpisy, { once: true });
+    });
+    let ostatnia = 0;
+    window.addEventListener('resize', () => {
+      const teraz = Date.now();
+      if (teraz - ostatnia > 120) { ostatnia = teraz; dopasujPodpisy(); }
+    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(dopasujPodpisy);
   }
 
   function naglowek() {
@@ -195,7 +247,7 @@
 <footer class="site-foot">
   <div class="foot-main wrap">
     <div class="foot-brand">
-      <a class="brand" href="index.html" aria-label="Sygnatura — strona główna">${znak('ciemny')}</a>
+      <a class="brand" href="index.html" aria-label="Sygnatura — strona główna">${znak('ciemny', 'pionowo')}</a>
     </div>
 
     <div>
@@ -364,6 +416,7 @@
     });
 
     podepnijNewsletter();
+    pilnujPodpisow();
     document.dispatchEvent(new CustomEvent('sygnatura:gotowe'));
   }
 
