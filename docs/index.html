@@ -99,11 +99,11 @@ a{text-decoration:none;color:inherit}
 .brand-blok:focus-visible{outline:2px solid var(--zloty);outline-offset:5px}
 .side-contact{display:flex;flex-direction:column;align-items:stretch;gap:7px;margin-top:20px;padding-top:15px;
   border-top:1px solid rgba(196,165,130,.48);font-family:var(--sans);width:100%}
-.side-contact-item{display:flex;align-items:center;gap:9px;width:100%;min-height:38px;padding:6px 8px;
-  border:1px solid rgba(196,165,130,.35);background:rgba(251,247,240,.035);border-radius:2px;
-  color:rgba(251,247,240,.98);font-size:15px;font-weight:600;line-height:1.35;text-decoration:none;white-space:nowrap;transition:all .2s}
-.side-contact-item:hover{color:var(--zloty);border-color:rgba(196,165,130,.78);background:rgba(196,165,130,.10)}
-.side-contact-mail{font-size:clamp(12.5px,.95vw,14px)}
+.side-contact-item{display:flex;align-items:center;gap:10px;width:100%;min-height:38px;padding:5px 0;
+  border:0;background:transparent;border-radius:0;
+  color:rgba(251,247,240,.98);font-size:17px;font-weight:800;line-height:1.35;text-decoration:none;white-space:nowrap;transition:color .2s}
+.side-contact-item:hover{color:var(--zloty)}
+.side-contact-mail{font-size:clamp(13px,1vw,15px)}
 .side-contact-icon{display:block;width:17px;height:17px;flex:0 0 17px;fill:none;stroke:var(--zloty);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .side-contact-item span{min-width:0}
 .side-social-block{width:100%;margin-top:11px;text-align:center}
@@ -176,7 +176,7 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 body.cta-hidden #cta-sekcja{display:none!important}
 body.has-home-cta #cta-sekcja{display:block!important}
 .main{width:100%;padding:8px clamp(12px,1.5vw,20px) 0}
-.home-search{display:flex;gap:0;max-width:740px;width:min(100%,740px);margin:10px auto 12px;border:1px solid rgba(107,69,48,.38);background:#fff;box-shadow:0 5px 16px rgba(31,58,50,.08);flex:none}
+.home-search{display:flex;gap:0;max-width:740px;width:min(100%,740px);margin:10px auto 12px 0;border:1px solid rgba(107,69,48,.38);background:#fff;box-shadow:0 5px 16px rgba(31,58,50,.08);flex:none}
 .home-search input{flex:1;min-width:0;border:0;background:transparent;padding:12px 16px;font:inherit;font-size:16px;outline:none}
 .home-search button{border:0;background:var(--butelkowa);color:var(--zloty);padding:0 22px;font:inherit;font-weight:700;letter-spacing:.06em;cursor:pointer}
 .home-search button:hover{background:var(--brunatny)}
@@ -195,7 +195,7 @@ body.has-home-cta #cta-sekcja{display:block!important}
 .sl-bg{position:absolute;inset:0;background-size:cover;background-position:center;transform-origin:center center}
 /* Keep background transform available for saved per-slide crop controls. */
 .sl-cien{position:absolute;inset:0;background:linear-gradient(200deg,rgba(14,14,12,.25) 0%,rgba(14,14,12,.78) 72%)}
-.sl-tresc{position:relative;z-index:2;width:100%;padding:clamp(20px,4vw,46px);color:var(--krem)}
+.sl-tresc{position:relative;z-index:2;width:100%;max-height:100%;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:clamp(20px,4vw,46px);color:var(--krem)}
 .sl-tag{display:inline-block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--zloty);
   border:1px solid rgba(196,165,130,.7);padding:5px 12px;margin-bottom:12px;background:rgba(14,14,12,.35)}
 .sl-tresc h2{font-size:clamp(28px,3.8vw,50px);font-weight:600;line-height:1.08;text-shadow:0 3px 18px rgba(0,0,0,.5)}
@@ -218,6 +218,13 @@ body.has-home-cta #cta-sekcja{display:block!important}
 .sl-karta-pusta{border:1px dashed rgba(196,165,130,.6);background:rgba(251,247,240,.18);color:var(--krem)}
 .sl-karta-pusta .nazwa{color:var(--krem)}
 .sl-karta-pusta .cena{color:rgba(196,165,130,.9)}
+.sl-karty-col-1{grid-template-columns:1fr}
+.sl-karty-col-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sl-karty-col-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.sl-karty-small .sl-karta{padding:7px 9px;gap:8px}.sl-karty-small .sl-karta img,.sl-karty-small .sl-karta .pusty{width:44px;height:44px}
+.sl-karty-small .sl-karta .nazwa{font-size:13px}.sl-karty-small .sl-karta .cena{font-size:12px}
+.sl-karty-large .sl-karta{padding:13px 15px;gap:14px}.sl-karty-large .sl-karta img,.sl-karty-large .sl-karta .pusty{width:76px;height:76px}
+.sl-karty-large .sl-karta .nazwa{font-size:17px}.sl-karty-large .sl-karta .cena{font-size:15px}
 
 .sl-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:52px;height:52px;
   border-radius:50%;border:1px solid rgba(196,165,130,.8);background:rgba(14,14,12,.45);color:var(--zloty);
@@ -282,7 +289,6 @@ body.has-home-cta #cta-sekcja{display:block!important}
   .head{padding:16px 18px 4px}
   .hk-napis{display:none}
   .sl-karty{grid-template-columns:1fr 1fr;max-width:none}
-  .sl-karta:nth-child(3){grid-column:span 2}
   .krok b{font-size:15px}
 }
 @supports not (aspect-ratio: 1/1){
@@ -527,8 +533,8 @@ html.dotyk .social{margin-top:14px}
 <script src="data/katalog.js?v=356"></script>
 <script src="assets/koszyk.js?v=356"></script>
 <script src="assets/config.js?v=356"></script>
-<script src="assets/api.js?v=356"></script>
-<script src="assets/main.js?v=358"></script>
+<script src="assets/api.js?v=358"></script>
+<script src="assets/main.js?v=357"></script>
 <script>
 /* nagłówek strony głównej: pełny serwis (szukaj + koszyk + konto) albo
    tryb startu (napisz/zadzwoń) — wg SYG.LAUNCH */
@@ -697,10 +703,18 @@ html.dotyk .social{margin-top:14px}
       im.src=src;
     });
     track.querySelectorAll('.sl-karty').forEach(function(el){
-      var lista = el.hasAttribute('data-odw') ? kat.slice().reverse().slice(0, 3) : kat.slice(0, 3);
-      var html = lista.map(karta).join('');
-      for (var i = lista.length; i < 3; i++) html += placeholder();
-      el.innerHTML = html;
+      var ustawienia = window.SYG_PASEK_PRODUKTOW || {};
+      var ids = Array.isArray(ustawienia.ids) ? ustawienia.ids.map(String) : [];
+      var dostepne = kat.filter(function(p){ return p.dostepny; });
+      var lista = Array.isArray(ustawienia.ids)
+        ? ids.map(function(id){ return dostepne.find(function(p){ return String(p.id) === id; }); }).filter(Boolean)
+        : (el.hasAttribute('data-odw') ? dostepne.slice().reverse() : dostepne.slice());
+      var liczba = Math.max(1, Math.min(6, Number(ustawienia.liczba) || 3));
+      lista = lista.slice(0, liczba);
+      var klasa = ['small','medium','large'].indexOf(ustawienia.rozmiar) >= 0 ? ustawienia.rozmiar : 'medium';
+      el.className = 'sl-karty sl-karty-' + klasa + ' sl-karty-col-' + Math.min(Math.max(lista.length,1),3);
+      el.innerHTML = lista.map(karta).join('');
+      if (!lista.length) el.innerHTML = placeholder();
     });
   }
 
@@ -767,6 +781,7 @@ html.dotyk .social{margin-top:14px}
     console.warn('Nie udało się pobrać zapisanej strony głównej — używam domyślnej.', e);
   }
 
+  window.SYG_PASEK_PRODUKTOW = dane.pasekProduktow || { ids: null, liczba: 3, rozmiar: 'medium' };
   var sliderDane = dane.slider || domyslne.slider || DOMYS.slider;
   var domyslneKafle =
     (domyslne.slider && domyslne.slider.kafle) || DOMYS.slider.kafle;

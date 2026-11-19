@@ -513,6 +513,20 @@
         return { ok: true };
       }
 
+      case 'produkt-usun': {
+        const id = Number(d.id);
+        if (!isFinite(id) || id <= 0) return { ok: false, blad: 'Nieprawidłowy identyfikator produktu.' };
+        const kat = window.SYG_KATALOG || [];
+        const i = kat.findIndex(function (p) { return Number(p.id) === id; });
+        if (i < 0) return { ok: false, blad: 'Nie znaleziono produktu w katalogu.' };
+        kat.splice(i, 1);
+        zapisz(KL.dodane, (czytaj(KL.dodane) || []).filter(function (p) { return Number(p.id) !== id; }));
+        const nadpisania = czytaj(KL.produkty) || {};
+        delete nadpisania[id];
+        zapisz(KL.produkty, nadpisania);
+        return { ok: true, id: id };
+      }
+
       case 'ustawienia-dostawa-zapisz': {
         if (!d.cennik || !d.cennik.paczkomat || !d.cennik.kurier) return { ok: false, blad: 'Niekompletny cennik.' };
         zapisz(KL.dostawa, d.cennik);
@@ -687,7 +701,7 @@
        statycznego klucza osadzonego w publicznym kodzie strony. */
     const ADMIN_AKCJE = [
       'zamowienia-lista', 'zamowienie-status', 'blog-zapisz', 'blog-widocznosc', 'blog-usun',
-      'admin-zmien-dane', 'produkt-nowy', 'produkty-zapisz', 'media-upload', 'strona-glowna-zapisz',
+      'admin-zmien-dane', 'produkt-nowy', 'produkt-usun', 'produkty-zapisz', 'media-upload', 'strona-glowna-zapisz',
       'strona-zamowienia-zapisz', 'strona-zapisz', 'strona-usun',
       'ustawienia-dostawa-zapisz', 'wynajem-zapytania-lista', 'wiadomosci-lista'
     ];

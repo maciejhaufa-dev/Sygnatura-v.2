@@ -166,7 +166,7 @@ function instaluj() {
  * ADMIN: login i hasło tworzą podpisaną sesję; pozostałe akcje wymagają tej sesji.
  *   admin-login, admin-zmien-dane, admin-reset-kod, admin-reset-haslo,
  *   zamowienia-lista, zamowienie-status, blog-zapisz, blog-widocznosc,
- *   blog-usun, produkt-nowy,
+ *   blog-usun, produkt-nowy, produkt-usun,
  *   produkty-zapisz, strona-glowna-zapisz, strona-zamowienia-zapisz,
  *   strona-zapisz, strona-usun, ustawienia-dostawa-zapisz,
  *   wynajem-zapytania-lista, wiadomosci-lista
@@ -225,6 +225,7 @@ function doPost(e) {
       case 'blog-widocznosc':         return odpowiedz(maAdminDostep(dane) ? blogWidocznosc(dane) : bladSesjiAdmina());
       case 'blog-usun':               return odpowiedz(maAdminDostep(dane) ? blogUsun(dane) : bladSesjiAdmina());
       case 'produkt-nowy':            return odpowiedz(maAdminDostep(dane) ? produktNowy(dane) : bladSesjiAdmina());
+      case 'produkt-usun':             return odpowiedz(maAdminDostep(dane) ? produktUsun(dane) : bladSesjiAdmina());
       case 'media-upload':             return odpowiedz(maAdminDostep(dane) ? mediaUploadGitHub(dane) : bladSesjiAdmina());
       case 'produkty-zapisz':         return odpowiedz(maAdminDostep(dane) ? produktyZapisz(dane) : bladSesjiAdmina());
       case 'strona-glowna-zapisz':    return odpowiedz(maAdminDostep(dane) ? zapiszJsonUstawienia('stronaGlowna', dane) : bladSesjiAdmina());

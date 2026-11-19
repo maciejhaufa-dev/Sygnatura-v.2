@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=357">
+<link rel="stylesheet" href="assets/style.css?v=358">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -201,10 +201,19 @@
               <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
                 <label style="cursor:pointer;font-weight:600">
                   <input type="checkbox" id="sg-karty" checked style="width:auto;margin-right:6px">
-                  Karty produktów pod treścią
+                  Pasek produktów
                 </label>
                 <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-kafel" style="padding:6px 14px;font-size:12.5px;border-radius:4px;box-shadow:none">💾 Zapisz stronę główną</button>
               </div>
+            </div>
+            <div id="sg-karty-opcje" class="sg-karty-opcje" style="display:none">
+              <div class="sg-karty-ustawienia">
+                <label>Liczba produktów <input type="number" id="sg-karty-liczba" min="1" max="6" value="2"></label>
+                <label>Rozmiar kart <select id="sg-karty-rozmiar"><option value="small">Kompaktowe</option><option value="medium" selected>Średnie</option><option value="large">Duże</option></select></label>
+              </div>
+              <p class="mala" style="margin:5px 0 8px">Zaznacz widoczne produkty i przeciągnij je za uchwyt ⠿, aby ustawić kolejność. Na stronie pokaże się podana liczba pierwszych pozycji.</p>
+              <ol id="sg-karty-lista" class="sg-karty-lista" aria-label="Produkty wyświetlane pod slajdem"></ol>
+              <p class="mala" id="sg-karty-info" role="status" aria-live="polite" style="margin:6px 0 0"></p>
             </div>
 
             <!-- Upload panel -->
@@ -460,7 +469,7 @@
     <!-- PRODUKTY -->
     <section class="admin-sekcja" id="tab-produkty" style="display:none">
       <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
-      <p class="mala">Zmień cenę, widoczność i tagi wyszukiwania. Wpisz tagi rozdzielone przecinkami, np. „wesele, drewno, prezent” — będą używane w wyszukiwarce na stronie.</p>
+      <p class="mala">Zmień cenę, widoczność i tagi wyszukiwania. Wpisz tagi rozdzielone przecinkami, np. „wesele, drewno, prezent”. „Usuń produkt” usuwa go z katalogu; powiązana historia/realizacja pozostaje.</p>
       <div class="flash" id="produkty-info" style="display:none"></div>
       <div class="tabela-wrap">
         <table class="tabela" id="tabela-produkty">
@@ -626,7 +635,7 @@
 
 <script src="assets/config.js?v=356"></script>
 <script src="assets/koszyk.js?v=356"></script>
-<script src="assets/api.js?v=356"></script>
+<script src="assets/api.js?v=358"></script>
 <script src="assets/editor.js?v=356"></script>
 <script src="assets/edytor.js?v=356"></script>
 <script src="data/katalog.js?v=356"></script>
@@ -713,6 +722,8 @@
   var SG_DANE = null;   /* robocza kopia danych strony głównej (zapis TYLKO przyciskiem) */
   var SG_BAZA_GOTOWA = !!SYG.TRYB_DEMO; /* blokuje zapis danych domyślnych, jeśli odczyt live nie powiódł się */
   var SG_EDYCJA = null; /* { id, kopia, nowy } — edytowany kafel */
+  var SG_PRODUKTY_PASKA = [];
+  var SG_PASEK_CONFIGURED = false;
   var SG_EDYTOR = null;     /* instancja EDYTORA TREŚCI (kafel) */
   var SG_EDYTOR_CTA = null; /* instancja EDYTORA TREŚCI (treść pod sliderem) */
   var SG_BRUDNY = false;/* czy są niezapisane zmiany */
@@ -955,7 +966,8 @@
       ctaTresc: ctaVal,
       ctaWidoczny: ctaWidoczny,
       menuKolejnosc: SG_DANE && Array.isArray(SG_DANE.menuKolejnosc) ? SG_DANE.menuKolejnosc : [],
-      blogKolejnosc: SG_DANE && Array.isArray(SG_DANE.blogKolejnosc) ? SG_DANE.blogKolejnosc : []
+      blogKolejnosc: SG_DANE && Array.isArray(SG_DANE.blogKolejnosc) ? SG_DANE.blogKolejnosc : [],
+      pasekProduktow: SG_DANE && SG_DANE.pasekProduktow ? SG_DANE.pasekProduktow : { ids: [], liczba: 3, rozmiar: 'medium' }
     };
     SG_DANE = dane;
 
@@ -988,6 +1000,104 @@
     }
     return zapisano;
   }
+
+  /* ---------- wybór i kolejność produktów w pasku strony głównej ---------- */
+  function sgPasekProduktow(){
+    if (!SG_DANE) SG_DANE = JSON.parse(JSON.stringify(SG_DOMYS));
+    var p = SG_DANE.pasekProduktow;
+    if (!p || typeof p !== 'object') { p = SG_DANE.pasekProduktow = { ids: [], liczba: 3, rozmiar: 'medium' }; SG_PASEK_CONFIGURED = false; }
+    else SG_PASEK_CONFIGURED = true;
+    if (!Array.isArray(p.ids)) p.ids = [];
+    p.ids = p.ids.map(String);
+    p.liczba = Math.max(1, Math.min(6, Number(p.liczba) || 3));
+    if (['small','medium','large'].indexOf(p.rozmiar) < 0) p.rozmiar = 'medium';
+    return p;
+  }
+  function sgProduktKarta(p){
+    var src = p.obraz && /^https?:\/\//i.test(String(p.obraz)) ? p.obraz : 'assets/media/sklep/' + (p.obraz || '');
+    var cena = Number(p.cena) > 0 ? sgEsc(p.cena) + ' zł / szt.' : 'na zamówienie';
+    return '<a class="sl-karta" href="sklep.html" onclick="return false">' +
+      (p.obraz ? '<img src="' + sgEsc(src) + '" alt="' + sgEsc(p.nazwa) + '">' : '<span class="pusty">' + sgEsc((p.nazwa || '?').slice(0,1)) + '</span>') +
+      '<span><span class="nazwa">' + sgEsc(p.nazwa) + '</span><br><span class="cena">' + cena + '</span></span></a>';
+  }
+  function sgRenderPasekProduktow(){
+    var p = sgPasekProduktow(), list = document.getElementById('sg-karty-lista');
+    if (!list) return;
+    var available = SG_PRODUKTY_PASKA.filter(function(x){ return x.dostepny; });
+    if (!p.ids.length && !SG_PASEK_CONFIGURED && available.length){
+      p.ids = available.slice(0,3).map(function(x){ return String(x.id); });
+      SG_PASEK_CONFIGURED = true;
+    }
+    var wybrane = p.ids.map(function(id){ return available.find(function(x){ return String(x.id) === id; }); }).filter(Boolean);
+    if (wybrane.length !== p.ids.length) p.ids = wybrane.map(function(x){ return String(x.id); });
+    document.getElementById('sg-karty-liczba').value = p.liczba;
+    document.getElementById('sg-karty-rozmiar').value = p.rozmiar;
+    list.innerHTML = available.map(function(x){
+      var chosen = p.ids.indexOf(String(x.id)) >= 0;
+      return '<li class="sg-karty-item' + (chosen ? ' wybrany' : '') + '" draggable="' + chosen + '" data-id="' + sgEsc(x.id) + '">' +
+        '<button type="button" class="sg-karty-drag" aria-label="Przeciągnij ' + sgEsc(x.nazwa) + '" title="Przeciągnij, aby zmienić kolejność"' + (chosen ? '' : ' disabled') + '>⠿</button>' +
+        '<label><input type="checkbox" class="sg-karty-check"' + (chosen ? ' checked' : '') + '> <span>' + sgEsc(x.nazwa) + '</span></label>' +
+        '<span class="sg-karty-cena">' + (Number(x.cena) > 0 ? sgEsc(x.cena) + ' zł' : 'na zamówienie') + '</span>' +
+        '<button type="button" class="sg-karty-up" aria-label="Przenieś wyżej" title="Przenieś wyżej"' + (chosen ? '' : ' disabled') + '>↑</button>' +
+        '<button type="button" class="sg-karty-down" aria-label="Przenieś niżej" title="Przenieś niżej"' + (chosen ? '' : ' disabled') + '>↓</button></li>';
+    }).join('') || '<li class="mala">Brak widocznych produktów w katalogu.</li>';
+    var preview = document.getElementById('sg-karty-podglad');
+    if (preview){
+      var pokazane = wybrane.slice(0,p.liczba);
+      preview.className = 'sl-karty sl-karty-' + p.rozmiar + ' sl-karty-col-' + Math.min(Math.max(pokazane.length,1),3);
+      preview.innerHTML = pokazane.map(sgProduktKarta).join('') || '<span class="sl-karta sl-karta-pusta">Brak wybranych produktów</span>';
+      var aktywny = SG_EDYCJA ? sgKafle().find(function(k){return String(k.id)===SG_EDYCJA.id;}) : null;
+      preview.style.display = aktywny && aktywny.karty ? 'grid' : 'none';
+    }
+    var info = document.getElementById('sg-karty-info');
+    if (info) info.textContent = wybrane.length ? wybrane.length + ' zaznaczonych · wyświetli się maksymalnie ' + Math.min(p.liczba, wybrane.length) : 'Nie wybrano produktów — pasek będzie pusty.';
+  }
+  function sgZapiszPasekProduktow(){
+    var p = sgPasekProduktow();
+    SG_PASEK_CONFIGURED = true;
+    SG_DANE.pasekProduktow = { ids: p.ids.slice(), liczba: p.liczba, rozmiar: p.rozmiar };
+    ustawBrudny();
+    sgRenderPasekProduktow();
+  }
+  function sgPrzesunProdukt(id, delta){
+    var ids = sgPasekProduktow().ids, i = ids.indexOf(String(id)), j = i + delta;
+    if (i < 0 || j < 0 || j >= ids.length) return;
+    var x = ids[i]; ids[i] = ids[j]; ids[j] = x;
+    sgZapiszPasekProduktow();
+  }
+  (function(){
+    var list = document.getElementById('sg-karty-lista');
+    if (!list) return;
+    list.addEventListener('change', function(e){
+      if (!e.target.matches('.sg-karty-check')) return;
+      var id = String(e.target.closest('[data-id]').getAttribute('data-id')), p = sgPasekProduktow();
+      if (e.target.checked){ if (p.ids.indexOf(id) < 0) p.ids.push(id); }
+      else p.ids = p.ids.filter(function(x){ return x !== id; });
+      sgZapiszPasekProduktow();
+    });
+    list.addEventListener('click', function(e){
+      var row = e.target.closest('[data-id]'); if (!row) return;
+      var delta = e.target.closest('.sg-karty-up') ? -1 : (e.target.closest('.sg-karty-down') ? 1 : 0);
+      if (delta) sgPrzesunProdukt(row.getAttribute('data-id'), delta);
+    });
+    var dragged = null;
+    list.addEventListener('dragstart', function(e){
+      var row=e.target.closest('.sg-karty-item'); if(!row||sgPasekProduktow().ids.indexOf(row.dataset.id)<0)return;
+      dragged=row.dataset.id; e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragged);
+    });
+    list.addEventListener('dragover', function(e){if(dragged&&e.target.closest('.sg-karty-item')){e.preventDefault();e.dataTransfer.dropEffect='move';}});
+    list.addEventListener('drop', function(e){
+      var row=e.target.closest('.sg-karty-item'); if(!dragged||!row)return;e.preventDefault();
+      var ids=sgPasekProduktow().ids, from=ids.indexOf(dragged),to=ids.indexOf(row.dataset.id);
+      if(from>=0&&to>=0&&from!==to){ids.splice(from,1);ids.splice(to,0,dragged);sgZapiszPasekProduktow();}
+      dragged=null;
+    });
+    list.addEventListener('dragend', function(){dragged=null;});
+  })();
+  var kartyLiczba = document.getElementById('sg-karty-liczba');
+  if(kartyLiczba) kartyLiczba.addEventListener('change', function(){sgPasekProduktow().liczba=Math.max(1,Math.min(6,Number(this.value)||1));sgZapiszPasekProduktow();});
+  var kartyRozmiar = document.getElementById('sg-karty-rozmiar');
+  if(kartyRozmiar) kartyRozmiar.addEventListener('change', function(){sgPasekProduktow().rozmiar=this.value;sgZapiszPasekProduktow();});
 
   /* ---------- rysowanie paska kafli ---------- */
   function rysujKafle(){
@@ -1162,6 +1272,8 @@
     
     var chkKarty = document.getElementById('sg-karty');
     if (chkKarty) chkKarty.checked = !!kafel.karty;
+    var opcjeKarty = document.getElementById('sg-karty-opcje');
+    if (opcjeKarty) opcjeKarty.style.display = kafel.karty ? 'block' : 'none';
     var podgladKarty = document.getElementById('sg-karty-podglad');
     if (podgladKarty) podgladKarty.style.display = kafel.karty ? 'grid' : 'none';
 
@@ -1264,6 +1376,8 @@
   var chkKarty = document.getElementById('sg-karty');
   if (chkKarty) chkKarty.addEventListener('change', function(){
     var podgladKarty = document.getElementById('sg-karty-podglad');
+    var opcjeKarty = document.getElementById('sg-karty-opcje');
+    if (opcjeKarty) opcjeKarty.style.display = this.checked ? 'block' : 'none';
     if (podgladKarty) podgladKarty.style.display = this.checked ? 'grid' : 'none';
     if (SG_EDYCJA){
       var kafle = sgKafle();
@@ -1557,6 +1671,7 @@
         if (odp.dane && !SG_BRUDNY){
           var zserwera = sgNaprawObrazy(sgMigrujStare(odp.dane));
           SG_DANE = Object.assign({}, SG_DANE, zserwera);
+          SG_PASEK_CONFIGURED = !!zserwera.pasekProduktow;
           if (SG_DANE.slider && Array.isArray(SG_DANE.slider.kafle) && SG_DANE.slider.kafle.length > 0){
             if (!sgPrawidlowyHtml(SG_DANE.ctaTresc)) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
             odswiezWidokStronyGlownej();
@@ -1567,6 +1682,15 @@
         console.warn('Błąd pobierania strony głównej z serwera:', err);
         sgInfo('Nie udało się pobrać zapisanej wersji z bazy. Sprawdź połączenie; zapisywanie jest zablokowane.', true);
       }
+    }
+    try {
+      var produktyPaska = await SYG.katalog();
+      SG_PRODUKTY_PASKA = Array.isArray(produktyPaska) ? produktyPaska : [];
+      sgRenderPasekProduktow();
+    } catch (errKatalog){
+      sgRenderPasekProduktow();
+      var pInfo = document.getElementById('sg-karty-info');
+      if (pInfo && !SG_PRODUKTY_PASKA.length) pInfo.textContent = 'Nie udało się pobrać katalogu produktów. Sprawdź połączenie i odśwież panel.';
     }
     wyczyscBrudny();
   }
@@ -1762,20 +1886,23 @@
   /* ============ produkty ============ */
   async function ladujProdukty(){
     var kat = await SYG.katalog();
+    SG_PRODUKTY_PASKA = Array.isArray(kat) ? kat : [];
+    sgRenderPasekProduktow();
     var tbody = document.querySelector('#tabela-produkty tbody');
     tbody.innerHTML = kat.map(function(p){
       return '<tr>' +
-        '<td><b>' + p.nazwa + '</b><br><span class="mala">#' + p.id +
+        '<td><b>' + sgEsc(p.nazwa) + '</b><br><span class="mala">#' + sgEsc(p.id) +
         (p.storyId ? ' · <a href="blog-wpis.html?id=' + p.storyId + '" target="_blank" rel="noopener" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">historia →</a>' : '') +
         '</span></td>' +
         '<td><input type="number" step="0.01" min="0" class="p-cena" data-id="' + p.id + '" value="' + p.cena + '" style="width:110px"></td>' +
         '<td><label style="cursor:pointer;font-size:14px"><input type="checkbox" class="p-dost" data-id="' + p.id + '"' + (p.dostepny ? ' checked' : '') + '> widoczny</label></td>' +
         '<td><input type="text" class="p-tagi" data-id="' + p.id + '" value="' + sgEsc(p.tagi || '') + '" placeholder="np. drewno, ślub, prezent" style="min-width:210px"></td>' +
-        '<td><button class="btn outline" type="button" style="padding:8px 16px" data-id="' + p.id + '">Zapisz</button></td>' +
+        '<td class="produkt-akcje"><button class="btn outline" type="button" style="padding:8px 12px" data-akcja="zapisz" data-id="' + Number(p.id) + '">Zapisz</button> ' +
+        '<button class="btn niebez" type="button" style="padding:8px 10px" data-akcja="usun" data-id="' + Number(p.id) + '">Usuń produkt</button></td>' +
       '</tr>';
     }).join('') || '<tr><td colspan="5">Brak produktów.</td></tr>';
 
-    tbody.querySelectorAll('button[data-id]').forEach(function(b){
+    tbody.querySelectorAll('button[data-akcja="zapisz"]').forEach(function(b){
       b.addEventListener('click', async function(){
         var id = Number(b.getAttribute('data-id'));
         var cena = Number(tbody.querySelector('.p-cena[data-id="' + id + '"]').value) || 0;
@@ -1786,6 +1913,23 @@
         f.style.display = 'block';
         f.textContent = odp.ok ? 'Zapisano: produkt #' + id + ' (' + cena + ' zł, ' + (dost ? 'widoczny' : 'ukryty') + ').' : (odp.blad || 'Nie zapisano.');
         setTimeout(function(){ f.style.display = 'none'; }, 4000);
+      });
+    });
+    tbody.querySelectorAll('button[data-akcja="usun"]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        var id = Number(b.getAttribute('data-id'));
+        var produkt = kat.find(function(x){ return Number(x.id) === id; });
+        if (!confirm('Usunąć produkt „' + (produkt ? produkt.nazwa : '#' + id) + '” z katalogu? Tego działania nie można cofnąć. Powiązana historia/realizacja pozostanie.')) return;
+        b.disabled = true;
+        var f = document.getElementById('produkty-info');
+        f.style.display = 'block'; f.textContent = 'Usuwanie produktu…';
+        try {
+          var odp = await SYG.wezwij('produkt-usun', { id: id });
+          if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Serwer nie potwierdził usunięcia.');
+          f.textContent = 'Produkt #' + id + ' usunięto z katalogu.';
+          await ladujProdukty();
+        } catch (err){ f.textContent = 'Nie udało się usunąć produktu: ' + (err.message || 'błąd serwera.'); b.disabled = false; }
+        setTimeout(function(){ f.style.display = 'none'; }, 5000);
       });
     });
   }

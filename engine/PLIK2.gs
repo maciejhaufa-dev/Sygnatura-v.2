@@ -373,6 +373,20 @@ function produktNowy(d) {
   return { ok: true, id: id };
 }
 
+function produktUsun(d) {
+  const id = Number(d.id);
+  if (!Number.isFinite(id) || id <= 0) return { ok: false, blad: 'Nieprawidłowy identyfikator produktu.' };
+  const sh = arkusz('Katalog');
+  const dane = sh.getDataRange().getValues();
+  for (let i = 1; i < dane.length; i++) {
+    if (Number(dane[i][0]) === id) {
+      sh.deleteRow(i + 1);
+      return { ok: true, id: id };
+    }
+  }
+  return { ok: false, blad: 'Nie znaleziono produktu w katalogu.' };
+}
+
 function produktyZapisz(d) {
   const sh = arkusz('Katalog');
   const dane = sh.getDataRange().getValues();
