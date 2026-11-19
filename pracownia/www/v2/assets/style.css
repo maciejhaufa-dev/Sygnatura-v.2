@@ -125,21 +125,41 @@ ul{margin:0;padding:0;list-style:none}
 /* ============================================================
    ZNAK (sygnet + SYGNATURA dwumaterialowo + podpis)
    ============================================================ */
-.znak{display:inline-flex;align-items:center;gap:13px;min-width:0}
-.znak-sygnet{width:auto;height:56px;flex:none}
-.znak-tekst{display:flex;flex-direction:column;min-width:0}
-.znak-nazwa{display:flex;align-items:baseline;gap:0;min-width:0}
-/* SYG z księgi znaku jest kreskowany — dodatkowo 50% krycia, NATURA lita 100% */
-.znak-nazwa .syg{height:30px;width:auto;opacity:.5;flex:none}
-.znak-nazwa .natura{height:30px;width:auto;flex:none}
-.znak-podpis{
-  font-family:var(--sans);font-size:9px;font-weight:500;letter-spacing:.24em;
-  text-transform:uppercase;color:var(--miod);margin-top:7px;white-space:nowrap;
+/* Jeden mechanizm, ten sam w nagłówku i w stopce:
+   wysokość sygnetu = 1, więc każdy element liczy się od niej (--z-jedn).
+   Dzięki temu nagłówek i stopka mają IDENTYCZNE proporcje — różni je
+   tylko skala. Zmienna --z-jedn ustawia rozmiar całości. */
+.znak{
+  --z-jedn:56px;                 /* wysokość sygnetu = jednostka */
+  display:inline-flex;align-items:center;gap:calc(var(--z-jedn) * .22);
+  min-width:0;line-height:1;
 }
-/* na ciemnym tle: znak biały, podpis złoty jaśniejszy */
-.znak-ciemny .znak-nazwa .syg{opacity:.5}
-.znak-ciemny .znak-podpis{color:var(--miod)}
+.znak-sygnet{
+  height:var(--z-jedn);width:var(--z-jedn);flex:none;   /* sygnet jest kwadratowy (1543×1543) */
+}
+.znak-tekst{display:flex;flex-direction:column;justify-content:center;min-width:0}
+
+/* SYG + NATURA: oba obrazki dostają TĘ SAMĄ wysokość i tę samą skalę,
+   bo ich viewBoxy sumują się do pełnej szerokości oryginału
+   (1118 + 2454 = 3572), więc odstęp G–N jest naturalny. */
+.znak-nazwa{display:flex;align-items:center;gap:0;min-width:0}
+.znak-nazwa .syg,
+.znak-nazwa .natura{
+  height:calc(var(--z-jedn) * .50);width:auto;flex:none;display:block;
+}
+/* SYG z księgi znaku jest kreskowane (211 kresek vs 9 w NATURA),
+   więc dodatkowo 50% krycia — akcent pada na NATURA. */
+.znak-nazwa .syg{opacity:.5}
+
+.znak-podpis{
+  font-family:var(--sans);font-weight:600;
+  font-size:calc(var(--z-jedn) * .125);
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--miod);margin-top:calc(var(--z-jedn) * .16);
+  white-space:nowrap;
+}
 .znak-jasny .znak-podpis{color:var(--miod)}
+.znak-ciemny .znak-podpis{color:var(--miod)}
 
 /* ============================================================
    NAGŁÓWEK — wymiary 1:1 z makiety (1505 px szerokości odniesienia)
@@ -439,9 +459,7 @@ ul{margin:0;padding:0;list-style:none}
 .foot-main .brand-text b{white-space:normal;overflow-wrap:anywhere}
 .foot-brand{display:flex;align-items:flex-start}
 .foot-main .brand{margin:0}
-.foot-main .brand img{height:54px}
-.foot-main .brand-text b{color:#F2EADD;font-size:19px;letter-spacing:.12em;line-height:1.16}
-.foot-main .brand-text > span{color:#C9AE84;font-size:8.5px;margin-top:7px}
+.foot-main .znak{--z-jedn:52px}
 .foot-about{font-size:12.5px;color:#CFC5B6;max-width:30ch;line-height:1.62}
 .foot-main h4{
   font-family:var(--sans);font-size:12.5px;font-weight:600;letter-spacing:.01em;text-transform:none;
@@ -461,6 +479,10 @@ ul{margin:0;padding:0;list-style:none}
 }
 .social a:hover{background:transparent;color:#fff;transform:translateY(-1px)}
 .social svg{width:23px;height:23px}
+/* kanał bez adresu: ikona widoczna, ale nieklikalna i przygaszona —
+   po wpisaniu adresu w panelu zamienia się w zwykły link */
+.social-brak{display:grid;place-items:center;color:#8C8172;opacity:.55;cursor:default}
+.social-brak:hover{opacity:.7}
 .social-label{font-size:12px;color:#F2EADD;margin-bottom:9px}
 .newsletter{display:flex;gap:0;max-width:288px;border:1px solid rgba(201,174,132,.42);border-radius:2px;overflow:hidden}
 .newsletter input{
@@ -597,9 +619,8 @@ ul{margin:0;padding:0;list-style:none}
 @media (max-width:1180px){
   .grid-real{grid-template-columns:repeat(3,minmax(0,1fr))}
   .head-top{gap:clamp(14px,2vw,28px)}
-  .znak-sygnet{height:48px}
-  .znak-nazwa .syg,.znak-nazwa .natura{height:26px}
-  .znak-podpis{font-size:8px;letter-spacing:.2em}
+  .znak{--z-jedn:48px}
+  .foot-main .znak{--z-jedn:46px}
   .search{max-width:380px}
   .head-akcje{gap:clamp(10px,1.4vw,18px)}
   .ha-item b{font-size:11.5px}
@@ -633,9 +654,7 @@ ul{margin:0;padding:0;list-style:none}
     row-gap:12px;padding:12px var(--pad);
   }
   .brand{grid-area:brand}
-  .znak-sygnet{height:42px}
-  .znak-nazwa .syg,.znak-nazwa .natura{height:23px}
-  .znak-podpis{font-size:7.5px;letter-spacing:.18em;margin-top:5px}
+  .znak{--z-jedn:42px}
   .head-akcje{grid-area:tools;justify-self:end;gap:12px}
   /* ikony kontaktu zostają (makieta ma trzy), chowamy tylko podpisy */
   .head-akcje .ha-item div{display:none}
@@ -679,9 +698,7 @@ ul{margin:0;padding:0;list-style:none}
 @media (max-width:640px){
   body{font-size:15px}
   .pasek-info .wrap{font-size:10.5px;min-height:32px}
-  .znak-sygnet{height:36px}
-  .znak-nazwa .syg,.znak-nazwa .natura{height:20px}
-  .znak{gap:10px}
+  .znak{--z-jedn:36px}
   .head-akcje .ha-item.tel,.head-akcje .ha-item.konto{width:38px;height:38px}
   .head-akcje .ha-item.koszyk{width:auto}
   .head-akcje .ha-item.koszyk div{display:none}
@@ -716,9 +733,7 @@ ul{margin:0;padding:0;list-style:none}
 /* najwęższe telefony (np. 360–430 px): znak i dwa przyciski muszą zmieścić się w jednym rzędzie */
 @media (max-width:430px){
   :root{--pad:16px}
-  .znak-sygnet{height:34px}
-  .znak-nazwa .syg,.znak-nazwa .natura{height:18px}
-  .znak{gap:8px}
+  .znak{--z-jedn:32px}
   .head-akcje{gap:10px}
   .head-akcje .ha-item.tel{width:40px;height:40px}
   .head-akcje .ha-item.konto{display:none}   /* miejsce na telefon, konto i koszyk */

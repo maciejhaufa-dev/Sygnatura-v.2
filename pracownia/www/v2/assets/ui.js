@@ -129,9 +129,9 @@
     <span class="znak znak-${odmiana || 'jasny'}">
       <img class="znak-sygnet" src="assets/sygnet-${odmiana === 'ciemny' ? 'bialy' : 'braz'}.svg" alt="" width="60" height="60">
       <span class="znak-tekst">
-        <span class="znak-nazwa">
-          <img class="syg" src="assets/logotyp-syg${c}.svg" alt="SYG" height="34">
-          <img class="natura" src="assets/logotyp-natura${c}.svg" alt="NATURA" height="34">
+        <span class="znak-nazwa" role="img" aria-label="SYGNATURA">
+          <img class="syg" src="assets/logotyp-syg${c}.svg" alt="" aria-hidden="true">
+          <img class="natura" src="assets/logotyp-natura${c}.svg" alt="" aria-hidden="true">
         </span>
         <span class="znak-podpis${podpisZloty}">Studio artystyczne</span>
       </span>
@@ -217,7 +217,10 @@
     <div>
       <h4>Bądźmy w kontakcie</h4>
       <div class="social">
-        ${SOCIAL.filter(s => s[2]).map(s => `<a href="${esc(s[2])}" target="_blank" rel="noopener noreferrer" aria-label="${esc(s[0])}" title="${esc(s[0])}">${I[s[1]]}</a>`).join('')}
+        ${SOCIAL.map(([nazwa, ikona, adres]) => adres
+          ? `<a href="${esc(adres)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(nazwa)}" title="${esc(nazwa)}">${I[ikona]}</a>`
+          : `<span class="social-brak" role="img" aria-label="${esc(nazwa)} — kanał w przygotowaniu" title="${esc(nazwa)} — kanał w przygotowaniu">${I[ikona]}</span>`
+        ).join('')}
       </div>
       <p class="social-label">Zapisz się do newslettera</p>
       <form class="newsletter" data-newsletter novalidate>
