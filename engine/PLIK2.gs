@@ -235,7 +235,27 @@ function blogWiersze() {
     let galeria = [], produkt = null;
     try { galeria = JSON.parse(r[7] || '[]'); } catch (e) {}
     try { produkt = JSON.parse(r[9] || 'null'); } catch (e) {}
-    lista.push({ id: Number(r[0]), data: String(r[1] || ''), kategoria: String(r[2] || ''),
+    const tz = Session.getScriptTimeZone() || 'Etc/UTC';
+    function dataIsoBlog(v) {
+      if (v instanceof Date && !isNaN(v.getTime())) return Utilities.formatDate(v, tz, 'yyyy-MM-dd');
+      const s = String(v == null ? '' : v).trim();
+      const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);
+      if (iso) {
+        const y=Number(iso[1]),m=Number(iso[2]),d=Number(iso[3]),test=new Date(Date.UTC(y,m-1,d));
+        if(test.getUTCFullYear()===y&&test.getUTCMonth()===m-1&&test.getUTCDate()===d)
+          return iso[1]+'-'+('0'+iso[2]).slice(-2)+'-'+('0'+iso[3]).slice(-2);
+      }
+      const pl = /^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/.exec(s);
+      if (pl) {
+        const d=Number(pl[1]),m=Number(pl[2]),y=Number(pl[3]),test=new Date(Date.UTC(y,m-1,d));
+        if(test.getUTCFullYear()===y&&test.getUTCMonth()===m-1&&test.getUTCDate()===d)
+          return pl[3]+'-'+('0'+pl[2]).slice(-2)+'-'+('0'+pl[1]).slice(-2);
+      }
+      return s;
+    }
+    const utworzono=r[11] instanceof Date?r[11].toISOString():String(r[11]||'');
+    const dodanoSort=Number(r[12])||i;
+    lista.push({ id: Number(r[0]), data: dataIsoBlog(r[1]), utworzono: utworzono, dodanoSort: dodanoSort, kategoria: String(r[2] || ''),
       tytul: String(r[3] || ''), zajawka: String(r[4] || ''), okladka: String(r[5] || ''),
       video: String(r[6] || ''), galeria: galeria, tresc: String(r[8] || ''),
       produkt: produkt, widoczny: Number(r[10]) === 1, _i: i });
@@ -283,6 +303,11 @@ function syncProdukt(wpis) {
     Number(pr.cena || 0), obraz, 1, pr.gabaryt || '', wpis.id]);
 }
 
+function blogUstawMetadaneDodania(sh) {
+  if (sh.getMaxColumns() < 13) sh.insertColumnsAfter(sh.getMaxColumns(), 13 - sh.getMaxColumns());
+  if (!sh.getRange(1, 12).getValue()) sh.getRange(1, 12, 1, 2).setValues([['utworzono', 'dodano_sort']]);
+}
+
 function blogZapisz(d) {
   const w = d.wpis || {};
   if (!w.tytul) return { ok: false, blad: 'Brak tytułu wpisu.' };
@@ -305,11 +330,14 @@ function blogZapisz(d) {
         wpis.tresc || '', JSON.stringify(wpis.produkt || null), wpis.widoczny === false ? 0 : 1]);
     }
   } else {
+    const utworzono = new Date();
     wpis = Object.assign({ id: Date.now() % 1000000,
-      data: new Date().toISOString().slice(0, 10), widoczny: true }, w);
-    sh.appendRow([wpis.id, wpis.data, wpis.kategoria || '', wpis.tytul, wpis.zajawka || '',
+      data: Utilities.formatDate(utworzono, Session.getScriptTimeZone() || 'Etc/UTC', 'yyyy-MM-dd'), widoczny: true }, w);
+    blogUstawMetadaneDodania(sh);
+    const nowyWiersz = sh.getLastRow() + 1;
+    sh.getRange(nowyWiersz, 1, 1, 13).setValues([[wpis.id, wpis.data, wpis.kategoria || '', wpis.tytul, wpis.zajawka || '',
       wpis.okladka || '', wpis.video || '', JSON.stringify(wpis.galeria || []),
-      wpis.tresc || '', JSON.stringify(wpis.produkt || null), 1]);
+      wpis.tresc || '', JSON.stringify(wpis.produkt || null), 1, utworzono, nowyWiersz]]);
   }
   if (wpis.produkt && wpis.produkt.sklep) syncProdukt(wpis);
   return { ok: true, id: wpis.id };

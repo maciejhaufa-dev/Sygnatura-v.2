@@ -11,12 +11,15 @@
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
-  function dzien(iso) {
-    try {
-      const d = new Date(iso + 'T12:00:00');
-      return d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
-    } catch (e) { return iso || ''; }
+  function parsujDateBlog(value){
+    const raw=String(value==null?'':value).trim();if(!raw)return null;
+    const m=/^(\d{4})-(\d{1,2})-(\d{1,2})(?:([T ].*)?)$/.exec(raw);
+    if(m){const y=+m[1],mo=+m[2]-1,day=+m[3],check=new Date(y,mo,day,12);if(isNaN(check.getTime())||check.getFullYear()!==y||check.getMonth()!==mo||check.getDate()!==day)return null;if(m[4]){const t=new Date(raw);return isNaN(t.getTime())?null:t;}return check;}
+    const d=new Date(raw);return isNaN(d.getTime())?null:d;
   }
+  function dzien(value){const d=parsujDateBlog(value);return d?d.toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'}):'';}
+  function sortDodano(w){return Number(w.dodanoSort)||Number(w.id)||0;}
+
   function videoId(url) {
     const m = String(url || '').match(/(?:v=|youtu\.be\/)([\w-]{6,})/);
     return m ? m[1] : '';
@@ -29,13 +32,10 @@
       kontener.innerHTML = '<p class="mala" role="alert" style="padding:14px 0">Nie udało się pobrać realizacji. Odśwież stronę za chwilę.</p>';
       return;
     }
-    const wpisy = odp.wpisy || [];
-    /* tylko widoczne, najnowsze na górze */
-    const widoczne = wpisy.filter(function (w) { return w.widoczny !== false; })
-      .sort(function (a, b) {
-        const da = String(a.data || ''), db = String(b.data || '');
-        return db < da ? -1 : (db > da ? 1 : 0);
-      });
+    const wpisy=odp.wpisy||[];
+    let order=[];try{const cfg=await SYG.wezwij('strona-glowna-pobierz',{});if(cfg&&cfg.ok&&cfg.dane&&Array.isArray(cfg.dane.blogKolejnosc))order=cfg.dane.blogKolejnosc.map(String);}catch(e){}
+    const widoczne=wpisy.filter(function(w){return w.widoczny!==false;});
+    widoczne.sort(function(a,b){const ai=order.indexOf(String(a.id)),bi=order.indexOf(String(b.id));if(ai>=0&&bi>=0)return ai-bi;if(ai<0&&bi>=0)return -1;if(ai>=0&&bi<0)return 1;return sortDodano(b)-sortDodano(a);});
     kontener.innerHTML = '';
     if (!widoczne.length) {
       kontener.innerHTML = '<p class="mala" style="padding:14px 0">Nie ma jeszcze wpisów. Pierwsza realizacja pojawi się tu wkrótce.</p>';
@@ -54,14 +54,15 @@
     kontener.appendChild(siatka);
     function rysuj(kat) {
       siatka.innerHTML = widoczne.filter(function (w) { return !kat || w.kategoria === kat; }).map(function (w) {
-        return '<a class="blog-kafel" href="blog-wpis.html?id=' + w.id + '">' +
-          '<img src="' + esc(w.okladka) + '" alt="' + esc(w.tytul) + '" loading="lazy">' +
+        const data=dzien(w.data);
+        return '<a class="blog-kafel" href="blog-wpis.html?id=' + encodeURIComponent(w.id) + '">' +
+          '<figure class="blog-kafel-foto"><img src="' + esc(w.okladka) + '" alt="' + esc(w.tytul) + '" loading="lazy">' +
+          (w.zajawka ? '<figcaption class="blog-zajawka">' + esc(w.zajawka) + '</figcaption>' : '') + '</figure>' +
           (!SYG.LAUNCH && w.produkt && w.produkt.sklep ? '<span class="blog-badge">dostępny w sklepie</span>' : '') +
           '<span class="blog-kafel-tresc">' +
-          '<span class="kat">' + esc(w.kategoria) + '</span>' +
           '<span class="nazwa">' + esc(w.tytul) + '</span>' +
-          '<span class="blog-data">' + dzien(w.data) + '</span>' +
-          '<span class="blog-zajawka">' + esc(w.zajawka) + '</span>' +
+          (data ? '<span class="blog-data">' + esc(data) + '</span>' : '') +
+          (w.kategoria ? '<span class="kat">' + esc(w.kategoria) + '</span>' : '') +
           '</span></a>';
       }).join('');
     }

@@ -56,30 +56,32 @@
     return STRONY_MENU.filter(function (s) { return s.menu && s.slug !== 'pracownia'; })
       .sort(function (a, b) { return (a.kol || 10) - (b.kol || 10); });
   }
+  function menuKlucz(item){
+    var href=String(item[0]||'');
+    if(href.indexOf('podstrona.html?s=')===0){try{return 'podstrona:'+decodeURIComponent(href.slice(href.indexOf('=')+1));}catch(e){return 'podstrona:'+href.slice(href.indexOf('=')+1);}}
+    return href.split('?')[0];
+  }
+  function escapeHtml(s){
+    return String(s==null?'':s).replace(/[&<>"]/g,function(c){return c==='&'?'&amp;':c==='<'?'&lt;':c==='>'?'&gt;':'&quot;';});
+  }
   async function ladujPozycjeMenu(){
-    try {
-      if (!SYG || !SYG.LAUNCH) {
-        const odp = await SYG.wezwij('strony-lista', {});
-        STRONY_MENU = (odp.ok && odp.strony) || [];
-        POZYCJE_MENU = MENU.concat(
-          widocznePodstrony().map(function (s) { return ['podstrona.html?s=' + encodeURIComponent(s.slug), s.tytul]; })
-        );
+    try{
+      if(SYG){
+        var pages=await SYG.wezwij('strony-lista',{});
+        STRONY_MENU=pages&&pages.ok&&Array.isArray(pages.strony)?pages.strony:[];
+        var settings=await SYG.wezwij('strona-glowna-pobierz',{}),order=settings&&settings.ok&&settings.dane&&settings.dane.menuKolejnosc;
+        var custom=widocznePodstrony().map(function(x){return ['podstrona.html?s='+encodeURIComponent(x.slug),x.tytul];});
+        var all=MENU.concat(custom),home=all.find(function(x){return menuKlucz(x)==='index.html';}),rest=all.filter(function(x){return menuKlucz(x)!=='index.html';});
+        if(Array.isArray(order)){order=order.map(String);rest.sort(function(a,b){var ai=order.indexOf(menuKlucz(a)),bi=order.indexOf(menuKlucz(b));if(ai>=0&&bi>=0)return ai-bi;if(ai>=0)return -1;if(bi>=0)return 1;return 0;});}
+        POZYCJE_MENU=(home?[home]:[]).concat(rest);
       }
-    } catch (e) { /* brak danych — zostaje menu stałe */ }
-    document.querySelectorAll('.menu-vert').forEach(function (nav) {
-      nav.innerHTML = pozycjeHtml(document.body.getAttribute('data-strona') || '');
-    });
-    if (!SYG || !SYG.LAUNCH) {
-      document.querySelectorAll('.foot-podstrony').forEach(function (el) {
-        el.innerHTML = widocznePodstrony().map(function (s2) {
-          return '<span class="sep">·</span><a href="podstrona.html?s=' + encodeURIComponent(s2.slug) + '">' + s2.tytul + '</a>';
-        }).join('');
-      });
-    }
+    }catch(e){/* API niedostępne: pozostaw menu stałe */}
+    document.querySelectorAll('.menu-vert').forEach(function(nav){nav.innerHTML=pozycjeHtml(document.body.getAttribute('data-strona')||'');});
+    if(!SYG||!SYG.LAUNCH)document.querySelectorAll('.foot-podstrony').forEach(function(el){el.innerHTML=widocznePodstrony().map(function(x){return '<span class="sep">·</span><a href="podstrona.html?s='+encodeURIComponent(x.slug)+'">'+escapeHtml(x.tytul)+'</a>';}).join('');});
   }
   function pozycjeHtml(aktywna){
     return POZYCJE_MENU.map(function (m) {
-      return '<a href="' + m[0] + '"' + (m[1] === aktywna ? ' class="on"' : '') + '>' + m[1] + '</a>';
+      return '<a href="' + escapeHtml(m[0]) + '"' + (m[1] === aktywna ? ' class="on"' : '') + '>' + escapeHtml(m[1]) + '</a>';
     }).join('');
   }
 

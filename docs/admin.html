@@ -357,8 +357,7 @@
     <!-- BLOG -->
     <section class="admin-sekcja" id="tab-blog" style="display:none">
       <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Nasze realizacje</h2>
-      <p class="mala">Po prawej lista wpisów (najnowsze na górze, najstarsze na dole) — kliknij wiersz,
-      aby zobaczyć podgląd po lewej. Checkbox „widoczny" pokazuje albo ukrywa wpis na stronie.
+      <p class="mala">Lista jest początkowo ułożona od najnowszego dodanego wpisu. Przeciągnij wpis za uchwyt ⠿, aby zmienić kolejność na stronie; kliknij wiersz, aby zobaczyć podgląd po lewej. Checkbox „widoczny" pokazuje albo ukrywa wpis na stronie.
       Wpis może jednocześnie być produktem sklepu — w trybie edycji zaznacz „Produkt w sklepie",
       a pozycja pojawi się w zakładce Produkty. Zapisane wpisy trafiają do bazy i są pobierane przez stronę realizacji.</p>
       <div class="flash" id="blog-info" style="display:none"></div>
@@ -421,8 +420,8 @@
               <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
             </div>
             <div class="pole">
-              <label for="bf-zajawka">Krótki opis (na kafelek)</label>
-              <textarea id="bf-zajawka" rows="2" placeholder="Dwa zdania, które zachęcą do kliknięcia…"></textarea>
+              <label for="bf-zajawka">Podpis zdjęcia / krótka notka na kafelku</label>
+              <textarea id="bf-zajawka" rows="2" placeholder="Krótki podpis zdjęcia widoczny pod fotografią…"></textarea>
             </div>
             <div class="pole">
               <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
@@ -447,9 +446,10 @@
           </div>
         </div>
         <div>
+          <p class="mala" id="blog-sort-info" role="status" aria-live="polite" style="margin:0 0 6px"></p>
           <div class="tabela-wrap">
             <table class="tabela" id="tabela-blog">
-              <thead><tr><th>Data</th><th>Tytuł</th><th>Widoczny</th></tr></thead>
+              <thead><tr><th>Przesuń</th><th>Dodano</th><th>Tytuł</th><th>Widoczny</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -500,11 +500,14 @@
     <!-- PODSTRONY -->
     <section class="admin-sekcja" id="tab-strony" style="display:none">
       <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podstrony</h2>
-      <p class="mala">Edytujesz treść PRACOWNI (prosty edytor — jak sformatujesz, tak się wyświetli)
-      i dodajesz nowe podstrony z przyciskiem w MENU. Strony-szkielety (Zamówienia, Sklep, Koszyk,
-      Kontakt, Regulamin…) mają własne układy i nie są tutaj — w tej wersji edytujemy treść
-      tekstową wybranych podstron i listę menu.</p>
+      <p class="mala">Zarządzaj własnymi podstronami i kolejnością menu. „Strona główna” jest przypięta na górze; przeciągnij pozostałe pozycje za uchwyt ⠿. Zmiany zapisują się automatycznie.</p>
       <div class="flash" id="strony-info" style="display:none"></div>
+      <div class="admin-card" style="margin:12px 0"><h3 style="margin:0 0 4px;color:var(--butelkowa)">Menu strony</h3>
+        <p class="mala" style="margin:0 0 10px">Przeciągnij pozycje za uchwyt, aby zmienić kolejność.</p>
+        <ol id="menu-sortable-list" class="menu-sortable-list" aria-label="Kolejność pozycji menu"></ol>
+        <p class="mala" id="menu-sort-info" role="status" aria-live="polite" style="margin:8px 0 0"></p>
+      </div>
+      <h3 style="font-size:16px;color:var(--butelkowa);margin:18px 0 6px">Własne podstrony</h3>
       <div class="admin-dwie">
         <div>
           <div class="przyciski" style="justify-content:flex-start">
@@ -950,7 +953,9 @@
     var dane = {
       slider: { autoplay: autoplayVal, kafle: sgKafle() },
       ctaTresc: ctaVal,
-      ctaWidoczny: ctaWidoczny
+      ctaWidoczny: ctaWidoczny,
+      menuKolejnosc: SG_DANE && Array.isArray(SG_DANE.menuKolejnosc) ? SG_DANE.menuKolejnosc : [],
+      blogKolejnosc: SG_DANE && Array.isArray(SG_DANE.blogKolejnosc) ? SG_DANE.blogKolejnosc : []
     };
     SG_DANE = dane;
 
@@ -1549,10 +1554,10 @@
         var odp = await SYG.wezwij('strona-glowna-pobierz', {});
         if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Brak odpowiedzi bazy.');
         SG_BAZA_GOTOWA = true;
-        if (odp.dane && odp.dane.slider && !SG_BRUDNY){
+        if (odp.dane && !SG_BRUDNY){
           var zserwera = sgNaprawObrazy(sgMigrujStare(odp.dane));
-          if (zserwera.slider && Array.isArray(zserwera.slider.kafle) && zserwera.slider.kafle.length > 0){
-            SG_DANE = zserwera;
+          SG_DANE = Object.assign({}, SG_DANE, zserwera);
+          if (SG_DANE.slider && Array.isArray(SG_DANE.slider.kafle) && SG_DANE.slider.kafle.length > 0){
             if (!sgPrawidlowyHtml(SG_DANE.ctaTresc)) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
             odswiezWidokStronyGlownej();
           }
@@ -1989,56 +1994,49 @@
       infoBlog((odp && odp.blad) || 'Nie udało się pobrać wpisów z bazy. Lista nie została zmieniona.');
       return;
     }
-    wpisyBlog = odp.wpisy || [];
-    /* najnowsze na górze, najstarsze na dole */
-    wpisyBlog.sort(function(a, b){
-      var da = String(a.data || ''), db = String(b.data || '');
-      return db < da ? -1 : (db > da ? 1 : 0);
-    });
+    wpisyBlog=odp.wpisy||[];
+    var cfg=null;try{cfg=await SYG.wezwij('strona-glowna-pobierz',{});}catch(ignore){}
+    var order=cfg&&cfg.ok&&cfg.dane&&Array.isArray(cfg.dane.blogKolejnosc)?cfg.dane.blogKolejnosc.map(String):[];
+    wpisyBlog.sort(function(a,b){var ai=order.indexOf(String(a.id)),bi=order.indexOf(String(b.id));if(ai>=0&&bi>=0)return ai-bi;if(ai<0&&bi>=0)return -1;if(ai>=0&&bi<0)return 1;return (Number(b.dodanoSort)||Number(b.id)||0)-(Number(a.dodanoSort)||Number(a.id)||0);});
     if (!wpisWybrany()) wybranyId = wpisyBlog.length ? wpisyBlog[0].id : null;
     rysujListeBlog();
     if (trybEdycji) wypelnijFormularz(wpisWybrany());
     else pokazPodglad();
   }
 
-  /* lista po prawej: data, tytuł, widoczny */
+  /* Lista realizacji z uchwytem do zmiany kolejności. */
   function rysujListeBlog(){
-    var tbody = document.querySelector('#tabela-blog tbody');
-    tbody.innerHTML = wpisyBlog.map(function(w){
-      var wid = w.widoczny !== false;
-      return '<tr data-wiersz="' + w.id + '"' + (Number(w.id) === Number(wybranyId) ? ' class="wybrany"' : '') + '>' +
-        '<td>' + escB(String(w.data || '').slice(0, 10)) + '</td>' +
-        '<td><b>' + escB(w.tytul) + '</b>' +
-        (w.produkt && w.produkt.sklep ? '<br><span class="mala" style="color:var(--butelkowa)">✓ produkt w sklepie</span>' : '') + '</td>' +
-        '<td><label style="cursor:pointer;font-size:14px;white-space:nowrap"><input type="checkbox" class="w-wid" data-id="' + w.id + '"' + (wid ? ' checked' : '') + '> widoczny</label></td></tr>';
-    }).join('') || '<tr><td colspan="3">Brak wpisów.</td></tr>';
-
-    tbody.querySelectorAll('tr[data-wiersz]').forEach(function(tr){
-      tr.addEventListener('click', function(){
-        var id = Number(tr.getAttribute('data-wiersz'));
-        if (Number(wybranyId) === id && !trybEdycji) return;
-        if (trybEdycji && !confirm('Porzucić niezapisane zmiany i przejść do innego wpisu?')) return;
-        wybranyId = id;
-        wyjdzZTrybuEdycji();
-        rysujListeBlog();
-        pokazPodglad();
-      });
-    });
+    var tbody=document.querySelector('#tabela-blog tbody');
+    tbody.innerHTML=wpisyBlog.map(function(w){
+      var raw=String(w.utworzono||'').trim(),label='—',m=/^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
+      if(raw&&/[T ]/.test(raw)){var ts=new Date(raw);if(!isNaN(ts.getTime()))label=ts.toLocaleDateString('pl-PL');}
+      else if(m){var y=+m[1],mo=+m[2]-1,day=+m[3],d=new Date(y,mo,day,12);if(d.getFullYear()===y&&d.getMonth()===mo&&d.getDate()===day)label=d.toLocaleDateString('pl-PL');}
+      var wid=w.widoczny!==false;
+      return '<tr data-wiersz="'+escB(w.id)+'" data-sort-label="'+escB(w.tytul)+'"'+(Number(w.id)===Number(wybranyId)?' class="wybrany"':'')+'>'+
+        '<td><button type="button" class="sort-handle" aria-label="Przeciągnij wpis '+escB(w.tytul)+'" title="Przeciągnij, aby zmienić kolejność">⠿</button></td>'+
+        '<td>'+escB(label)+'</td><td><b>'+escB(w.tytul)+'</b>'+(w.produkt&&w.produkt.sklep?'<br><span class="mala" style="color:var(--butelkowa)">✓ produkt w sklepie</span>':'')+'</td>'+
+        '<td><label style="cursor:pointer;font-size:14px;white-space:nowrap"><input type="checkbox" class="w-wid" data-id="'+escB(w.id)+'"'+(wid?' checked':'')+'> widoczny</label></td></tr>';
+    }).join('')||'<tr><td colspan="4">Brak wpisów.</td></tr>';
+    tbody.querySelectorAll('tr[data-wiersz]').forEach(function(tr){tr.addEventListener('click',function(){
+      var id=Number(tr.getAttribute('data-wiersz'));if(Number(wybranyId)===id&&!trybEdycji)return;
+      if(trybEdycji&&!confirm('Porzucić niezapisane zmiany i przejść do innego wpisu?'))return;
+      wybranyId=id;wyjdzZTrybuEdycji();rysujListeBlog();pokazPodglad();
+    });});
     tbody.querySelectorAll('.w-wid').forEach(function(ch){
-      ch.addEventListener('click', function(e){ e.stopPropagation(); });
-      ch.addEventListener('change', async function(){
-        var id = Number(ch.getAttribute('data-id'));
-        var odp = await SYG.wezwij('blog-widocznosc', { id: id, widoczny: ch.checked });
-        var w = wpisyBlog.find(function(x){ return Number(x.id) === id; });
-        if (odp && odp.ok && w) w.widoczny = ch.checked;
-        else ch.checked = !!(w && w.widoczny !== false);
-        infoBlog(odp && odp.ok
-          ? 'Wpis „' + (w ? w.tytul : '') + '” jest teraz ' + (ch.checked ? 'WIDOCZNY na stronie.' : 'UKRYTY.')
-          : ((odp && odp.blad) || 'Nie zapisano. Zmiana została cofnięta.'));
-        if (Number(wybranyId) === id && !trybEdycji) pokazPodglad();
+      ch.addEventListener('click',function(e){e.stopPropagation();});
+      ch.addEventListener('change',async function(){
+        var id=Number(ch.getAttribute('data-id')),out=await SYG.wezwij('blog-widocznosc',{id:id,widoczny:ch.checked}),w=wpisyBlog.find(function(x){return Number(x.id)===id;});
+        if(out&&out.ok&&w)w.widoczny=ch.checked;else ch.checked=!!(w&&w.widoczny!==false);
+        infoBlog(out&&out.ok?'Wpis „'+(w?w.tytul:'')+'” jest teraz '+(ch.checked?'WIDOCZNY na stronie.':'UKRYTY.'):((out&&out.blad)||'Nie zapisano. Zmiana została cofnięta.'));
+        if(Number(wybranyId)===id&&!trybEdycji)pokazPodglad();
       });
     });
-    document.getElementById('blog-edytuj').disabled = !wpisWybrany();
+    sgPodlaczSortowanie(tbody,'tr[data-wiersz]','.sort-handle','data-wiersz',function(ids){
+      sgZapiszPoleStronyGlownej('blogKolejnosc',ids.map(Number),document.getElementById('blog-sort-info')).then(function(ok){
+        if(ok){var pos={};ids.forEach(function(id,i){pos[String(id)]=i;});wpisyBlog.sort(function(a,b){return pos[String(a.id)]-pos[String(b.id)];});}rysujListeBlog();
+      });
+    },true);
+    document.getElementById('blog-edytuj').disabled=!wpisWybrany();
   }
 
   /* podgląd zaznaczonego wpisu — jak na stronie */
@@ -2238,48 +2236,45 @@
     setTimeout(function(){ f.style.display = 'none'; }, 4000);
   }
 
+  var SG_MENU_BASE=(SYG&&SYG.LAUNCH)?[
+    {key:'index.html',href:'index.html',title:'Strona główna',pinned:true},{key:'realizacje.html',href:'realizacje.html',title:'Nasze realizacje'},
+    {key:'szukaj.html',href:'szukaj.html',title:'Szukaj'},{key:'kontakt.html',href:'kontakt.html',title:'Kontakt'}
+  ]:[
+    {key:'index.html',href:'index.html',title:'Strona główna',pinned:true},{key:'sklep.html',href:'sklep.html',title:'Sklep'},
+    {key:'zamowienia.html',href:'zamowienia.html',title:'Zamówienia'},{key:'wynajem.html',href:'wynajem.html',title:'Wynajem'},
+    {key:'pracownia.html',href:'pracownia.html',title:'Pracownia'},{key:'realizacje.html',href:'realizacje.html',title:'Nasze realizacje'},
+    {key:'wspolpraca.html',href:'wspolpraca.html',title:'Współpraca'},{key:'kontakt.html',href:'kontakt.html',title:'Kontakt'}
+  ];
+  function sgZapiszPoleStronyGlownej(key,value,status){
+    if(status){status.textContent='Zapisywanie…';status.style.color='';}
+    return (async function(){try{var r=await SYG.wezwij('strona-glowna-pobierz',{});if(!r||!r.ok)throw new Error((r&&r.blad)||'Nie udało się odczytać ustawień.');var data=Object.assign({},r.dane||{});data[key]=value;var w=await SYG.wezwij('strona-glowna-zapisz',{dane:data});if(!w||!w.ok)throw new Error((w&&w.blad)||'Serwer nie potwierdził zapisu.');if(SG_DANE)SG_DANE[key]=value.slice();if(status){status.textContent='✓ Zapisano';status.style.color='#24613c';}return true;}catch(e){if(status){status.textContent='Nie zapisano: '+(e.message||'błąd połączenia');status.style.color='#8a2f1d';}return false;}})();
+  }
+  function sgPodlaczSortowanie(container,selector,handleSelector,attribute,save,vertical){
+    if(!container)return;
+    container.querySelectorAll(handleSelector).forEach(function(handle){
+      handle.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();});
+      handle.addEventListener('pointerdown',function(e){if(e.button!==undefined&&e.button!==0)return;var source=handle.closest(selector);if(!source||source.getAttribute('data-sort-pinned')==='1')return;e.preventDefault();var r=source.getBoundingClientRect(),ghost=document.createElement('div');ghost.className='sort-drag-ghost';ghost.textContent=source.getAttribute('data-sort-label')||source.textContent.trim();ghost.style.width=Math.max(170,r.width)+'px';ghost.style.left=r.left+'px';ghost.style.top=r.top+'px';document.body.appendChild(ghost);container._sgDrag={id:e.pointerId,source:source,ghost:ghost,x:e.clientX,y:e.clientY,target:null,moved:false};source.classList.add('sort-source');source.setAttribute('aria-grabbed','true');try{handle.setPointerCapture(e.pointerId);}catch(ignore){}});
+      handle.addEventListener('pointermove',function(e){var st=container._sgDrag;if(!st||st.id!==e.pointerId)return;if(!st.moved&&Math.hypot(e.clientX-st.x,e.clientY-st.y)<5)return;st.moved=true;st.ghost.style.left=(e.clientX-st.ghost.offsetWidth/2)+'px';st.ghost.style.top=(e.clientY-st.ghost.offsetHeight/2)+'px';var hit=document.elementFromPoint(e.clientX,e.clientY),target=hit&&hit.closest?hit.closest(selector):null;if(target&&target.parentNode!==container)target=null;if(target&&target.getAttribute('data-sort-pinned')==='1')target=null;if(st.target&&st.target!==target)st.target.classList.remove('sort-target');st.target=target;if(target&&target!==st.source)target.classList.add('sort-target');});
+      function end(e){var st=container._sgDrag;if(!st||st.id!==e.pointerId)return;container._sgDrag=null;if(st.target)st.target.classList.remove('sort-target');st.source.classList.remove('sort-source');st.source.setAttribute('aria-grabbed','false');st.ghost.remove();if(!st.moved||!st.target||st.target===st.source)return;var r=st.target.getBoundingClientRect(),p=vertical?e.clientY:e.clientX,m=vertical?r.top+r.height/2:r.left+r.width/2,before=p>m?st.target.nextElementSibling:st.target;if(before===st.source)return;container.insertBefore(st.source,before);save(Array.prototype.map.call(container.querySelectorAll(selector),function(item){return item.getAttribute(attribute);}));}
+      handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);
+    });
+  }
+  function rysujMenuSortowalne(pages,order){
+    var list=document.getElementById('menu-sortable-list');if(!list)return;
+    var custom=(pages||[]).filter(function(x){return x.menu&&x.slug!=='pracownia';}).map(function(x){return {key:'podstrona:'+x.slug,href:'podstrona.html?s='+encodeURIComponent(x.slug),title:x.tytul||x.slug,custom:true};});
+    var items=SG_MENU_BASE.concat(custom),home=items.find(function(x){return x.key==='index.html';}),rest=items.filter(function(x){return x.key!=='index.html';});order=Array.isArray(order)?order.map(String):[];
+    rest.sort(function(a,b){var ai=order.indexOf(a.key),bi=order.indexOf(b.key);if(ai>=0&&bi>=0)return ai-bi;if(ai>=0)return -1;if(bi>=0)return 1;return 0;});
+    list.innerHTML=(home?[home]:[]).concat(rest).map(function(x){return '<li class="menu-sort-item'+(x.pinned?' menu-sort-pinned':'')+'" data-menu-key="'+escB(x.key)+'" data-sort-label="'+escB(x.title)+'"'+(x.pinned?' data-sort-pinned="1"':'')+'>'+(x.pinned?'<span class="menu-sort-pin" aria-hidden="true">⌂</span>':'<button class="sort-handle" type="button" aria-label="Przeciągnij '+escB(x.title)+'" title="Przeciągnij, aby zmienić kolejność">⠿</button>')+'<span class="menu-sort-name">'+escB(x.title)+'</span><span class="menu-sort-type">'+(x.custom?'Podstrona':'Strona')+'</span><a class="menu-sort-preview" href="'+escB(x.href)+'" target="_blank" rel="noopener">Podgląd</a></li>';}).join('');
+    sgPodlaczSortowanie(list,'li[data-menu-key]','.sort-handle','data-menu-key',function(keys){sgZapiszPoleStronyGlownej('menuKolejnosc',keys.filter(function(k){return k!=='index.html';}),document.getElementById('menu-sort-info'));},true);
+  }
   async function ladujStrony(){
-    var odp = await SYG.wezwij('strony-lista', {});
-    if (!odp || !odp.ok){
-      infoStrony((odp && odp.blad) || 'Nie udało się pobrać podstron z bazy. Lista nie została zmieniona.');
-      return;
-    }
-    var lista = odp.strony || [];
-    var tbody = document.querySelector('#tabela-stron tbody');
-    tbody.innerHTML = lista.map(function(s){
-      return '<tr>' +
-        '<td><b>' + s.tytul + '</b><br><span class="mala">/' + s.slug + '</span></td>' +
-        '<td>' + (s.menu ? '✓' : '—') + '</td>' +
-        '<td>' + s.kol + '</td>' +
-        '<td style="white-space:nowrap">' +
-        '<a class="btn outline" style="padding:6px 12px;font-size:13px" href="podstrona.html?s=' + encodeURIComponent(s.slug) + '" target="_blank" rel="noopener">Podgląd</a> ' +
-        '<button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="' + s.slug + '">Edytuj</button> ' +
-        '<button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="' + s.slug + '">Usuń</button>' +
-        '</td></tr>';
-    }).join('') || '<tr><td colspan="4">Brak podstron. Dodaj pierwszą.</td></tr>';
-
-    tbody.querySelectorAll('button[data-edit]').forEach(function(b){
-      b.addEventListener('click', function(){
-        var s = lista.find(function(x){ return x.slug === b.getAttribute('data-edit'); });
-        if (!s) return;
-        edycjaStrona = s.slug;
-        document.getElementById('strona-form-tytul').textContent = 'Edycja: ' + s.tytul;
-        document.getElementById('sf-slug').value = s.slug;
-        document.getElementById('sf-tytul').value = s.tytul || '';
-        document.getElementById('sf-menu').checked = s.menu !== 0;
-        document.getElementById('sf-kol').value = s.kol || 10;
-        stronaEdytor.ustaw(s.tresc || '');
-        document.getElementById('strona-form').style.display = 'block';
-      });
-    });
-    tbody.querySelectorAll('button[data-usun]').forEach(function(b){
-      b.addEventListener('click', async function(){
-        if (!confirm('Usunąć podstronę „' + b.getAttribute('data-usun') + '"? Zniknie też z menu.')) return;
-        var odp2 = await SYG.wezwij('strona-usun', { slug: b.getAttribute('data-usun') });
-        infoStrony(odp2.ok ? 'Podstrona usunięta.' : (odp2.blad || 'Nie usunięto.'));
-        ladujStrony();
-      });
-    });
+    var response=null,cfg=null;try{response=await SYG.wezwij('strony-lista',{});}catch(e){infoStrony('Nie udało się pobrać podstron: '+(e.message||'błąd połączenia'));}try{cfg=await SYG.wezwij('strona-glowna-pobierz',{});}catch(ignore){}
+    var valid=!!(response&&response.ok&&Array.isArray(response.strony)),pages=valid?response.strony:[];if(!valid)infoStrony((response&&response.blad)||'API nie zwróciło listy podstron w oczekiwanym formacie. Pozycje menu stałego nadal są dostępne.');
+    rysujMenuSortowalne(pages,cfg&&cfg.ok&&cfg.dane&&cfg.dane.menuKolejnosc);
+    var tbody=document.querySelector('#tabela-stron tbody');
+    tbody.innerHTML=pages.map(function(x){return '<tr><td><b>'+escB(x.tytul)+'</b><br><span class="mala">/'+escB(x.slug)+'</span></td><td>'+(x.menu?'✓':'—')+'</td><td>'+escB(x.kol)+'</td><td style="white-space:nowrap"><a class="btn outline" style="padding:6px 12px;font-size:13px" href="podstrona.html?s='+encodeURIComponent(x.slug)+'" target="_blank" rel="noopener">Podgląd</a> <button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="'+escB(x.slug)+'">Edytuj</button> <button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="'+escB(x.slug)+'">Usuń</button></td></tr>';}).join('')||(valid?'<tr><td colspan="4">Brak własnych podstron. Pozycje menu są widoczne powyżej.</td></tr>':'<tr><td colspan="4">Nie można wyświetlić podstron: błędna odpowiedź API. Szczegóły podano powyżej.</td></tr>');
+    tbody.querySelectorAll('button[data-edit]').forEach(function(b){b.addEventListener('click',function(){var x=pages.find(function(y){return y.slug===b.getAttribute('data-edit');});if(!x)return;edycjaStrona=x.slug;document.getElementById('strona-form-tytul').textContent='Edycja: '+x.tytul;document.getElementById('sf-slug').value=x.slug;document.getElementById('sf-tytul').value=x.tytul||'';document.getElementById('sf-menu').checked=x.menu!==0;document.getElementById('sf-kol').value=x.kol||10;stronaEdytor.ustaw(x.tresc||'');document.getElementById('strona-form').style.display='block';});});
+    tbody.querySelectorAll('button[data-usun]').forEach(function(b){b.addEventListener('click',async function(){if(!confirm('Usunąć podstronę „'+b.getAttribute('data-usun')+'”? Zniknie też z menu.'))return;var out=await SYG.wezwij('strona-usun',{slug:b.getAttribute('data-usun')});infoStrony(out&&out.ok?'Podstrona usunięta.':((out&&out.blad)||'Nie usunięto.'));ladujStrony();});});
   }
 
   document.getElementById('strona-nowa').addEventListener('click', function(){

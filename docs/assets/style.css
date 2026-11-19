@@ -1124,3 +1124,28 @@ body.launch-budowa main.wrap > :not(.budowa-box){display:none}
 .sg-slajd-akcje button.km-edycja{flex:1;min-width:48px;white-space:nowrap}
 .sg-slider-podglad .sl-cien{z-index:2}
 .sg-slider-podglad .sl-tresc{z-index:3}
+
+/* Realizacje: trzy duże kafle na desktopie, ze zdjęciem i podpisem. */
+.blog-siatka{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,26px)}
+.blog-kafel{min-width:0}
+.blog-kafel-foto{margin:0;background:#f3eee7}
+.blog-kafel-foto img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f3eee7}
+.blog-kafel .blog-zajawka{display:block;padding:10px 14px 12px;background:#fbf7f0;color:rgba(51,38,28,.78);font-size:14px;line-height:1.45}
+.blog-kafel-tresc{padding:14px 16px 18px;gap:6px}
+.blog-kafel .nazwa{font-size:clamp(19px,1.6vw,24px)}
+.blog-kafel .blog-data{font-size:14px}
+@media(max-width:900px){.blog-siatka{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.blog-siatka{grid-template-columns:minmax(0,1fr);gap:18px}.blog-kafel-foto img{aspect-ratio:16/10}.blog-kafel-tresc{padding:13px 14px 16px}}
+
+/* Uchwyty kolejności w panelu — obsługują także ekran dotykowy. */
+.menu-sortable-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.menu-sort-item{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border:1px solid #d8c9b8;border-radius:6px;background:#fff}
+.menu-sort-item.menu-sort-pinned{background:#eef3ef;border-color:#bdcfc2}
+.menu-sort-pin{width:34px;flex:none;text-align:center;font-size:19px;color:var(--butelkowa)}
+.menu-sort-name{flex:1;min-width:0;font-weight:700;color:var(--butelkowa)}
+.menu-sort-type,.menu-sort-preview{font-size:12px;white-space:nowrap}
+.menu-sort-type{color:#756b61}.menu-sort-preview{color:var(--brunatny)}
+.sort-handle{display:inline-grid;place-items:center;flex:none;width:34px;height:34px;border:1px solid #d5c4b1;border-radius:5px;background:#faf7f2;color:var(--brunatny);font-size:20px;line-height:1;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.sort-handle:active{cursor:grabbing}.sort-source{opacity:.35!important}.sort-target{outline:3px solid var(--zloty);outline-offset:1px}
+.sort-drag-ghost{position:fixed;z-index:100000;pointer-events:none;opacity:.95;padding:12px 14px;border:1px solid var(--butelkowa);border-radius:6px;background:#fff;color:var(--butelkowa);font-weight:700;box-shadow:0 10px 28px rgba(0,0,0,.24)}
+#tabela-blog .sort-handle{width:32px;height:32px}
