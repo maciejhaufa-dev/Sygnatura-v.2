@@ -21,8 +21,8 @@ import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DANE = join(ROOT, 'admin', 'panele');
 const PLIK_DANYCH = join(DANE, 'dane.json');
-const PLIK_NAKLADKI = join(DANE, 'dane.js');   // to samo, ale jako skrypt dla strony
 const PLIK_HASLA = join(DANE, '.haslo');
+const PLIK_NAKLADKI = join(DANE, 'dane.js');   // to samo, ale jako skrypt dla strony
 const PORT = Number(process.argv[2] || process.env.PORT || 8003);
 const HOST = process.env.HOST || '0.0.0.0';
 
