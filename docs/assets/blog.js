@@ -117,6 +117,27 @@
         '<p><a class="btn" href="blog.html" style="margin-top:12px">← Wróć do realizacji</a></p></div>';
       return;
     }
+    const canonicalUrl = 'https://studiosygnatura.pl/blog-wpis.html?id=' + encodeURIComponent(id);
+    const opisTekst = String(w.zajawka || w.tresc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155);
+    document.title = (w.tytul || 'Realizacja') + ' | Studio Sygnatura Poznań';
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+    canonical.href = canonicalUrl;
+    function setMeta(selector, attr, value, property) {
+      let el = document.querySelector(selector);
+      if (!el) { el = document.createElement('meta'); el.setAttribute(property ? 'property' : 'name', attr); document.head.appendChild(el); }
+      el.content = value;
+    }
+    setMeta('meta[name="description"]', 'description', opisTekst || 'Realizacja Studio Sygnatura z Poznania — drewniane dekoracje i projekty na zamówienie.');
+    setMeta('meta[property="og:title"]', 'og:title', document.title, true);
+    setMeta('meta[property="og:description"]', 'og:description', opisTekst, true);
+    setMeta('meta[property="og:url"]', 'og:url', canonicalUrl, true);
+    if (w.okladka) setMeta('meta[property="og:image"]', 'og:image', new URL(w.okladka, location.href).href, true);
+    const article = {"@context":"https://schema.org","@type":"Article","headline":w.tytul || 'Realizacja Studio Sygnatura',"description":opisTekst,"image":w.okladka ? [new URL(w.okladka, location.href).href] : undefined,"datePublished":w.data || undefined,"author":{"@type":"Organization","name":"Studio Sygnatura","url":"https://studiosygnatura.pl/"},"publisher":{"@type":"Organization","name":"Studio Sygnatura","url":"https://studiosygnatura.pl/"},"mainEntityOfPage":canonicalUrl};
+    let articleLd = document.getElementById('seo-article-jsonld');
+    if (!articleLd) { articleLd = document.createElement('script'); articleLd.type = 'application/ld+json'; articleLd.id = 'seo-article-jsonld'; document.head.appendChild(articleLd); }
+    articleLd.textContent = JSON.stringify(article);
+
     const lb = lightbox();
     const wszystkie = [w.okladka].concat((w.galeria || []).filter(function (g) { return g && g !== w.okladka; }));
 

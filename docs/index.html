@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Studio Sygnatura — dekoracje, personalizacja, sklep z duszą</title>
-<link rel="canonical" href="https://www.studiosygnatura.pl/">
-<meta property="og:url" content="https://www.studiosygnatura.pl/">
+<title>Studio Sygnatura Poznań | Dekoracje, szyldy i prezenty z drewna</title>
+<link rel="canonical" href="https://studiosygnatura.pl/">
+<meta name="description" content="Studio Sygnatura z Poznania: drewniane szyldy, szopki LED, personalizowane prezenty i wynajem dekoracji na wydarzenia. Projekty na zamówienie.">
+<meta property="og:url" content="https://studiosygnatura.pl/">
+<meta property="og:title" content="Studio Sygnatura Poznań | Dekoracje, szyldy i prezenty z drewna">
+<meta property="og:description" content="Studio Sygnatura z Poznania: drewniane szyldy, szopki LED, personalizowane prezenty i wynajem dekoracji na wydarzenia. Projekty na zamówienie.">
+
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Studio Sygnatura">
 <meta property="og:locale" content="pl_PL">
-<meta property="og:title" content="Studio Sygnatura — dekoracje, personalizacja, sklep z duszą">
-<meta property="og:description" content="Studio Sygnatura — rodzinna manufaktura. Wynajem dekoracji na wydarzenia, personalizowane prezenty i sklep z dekoracjami z drewna i światła.">
-<meta property="og:image" content="https://www.studiosygnatura.pl/assets/og.jpg">
+<meta property="og:image" content="https://studiosygnatura.pl/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="description" content="Studio Sygnatura — rodzinna manufaktura. Wynajem dekoracji na wydarzenia, personalizowane prezenty i sklep z dekoracjami z drewna i światła.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -176,11 +177,11 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .slider{position:relative;overflow:hidden;border:1px solid rgba(107,69,48,.25);
   background:var(--butelkowa);width:100%;max-width:none;margin:0 auto;aspect-ratio:16/8.6;max-height:600px}
 @media (min-width:761px){
-  .page{height:100vh;height:100dvh;overflow:hidden}
-  .srodek{flex:1 1 auto;min-height:0}
-  .prawa{min-height:0}
-  .main{display:flex;flex:1 1 auto;min-height:0;padding:0}
-  .slider{flex:1 1 auto;height:100%;min-height:0;max-height:none;aspect-ratio:auto;margin:0;border:0}
+  .page{height:auto;min-height:100vh;min-height:100dvh;overflow:visible}
+  .srodek{flex:1 0 auto;min-height:100vh;min-height:100dvh}
+  .prawa{min-height:100vh;min-height:100dvh}
+  .main{display:flex;flex:1 0 auto;min-height:72vh;padding:0}
+  .slider{flex:1 1 auto;height:auto;min-height:72vh;max-height:none;aspect-ratio:auto;margin:0;border:0}
   .sl-track,.sl-slide{height:100%;min-height:100%}
 }
 .sl-track{display:flex;height:100%;transition:transform .65s cubic-bezier(.65,.05,.36,1)}
@@ -222,6 +223,12 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 .sl-dots button{width:9px;height:9px;border-radius:10px;border:none;background:rgba(251,247,240,.45);
   cursor:pointer;padding:0;transition:all .3s}
 .sl-dots button.akt{width:30px;background:var(--zloty)}
+
+/* --- lokalny opis SEO: widoczny tekst, nie ukryty keyword stuffing --- */
+.seo-local{padding:18px clamp(16px,3vw,34px) 24px;background:#fff;border-top:1px solid rgba(107,69,48,.2);font-family:var(--sans)}
+.seo-local h1{font-family:var(--serif);font-size:clamp(22px,2.4vw,30px);color:var(--butelkowa);margin:0 0 8px}
+.seo-local p{font-size:15px;line-height:1.65;margin:7px 0;color:rgba(51,38,28,.85)}
+.seo-local a{color:var(--butelkowa);text-decoration:underline;text-underline-offset:3px}
 
 /* --- jak działamy + CTA --- */
 .cta{flex:none;padding:26px clamp(12px,1.5vw,20px) 40px}
@@ -345,6 +352,16 @@ html.dotyk .social{margin-top:14px}
 .tre-grupa .tre-ksztalt,.tre-grupa .tre-przycisk-obiekt,.tre-grupa .tre-blok,.tre-grupa img{position:absolute}
 .tre-tabela td{vertical-align:top}
 </style>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {"@type":"Organization","@id":"https://studiosygnatura.pl/#organization","name":"Studio Sygnatura","url":"https://studiosygnatura.pl/","logo":"https://studiosygnatura.pl/assets/sygnet.svg","image":"https://studiosygnatura.pl/assets/og.jpg","description":"Poznańska pracownia tworząca drewniane szyldy, szopki LED, dekoracje na wydarzenia i personalizowane prezenty.","email":"kontakt@studiosygnatura.pl","telephone":"+48538124538","areaServed":[{"@type":"City","name":"Poznań"},{"@type":"AdministrativeArea","name":"Wielkopolska"}],"sameAs":["https://www.instagram.com/studiosygnatura/","https://www.facebook.com/p/Studio-SygNatura-61595255863642/","https://pl.pinterest.com/studiosygnatura/"]},
+    {"@type":"WebSite","@id":"https://studiosygnatura.pl/#website","url":"https://studiosygnatura.pl/","name":"Studio Sygnatura","inLanguage":"pl-PL","publisher":{"@id":"https://studiosygnatura.pl/#organization"}}
+  ]
+}
+</script>
 </head>
 <body data-strona="Strona główna">
 
@@ -465,6 +482,11 @@ html.dotyk .social{margin-top:14px}
       <div class="sl-dots" id="sl-dots"></div>
     </div>
   </main>
+  <section class="seo-local" aria-labelledby="seo-local-title">
+    <h1 id="seo-local-title">Studio Sygnatura — drewniane dekoracje i prezenty z Poznania</h1>
+    <p>Projektujemy i wykonujemy w Poznaniu drewniane szyldy, szopki warstwowe z podświetleniem LED, personalizowane prezenty oraz dekoracje na wesela i wydarzenia. Działamy w Poznaniu i okolicy; wybrane produkty wysyłamy na terenie Polski.</p>
+    <p><a href="wynajem.html">Wynajem dekoracji</a> · <a href="sklep.html">Sklep z dekoracjami</a> · <a href="personalizacja.html">Prezenty personalizowane</a> · <a href="realizacje.html">Nasze realizacje</a></p>
+  </section>
 
   <section class="cta" id="cta-sekcja">
     <div class="jak" id="cta-tresc-box">

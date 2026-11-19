@@ -8,8 +8,9 @@
 <meta property="og:site_name" content="Studio Sygnatura">
 <meta property="og:locale" content="pl_PL">
 <meta property="og:title" content="Studio Sygnatura">
-<meta property="og:description" content="Studio Sygnatura — rodzinna pracownia z Poznania. Dekoracje i prezenty z drewna na zamówienie — zobacz nasze realizacje i napisz do nas.">
-<meta property="og:image" content="https://www.studiosygnatura.pl/assets/og.jpg">
+<meta property="og:description" content="Studio Sygnatura — pracownia z Poznania. Dekoracje, szyldy i prezenty wykonywane na zamówienie.">
+<meta name="description" content="Studio Sygnatura — pracownia z Poznania. Dekoracje, szyldy i prezenty wykonywane na zamówienie.">
+<meta property="og:image" content="https://studiosygnatura.pl/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +48,20 @@
         '<p><a href="index.html" class="btn">← Strona główna</a></p>';
       return;
     }
-    document.title = strona.tytul + ' — Studio Sygnatura';
+    document.title = strona.tytul + ' — Studio Sygnatura Poznań';
+    var canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+    canonical.href = 'https://studiosygnatura.pl/podstrona.html?s=' + encodeURIComponent(strona.slug);
+    var opis = String(strona.tresc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155);
+    var desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.content = opis || 'Studio Sygnatura z Poznania — informacje o pracowni i ofercie.';
+    var ogUrl = document.querySelector('meta[property="og:url"]');
+    if (!ogUrl) { ogUrl = document.createElement('meta'); ogUrl.setAttribute('property','og:url'); document.head.appendChild(ogUrl); }
+    ogUrl.content = canonical.href;
+    var ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.content = document.title;
+    var ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.content = desc.content;
     document.body.setAttribute('data-strona', strona.tytul);
     kontener.innerHTML = strona.tresc || '<p class="mala">Ta podstrona nie ma jeszcze treści.</p>';
     var h1 = document.getElementById('strona-tytul');
