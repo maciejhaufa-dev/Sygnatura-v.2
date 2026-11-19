@@ -796,3 +796,58 @@ ul{margin:0;padding:0;list-style:none}
   .site-head,.site-foot,.cta-band,.pasek-info,.hero-actions,.strip{display:none}
   body{background:#fff}
 }
+
+/* ============================================================
+   TRYB EDYCJI (klik-w-element) — panel na dole ekranu
+   Widoczny tylko po uruchomieniu edytora (admin/edytor.js).
+   Kolory z księgi znaku: butelkowa zieleń + złoto.
+   ============================================================ */
+.syg-edycja{outline:2px dashed rgba(201,162,39,.85) !important;outline-offset:3px;cursor:pointer !important}
+.syg-edycja:hover{outline-style:solid;background:rgba(201,162,39,.10) !important}
+body.syg-tryb [data-pole]:not(.syg-edycja){cursor:pointer}
+
+#syg-panel{
+  position:fixed;left:0;right:0;bottom:0;z-index:2147483000;
+  background:#1E4534;color:#F2EADD;
+  box-shadow:0 -8px 30px rgba(0,0,0,.28);
+  padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+  font-family:var(--sans);font-size:14px;
+  display:grid;gap:10px;
+  max-height:70vh;overflow-y:auto;
+  border-top:3px solid var(--miod);
+}
+#syg-panel[hidden]{display:none}
+.syg-wiersz{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.syg-etykieta{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#C9AE84;flex:1 1 auto;min-width:0}
+.syg-etykieta b{color:#fff;letter-spacing:0;text-transform:none;font-size:13px;display:block;margin-top:2px}
+#syg-panel textarea,#syg-panel input{
+  width:100%;font:inherit;font-size:16px; /* 16px = brak auto-zoomu na iPhonie */
+  padding:11px 12px;border-radius:6px;border:1px solid rgba(201,174,132,.45);
+  background:#FFFDF9;color:#2C2A26;resize:vertical;
+}
+#syg-panel textarea{min-height:84px;line-height:1.45}
+#syg-panel input[type=number]{max-width:140px}
+.syg-przyciski{display:flex;gap:8px;flex-wrap:wrap}
+.syg-b{
+  appearance:none;border:0;border-radius:6px;padding:11px 16px;
+  font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+  min-height:44px; /* wygodne dla palca */
+}
+.syg-b.glowny{background:var(--miod);color:#241D12}
+.syg-b.poboczny{background:rgba(255,255,255,.12);color:#F2EADD}
+.syg-b.niebezpieczny{background:rgba(200,70,50,.85);color:#fff}
+.syg-b:disabled{opacity:.5;cursor:default}
+.syg-podpowiedz{font-size:11.5px;color:#A79C8D;line-height:1.4}
+.syg-status{font-size:12px;color:#DCC39A;min-height:16px}
+#syg-przycisk{
+  position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:2147482999;
+  display:inline-flex;align-items:center;gap:7px;
+  background:#1E4534;color:#F2EADD;border:1px solid var(--miod);
+  border-radius:999px;padding:10px 16px;font:inherit;font-size:13px;font-weight:600;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;min-height:44px;
+}
+#syg-przycisk b{color:var(--miod);font-size:15px}
+@media (max-width:520px){
+  #syg-przycisk{padding:9px 13px;font-size:12px}
+  .syg-b{flex:1 1 auto}
+}

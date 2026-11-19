@@ -128,19 +128,46 @@ http.createServer(async (req, res) => {
     }
 
     if (p === '/api/stan') {
+      // tryb klik-w-element czyta ten adres prosto ze strony (inny port)
       if (!sesjaOK(req)) return json(res, 401, { ok: false, blad: 'Zaloguj się.' });
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
       return json(res, 200, { ok: true, ...(await czytajDane()) });
+    }
+
+    if (req.method === 'OPTIONS' && p.startsWith('/api/')) {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': req.headers.origin || '*',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+      });
+      return res.end();
     }
 
     if (p === '/api/zapisz' && req.method === 'POST') {
       if (!sesjaOK(req)) return json(res, 401, { ok: false, blad: 'Sesja wygasła — zaloguj się ponownie.' });
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
       const d = await cialo(req);
       const stan = await czytajDane();
       const kopia = JSON.stringify(stan);
-      if (d.produkty) stan.produkty = d.produkty;
+      // zwykły zapis z panelu przysyła całe listy; tryb klik-w-element
+      // przysyła jedno pole — wtedy tylko je podmieniamy
+      if (d.produkty) {
+        if (d.produkty.length === 1 && d.produkty[0].id) {
+          const z = d.produkty[0];
+          const i = (stan.produkty || []).findIndex((p) => p.id === z.id);
+          if (i >= 0) stan.produkty[i] = { ...stan.produkty[i], ...z };
+          else { stan.produkty = stan.produkty || []; stan.produkty.push(z); }
+        } else {
+          stan.produkty = d.produkty;
+        }
+      }
       if (d.ustawienia) stan.ustawienia = { ...stan.ustawienia, ...d.ustawienia };
+      stan.wersja = Date.now();   // strona po tym poznaje, że są nowe dane
       await zapiszDane(stan);
-      return json(res, 200, { ok: true, cofnij: kopia.slice(0, 200000) });
+      return json(res, 200, { ok: true, wersja: stan.wersja, cofnij: kopia.slice(0, 200000) });
     }
 
     /* ---------- pliki ---------- */

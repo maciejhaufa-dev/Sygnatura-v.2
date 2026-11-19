@@ -96,12 +96,30 @@
      Facebook / Instagram / Pinterest: adresy z profilu firmy. */
   // adresy z księgi znaku; pusty adres = ikona widoczna, ale nieklikalna.
   // Panel może nadpisać każdy adres przez SYG_PANEL.ustawienia.<fb|ig|pin|yt>.
+  const POLE_SOCIAL = ['fb', 'ig', 'pin', 'youtube'];
   const SOCIAL = [
     ['Facebook', 'fb', PU.fb || 'https://www.facebook.com/p/Studio-SygNatura-61595255863642/'],
     ['Instagram', 'ig', PU.ig || 'https://www.instagram.com/studiosygnatura/'],
     ['Pinterest', 'pin2', PU.pin || 'https://pl.pinterest.com/studiosygnatura/'],
     ['YouTube', 'yt', PU.youtube || '']
   ];
+
+  /* Pola, które operator może zmienić klikając w element na stronie.
+     Te same nazwy co w panelu; edytor (admin/edytor.js) ich używa. */
+  const POLA = {
+    hero_tytul: { etykieta: 'Nagłówek na stronie głównej', typ: 'wielo' },
+    hero_lead: { etykieta: 'Podtytuł pod nagłówkiem', typ: 'wielo' },
+    hero_przycisk: { etykieta: 'Napis na przycisku', typ: 'krotkie' },
+    sekcja_tytul: { etykieta: 'Tytuł sekcji z produktami', typ: 'krotkie' },
+    telefon: { etykieta: 'Telefon', typ: 'krotkie' },
+    mail: { etykieta: 'E-mail', typ: 'krotkie' },
+    obszar: { etykieta: 'Obszar działania', typ: 'krotkie' },
+    youtube: { etykieta: 'Adres kanału YouTube', typ: 'krotkie' },
+    fb: { etykieta: 'Adres Facebooka', typ: 'krotkie' },
+    ig: { etykieta: 'Adres Instagrama', typ: 'krotkie' },
+    pin: { etykieta: 'Adres Pinterest', typ: 'krotkie' }
+  };
+  window.SYG_POLA = POLA;
 
   const MENU = [
     ['sklep.html', 'Produkty', true],
@@ -256,7 +274,7 @@
     </form>
 
     <div class="head-akcje">
-      <a class="ha-item tel" href="${esc(telHref)}">
+      <a class="ha-item tel" href="${esc(telHref)}" data-pole="telefon">
         ${I.tel}<div><b>${esc(F.tel)}</b><span>Odpowiedź 1–2 dni robocze</span></div>
       </a>
       <span class="ha-sep" aria-hidden="true"></span>
@@ -307,9 +325,9 @@
     <div>
       <h4>Bądźmy w kontakcie</h4>
       <div class="social">
-        ${SOCIAL.map(([nazwa, ikona, adres]) => adres
-          ? `<a href="${esc(adres)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(nazwa)}" title="${esc(nazwa)}">${I[ikona]}</a>`
-          : `<span class="social-brak" role="img" aria-label="${esc(nazwa)} — kanał w przygotowaniu" title="${esc(nazwa)} — kanał w przygotowaniu">${I[ikona]}</span>`
+        ${SOCIAL.map(([nazwa, ikona, adres], i) => adres
+          ? `<a href="${esc(adres)}" data-pole="${POLE_SOCIAL[i]}" target="_blank" rel="noopener noreferrer" aria-label="${esc(nazwa)}" title="${esc(nazwa)}">${I[ikona]}</a>`
+          : `<span class="social-brak" role="img" data-pole="${POLE_SOCIAL[i]}" aria-label="${esc(nazwa)} — kanał w przygotowaniu" title="${esc(nazwa)} — kanał w przygotowaniu">${I[ikona]}</span>`
         ).join('')}
       </div>
       <p class="social-label">Zapisz się do newslettera</p>
@@ -325,8 +343,8 @@
       <h4>Kontakt</h4>
       <ul class="foot-contact">
         <li>${I.tel}<a href="${esc(telHref)}">${esc(F.tel)}</a></li>
-        <li>${I.mail}<a href="mailto:${esc(F.mail)}">${esc(F.mail)}</a></li>
-        <li>${I.pin}<span>Studio Sygnatura, ${esc(F.obszar)}</span></li>
+        <li>${I.mail}<a href="mailto:${esc(F.mail)}" data-pole="mail">${esc(F.mail)}</a></li>
+        <li>${I.pin}<span data-pole="obszar">Studio Sygnatura, ${esc(F.obszar)}</span></li>
       </ul>
     </div>
   </div>
@@ -476,7 +494,7 @@
     document.dispatchEvent(new CustomEvent('sygnatura:gotowe'));
   }
 
-  window.SYG_UI = { esc, zl, I, IKONA: I, kartaProduktu, kartaRealizacji, odznakaProduktu, MENU, foto };
+  window.SYG_UI = { esc, zl, I, IKONA: I, kartaProduktu, kartaRealizacji, odznakaProduktu, MENU, foto, POLA };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montuj);
   else montuj();
 })();
