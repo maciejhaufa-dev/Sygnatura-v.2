@@ -19,6 +19,7 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0;background:var(--biel);color:var(--orzech);
@@ -65,16 +66,17 @@ input,textarea,select{font:inherit;color:inherit}
 
 /* ---------- pasek górny ---------- */
 .pasek{
-  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
-  gap:12px;padding:10px var(--pad);background:rgba(250,248,245,.96);
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:8px 12px;padding:10px var(--pad);background:rgba(250,248,245,.96);
   backdrop-filter:blur(8px);border-bottom:1px solid var(--ramka);
 }
 .pasek-znak{display:flex;align-items:center;gap:9px}
 .pasek-znak b{font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--czern)}
-.pasek-akcje{display:flex;align-items:center;gap:10px}
+.pasek-akcje{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .stan{font-size:12.5px;color:var(--szary)}
 .stan.ok{color:var(--zielony)}
 .btn-ikona{
+  display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap;
   min-height:40px;padding:0 12px;border:1px solid var(--ramka);border-radius:8px;
   background:#fff;font-size:13px;font-weight:600;color:var(--czern);
 }

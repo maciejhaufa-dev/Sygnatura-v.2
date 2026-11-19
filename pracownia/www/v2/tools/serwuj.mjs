@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.argv[2] || process.env.PORT || 8002);
+const PANEL_PORT = Number(process.env.PANEL_PORT || 8003);
 const HOST = process.env.HOST || '0.0.0.0';
 
 const TYPY = {
@@ -28,10 +29,32 @@ const TYPY = {
   '.txt': 'text/plain; charset=utf-8'
 };
 
+function przekazDoPanelu(req, res) {
+  const naglowki = { ...req.headers };
+  delete naglowki.host;
+  const proxy = http.request({
+    hostname: '127.0.0.1',
+    port: PANEL_PORT,
+    path: req.url,
+    method: req.method,
+    headers: naglowki
+  }, (odp) => {
+    res.writeHead(odp.statusCode || 502, odp.headers);
+    odp.pipe(res);
+  });
+  proxy.on('error', () => {
+    res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ ok: false, blad: 'Serwer panelu (port ' + PANEL_PORT + ') nie odpowiada.' }));
+  });
+  req.pipe(proxy);
+}
+
 http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     let sciezka = decodeURIComponent(url.pathname);
+    if (sciezka.startsWith('/api/')) { przekazDoPanelu(req, res); return; }
+    if (sciezka === '/admin') { res.writeHead(302, { Location: '/admin/' }); res.end(); return; }
     if (sciezka.endsWith('/')) sciezka += 'index.html';
     const plik = normalize(join(ROOT, sciezka));
     if (!plik.startsWith(ROOT)) { res.writeHead(403).end('403'); return; }

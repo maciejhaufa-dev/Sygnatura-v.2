@@ -18,7 +18,7 @@
     <h1>Panel pracowni</h1>
     <p class="logowanie-opis">Zaloguj się, żeby zmieniać ceny, zdjęcia i teksty na stronie.</p>
 
-    <form id="forma-logowania" novalidate autocomplete="on">
+    <form id="forma-logowania" method="post" action="/api/logowanie" novalidate autocomplete="on">
       <label for="haslo">Hasło</label>
       <div class="pole-haslo">
         <input id="haslo" name="haslo" type="password" autocomplete="current-password"
@@ -47,6 +47,7 @@
     </div>
     <div class="pasek-akcje">
       <span id="stan-zapisu" class="stan" role="status" aria-live="polite"></span>
+      <a class="btn-ikona" href="../index.html?edycja=1">Na stronie ✎</a>
       <button type="button" id="przycisk-wyloguj" class="btn-ikona" aria-label="Wyloguj">Wyloguj</button>
     </div>
   </header>

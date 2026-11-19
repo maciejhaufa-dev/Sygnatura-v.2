@@ -12,17 +12,21 @@
 
   const API = '';                                  // ten sam serwer co panel
   const KLUCZ_TOKENU = 'syg-token';
+  let pamiecToken = '';
 
   /* Sesja działa na dwa sposoby: ciasteczkiem (najlepiej) albo tokenem
      w nagłówku. Token jest zapasem — jeśli przeglądarka albo proxy
-     zgubi ciasteczko, panel i tak się zaloguje. */
+     zgubi ciasteczko, panel i tak się zaloguje. Trzymamy go i w pamięci,
+     i w localStorage (na wypadek trybu prywatnego lub blokady iframe). */
   function token() {
-    try { return localStorage.getItem(KLUCZ_TOKENU) || ''; } catch { return ''; }
+    if (pamiecToken) return pamiecToken;
+    try { return localStorage.getItem(KLUCZ_TOKENU) || ''; } catch (_) { return ''; }
   }
   function zapamietajToken(t) {
+    pamiecToken = t || '';
     try {
       t ? localStorage.setItem(KLUCZ_TOKENU, t) : localStorage.removeItem(KLUCZ_TOKENU);
-    } catch { /* tryb prywatny — zostaje samo ciasteczko */ }
+    } catch (_) { /* tryb prywatny — zostaje pamiecToken + ciasteczko */ }
   }
   function zapytanie(droga, opcje) {
     const o = Object.assign({ credentials: 'same-origin' }, opcje || {});
@@ -97,8 +101,9 @@
       try {
         const odp = await fetch(API + '/api/logowanie', {
           method: 'POST',
+          credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ haslo: haslo.value })
+          body: JSON.stringify({ haslo: haslo.value.trim() })
         });
         const d = await odp.json().catch(() => ({}));
         if (odp.ok && d.ok) {
@@ -115,6 +120,9 @@
         przycisk.textContent = 'Wejdź';
       }
     });
+    if (location.search.indexOf('blad=1') >= 0) {
+      blad.textContent = 'Nieprawidłowe hasło.';
+    }
   }
 
   /* ---------- start panelu ---------- */
@@ -122,7 +130,7 @@
     let odp;
     try {
       odp = await zapytanie('/api/stan');
-    } catch {
+    } catch (_) {
       const b = el('#blad-logowania');
       if (b) b.textContent = 'Brak połączenia z serwerem panelu. Odśwież stronę.';
       return;
@@ -140,8 +148,13 @@
       return;
     }
     stan = d;
+    const bladEl = el('#blad-logowania');
+    if (bladEl) bladEl.textContent = '';
+    const hasloEl = el('#haslo');
+    if (hasloEl) hasloEl.value = '';
     el('#ekran-logowania').hidden = true;
     el('#panel').hidden = false;
+    window.scrollTo(0, 0);
     rysujProdukty();
     rysujPolaStrony();
     rysujPolaKontaktu();
@@ -175,7 +188,8 @@
     const d = e.target.closest('[data-dol]');
     if (g || d) {
       e.stopPropagation();
-      const i = Number((g || d).dataset.gora ?? (g || d).dataset.dol);
+      const ds = (g || d).dataset;
+      const i = Number(ds.gora !== undefined ? ds.gora : ds.dol);
       const j = g ? i - 1 : i + 1;
       if (j < 0 || j >= stan.produkty.length) return;
       [stan.produkty[i], stan.produkty[j]] = [stan.produkty[j], stan.produkty[i]];

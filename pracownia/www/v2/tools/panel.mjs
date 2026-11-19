@@ -75,9 +75,19 @@ const json = (res, kod, obj) => {
   res.end(JSON.stringify(obj));
 };
 
+function ciasteczkoSesji(req, wartosc, maxAge) {
+  const https = String(req.headers['x-forwarded-proto'] || '').toLowerCase() === 'https';
+  const atrybuty = https ? 'SameSite=None; Secure' : 'SameSite=Lax';
+  return `syg_sesja=${wartosc}; HttpOnly; ${atrybuty}; Path=/; Max-Age=${maxAge}`;
+}
+
 async function cialo(req) {
   let d = '';
   for await (const k of req) { d += k; if (d.length > 5e6) throw new Error('za duże'); }
+  const ct = String(req.headers['content-type'] || '').toLowerCase();
+  if (ct.includes('application/x-www-form-urlencoded')) {
+    return Object.fromEntries(new URLSearchParams(d));
+  }
   try { return JSON.parse(d || '{}'); } catch { return {}; }
 }
 
@@ -112,21 +122,38 @@ http.createServer(async (req, res) => {
     if (p === '/api/logowanie' && req.method === 'POST') {
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const formularz = String(req.headers['content-type'] || '').toLowerCase().includes('application/x-www-form-urlencoded');
       const d = await cialo(req);
-      const podane = Buffer.from(sha(d.haslo || ''));
+      const podane = Buffer.from(sha(String(d.haslo || '').trim()));
       const wzor = Buffer.from(sha(haslo));
       if (podane.length === wzor.length && timingSafeEqual(podane, wzor)) {
         const t = nowaSesja();
-        res.writeHead(200, {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Set-Cookie': `syg_sesja=${t}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800`
-        });
-        // token w treści — panel zapisze go u siebie i będzie go dosyłał
-        res.end(JSON.stringify({ ok: true, token: t }));
+        console.log('[api] POST /api/logowanie -> 200' + (formularz ? ' (formularz)' : ''));
+        if (formularz) {
+          res.writeHead(303, {
+            Location: '/admin/',
+            'Set-Cookie': ciasteczkoSesji(req, t, 28800)
+          });
+          res.end();
+        } else {
+          res.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Cache-Control': 'no-store',
+            'Set-Cookie': ciasteczkoSesji(req, t, 28800)
+          });
+          // token w treści — panel zapisze go u siebie i będzie go dosyłał
+          res.end(JSON.stringify({ ok: true, token: t }));
+        }
       } else {
         // celowa zwłoka — utrudnia zgadywanie hasła
         await new Promise(r => setTimeout(r, 400));
-        json(res, 401, { ok: false, blad: 'Nieprawidłowe hasło.' });
+        console.log('[api] POST /api/logowanie -> 401');
+        if (formularz) {
+          res.writeHead(303, { Location: '/admin/?blad=1' });
+          res.end();
+        } else {
+          json(res, 401, { ok: false, blad: 'Nieprawidłowe hasło.' });
+        }
       }
       return;
     }
@@ -136,16 +163,18 @@ http.createServer(async (req, res) => {
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       const t = tokenZ(req);
       if (t) sesje.delete(t);
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Set-Cookie': 'syg_sesja=; Path=/; Max-Age=0' });
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Set-Cookie': ciasteczkoSesji(req, '', 0) });
       res.end('{"ok":true}');
       return;
     }
 
     if (p === '/api/stan') {
       // tryb klik-w-element czyta ten adres prosto ze strony (inny port)
-      if (!sesjaOK(req)) return json(res, 401, { ok: false, blad: 'Zaloguj się.' });
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const ok = sesjaOK(req);
+      console.log('[api] GET /api/stan -> ' + (ok ? 200 : 401));
+      if (!ok) return json(res, 401, { ok: false, blad: 'Zaloguj się.' });
       return json(res, 200, { ok: true, ...(await czytajDane()) });
     }
 
@@ -160,9 +189,11 @@ http.createServer(async (req, res) => {
     }
 
     if (p === '/api/zapisz' && req.method === 'POST') {
-      if (!sesjaOK(req)) return json(res, 401, { ok: false, blad: 'Sesja wygasła — zaloguj się ponownie.' });
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const ok = sesjaOK(req);
+      console.log('[api] POST /api/zapisz -> ' + (ok ? 200 : 401));
+      if (!ok) return json(res, 401, { ok: false, blad: 'Sesja wygasła — zaloguj się ponownie.' });
       const d = await cialo(req);
       const stan = await czytajDane();
       const kopia = JSON.stringify(stan);

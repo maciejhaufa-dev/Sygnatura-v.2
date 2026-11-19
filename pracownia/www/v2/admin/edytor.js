@@ -39,7 +39,7 @@
      który panel zapisał przy logowaniu. Token ratuje sytuację, gdy proxy
      podglądu gubi ciasteczka. */
   function token() {
-    try { return localStorage.getItem('syg-token') || ''; } catch { return ''; }
+    try { return localStorage.getItem('syg-token') || ''; } catch (_) { return ''; }
   }
   function api(droga, opcje) {
     const o = Object.assign({ credentials: 'include' }, opcje || {});
@@ -63,7 +63,7 @@
       if (!odp.ok) return null;
       const d = await odp.json();
       return (d.produkty || []).find((p) => p.id === id) || null;
-    } catch { return null; }
+    } catch (_) { return null; }
   }
 
   /* ---------- zapis jednego pola ---------- */
@@ -308,7 +308,7 @@
     b.setAttribute('aria-pressed', String(tryb));
     if (tryb) { oznacz(); komunikat(''); }
     else { odznacz(); zamknijPanel(); }
-    try { localStorage.setItem(KLUCZ, tryb ? '1' : ''); } catch { /* tryb prywatny */ }
+    try { localStorage.setItem(KLUCZ, tryb ? '1' : ''); } catch (_) { /* tryb prywatny */ }
   }
 
   /* Czy jesteśmy zalogowani? Pytamy serwer, ale i sprawdzamy treść
@@ -319,16 +319,16 @@
       if (!odp.ok) return false;
       const d = await odp.json().catch(() => ({}));
       return d.ok === true;
-    } catch { return false; }
+    } catch (_) { return false; }
   }
 
   async function start() {
     // ?edycja=1 włącza tryb na stałe (do wyłączenia przyciskiem)
     if (Q.get('edycja') === '1') {
-      try { localStorage.setItem(KLUCZ, '1'); } catch { /* ignoruj */ }
+      try { localStorage.setItem(KLUCZ, '1'); } catch (_) { /* ignoruj */ }
     }
     let zapamietane = '';
-    try { zapamietane = localStorage.getItem(KLUCZ) || ''; } catch { /* ignoruj */ }
+    try { zapamietane = localStorage.getItem(KLUCZ) || ''; } catch (_) { /* ignoruj */ }
 
     const zalogowany = await czyZalogowany();
 
