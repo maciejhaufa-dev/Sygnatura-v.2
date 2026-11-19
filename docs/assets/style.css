@@ -1109,3 +1109,18 @@ body.launch-budowa main.wrap > :not(.budowa-box){display:none}
   font-size:17px;color:var(--butelkowa)}
 .paragon + .p-wiersz{margin-top:10px}
 .tre-tabela td{vertical-align:top}
+
+/* Drag & drop slajdów działa także na ekranach dotykowych. */
+.sg-slajd-karta{user-select:none;-webkit-user-select:none}
+.sg-slajd-akcje button.km-drag{flex:0 0 34px;padding:4px 2px;font-size:20px;line-height:1;cursor:grab;touch-action:none;color:var(--brunatny)}
+.sg-slajd-akcje button.km-drag:active{cursor:grabbing}
+.sg-slajd-karta.sg-sort-source{opacity:.35}
+.sg-slajd-karta.drag-nad{outline:3px solid var(--zloty);outline-offset:2px}
+.sg-drag-ghost{position:fixed!important;z-index:99999!important;pointer-events:none!important;opacity:.94;transform:rotate(1deg) scale(1.03);box-shadow:0 14px 32px rgba(0,0,0,.28)!important}
+.sg-crop-image{position:absolute;z-index:1;display:none;max-width:none!important;max-height:none!important;object-fit:fill;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}
+.sg-crop-image:active{cursor:grabbing}
+.sg-slajd-akcje button.km-drag{flex:0 0 28px}
+.sg-slajd-akcje button.km-lewo,.sg-slajd-akcje button.km-prawo,.sg-slajd-akcje button.km-usun{flex:0 0 26px;padding-left:0;padding-right:0}
+.sg-slajd-akcje button.km-edycja{flex:1;min-width:48px;white-space:nowrap}
+.sg-slider-podglad .sl-cien{z-index:2}
+.sg-slider-podglad .sl-tresc{z-index:3}

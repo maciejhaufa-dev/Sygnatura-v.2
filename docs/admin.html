@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=356">
+<link rel="stylesheet" href="assets/style.css?v=357">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -130,7 +130,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
           <div>
             <h3 style="font-size:17px;color:var(--butelkowa);margin:0 0 4px">1. Slider na stronie głównej (slajdy)</h3>
-            <p class="mala" style="margin:0">Wybierz kafel poniżej, aby edytować jego tło, teksty i układ. Kolejność zmieniasz strzałkami ‹ › lub przeciągając kafel.</p>
+            <p class="mala" style="margin:0">Wybierz slajd do edycji. Kolejność zmienisz strzałkami albo chwytając uchwyt ⠿ — również na telefonie.</p>
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             <label style="font-size:13px;font-weight:700;color:var(--brunatny)">Czas slajdu (sekundy):</label>
@@ -140,7 +140,7 @@
 
         <!-- Pasek miniatur slajdów -->
         <div class="sg-slajdy-pasek" id="sg-kafle">
-          <div class="sg-slajd-karta" draggable="true" data-sg-kafel="nowosci">
+          <div class="sg-slajd-karta" draggable="false" data-sg-kafel="nowosci">
             <div class="sg-slajd-mini" style="background-image:url('assets/media/sklep/szopka.jpg')"><span class="sg-slajd-nr">Slajd 1</span></div>
             <div class="sg-slajd-opis" title="Nowości Najnowsze produkty z pracowni">Nowości — Najnowsze produkty...</div>
             <div class="sg-slajd-akcje">
@@ -150,7 +150,7 @@
               <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
             </div>
           </div>
-          <div class="sg-slajd-karta aktywny" draggable="true" data-sg-kafel="bestsellery">
+          <div class="sg-slajd-karta aktywny" draggable="false" data-sg-kafel="bestsellery">
             <div class="sg-slajd-mini" style="background-image:url('assets/media/sklep/szyld.jpg')"><span class="sg-slajd-nr">Slajd 2</span></div>
             <div class="sg-slajd-opis" title="Bestsellery Najczęściej zamawiane">Bestsellery — Najczęściej zamawiane...</div>
             <div class="sg-slajd-akcje">
@@ -160,7 +160,7 @@
               <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
             </div>
           </div>
-          <div class="sg-slajd-karta" draggable="true" data-sg-kafel="aktualnosci">
+          <div class="sg-slajd-karta" draggable="false" data-sg-kafel="aktualnosci">
             <div class="sg-slajd-mini" style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"><span class="sg-slajd-nr">Slajd 3</span></div>
             <div class="sg-slajd-opis" title="Aktualności z pracowni">Aktualności — Z pracowni...</div>
             <div class="sg-slajd-akcje">
@@ -170,7 +170,7 @@
               <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
             </div>
           </div>
-          <div class="sg-slajd-karta" draggable="true" data-sg-kafel="sezonowa">
+          <div class="sg-slajd-karta" draggable="false" data-sg-kafel="sezonowa">
             <div class="sg-slajd-mini" style="background-image:url('assets/hero.jpg')"><span class="sg-slajd-nr">Slajd 4</span></div>
             <div class="sg-slajd-opis" title="Oferta sezonowa">Oferta sezonowa — Sezon świąteczny...</div>
             <div class="sg-slajd-akcje">
@@ -223,18 +223,19 @@
               <div id="sg-obraz-upload-info" role="status" aria-live="polite" style="display:none;margin-top:10px;padding:9px 12px;border-radius:4px;font-size:13px"></div>
             </div>
             <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;background:#24272A;color:#FFF;border-bottom:1px solid #444">
-              <strong style="font-size:12px">Kadrowanie tła:</strong>
+              <strong style="font-size:12px">Kadrowanie zdjęcia:</strong>
               <label style="display:flex;gap:8px;align-items:center;font-size:12px">Rozmiar zdjęcia
                 <input type="range" id="sg-tlo-zoom" min="50" max="200" step="1" value="100" style="width:140px">
                 <output id="sg-tlo-zoom-wartosc">100%</output>
               </label>
-              <span style="font-size:11px;color:#BBB">Chwyć zdjęcie w podglądzie i przeciągnij. Kadr przytnie brzegi; nie odsłonisz tła.</span>
+              <span style="font-size:11px;color:#BBB">Złap widoczne zdjęcie i przeciągnij. Kadr przytnie brzegi, bez pustych pól.</span>
             </div>
 
             <!-- Edytor treści ze wstążką i podglądem na żywo -->
             <div id="sg-tresc-edytor" style="background:var(--butelkowa)">
               <div class="slider sg-slider-podglad" id="sg-slider-preview" style="border-radius:0 0 8px 8px;border-top:none">
                 <div class="sl-bg" id="sg-tresc-bg" style="background-image:url('assets/media/sklep/szyld.jpg')"></div>
+                <img id="sg-crop-image" class="sg-crop-image" alt="" aria-label="Zdjęcie do kadrowania — przeciągnij, aby przesunąć" draggable="false">
                 <div class="sl-cien"></div>
                 <div class="sl-tresc">
                   <div class="edtr-tresc" id="sg-tresc-pole" contenteditable="true">
@@ -274,8 +275,9 @@
       <div class="admin-card">
         <h3 style="font-size:17px;color:var(--butelkowa);margin:0 0 4px">2. Sekcja pod sliderem („Jak działamy”)</h3>
         <p class="mala" style="margin:0 0 14px">Sekcja z trzema krokami i przyciskami zamówień. Kliknij i edytuj treść bezpośrednio na podglądzie poniżej.</p>
-        <label style="display:flex;align-items:center;gap:8px;margin:0 0 12px;font-weight:700;color:var(--butelkowa)">
-          <input type="checkbox" id="sg-cta-widoczny" style="width:auto"> Pokaż sekcję „Jak działamy” na stronie głównej
+        <label style="display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:12px 14px;font-weight:700;color:var(--butelkowa);background:#eef3ef;border:1px solid #c5d3c9;border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="sg-cta-widoczny" style="width:20px;height:20px;flex:none"> Pokaż sekcję „Jak działamy” na stronie głównej
+          <span style="font-weight:400;color:#536158">(zapisz przyciskiem „Zapisz stronę główną”)</span>
         </label>
         <div id="sg-cta-edytor">
           <div class="jak" style="border:1px solid #D5C4B1;border-radius:0 0 8px 8px;border-top:none;margin:0">
@@ -625,7 +627,7 @@
 <script src="assets/editor.js?v=356"></script>
 <script src="assets/edytor.js?v=356"></script>
 <script src="data/katalog.js?v=356"></script>
-<script src="assets/main.js?v=356"></script>
+<script src="assets/main.js?v=357"></script>
 <script>
 (function(){
   var info = document.getElementById('tryb-info');
@@ -711,6 +713,7 @@
   var SG_EDYTOR = null;     /* instancja EDYTORA TREŚCI (kafel) */
   var SG_EDYTOR_CTA = null; /* instancja EDYTORA TREŚCI (treść pod sliderem) */
   var SG_BRUDNY = false;/* czy są niezapisane zmiany */
+  var SG_SLIDE_DRAG = null;
   var SG_GITHUB_MEDIA_SESJA = {};
 
   function ustawBrudny(){
@@ -991,12 +994,13 @@
       var isAkt = SG_EDYCJA && String(SG_EDYCJA.id) === String(k.id);
       var czystyTekst = (k.tresc || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       var tytulKrotki = czystyTekst.slice(0, 32) || ('Slajd ' + (i + 1));
-      html += '<div class="sg-slajd-karta' + (isAkt ? ' aktywny' : '') + '" draggable="true" data-sg-kafel="' + sgEsc(k.id) + '">' +
+      html += '<div class="sg-slajd-karta' + (isAkt ? ' aktywny' : '') + '" draggable="false" data-sg-kafel="' + sgEsc(k.id) + '">' +
         '<div class="sg-slajd-mini" style="background-image:' + kafelObrazCss(k.obraz) + '">' +
           '<span class="sg-slajd-nr">Slajd ' + (i + 1) + '</span>' +
         '</div>' +
         '<div class="sg-slajd-opis" title="' + sgEsc(czystyTekst) + '">' + sgEsc(tytulKrotki) + '</div>' +
         '<div class="sg-slajd-akcje">' +
+          '<button type="button" class="km-drag" title="Przeciągnij, aby zmienić kolejność" aria-label="Przeciągnij slajd, aby zmienić kolejność">⠿</button>' +
           '<button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>' +
           '<button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>' +
           '<button type="button" class="km-prawo" title="Przesuń w prawo">›</button>' +
@@ -1036,32 +1040,62 @@
         var t = kafle[i + 1]; kafle[i + 1] = kafle[i]; kafle[i] = t;
         ustawBrudny(); rysujKafle();
       });
-      /* Drag & Drop */
-      el.addEventListener('dragstart', function(e){
-        e.dataTransfer.setData('text/plain', id);
-        e.dataTransfer.effectAllowed = 'move';
-        el.classList.add('drag-nad');
-      });
-      el.addEventListener('dragend', function(){ el.classList.remove('drag-nad'); });
-      el.addEventListener('dragover', function(e){
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        el.classList.add('drag-nad');
-      });
-      el.addEventListener('dragleave', function(){ el.classList.remove('drag-nad'); });
-      el.addEventListener('drop', function(e){
-        e.preventDefault();
-        el.classList.remove('drag-nad');
-        var zId = e.dataTransfer.getData('text/plain');
-        if (!zId || zId === id) return;
-        var lista = sgKafle();
-        var zi = lista.findIndex(function(k){ return String(k.id) === zId; });
-        var ci = lista.findIndex(function(k){ return String(k.id) === id; });
-        if (zi < 0 || ci < 0) return;
-        var przen = lista.splice(zi, 1)[0];
-        lista.splice(ci, 0, przen);
-        ustawBrudny(); rysujKafle();
-      });
+      /* Drag & drop slajdów przez uchwyt — działa myszą i dotykiem. */
+      var dragHandle = el.querySelector('.km-drag');
+      if (dragHandle) {
+        dragHandle.style.touchAction = 'none';
+        dragHandle.addEventListener('pointerdown', function(e){
+          if (e.button !== undefined && e.button !== 0) return;
+          e.preventDefault();
+          var rect = el.getBoundingClientRect();
+          var ghost = el.cloneNode(true);
+          ghost.classList.add('sg-drag-ghost');ghost.setAttribute('aria-hidden','true');
+          ghost.style.width = rect.width + 'px';
+          ghost.style.left = rect.left + 'px';
+          ghost.style.top = rect.top + 'px';
+          document.body.appendChild(ghost);
+          var state = { pointerId:e.pointerId, sourceId:id, source:el, ghost:ghost,
+                        startX:e.clientX, startY:e.clientY, target:null, x:e.clientX, moved:false };
+          SG_SLIDE_DRAG = state;
+          el.classList.add('sg-sort-source');el.setAttribute('aria-grabbed','true');
+          try { dragHandle.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+        dragHandle.addEventListener('pointermove', function(e){
+          var d=SG_SLIDE_DRAG;if(!d||d.pointerId!==e.pointerId)return;
+          if(!d.moved && Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<5)return;
+          d.moved=true;d.x=e.clientX;
+          d.ghost.style.left=(e.clientX-d.ghost.offsetWidth/2)+'px';
+          d.ghost.style.top=(e.clientY-d.ghost.offsetHeight/2)+'px';
+          var under=document.elementFromPoint(e.clientX,e.clientY);
+          var target=under&&under.closest?under.closest('.sg-slajd-karta'):null;
+          if(target&&target.parentNode!==pasek)target=null;
+          if(d.target&&d.target!==target)d.target.classList.remove('drag-nad');
+          d.target=target;
+          if(target&&target!==d.source)target.classList.add('drag-nad');
+        });
+        function stopSlideDrag(e){
+          var d=SG_SLIDE_DRAG;if(!d||d.pointerId!==e.pointerId)return;
+          SG_SLIDE_DRAG=null;
+          if(d.target)d.target.classList.remove('drag-nad');
+          d.source.classList.remove('sg-sort-source');d.source.setAttribute('aria-grabbed','false');
+          d.ghost.remove();
+          if(d.moved&&d.target&&d.target!==d.source){
+            var r=d.target.getBoundingClientRect();
+            var after=d.x>r.left+r.width/2;
+            var lista=sgKafle(),from=lista.findIndex(function(k){return String(k.id)===d.sourceId;});
+            var targetId=d.target.getAttribute('data-sg-kafel');
+            var to=lista.findIndex(function(k){return String(k.id)===targetId;});
+            if(from>=0&&to>=0){
+              var moved=lista.splice(from,1)[0];
+              to=lista.findIndex(function(k){return String(k.id)===targetId;});
+              lista.splice(to+(after?1:0),0,moved);
+              ustawBrudny();rysujKafle();
+            }
+          }
+        }
+        dragHandle.addEventListener('pointerup',stopSlideDrag);
+        dragHandle.addEventListener('pointercancel',stopSlideDrag);
+      }
     });
 
     var dodaj = document.getElementById('sg-dodaj-kafel');
@@ -1147,29 +1181,44 @@
       el.textContent = v === 'gradient' ? 'gradient' : '';
     }
   }
-  var SG_CROP_GEOM={maxX:0,maxY:0};
+  var SG_CROP_GEOM={maxX:0,maxY:0,baseLeft:0,baseTop:0};
+  var SG_CROP_REQUEST=0;
   function odswiezTloEdytora(){
     var sel=document.getElementById('sg-obraz'),v=sel?sel.value:'assets/media/sklep/szyld.jpg';
-    var bg=document.getElementById('sg-tresc-bg');
+    var bg=document.getElementById('sg-tresc-bg'),img=document.getElementById('sg-crop-image');
     var k=SG_EDYCJA?sgKafle().find(function(x){return String(x.id)===SG_EDYCJA.id;}):null;
     var zoom=Math.max(50,Math.min(200,Number(k&&k.zoomTla)||100));
     var x=Math.max(-100,Math.min(100,Number(k&&k.przesuniecieTlaX)||0));
     var legacyY=k?(k.przesuniecieTlaY!=null?k.przesuniecieTlaY:k.przesuniecieTla):0;
     var y=Math.max(-100,Math.min(100,Number(legacyY)||0));
     var z=document.getElementById('sg-tlo-zoom'),out=document.getElementById('sg-tlo-zoom-wartosc');
-    if(z)z.value=zoom;if(out)out.textContent=zoom+'%';if(!bg)return;
-    bg.style.backgroundImage=kafelObrazCss(v);bg.style.backgroundRepeat='no-repeat';bg.style.transform='none';
-    var src=sgMediaRozwiaz(v);if(src==='gradient'){bg.style.backgroundSize='cover';bg.style.backgroundPosition='center';return;}
-    var im=new Image();im.onload=function(){
+    if(z)z.value=zoom;if(out)out.textContent=zoom+'%';if(!bg||!img)return;
+    var request=++SG_CROP_REQUEST;
+    bg.style.backgroundColor='#1a2f26';
+    bg.style.backgroundRepeat='no-repeat';
+    img.style.display='none';img.removeAttribute('src');
+    var src=sgMediaRozwiaz(v);
+    if(src==='gradient'){
+      bg.style.backgroundImage=kafelObrazCss(v);bg.style.backgroundSize='cover';bg.style.backgroundPosition='center';
+      SG_CROP_GEOM={maxX:0,maxY:0,baseLeft:0,baseTop:0};return;
+    }
+    var probe=new Image();
+    probe.onload=function(){
+      if(request!==SG_CROP_REQUEST)return;
       var box=bg.getBoundingClientRect();if(!box.width||!box.height)return;
-      var minZoom=Math.max(50,box.width/im.naturalWidth*100,box.height/im.naturalHeight*100),actual=Math.max(zoom,minZoom);
-      var iw=im.naturalWidth*actual/100,ih=im.naturalHeight*actual/100;
-      SG_CROP_GEOM={maxX:Math.max(0,(iw-box.width)/2),maxY:Math.max(0,(ih-box.height)/2)};
-      bg.style.backgroundSize=iw+'px '+ih+'px';
-      bg.style.backgroundPosition='calc(50% + '+SG_CROP_GEOM.maxX*x/100+'px) calc(50% + '+SG_CROP_GEOM.maxY*y/100+'px)';
-      if(out)out.textContent=zoom+'%'+(actual>zoom?' (dopasowanie kadru)':'');
+      var minZoom=Math.max(50,box.width/probe.naturalWidth*100,box.height/probe.naturalHeight*100);
+      var actual=Math.max(zoom,minZoom),iw=probe.naturalWidth*actual/100,ih=probe.naturalHeight*actual/100;
+      SG_CROP_GEOM={maxX:Math.max(0,(iw-box.width)/2),maxY:Math.max(0,(ih-box.height)/2),baseLeft:(box.width-iw)/2,baseTop:(box.height-ih)/2};
+      bg.style.backgroundImage='none';
+      img.style.position='absolute';img.style.maxWidth='none';img.style.maxHeight='none';
+      img.style.width=iw+'px';img.style.height=ih+'px';
+      img.style.left=(SG_CROP_GEOM.baseLeft+SG_CROP_GEOM.maxX*x/100)+'px';
+      img.style.top=(SG_CROP_GEOM.baseTop+SG_CROP_GEOM.maxY*y/100)+'px';
+      img.style.display='block';img.src=src;
+      if(out)out.textContent=zoom+'%'+(actual>zoom?' (dopasowane do kadru)':'');
     };
-    im.onerror=function(){bg.style.backgroundSize='cover';bg.style.backgroundPosition='center';};im.src=src;
+    probe.onerror=function(){if(request===SG_CROP_REQUEST){img.style.display='none';bg.style.backgroundImage=kafelObrazCss(v);bg.style.backgroundSize='cover';bg.style.backgroundPosition='center';}};
+    probe.src=src;
   }
 
   function sgUploadInfo(tresc, blad){
@@ -1395,26 +1444,35 @@
     ks[i].zoomTla=Number(this.value)||100;odswiezTloEdytora();ustawBrudny();
   });
   (function(){
-    var preview=document.getElementById('sg-slider-preview'),bg=document.getElementById('sg-tresc-bg');if(!preview||!bg)return;
+    var preview=document.getElementById('sg-slider-preview'),bg=document.getElementById('sg-tresc-bg');
+    var img=document.getElementById('sg-crop-image');if(!preview||!bg||!img)return;
     var shade=preview.querySelector('.sl-cien'),drag=null;
     preview.style.touchAction='none';
-    if(shade){shade.style.cursor='grab';shade.style.touchAction='none';shade.style.pointerEvents='auto';}
+    img.style.pointerEvents='auto';img.style.cursor='grab';img.style.touchAction='none';img.style.userSelect='none';
+    img.style.webkitUserDrag='none';
+    if(shade)shade.style.pointerEvents='none';
     preview.addEventListener('pointerdown',function(e){
-      if(!SG_EDYCJA||!e.target.closest('.sl-cien, #sg-tresc-bg'))return;
-      e.preventDefault();preview.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY};if(shade)shade.style.cursor='grabbing';
+      if(!SG_EDYCJA||img.style.display!=='block'||(e.button!==undefined&&e.button!==0))return;
+      if(e.target.closest('a,button,input,textarea,select,[contenteditable="true"],.sl-karty'))return;
+      if(!e.target.closest('#sg-crop-image,.sl-bg,.sl-cien,.sl-tresc'))return;
+      e.preventDefault();
+      try{preview.setPointerCapture(e.pointerId);}catch(err){}
+      drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};img.style.cursor='grabbing';
     });
     preview.addEventListener('pointermove',function(e){
       if(!drag||drag.id!==e.pointerId||!SG_EDYCJA)return;
       var ks=sgKafle(),i=ks.findIndex(function(k){return String(k.id)===SG_EDYCJA.id;});if(i<0)return;
       var dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+      if(Math.abs(dx)+Math.abs(dy)>0)drag.moved=true;
       var mx=SG_CROP_GEOM.maxX,my=SG_CROP_GEOM.maxY,x=Number(ks[i].przesuniecieTlaX)||0;
       var oldY=ks[i].przesuniecieTlaY!=null?ks[i].przesuniecieTlaY:ks[i].przesuniecieTla;
       var y=Number(oldY)||0;
       ks[i].przesuniecieTlaX=mx?Math.max(-100,Math.min(100,x+dx/mx*100)):0;
       ks[i].przesuniecieTlaY=my?Math.max(-100,Math.min(100,y+dy/my*100)):0;
-      bg.style.backgroundPosition='calc(50% + '+mx*ks[i].przesuniecieTlaX/100+'px) calc(50% + '+my*ks[i].przesuniecieTlaY/100+'px)';
+      img.style.left=(SG_CROP_GEOM.baseLeft+mx*ks[i].przesuniecieTlaX/100)+'px';
+      img.style.top=(SG_CROP_GEOM.baseTop+my*ks[i].przesuniecieTlaY/100)+'px';
     });
-    function stop(e){if(!drag||drag.id!==e.pointerId)return;drag=null;if(shade)shade.style.cursor='grab';ustawBrudny();}
+    function stop(e){if(!drag||drag.id!==e.pointerId)return;var moved=drag.moved;drag=null;img.style.cursor='grab';if(moved)ustawBrudny();}
     preview.addEventListener('pointerup',stop);preview.addEventListener('pointercancel',stop);
     window.addEventListener('resize',function(){if(SG_EDYCJA)odswiezTloEdytora();});
   })();

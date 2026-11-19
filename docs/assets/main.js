@@ -30,6 +30,7 @@
   const MENU = (SYG && SYG.LAUNCH) ? [
     ['index.html', 'Strona główna'],
     ['realizacje.html', 'Nasze realizacje'],
+    ['szukaj.html', 'Szukaj'],
     ['kontakt.html', 'Kontakt']
   ] : [
     ['index.html', 'Strona główna'],
@@ -155,6 +156,7 @@
     if (SYG.LAUNCH){
       return '<span><a href="index.html">Strona główna</a><span class="sep">·</span>' +
         '<a href="realizacje.html">Nasze realizacje</a><span class="sep">·</span>' +
+        '<a href="szukaj.html">Szukaj</a><span class="sep">·</span>' +
         '<a href="kontakt.html">Kontakt</a></span>' +
         '<span>© Sygnatura 2026 · wersja 28.75</span>';
     }
@@ -228,7 +230,7 @@
        zostaje w pliku (i w skryptach) i wróci po przestawieniu SYG.LAUNCH na false */
     if (SYG.LAUNCH){
       var BUDOWA = ['zamowienia.html','sklep.html','personalizacja.html','koszyk.html','dane.html',
-        'podsumowanie.html','dziekuje.html','wynajem.html','konto.html','wspolpraca.html','szukaj.html','regulamin.html','pracownia.html','jak-pracujemy.html'];
+        'podsumowanie.html','dziekuje.html','wynajem.html','konto.html','wspolpraca.html','regulamin.html','pracownia.html','jak-pracujemy.html'];
       var plik = (window.location.pathname.split('/').pop() || 'index.html').split('?')[0].toLowerCase();
       if (BUDOWA.indexOf(plik) >= 0){
         document.body.classList.add('launch-budowa');
