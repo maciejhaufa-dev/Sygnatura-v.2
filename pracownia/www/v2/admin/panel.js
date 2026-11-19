@@ -11,6 +11,26 @@
   'use strict';
 
   const API = '';                                  // ten sam serwer co panel
+  const KLUCZ_TOKENU = 'syg-token';
+
+  /* Sesja działa na dwa sposoby: ciasteczkiem (najlepiej) albo tokenem
+     w nagłówku. Token jest zapasem — jeśli przeglądarka albo proxy
+     zgubi ciasteczko, panel i tak się zaloguje. */
+  function token() {
+    try { return localStorage.getItem(KLUCZ_TOKENU) || ''; } catch { return ''; }
+  }
+  function zapamietajToken(t) {
+    try {
+      t ? localStorage.setItem(KLUCZ_TOKENU, t) : localStorage.removeItem(KLUCZ_TOKENU);
+    } catch { /* tryb prywatny — zostaje samo ciasteczko */ }
+  }
+  function zapytanie(droga, opcje) {
+    const o = Object.assign({ credentials: 'same-origin' }, opcje || {});
+    o.headers = Object.assign({}, o.headers || {});
+    const t = token();
+    if (t) o.headers.Authorization = 'Bearer ' + t;
+    return fetch(API + droga, o);
+  }
   const el = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g,
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -82,6 +102,7 @@
         });
         const d = await odp.json().catch(() => ({}));
         if (odp.ok && d.ok) {
+          if (d.token) zapamietajToken(d.token);
           await start();
         } else {
           blad.textContent = d.blad || 'Nie udało się zalogować.';
@@ -98,10 +119,26 @@
 
   /* ---------- start panelu ---------- */
   async function start() {
-    const odp = await fetch(API + '/api/stan');
-    if (odp.status === 401) return;                 // zostaje ekran logowania
-    const d = await odp.json();
-    if (!d.ok) return;
+    let odp;
+    try {
+      odp = await zapytanie('/api/stan');
+    } catch {
+      const b = el('#blad-logowania');
+      if (b) b.textContent = 'Brak połączenia z serwerem panelu. Odśwież stronę.';
+      return;
+    }
+    if (odp.status === 401) {
+      // sesja nie przeszła — mówimy to wprost zamiast milczeć
+      const b = el('#blad-logowania');
+      if (b) b.textContent = 'Serwer nie przyjął sesji. Spróbuj ponownie — jeśli błąd wraca, odśwież stronę (Ctrl+R).';
+      return;
+    }
+    const d = await odp.json().catch(() => ({}));
+    if (!d.ok) {
+      const b = el('#blad-logowania');
+      if (b) b.textContent = d.blad || 'Nie udało się wczytać danych panelu.';
+      return;
+    }
     stan = d;
     el('#ekran-logowania').hidden = true;
     el('#panel').hidden = false;
@@ -262,7 +299,7 @@
     przycisk.disabled = true;
     komunikat('Zapisuję…');
     try {
-      const odp = await fetch(API + '/api/zapisz', {
+      const odp = await zapytanie('/api/zapisz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ produkty: stan.produkty, ustawienia })
@@ -284,7 +321,8 @@
 
   /* ---------- wylogowanie ---------- */
   el('#przycisk-wyloguj').addEventListener('click', async () => {
-    await fetch(API + '/api/wyloguj', { method: 'POST' }).catch(() => {});
+    await zapytanie('/api/wyloguj', { method: 'POST' }).catch(() => {});
+    zapamietajToken('');
     location.reload();
   });
 
@@ -297,6 +335,7 @@
 
   /* ---------- próba wejścia, gdy sesja już jest ---------- */
   if (typeof fetch === 'function') {
-    fetch(API + '/api/stan').then((o) => { if (o.ok) start(); }).catch(() => {});
+    // przy wejściu: jeśli token/ciasteczko wciąż ważne, wchodzimy bez pytania o hasło
+    zapytanie('/api/stan').then((o) => { if (o.ok) start(); }).catch(() => {});
   }
 })();

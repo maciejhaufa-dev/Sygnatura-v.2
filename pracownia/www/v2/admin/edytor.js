@@ -23,6 +23,7 @@
   const KLUCZ = 'syg-edycja-wlaczona';
   const POLA = window.SYG_POLA || {};
 
+  const KLUCZ_TOKENU = 'syg-token';
   let panel = null;
   let tryb = false;
   let aktywny = null;      // element, który aktualnie edytujemy
@@ -34,8 +35,18 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  /* Sesja: ciasteczko z panelu (ten sam host) albo token z localStorage,
+     który panel zapisał przy logowaniu. Token ratuje sytuację, gdy proxy
+     podglądu gubi ciasteczka. */
+  function token() {
+    try { return localStorage.getItem('syg-token') || ''; } catch { return ''; }
+  }
   function api(droga, opcje) {
-    return fetch(ADRES_API + droga, Object.assign({ credentials: 'include' }, opcje || {}));
+    const o = Object.assign({ credentials: 'include' }, opcje || {});
+    o.headers = Object.assign({}, o.headers || {});
+    const t = token();
+    if (t) o.headers.Authorization = 'Bearer ' + t;
+    return fetch(ADRES_API + droga, o);
   }
 
   function komunikat(tekst, blad) {
@@ -300,6 +311,17 @@
     try { localStorage.setItem(KLUCZ, tryb ? '1' : ''); } catch { /* tryb prywatny */ }
   }
 
+  /* Czy jesteśmy zalogowani? Pytamy serwer, ale i sprawdzamy treść
+     odpowiedzi — 200 z „ok:false" to jeszcze nie sesja. */
+  async function czyZalogowany() {
+    try {
+      const odp = await api('/api/stan');
+      if (!odp.ok) return false;
+      const d = await odp.json().catch(() => ({}));
+      return d.ok === true;
+    } catch { return false; }
+  }
+
   async function start() {
     // ?edycja=1 włącza tryb na stałe (do wyłączenia przyciskiem)
     if (Q.get('edycja') === '1') {
@@ -308,14 +330,7 @@
     let zapamietane = '';
     try { zapamietane = localStorage.getItem(KLUCZ) || ''; } catch { /* ignoruj */ }
 
-    // najpierw sprawdzamy, czy ktoś jest zalogowany w panelu
-    let zalogowany = false;
-    try {
-      const odp = await api('/api/stan');
-      zalogowany = odp.ok;
-    } catch {
-      zalogowany = false;
-    }
+    const zalogowany = await czyZalogowany();
 
     if (zalogowany) {
       przycisk();
@@ -325,9 +340,9 @@
       const b = przycisk();
       b.innerHTML = '<b>✎</b> Zaloguj się, by edytować';
       b.addEventListener('click', () => {
-        const cel = (location.port && location.port !== '8003')
-          ? 'http://' + location.hostname + ':8003/admin/'
-          : '/admin/';
+        // panel stoi na tym samym hoście, na porcie 8003 (albo pod /admin/
+        // na docelowym hostingu, gdzie wszystko jest na jednym porcie)
+        const cel = ADRES_API ? ADRES_API + '/admin/' : '/admin/';
         location.href = cel;
       });
     }

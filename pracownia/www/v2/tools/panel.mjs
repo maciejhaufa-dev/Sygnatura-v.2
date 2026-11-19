@@ -53,8 +53,17 @@ function nowaSesja() {
   sesje.set(t, Date.now() + 1000 * 60 * 60 * 8); // 8 h
   return t;
 }
+function tokenZ(req) {
+  // 1) ciasteczko (działa, gdy przeglądarka je zachowa),
+  // 2) nagłówek Authorization: Bearer … (działa zawsze — także za proxy,
+  //    które gubi ciasteczka; token leży w localStorage przeglądarki)
+  const zCookie = (req.headers.cookie || '').match(/(?:^|;\s*)syg_sesja=([a-f0-9]+)/)?.[1];
+  if (zCookie) return zCookie;
+  const zNaglowka = (req.headers.authorization || '').match(/^Bearer\s+([a-f0-9]+)$/i)?.[1];
+  return zNaglowka || null;
+}
 function sesjaOK(req) {
-  const t = (req.headers.cookie || '').match(/(?:^|;\s*)syg_sesja=([a-f0-9]+)/)?.[1];
+  const t = tokenZ(req);
   if (!t) return false;
   const wygasa = sesje.get(t);
   if (!wygasa || wygasa < Date.now()) { sesje.delete(t); return false; }
@@ -101,6 +110,8 @@ http.createServer(async (req, res) => {
   try {
     /* ---------- API ---------- */
     if (p === '/api/logowanie' && req.method === 'POST') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
       const d = await cialo(req);
       const podane = Buffer.from(sha(d.haslo || ''));
       const wzor = Buffer.from(sha(haslo));
@@ -110,7 +121,8 @@ http.createServer(async (req, res) => {
           'Content-Type': 'application/json; charset=utf-8',
           'Set-Cookie': `syg_sesja=${t}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800`
         });
-        res.end(JSON.stringify({ ok: true }));
+        // token w treści — panel zapisze go u siebie i będzie go dosyłał
+        res.end(JSON.stringify({ ok: true, token: t }));
       } else {
         // celowa zwłoka — utrudnia zgadywanie hasła
         await new Promise(r => setTimeout(r, 400));
@@ -120,7 +132,9 @@ http.createServer(async (req, res) => {
     }
 
     if (p === '/api/wyloguj' && req.method === 'POST') {
-      const t = (req.headers.cookie || '').match(/syg_sesja=([a-f0-9]+)/)?.[1];
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      const t = tokenZ(req);
       if (t) sesje.delete(t);
       res.writeHead(200, { 'Content-Type': 'application/json', 'Set-Cookie': 'syg_sesja=; Path=/; Max-Age=0' });
       res.end('{"ok":true}');
@@ -139,7 +153,7 @@ http.createServer(async (req, res) => {
       res.writeHead(204, {
         'Access-Control-Allow-Origin': req.headers.origin || '*',
         'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
       });
       return res.end();
