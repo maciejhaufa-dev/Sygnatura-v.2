@@ -21,6 +21,7 @@ import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DANE = join(ROOT, 'admin', 'panele');
 const PLIK_DANYCH = join(DANE, 'dane.json');
+const PLIK_NAKLADKI = join(DANE, 'dane.js');   // to samo, ale jako skrypt dla strony
 const PLIK_HASLA = join(DANE, '.haslo');
 const PORT = Number(process.argv[2] || process.env.PORT || 8003);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -39,6 +40,9 @@ async function przygotuj() {
   }
   try { await stat(PLIK_DANYCH); }
   catch { await writeFile(PLIK_DANYCH, JSON.stringify({ produkty: [], ustawienia: {}, wiadomosci: [] }, null, 2)); }
+  // nakładka dla strony musi istnieć także po sklonowaniu repo / restarcie
+  try { await stat(PLIK_NAKLADKI); }
+  catch { await zapiszDane(await czytajDane()); }
   return haslo;
 }
 
@@ -74,6 +78,11 @@ async function czytajDane() {
 }
 async function zapiszDane(d) {
   await writeFile(PLIK_DANYCH, JSON.stringify(d, null, 2));
+  // strona doładowuje ten plik jako zwykły skrypt — JSON podany w <script>
+  // wywalałby SyntaxError, więc publikujemy go jako przypisanie do window
+  await writeFile(PLIK_NAKLADKI,
+    '/* Plik generowany przez panel — nie edytuj ręcznie. */\n' +
+    'window.SYG_PANEL = ' + JSON.stringify(d) + ';\n');
 }
 
 const TYPY = {

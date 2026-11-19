@@ -293,6 +293,8 @@ ul{margin:0;padding:0;list-style:none}
 /* Rozmiar pisma zależy od szerokości KOLUMNY (cqw), nie okna — dzięki temu
    „Osobiste detale,” / „które zostają na lata” zawsze mieszczą się w dwóch
    liniach i nigdy nie wchodzą na zdjęcie (10,35 em ≈ 9,7cqw). */
+.hero h1.male{font-size:clamp(20px,7.4cqw,42px)}   /* dłuższy tytuł z panelu */
+.hero .hero-lead.male{font-size:11.5px}
 .hero h1{
   color:var(--butelkowa-makieta);
   font-size:clamp(23px,9.7cqw,53px);font-weight:500;line-height:1.12;letter-spacing:-.004em;

@@ -11,6 +11,42 @@
 (function () {
   'use strict';
   const D = window.SYG_DANE || {};
+
+  /* ---------- nakładka z panelu (window.SYG_PANEL) ----------
+     Panel zapisuje w admin/panele/dane.json to, co operator zmienił.
+     Strona czyta ten plik jako window.SYG_PANEL i nakłada zmiany na dane
+     produkcyjne (data/dane.js). Nie ma pliku → strona działa jak dotąd.
+     Produkty: puste pole w panelu NIE kasuje wartości produkcyjnej;
+     nowe produkty (id „nowy-…") dokładają się na końcu listy. */
+  const P = window.SYG_PANEL || {};
+  const PU = P.ustawienia || {};
+  function nalozPanel() {
+    if (!P || (!P.produkty && !P.ustawienia)) return;
+
+    if (PU.telefon) {
+      D.firma = D.firma || {};
+      D.firma.tel = PU.telefon;
+      D.firma.telHref = 'tel:' + String(PU.telefon).replace(/[^\d+]/g, '');
+    }
+    if (PU.mail) { D.firma = D.firma || {}; D.firma.mail = PU.mail; D.firma.mailHref = 'mailto:' + PU.mail; }
+    if (PU.obszar) { D.firma = D.firma || {}; D.firma.obszar = PU.obszar; }
+
+    if (Array.isArray(P.produkty)) {
+      const wgId = new Map((D.produkty || []).map((p) => [p.id, p]));
+      P.produkty.forEach((z) => {
+        if (wgId.has(z.id)) {
+          const cel = wgId.get(z.id);
+          ['nazwa', 'cena', 'kategoria', 'opis', 'foto', 'fotoMala', 'jednostka', 'dostepny', 'kolejnosc']
+            .forEach((k) => { if (z[k] !== '' && z[k] != null) cel[k] = z[k]; });
+        } else if (z.nazwa) {
+          D.produkty = D.produkty || [];
+          D.produkty.push({ ...z, kolejnosc: z.kolejnosc != null ? z.kolejnosc : 999 });
+        }
+      });
+    }
+  }
+  nalozPanel();
+
   const F = D.firma || {};
   const Q = new URLSearchParams(location.search);
 
@@ -58,11 +94,13 @@
      ikony, żeby nie prowadziła donikąd. Wpisujemy tu prawdziwy link do
      kanału YouTube, gdy będzie — ikona pojawi się sama.
      Facebook / Instagram / Pinterest: adresy z profilu firmy. */
+  // adresy z księgi znaku; pusty adres = ikona widoczna, ale nieklikalna.
+  // Panel może nadpisać każdy adres przez SYG_PANEL.ustawienia.<fb|ig|pin|yt>.
   const SOCIAL = [
-    ['Facebook', 'fb', 'https://www.facebook.com/p/Studio-SygNatura-61595255863642/'],
-    ['Instagram', 'ig', 'https://www.instagram.com/studiosygnatura/'],
-    ['Pinterest', 'pin2', 'https://pl.pinterest.com/studiosygnatura/'],
-    ['YouTube', 'yt', '']
+    ['Facebook', 'fb', PU.fb || 'https://www.facebook.com/p/Studio-SygNatura-61595255863642/'],
+    ['Instagram', 'ig', PU.ig || 'https://www.instagram.com/studiosygnatura/'],
+    ['Pinterest', 'pin2', PU.pin || 'https://pl.pinterest.com/studiosygnatura/'],
+    ['YouTube', 'yt', PU.youtube || '']
   ];
 
   const MENU = [
@@ -409,10 +447,28 @@
       el.innerHTML = lista.map(kartaProduktu).join('');
     });
 
+    /* dłuższe teksty z panelu dostają mniejszy stopień pisma,
+       żeby hero nadal mieściło się w swojej kolumnie bez nachodzenia na zdjęcie */
+    [['#hero-tytul', 'hero_tytul', 46], ['.hero-lead', 'hero_lead', 96]].forEach(([sel, pole, limit]) => {
+      const el = document.querySelector(sel);
+      if (el && PU[pole] && String(PU[pole]).length > limit) el.classList.add('male');
+    });
+
     document.querySelectorAll('[data-realizacje]').forEach(el => {
       const ile = Number(el.getAttribute('data-ile')) || 0;
       const lista = (D.realizacje || []).slice(0, ile > 0 ? ile : undefined);
       el.innerHTML = lista.map(kartaRealizacji).join('');
+    });
+
+    /* treści strony z panelu: [selektor, pole] — podmieniamy tylko wtedy,
+       gdy operator coś wpisał, żeby puste pole nie wyczyściło tekstu */
+    [['#hero-tytul', 'hero_tytul', true], ['.hero-lead', 'hero_lead', true],
+     ['#produkty-tytul', 'sekcja_tytul', false]].forEach(([sel, pole, wielolinia]) => {
+      const el = document.querySelector(sel);
+      const tekst = PU[pole];
+      if (!el || !tekst) return;
+      if (wielolinia) el.innerHTML = esc(tekst).replace(/\n/g, '<br>');
+      else el.textContent = tekst;
     });
 
     podepnijNewsletter();

@@ -33,7 +33,10 @@
     ['telefon', 'Telefon', 'text', 'np. 538 124 538'],
     ['mail', 'E-mail', 'text', 'np. kontakt@studiosygnatura.pl'],
     ['obszar', 'Obszar działania', 'text', 'np. Poznań i okolice, woj. wielkopolskie'],
-    ['youtube', 'Kanał YouTube', 'text', 'Wklej pełny adres kanału — ikona pojawi się w stopce']
+    ['youtube', 'Kanał YouTube', 'text', 'Wklej pełny adres kanału — ikona pojawi się w stopce'],
+    ['fb', 'Facebook', 'text', 'Pełny adres profilu'],
+    ['ig', 'Instagram', 'text', 'Pełny adres profilu'],
+    ['pin', 'Pinterest', 'text', 'Pełny adres profilu']
   ];
 
   /* ---------- komunikaty ---------- */
