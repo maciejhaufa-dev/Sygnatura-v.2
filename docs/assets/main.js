@@ -137,7 +137,7 @@
       '<div class="side-social-block"><span class="side-social-label">Znajdź nas na:</span>' +
       '<div class="side-social">' +
       '<a href="https://pl.pinterest.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" title="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_PIN + '</svg></a>' +
-      '<a href="https://studio.youtube.com/channel/UCZRfDHMy_PM7vu0uNQLg8Yw" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_YT + '</svg></a>' +
+      '<a href="https://www.youtube.com/@StudioSygnatura" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_YT + '</svg></a>' +
       '<a href="https://www.instagram.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">' + SVG_IG + '</svg></a>' +
       '<a href="https://www.facebook.com/p/Studio-SygNatura-61595255863642/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_FB + '</svg></a>' +
       '</div>' +
