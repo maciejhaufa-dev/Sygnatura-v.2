@@ -173,6 +173,8 @@ h1.strona-tytul::before{content:"";display:block;width:52px;height:2px;backgroun
 /* --- strona główna: czysty, pełnoekranowy hero --- */
 #hg-actions[hidden]{display:none!important}
 .listwa-poziom,.foot{display:none!important}
+/* Ukryj sekcję od pierwszego renderu: widoczność ustala dopiero API z ustawieniami zapisanymi w panelu. */
+#cta-sekcja{display:none}
 body.cta-hidden #cta-sekcja{display:none!important}
 body.has-home-cta #cta-sekcja{display:block!important}
 .main{width:100%;padding:8px clamp(12px,1.5vw,20px) 0}
