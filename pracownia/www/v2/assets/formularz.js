@@ -98,8 +98,21 @@
         + `&body=${encodeURIComponent(dane.tresc + '\n\n' + dane.imie + '\n' + dane.email + (dane.telefon ? '\n' + dane.telefon : ''))}`;
 
       const panelTestowy = !!(window.SYG_PANEL && window.SYG_PANEL.ustawienia && window.SYG_PANEL.ustawienia.tryb_testowy_formularza);
+      const trybPodgladu = !API || !!(D.api && D.api.trybPodgladu);
 
       try {
+        if (trybPodgladu) {
+          clearTimeout(timer);
+          form.hidden = true;
+          pokazKomunikat(box, 'ok',
+            `<b>Podgląd statyczny — formularz nie wysyła zgłoszeń do pracowni.</b><br>`
+            + `Walidacja pól działa poprawnie. W tym podglądzie połączenie z produkcyjnym systemem pracowni jest wyłączone.<br>`
+            + `Prawdziwy kontakt: <a href="${escapeHtml(mailto)}">${escapeHtml(F.mail)}</a> lub <a href="${escapeHtml(F.telHref)}">${escapeHtml(F.tel)}</a>.`);
+          box.setAttribute('role', 'status');
+          try { if (box.scrollIntoView) box.scrollIntoView({ block: 'center' }); } catch (_) {}
+          return;
+        }
+
         if (panelTestowy) {
           const odp = await fetch('/api/wiadomosc', {
             method: 'POST',
