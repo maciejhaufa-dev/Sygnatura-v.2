@@ -201,32 +201,31 @@ html.about-cms-loading #podstrona-tresc{visibility:hidden}
 .hero-copy>p{margin:8px 0 16px}
 .hero-points{margin-top:22px}
 .home-process{max-width:1460px;margin:10px auto 0;padding:25px clamp(18px,2.5vw,36px) 30px;background:#f4eee6;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.home-process-inner{display:grid;grid-template-columns:minmax(155px,.45fr) minmax(0,2.55fr);align-items:center;gap:24px}
-.home-process h2{margin:0;color:var(--forest);font:600 clamp(24px,2.7vw,34px)/1.05 var(--serif)}
-.home-process-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none}
-.home-process-card{position:relative;display:flex;min-width:0;min-height:104px;flex-direction:column;justify-content:center;align-items:flex-start;gap:8px;padding:14px 15px;border:1px solid #e4d9ca;background:var(--paper)}
-.home-process-icon{display:grid;width:31px;height:31px;place-items:center;border-radius:50%;background:#fbf8f4;color:#a87942}
-.home-process-icon svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.home-process-number{position:absolute;top:12px;right:13px;color:#b27d43;font:700 9px/1 var(--sans);letter-spacing:.1em}
-.home-process-card h3{max-width:100%;margin:0;color:var(--forest);font:600 18px/1.12 var(--serif)}
-@media(max-width:850px){.home-process-inner{grid-template-columns:1fr;gap:14px}.home-process h2{text-align:center}.home-process{margin-top:8px}}
+.home-process .section-title{margin:0 auto 22px}
+.home-process-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:0 auto;padding:0;max-width:1180px;list-style:none}
+.home-process-card{position:relative;display:flex;min-width:0;min-height:110px;align-items:center;gap:16px;padding:18px 20px;border:1px solid #e4d9ca;background:var(--paper)}
+.home-process-card:not(:last-child)::after{content:"→";position:absolute;z-index:2;top:50%;right:-20px;display:grid;width:20px;height:30px;place-items:center;transform:translateY(-50%);background:#f4eee6;color:#a87942;font:400 25px/1 var(--sans)}
+.home-process-icon{display:grid;width:50px;height:50px;flex:0 0 50px;place-items:center;border:1px solid #eadbc7;border-radius:50%;background:#fbf8f4;color:#a87942}
+.home-process-icon svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.home-process-card h3{max-width:100%;margin:0;color:var(--forest);font:600 20px/1.15 var(--serif)}
+@media(max-width:850px){.home-process{margin-top:8px}.home-process-steps{gap:14px}.home-process-card{gap:12px;padding:15px 13px}.home-process-icon{width:46px;height:46px;flex-basis:46px}.home-process-icon svg{width:25px;height:25px}.home-process-card h3{font-size:18px}}
 @media(max-width:700px){
  .home-hero{align-items:stretch}
  .hero-copy{padding:21px 18px 20px}
  .hero-copy>p{margin:7px 0 15px}
  .hero-points{margin-top:20px}
  .home-process{padding:20px 14px 22px}
- .home-process-steps{gap:7px}
- .home-process-card{min-height:112px;gap:7px;padding:11px 9px}
- .home-process-card h3{font-size:15px}
- .home-process-icon{width:27px;height:27px}
- .home-process-icon svg{width:17px;height:17px}
+ .home-process-steps{grid-template-columns:1fr;gap:9px}
+ .home-process-card{min-height:76px;gap:14px;padding:12px 14px}
+ .home-process-card h3{font-size:18px}
+ .home-process-icon{width:44px;height:44px;flex-basis:44px}
+ .home-process-icon svg{width:24px;height:24px}
+ .home-process-card:not(:last-child)::after{content:"↓";top:auto;right:auto;bottom:-17px;left:50%;width:26px;height:20px;transform:translateX(-50%);font-size:21px}
 }
 @media(max-width:420px){
- .home-process-steps{grid-template-columns:1fr;gap:8px}
- .home-process-card{min-height:75px;padding:10px 13px 10px 52px;justify-content:center}
- .home-process-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%)}
- .home-process-number{top:12px;right:12px}
+ .home-process-steps{gap:9px}
+ .home-process-card{min-height:72px;padding:10px 12px}
+ .home-process-card h3{font-size:17px}
 }
 
 /* Restore the compact horizontal realization cards and keep their actions discreet. */

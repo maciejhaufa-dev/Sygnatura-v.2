@@ -65,8 +65,18 @@
     if(!photo)return;
     var candidates=[src].concat(Array.isArray(alternates)?alternates:[]).map(function(item){return String(item||'').trim();}).filter(function(item,index,list){return !!item&&list.indexOf(item)===index;});
     if(!candidates.length)return;
-    photo.hidden=true;
+    photo.loading='eager';photo.fetchPriority='high';photo.decoding='async';
+    var current=String(photo.getAttribute('src')||'').split('?')[0].replace(/^\.\//,'');
+    var first=String(candidates[0]).split('?')[0].replace(/^\.\//,'');
     var index=0;
+    if(current&&current===first){
+      photo.hidden=false;
+      photo.onload=function(){if(photo.naturalWidth>0)photo.hidden=false;else next();};
+      photo.onerror=function(){index=1;next();};
+      if(photo.complete){if(photo.naturalWidth>0)return;index=1;}
+      else return;
+    }
+    photo.hidden=true;
     function next(){
       if(index>=candidates.length){photo.hidden=true;return;}
       var candidate=candidates[index++],settled=false;
