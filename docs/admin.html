@@ -838,7 +838,7 @@
       nhRenderForm(r.dane&&r.dane.landing?r.dane.landing:NH_DEFAULTS);
       nhText('nh-status',r.dane&&r.dane.landing?'Załadowano zapisany układ.':'Załadowano bieżące ustawienia domyślne.');
       if(!NH_DATA.cards[2].image){
-        try{var list=await SYG.wezwij('blog-lista',{}),posts=list&&list.ok&&Array.isArray(list.wpisy)?list.wpisy:[],entry=posts.find(function(w){return w&&w.widoczny!==false&&(/metryczk/i.test(String(w.tytul||''))||/metryczk/i.test(String(w.produkt&&w.produkt.nazwa||'')));});NH_THIRD_CURRENT_IMAGE=entry&&(entry.okladka||(Array.isArray(entry.galeria)&&entry.galeria.find(Boolean)))||'';nhUpdatePreview();}catch(ignore){}
+        try{var list=await SYG.wezwij('blog-lista',{}),posts=list&&list.ok&&Array.isArray(list.wpisy)?list.wpisy:[],entry=posts.find(function(w){return w&&w.widoczny!==false&&/metryczk/i.test(String(w.tytul||'')+' '+String(w.produkt&&w.produkt.nazwa||''));});if(!entry){var response=await SYG.wezwij('blog-pobierz',{id:14}),candidate=response&&response.ok&&response.wpis;if(candidate&&candidate.widoczny!==false&&/metryczk/i.test(String(candidate.tytul||'')+' '+String(candidate.produkt&&candidate.produkt.nazwa||'')))entry=candidate;}NH_THIRD_CURRENT_IMAGE=entry&&(entry.okladka||(Array.isArray(entry.galeria)&&entry.galeria.find(Boolean)))||'';nhUpdatePreview();}catch(ignore){}
       }
     }catch(e){nhText('nh-status','Błąd odczytu: '+(e.message||'brak połączenia'));}
     finally{NH_LOADING=false;}

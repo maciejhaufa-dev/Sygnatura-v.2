@@ -23,7 +23,9 @@
     /* Migrate the previously uploaded angled photo and cache-old local image too,
        so the settings response can never replace the exact-color first paint. */
     if (pathNoQuery === 'assets/media/sklep/szyld.jpg' || pathNoQuery === 'assets/media/sklep/szyld-czesc-profesjonalne.jpg' || /(?:^|\/)uploads\/home-(?:hero|card2)-czesc-[A-Za-z0-9._-]+\.jpg$/i.test(pathNoQuery)) src = polished;
-    if (e && (/^https:\/\//i.test(src) || /^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)(?:\?v=[A-Za-z0-9_-]+)?$/i.test(src))) e.src = src;
+    if (!e || !(/^https:\/\//i.test(src) || /^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)(?:\?v=[A-Za-z0-9_-]+)?$/i.test(src))) return false;
+    e.src = src;
+    return true;
   }
   function description(id, value) {
     var e = document.getElementById(id);
@@ -57,31 +59,49 @@
     }).sort(function(a,b){return b.score-a.score;});
     return ranking.length&&ranking[0].score>0?ranking[0].w:null;
   }
-  function ustawZdjecieMetryczki(src) {
+  function ustawZdjecieMetryczki(src, alternates) {
     var photo=document.getElementById('metryczka-photo');
-    if(!photo||!src)return;
+    if(!photo)return;
+    var candidates=[src].concat(Array.isArray(alternates)?alternates:[]).map(function(item){return String(item||'').trim();}).filter(function(item,index,list){return !!item&&list.indexOf(item)===index;});
+    if(!candidates.length)return;
     photo.hidden=true;
-    photo.onload=function(){photo.hidden=false;};
-    photo.onerror=function(){photo.hidden=true;};
-    image('metryczka-photo',src);
-    if(photo.complete&&photo.naturalWidth>0)photo.hidden=false;
+    var index=0;
+    function next(){
+      if(index>=candidates.length){photo.hidden=true;return;}
+      var candidate=candidates[index++],settled=false;
+      function failed(){if(settled)return;settled=true;next();}
+      photo.onload=function(){if(settled)return;settled=true;if(photo.naturalWidth>0)photo.hidden=false;else next();};
+      photo.onerror=failed;
+      if(!image('metryczka-photo',candidate)){failed();return;}
+      if(photo.complete&&!settled){if(photo.naturalWidth>0){settled=true;photo.hidden=false;}else failed();}
+    }
+    next();
   }
   function polaczKartyRealizacjami() {
+    function ustawMetryczke(wpis){
+      if(!wpis||wpis.widoczny===false||!/metryczk/i.test(String(wpis.tytul||'')+' '+String(wpis.produkt&&wpis.produkt.nazwa||'')))return false;
+      var href='blog-wpis.html?id='+encodeURIComponent(wpis.id);
+      ['metryczka-link','home-card3-cta'].forEach(function(id){var a=document.getElementById(id);if(a)a.href=href;});
+      var photo=document.getElementById('metryczka-photo');
+      if(photo&&photo.dataset.adminOverride!=='true')ustawZdjecieMetryczki(wpis.okladka, wpis.galeria);
+      return true;
+    }
     SYG.wezwij('blog-lista',{}).then(function(r){
       var posts=r&&r.ok&&Array.isArray(r.wpisy)?r.wpisy:[];
-      [['szopka','home-card1-link','home-card1-cta'],['szyld','home-card2-link','home-card2-cta'],['metryczka','metryczka-link','home-card3-cta']].forEach(function(item){
+      [['szopka','home-card1-link','home-card1-cta'],['szyld','home-card2-link','home-card2-cta']].forEach(function(item){
         var wpis=dopasujRealizacje(posts,item[0]);if(!wpis)return;
         var href='blog-wpis.html?id='+encodeURIComponent(wpis.id);
         [item[1],item[2]].forEach(function(id){var a=document.getElementById(id);if(a)a.href=href;});
-        if(item[0]==='metryczka'){
-          var photo=document.getElementById('metryczka-photo');
-          if(photo&&photo.dataset.adminOverride!=='true')ustawZdjecieMetryczki(wpis.okladka||(Array.isArray(wpis.galeria)&&wpis.galeria.find(Boolean)));
-        }
       });
-    }).catch(function(){/* Metryczka pozostaje ukryta zamiast pokazywać fałszywy tekst ładowania. */});
+      var metric=dopasujRealizacje(posts,'metryczka');
+      if(!ustawMetryczke(metric)){
+        /* Older production data may omit the story from the list response; verify the historic id by title before using it. */
+        SYG.wezwij('blog-pobierz',{id:14}).then(function(response){if(response&&response.ok)ustawMetryczke(response.wpis);}).catch(function(){});
+      }
+    }).catch(function(){/* A missing story never shows a fake loading message or an unrelated photo. */});
   }
   function revealHeroCopy() {
-    ['home-hero-copy','home-process','home-points'].forEach(function(id){
+    ['hero-title','home-hero-copy','home-process','home-points'].forEach(function(id){
       var node=document.getElementById(id);
       if(node)node.style.visibility='visible';
     });
