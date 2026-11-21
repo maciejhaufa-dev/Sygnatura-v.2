@@ -99,7 +99,7 @@ body.admin-page button,body.admin-page input,body.admin-page select,body.admin-p
 .side-contact-item span{min-width:0}
 .side-social-block{width:100%;margin-top:11px;text-align:center}
 .side-social-label{display:block;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(220,201,172,.98)}
-.side-social{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;gap:8px;width:100%;margin-top:9px;padding:0 3px}
+.side-social{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:8px;width:100%;margin-top:9px;padding:0 3px}
 .side-social a{display:grid;place-items:center;width:100%;height:40px;border:1px solid rgba(196,165,130,.5);border-radius:3px;
   background:rgba(251,247,240,.035);color:var(--zloty);transition:all .2s}
 .side-social a:hover{background:var(--zloty);color:var(--butelkowa);border-color:var(--zloty)}

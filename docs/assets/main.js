@@ -95,6 +95,7 @@
   const SVG_YT = '<path d="M23 12s0-3.3-.4-4.9c-.2-.9-.9-1.6-1.8-1.8C19.2 4.9 12 4.9 12 4.9s-7.2 0-8.8.4c-.9.2-1.6.9-1.8 1.8C1 8.7 1 12 1 12s0 3.3.4 4.9c.2.9.9 1.6 1.8 1.8 1.6.4 8.8.4 8.8.4s7.2 0 8.8-.4c.9-.2 1.6-.9 1.8-1.8.4-1.6.4-4.9.4-4.9zM9.8 15.3V8.7l6 3.3-6 3.3z"/>';
   const SVG_IG = '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.15"/>';
   const SVG_FB = '<path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/>';
+  const SVG_TIKTOK = '<path d="M19.4 7.2a5.4 5.4 0 0 1-3.2-1.1V15a5.8 5.8 0 1 1-5-5.7v3.2a2.7 2.7 0 1 0 2 2.6V2h3.1c.2 2.4 1.8 4 4.1 4.3v3.1c-.4 0-.7-.1-1-.2z"/>';
 
   function szkielet(aktywna) {
     /* etykieta konta w nagłówku: imię zalogowanego użytkownika */
@@ -140,6 +141,7 @@
       '<a href="https://www.youtube.com/@StudioSygnatura" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_YT + '</svg></a>' +
       '<a href="https://www.instagram.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">' + SVG_IG + '</svg></a>' +
       '<a href="https://www.facebook.com/p/Studio-SygNatura-61595255863642/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_FB + '</svg></a>' +
+      '<a href="https://www.tiktok.com/@studiosygnatura" target="_blank" rel="noopener noreferrer" aria-label="TikTok Studio Sygnatura" title="TikTok — Studio Sygnatura"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_TIKTOK + '</svg></a>' +
       '</div>' +
       '</div>' +
       '</section>' +
@@ -238,12 +240,12 @@
         document.body.classList.add('launch-budowa');
         var box = document.createElement('div');
         box.className = 'budowa-box';
-        box.innerHTML = '<span class="tag">Zamówienia i Wyceny</span>' +
-          '<h2>Złóż zamówienie lub zapytaj o realizację</h2>' +
-          '<p>Wszystkie zamówienia i projekty personalizowane realizujemy bezpośrednio — napisz do nas przez formularz kontaktowy, podając szczegóły lub zadzwoń:</p>' +
+        box.innerHTML = '<span class="tag">Strona w budowie</span>' +
+          '<h2>Moje konto i koszyk będą dostępne niebawem</h2>' +
+          '<p>Pracujemy nad uruchomieniem tej funkcji. Jeśli chcesz już teraz zamówić produkt lub przesłać projekt do wyceny, skontaktuj się z nami — chętnie pomożemy.</p>' +
           '<div class="przyciski" style="justify-content:flex-start">' +
-          '<a class="btn" href="kontakt.html">✉ Formularz kontaktowy i wycena</a>' +
-          '<a class="btn outline" href="realizacje.html">Zobacz nasze realizacje</a>' +
+          '<a class="btn" href="kontakt.html">✉ Skontaktuj się z nami</a>' +
+          '<a class="btn outline" href="index.html">Wróć na stronę główną</a>' +
           '<a class="btn outline" href="' + telHref() + '">☎ ' + SYG.TEL + '</a></div>';
         tresc.insertBefore(box, tresc.firstChild);
       }
