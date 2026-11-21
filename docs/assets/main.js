@@ -97,7 +97,68 @@
   const SVG_FB = '<path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5V11H8.5v3H11v7h2.5z"/>';
   const SVG_TIKTOK = '<path d="M19.4 7.2a5.4 5.4 0 0 1-3.2-1.1V15a5.8 5.8 0 1 1-5-5.7v3.2a2.7 2.7 0 1 0 2 2.6V2h3.1c.2 2.4 1.8 4 4.1 4.3v3.1c-.4 0-.7-.1-1-.2z"/>';
 
+  function szkieletAdmin(aktywna) {
+    /* etykieta konta w nagłówku: imię zalogowanego użytkownika */
+    var kontoEtykieta = 'Panel użytkownika', kontoTytul = 'Konto — logowanie';
+    try {
+      var kuz = (SYG.demoDb && SYG.demoDb.zalogowany) ? SYG.demoDb.zalogowany() : null;
+      if (kuz && kuz.imie){
+        kontoEtykieta = 'Witaj, ' + kuz.imie;
+        kontoTytul = 'Konto — ' + kuz.email;
+      }
+    } catch (e) {}
+    var headGora = '';
+    if (!SYG.LAUNCH){
+      headGora = '<div class="head-gora">' +
+        '<form class="szukaj" action="szukaj.html" method="get" role="search">' +
+        '<input type="search" name="q" placeholder="Szukaj: szopka, szyld, litery, grawer…" aria-label="Szukaj produktów i realizacji">' +
+        '<button type="submit" aria-label="Szukaj">' + ikonaSvg(SVG_SZUKAJ) + '</button>' +
+        '</form>' +
+        '<div class="head-przyciski">' +
+        '<a class="head-przycisk" href="koszyk.html" title="Koszyk" aria-label="Koszyk">' +
+        '<span class="kropka"></span>' + ikonaSvg(SVG_KOSZYK) + '<span class="hp-etyk">Koszyk</span></a>' +
+        '<a class="head-przycisk" href="konto.html" title="' + kontoTytul + '" aria-label="Panel użytkownika">' +
+        ikonaSvg(SVG_PANEL) + '<span class="hp-etyk">' + kontoEtykieta + '</span></a>' +
+        '</div>' +
+        '</div>';
+    }
+    return '' +
+      '<div class="srodek">' +
+      /* A + C: logo i menu */
+      '<aside class="side">' +
+      '<a class="brand-blok" href="index.html" aria-label="Strona główna Studio Sygnatura">' +
+      '<div class="brand-kwadrat"><img src="assets/sygnet.svg" alt="Sygnet Studio Sygnatura"></div>' +
+      '<div class="brand-nazwa"><span class="syg">Syg</span><span class="natura">natura</span></div>' +
+      '<div class="brand-tag">drewno · światło · detal</div>' +
+      '</a>' +
+      '<nav class="menu-vert" aria-label="Menu główne"></nav>' +
+      '<section class="side-contact" aria-label="Kontakt i media społecznościowe">' +
+      '<a class="side-contact-item" href="' + telHref() + '" aria-label="Zadzwoń: ' + SYG.TEL + '"><svg class="side-contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16.5v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 10.2 18a19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.9 3.2 2 2 0 0 1 3.9 1h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L7.8 9a16 16 0 0 0 7.2 7.2l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 1.4Z"/></svg><span>' + SYG.TEL + '</span></a>' +
+      '<a class="side-contact-item side-contact-mail" href="mailto:' + SYG.MAIL + '" aria-label="Wyślij e-mail: ' + SYG.MAIL + '"><svg class="side-contact-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="1.5"/><path d="m3 6 9 7 9-7"/></svg><span>' + SYG.MAIL + '</span></a>' +
+      '<div class="side-social-block"><span class="side-social-label">Znajdź nas na:</span>' +
+      '<div class="side-social">' +
+      '<a href="https://pl.pinterest.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Pinterest" title="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_PIN + '</svg></a>' +
+      '<a href="https://www.youtube.com/@StudioSygnatura" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_YT + '</svg></a>' +
+      '<a href="https://www.instagram.com/studiosygnatura/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">' + SVG_IG + '</svg></a>' +
+      '<a href="https://www.facebook.com/p/Studio-SygNatura-61595255863642/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_FB + '</svg></a>' +
+      '<a href="https://www.tiktok.com/@studiosygnatura" target="_blank" rel="noopener noreferrer" aria-label="TikTok Studio Sygnatura" title="TikTok — Studio Sygnatura"><svg viewBox="0 0 24 24" fill="currentColor">' + SVG_TIKTOK + '</svg></a>' +
+      '</div>' +
+      '</div>' +
+      '</section>' +
+      '</aside>' +
+      '<div class="listwa" aria-hidden="true"></div>' +
+      /* B + D: prawa kolumna */
+      '<div class="prawa">' +
+      '<div class="head">' + headGora +
+      '<h1 class="strona-tytul" id="strona-tytul"></h1>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+
   function szkielet(aktywna) {
+    if (document.body.classList.contains('admin-page')) return szkieletAdmin(aktywna);
     var tel = telHref();
     var accountLabel = 'Moje konto', accountTitle = 'Konto — logowanie';
     try {
