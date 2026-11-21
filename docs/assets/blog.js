@@ -140,25 +140,34 @@
     articleLd.textContent = JSON.stringify(article);
 
     const lb = lightbox();
-    const wszystkie = [w.okladka].concat((w.galeria || []).filter(function (g) { return g && g !== w.okladka; }));
-
-    /* galeria: okładka + miniatury */
-    let galeria = '<div class="wpis-galeria">' +
-      '<figure class="wpis-okladka"><img src="' + esc(w.okladka) + '" alt="' + esc(w.tytul) + '"></figure>';
-    if (wszystkie.length > 1) {
-      galeria += '<div class="wpis-miniatury">';
-      wszystkie.forEach(function (g, i) {
-        galeria += '<button type="button" class="wpis-mini" data-i="' + i + '"><img src="' + esc(g) + '" alt="zdjęcie ' + (i + 1) + '"></button>';
-      });
-      galeria += '</div></div>';
-    } else {
-      galeria += '</div>';
+    function mediaItem(value, isCover) {
+      const item = typeof value === 'string' ? { src: value } : (value || {});
+      const src = String(item.src || item.url || item.video || '');
+      if (!src) return null;
+      const yt = videoId(src), type = String(item.type || '').toLowerCase();
+      const video = type === 'video' || type === 'film' || !!yt || /\.(mp4|webm|ogg)(?:[?#]|$)/i.test(src);
+      return { src: src, thumb: String(item.thumbnail || item.miniatura || (isCover ? src : src)), video: video, youtube: yt };
     }
-
-    /* film YouTube */
-    const vId = videoId(w.video);
-    const film = vId ? '<div class="wpis-film"><div class="edytor-video"><iframe width="560" height="315" ' +
-      'src="https://www.youtube.com/embed/' + vId + '" frameborder="0" allowfullscreen loading="lazy"></iframe></div></div>' : '';
+    const media = [mediaItem(w.okladka, true)].concat((Array.isArray(w.galeria) ? w.galeria : []).map(function (g) { return mediaItem(g, false); }));
+    if (w.video) media.push(mediaItem({ src: w.video, type: 'video' }, false));
+    const wszystkie = media.filter(function (m, i, a) { return m && a.findIndex(function (x) { return x && x.src === m.src; }) === i; });
+    function renderMainMedia(index) {
+      const m = wszystkie[index];
+      if (!m) return '';
+      if (m.youtube) return '<div class="wpis-okladka wpis-okladka-video"><iframe src="https://www.youtube.com/embed/' + esc(m.youtube) + '" title="Film: ' + esc(w.tytul) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>';
+      if (m.video) return '<div class="wpis-okladka wpis-okladka-video"><video controls playsinline preload="metadata" poster="' + esc(m.thumb || '') + '"><source src="' + esc(m.src) + '"></video></div>';
+      return '<figure class="wpis-okladka"><img src="' + esc(m.src) + '" alt="' + esc(w.tytul) + '"></figure>';
+    }
+    let galeria = '<div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">' + renderMainMedia(0);
+    if (wszystkie.length > 1) {
+      galeria += '<div class="wpis-galeria-pasek"><button type="button" class="wpis-galeria-nav" data-dir="-1" aria-label="Przewiń zdjęcia w lewo">‹</button><div class="wpis-miniatury" aria-label="Zdjęcia i filmy realizacji">';
+      wszystkie.forEach(function (m, i) {
+        galeria += '<button type="button" class="wpis-mini' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" aria-label="' + (m.video ? 'Odtwórz film ' : 'Pokaż zdjęcie ') + (i + 1) + '">' +
+          (m.video ? '<span class="wpis-mini-video">▶</span>' : '<img src="' + esc(m.thumb) + '" alt="">') + '</button>';
+      });
+      galeria += '</div><button type="button" class="wpis-galeria-nav" data-dir="1" aria-label="Przewiń zdjęcia w prawo">›</button></div>';
+    }
+    galeria += '</div></div>';
 
     /* blok produktu — w trybie startu każda realizacja ma przycisk e-mail / kontakt */
     let produktBlok = '';
@@ -185,17 +194,36 @@
     }
 
     kontener.innerHTML =
-      '<a class="powrot" href="realizacje.html">← wszystkie realizacje</a>' +
-      '<span class="tag">' + esc(w.kategoria) + '</span>' +
+      '<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a>' +
+      '<article class="wpis-artykul"><header class="wpis-naglowek">' +
+      (w.kategoria ? '<span class="tag">' + esc(w.kategoria) + '</span>' : '') +
       '<h1>' + esc(w.tytul) + '</h1>' +
-      '<p class="sub">' + dzien(w.data) + (!SYG.LAUNCH && w.produkt && w.produkt.sklep ? ' · dostępny w sklepie' : '') + '</p>' +
-      galeria + film + produktBlok +
-      '<div class="blog-tresc">' + (w.tresc || '') + '</div>';
+      '<p class="sub">' + dzien(w.data) + '</p></header>' +
+      '<div class="wpis-uklad"><div class="blog-tresc">' + (w.tresc || '') + '</div>' + galeria + '</div>' +
+      produktBlok + '</article>';
 
-    kontener.querySelectorAll('.wpis-mini').forEach(function (b) {
-      b.addEventListener('click', function () { lb.otworz(wszystkie, Number(b.getAttribute('data-i'))); });
+    const mainMedia = kontener.querySelector('.wpis-media-glowny');
+    kontener.querySelectorAll('.wpis-mini').forEach(function (button) {
+      button.addEventListener('click', function () {
+        const index = Number(button.getAttribute('data-i'));
+        mainMedia.innerHTML = renderMainMedia(index);
+        mainMedia.dataset.current = String(index);
+        kontener.querySelectorAll('.wpis-mini').forEach(function (thumb) { thumb.classList.toggle('on', thumb === button); });
+      });
     });
-    kontener.querySelector('.wpis-okladka img').addEventListener('click', function () { lb.otworz(wszystkie, 0); });
+    kontener.querySelectorAll('.wpis-galeria-nav').forEach(function (button) {
+      button.addEventListener('click', function () {
+        const strip = kontener.querySelector('.wpis-miniatury');
+        if (strip) strip.scrollBy({ left: Number(button.dataset.dir) * Math.max(220, strip.clientWidth * 0.8), behavior: 'smooth' });
+      });
+    });
+    mainMedia.addEventListener('click', function (event) {
+      if (!event.target.matches('.wpis-okladka img')) return;
+      const selected = Number(mainMedia.dataset.current || 0), imageIndexes = [];
+      wszystkie.forEach(function (m, i) { if (!m.video) imageIndexes.push(i); });
+      const lightboxIndex = imageIndexes.indexOf(selected);
+      if (lightboxIndex >= 0) lb.otworz(imageIndexes.map(function (i) { return wszystkie[i].src; }), lightboxIndex);
+    });
 
     /* dodaj do koszyka */
     const gK = kontener.querySelector('button[data-koszyk]');

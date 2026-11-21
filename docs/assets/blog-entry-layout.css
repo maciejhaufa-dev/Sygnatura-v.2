@@ -1,0 +1,22 @@
+/* Responsive refinements for the editorial realization page. */
+.interior-content .wpis-powrot { display: inline-flex; align-items: center; margin: 0 0 25px; padding: 9px 13px; border: 1px solid rgba(107,69,48,.28); background: var(--krem-2); font-size: 13px; letter-spacing: .04em; }
+.interior-content .wpis-powrot:hover { border-color: var(--butelkowa); background: #fff; }
+.interior-content .wpis-uklad > .blog-tresc { max-width: none; margin: 0; }
+.interior-content .wpis-miniatury { flex-wrap: nowrap; overflow-x: auto; }
+.interior-content .wpis-mini { flex: 0 0 86px; }
+.interior-content .wpis-mini:hover, .interior-content .wpis-mini.on { border: 2px solid var(--interior-forest); }
+.interior-content .wpis-okladka-video { max-height: 660px; overflow: hidden; }
+.interior-content .wpis-okladka-video iframe, .interior-content .wpis-okladka-video video { height: 100%; min-height: 0; }
+@media (max-width: 760px) {
+  .wpis-uklad { grid-template-columns: 1fr; gap: 18px; }
+  .wpis-galeria { grid-row: 1; }
+  .blog-tresc { grid-row: 2; }
+  .wpis-okladka img, .wpis-okladka video { height: min(58vh, 460px); min-height: 230px; }
+  .wpis-powrot { margin-bottom: 19px; }
+}
+@media (max-width: 420px) {
+  .wpis-galeria-pasek { gap: 5px; }
+  .wpis-galeria-nav { width: 32px; height: 34px; flex-basis: 32px; }
+  .wpis-mini { width: 76px; height: 60px; flex-basis: 76px; }
+  .wpis-naglowek h1 { font-size: 29px; }
+}
