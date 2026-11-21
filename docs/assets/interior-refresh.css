@@ -1,0 +1,131 @@
+/* Shared interior-page system: matches the current Studio Sygnatura homepage. */
+.strona-uklad{
+  --interior-forest:#1f3a32;--interior-cream:#fbf7f0;--interior-paper:#fffdf9;
+  --interior-ink:#33261c;--interior-muted:#74695f;--interior-line:#e6ddd1;--interior-gold:#b27d43;
+  display:flex;flex-direction:column;min-height:100vh;width:100%;padding:0;background:var(--interior-cream);color:var(--interior-ink);
+  font-family:"Lato","Montserrat",Arial,sans-serif;font-size:15px
+}
+.strona-uklad a{color:inherit;text-decoration:none}
+.interior-site-header{flex:none;background:#fff;border-bottom:1px solid var(--interior-line)}
+.interior-header-top{display:grid;grid-template-columns:minmax(180px,1.2fr) minmax(200px,.9fr) minmax(160px,.75fr) auto;gap:clamp(14px,2.4vw,34px);align-items:center;max-width:1460px;min-height:94px;margin:auto;padding:12px clamp(18px,2.5vw,36px)}
+.interior-brand{display:block;max-width:280px}
+.interior-brand img{width:min(270px,100%);height:auto;max-height:68px;object-fit:contain;object-position:left center}
+.interior-search{height:46px;display:flex;min-width:0;border:1px solid #ded4c8;background:#fff}
+.interior-search input{width:100%;min-width:0;padding:0 13px;border:0;outline:0;background:transparent;color:var(--interior-ink);font:13px "Lato",Arial,sans-serif}
+.interior-search button{display:grid;place-items:center;flex:0 0 44px;border:0;background:transparent;color:#887c70;cursor:pointer}
+.interior-search svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.interior-phone{display:flex;align-items:center;gap:11px;white-space:nowrap;color:var(--interior-forest)}
+.interior-phone>svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.interior-phone span,.interior-utilities a>span:last-child{display:flex;flex-direction:column;gap:3px}
+.interior-phone b,.interior-utilities b{font-size:13px;font-weight:700}
+.interior-phone small,.interior-utilities small{font-size:10px;color:var(--interior-muted)}
+.interior-utilities{display:flex;align-items:stretch}
+.interior-utilities>a{display:flex;align-items:center;gap:9px;padding:5px 14px;border-left:1px solid var(--interior-line);white-space:nowrap;color:var(--interior-forest)}
+.interior-utilities>a:last-child{padding-right:0}
+.interior-utility-icon{position:relative;display:grid;place-items:center}
+.interior-utility-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.interior-utilities .kropka{position:absolute;top:-8px;right:-10px;display:none;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:50%;background:#b27d43;color:#fff;font:700 9px/1 "Lato",Arial,sans-serif}
+.interior-utilities .kropka.widoczna{display:grid}
+.interior-nav-row{border-top:1px solid #f0ebe5}
+.interior-nav-inner{display:flex;align-items:center;gap:20px;max-width:1460px;min-height:47px;margin:auto;padding:0 clamp(18px,2.5vw,36px)}
+.interior-nav-inner .menu-vert{display:flex;flex:1;flex-direction:row;align-items:center;gap:clamp(17px,2.3vw,33px);min-width:0;margin:0;padding:0;overflow-x:auto;scrollbar-width:thin}
+.interior-nav-inner .menu-vert a{position:relative;flex:none;padding:15px 0 13px;border:0;border-bottom:2px solid transparent;background:none;color:#181c19;font:700 10px/1.2 "Lato","Montserrat",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.interior-nav-inner .menu-vert a::after{display:none}
+.interior-nav-inner .menu-vert a:hover,.interior-nav-inner .menu-vert a.on{border-color:#b27d43;background:none;color:var(--interior-forest)}
+.interior-nav-phone{display:none;margin-left:auto;color:var(--interior-gold)!important;font-size:11px;white-space:nowrap}
+.interior-page-title:empty{display:none}
+.interior-page-title-inner{max-width:1380px;margin:auto;padding:20px clamp(18px,2.5vw,36px) 0}
+#strona-tytul>h1{margin:0;color:var(--interior-forest);font:600 clamp(32px,3.5vw,46px)/1.05 "Cormorant Garamond",Georgia,serif;letter-spacing:-.015em}
+#strona-tytul:empty{display:none}
+.interior-content{display:block;flex:1 0 auto;min-width:0;background:var(--interior-cream)}
+.strona-uklad main.wrap{width:100%;max-width:1380px;margin:0 auto;padding:28px clamp(18px,2.5vw,36px) 62px}
+.strona-uklad main.wrap>h1:first-child{color:var(--interior-forest);font:600 clamp(34px,4.3vw,52px)/1.02 "Cormorant Garamond",Georgia,serif}
+.strona-uklad main.wrap .lead{max-width:850px;margin:12px 0 24px;color:#655b52;font:14px/1.7 "Lato",Arial,sans-serif}
+.interior-content .tag{display:inline-block;margin:0 0 8px;color:var(--interior-gold);font:700 9px/1.3 "Lato",Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase}
+.interior-content .powrot{display:inline-block;margin:0 0 12px;color:#786d63;font-size:11px}
+.interior-content .powrot:hover{color:var(--interior-forest)}
+.interior-content .sub{margin:7px 0 17px;color:#877b70;font:12px "Lato",Arial,sans-serif}
+.interior-content .blog-filtr{gap:7px;margin:20px 0 8px}
+.interior-content .blog-chip{padding:8px 14px;border:1px solid #ddd2c4;background:#fffdf9;color:#584c41;font:700 10px "Lato",Arial,sans-serif;letter-spacing:.07em}
+.interior-content .blog-chip:hover,.interior-content .blog-chip.on{border-color:var(--interior-forest);background:var(--interior-forest);color:#fff}
+.interior-content .blog-siatka{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:18px}
+.interior-content .blog-kafel{border:1px solid var(--interior-line);background:var(--interior-paper);box-shadow:0 5px 18px rgba(40,35,28,.045)}
+.interior-content .blog-kafel:hover{box-shadow:0 12px 30px rgba(31,58,50,.12)}
+.interior-content .blog-kafel-foto{margin:0;background:#f3eee7}
+.interior-content .blog-kafel-foto img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f3eee7}
+.interior-content .blog-kafel-tresc{gap:6px;padding:15px 17px 18px}
+.interior-content .blog-kafel .nazwa{color:var(--interior-forest);font:600 clamp(19px,1.6vw,24px)/1.15 "Cormorant Garamond",Georgia,serif}
+.interior-content .blog-kafel .kat{color:var(--interior-gold);font:700 9px "Lato",Arial,sans-serif;letter-spacing:.13em}
+.interior-content .blog-kafel .blog-data{color:#877b70;font:11px "Lato",Arial,sans-serif}
+.interior-content .blog-kafel .blog-zajawka{padding:10px 14px 12px;background:#fbf7f0;color:#665d54;font:12px/1.5 "Lato",Arial,sans-serif}
+.interior-content .blog-kafel .blog-badge{background:var(--interior-forest);color:#fff;font:700 9px "Lato",Arial,sans-serif}
+/* Project detail: large restrained gallery, readable story and clear contact action. */
+.interior-content #blog-tresc>h1{max-width:1000px;margin:0;color:var(--interior-forest);font:600 clamp(34px,4.3vw,52px)/1.04 "Cormorant Garamond",Georgia,serif}
+.interior-content .wpis-galeria{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:20px 0 12px}
+.interior-content .wpis-okladka{width:100%;min-width:0;max-height:660px;overflow:hidden;background:#f2ece2;cursor:zoom-in}
+.interior-content .wpis-okladka img{width:100%;height:min(68vh,620px);min-height:300px;object-fit:contain;background:#f2ece2;border:1px solid var(--interior-line)}
+.interior-content .wpis-miniatury{display:flex;flex-direction:row;gap:9px;flex-wrap:wrap}
+.interior-content .wpis-mini{width:86px;height:68px;border:1px solid var(--interior-line);border-radius:2px;overflow:hidden}
+.interior-content .wpis-mini:hover{border-color:var(--interior-gold)}
+.interior-content .wpis-film{max-width:860px;margin:24px auto}
+.interior-content .wpis-produkt{margin:16px 0 25px;padding:22px 24px;border:1px solid var(--interior-line);border-left:3px solid var(--interior-forest);background:#f3eee7}
+.interior-content .wpis-produkt h2{color:var(--interior-forest);font:600 26px/1.1 "Cormorant Garamond",Georgia,serif}
+.interior-content .wpis-produkt p{color:#665d54;font:12px/1.6 "Lato",Arial,sans-serif}
+.interior-content .wpis-produkt .przyciski{gap:9px}
+.interior-content .wpis-produkt .btn{min-height:42px;padding:12px 17px;border:1px solid var(--interior-forest);background:var(--interior-forest);color:white;font:700 9px "Lato",Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.interior-content .wpis-produkt .btn:hover{background:#294b40}
+.interior-content .wpis-produkt .btn.outline{background:transparent;color:var(--interior-forest)}
+.interior-content .wpis-produkt .btn.outline:hover{background:#fff}
+.interior-content .blog-tresc{max-width:920px;margin:30px auto 0;color:#514940;font:15px/1.8 "Lato",Arial,sans-serif}
+.interior-content .blog-tresc h2{margin:26px 0 10px;color:var(--interior-forest);font:600 30px/1.15 "Cormorant Garamond",Georgia,serif}
+.interior-content .blog-tresc h3{color:#755438;font:600 24px/1.2 "Cormorant Garamond",Georgia,serif}
+.interior-content .blog-tresc img{max-height:680px;object-fit:contain;border:0}
+.interior-content .blog-tresc blockquote{border-left:3px solid #c4a582;background:#f3eee7}
+.interior-content .sukces{border:1px solid var(--interior-line);background:#fffdf9;color:var(--interior-forest)}
+.interior-content .sukces .btn{display:inline-flex;align-items:center;min-height:40px;padding:11px 16px;background:var(--interior-forest);color:#fff;font-size:10px}
+.strona-uklad .listwa-poziom{height:1px;background:var(--interior-line);box-shadow:none}
+.strona-uklad .stopka{display:flex;justify-content:space-between;align-items:center;gap:18px;min-height:68px;padding:18px clamp(18px,4vw,58px);background:var(--interior-forest);color:#f7f1e8;font:10px/1.5 "Lato",Arial,sans-serif}
+.strona-uklad .stopka>span{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.strona-uklad .stopka a{color:#ead5b8}
+.strona-uklad .stopka a:hover{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.strona-uklad .stopka .sep{color:rgba(255,255,255,.42)}
+.strona-uklad .budowa-box{max-width:950px;margin:24px auto;padding:30px;border:1px solid var(--interior-line);background:#fffdf9}
+.strona-uklad .budowa-box h2{color:var(--interior-forest);font:600 32px/1.1 "Cormorant Garamond",Georgia,serif}
+.strona-uklad .budowa-box p{margin:12px 0;color:#655b52;font:14px/1.7 "Lato",Arial,sans-serif}
+@media(max-width:1000px){
+ .interior-header-top{grid-template-columns:minmax(150px,1fr) minmax(190px,1.2fr) auto;gap:15px}
+ .interior-phone{display:none}
+ .interior-content .blog-siatka{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ .interior-header-top{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;min-height:0;padding:10px 14px 0}
+ .interior-brand{grid-column:1;grid-row:1;max-width:220px}
+ .interior-brand img{max-height:50px}
+ .interior-utilities{grid-column:2;grid-row:1;justify-self:end}
+ .interior-utilities>a{gap:5px;padding:4px 8px}
+ .interior-utilities small{display:none}
+ .interior-utilities b{font-size:10px}
+ .interior-utility-icon svg{width:18px;height:18px}
+ .interior-search{grid-column:1/-1;grid-row:2;height:41px;margin:5px 0 9px}
+ .interior-nav-inner{min-height:43px;padding:0 14px;gap:10px}
+ .interior-nav-inner .menu-vert{gap:20px;white-space:nowrap}
+ .interior-nav-inner .menu-vert a{padding:14px 0 12px;font-size:9px}
+ .interior-nav-phone{display:block}
+ .interior-page-title-inner{padding:17px 16px 0}
+ #strona-tytul{font-size:34px}
+ .strona-uklad main.wrap{padding:22px 15px 48px}
+ .strona-uklad main.wrap>h1:first-child{font-size:39px}
+ .interior-content .blog-siatka{grid-template-columns:1fr;gap:15px}
+ .interior-content .blog-kafel-foto img{aspect-ratio:16/10}
+ .interior-content #blog-tresc>h1{font-size:38px}
+ .interior-content .wpis-galeria{gap:8px;margin-top:16px}
+ .interior-content .wpis-okladka img{height:clamp(240px,78vw,520px);min-height:0}
+ .interior-content .wpis-miniatury{gap:7px}
+ .interior-content .wpis-mini{width:68px;height:54px}
+ .interior-content .wpis-produkt{padding:17px 16px}
+ .interior-content .blog-tresc{margin-top:22px;font-size:14px;line-height:1.75}
+ .interior-content .blog-tresc h2{font-size:26px}
+ .strona-uklad .stopka{display:block;padding:16px 15px}
+ .strona-uklad .stopka>span+span{display:block;margin-top:10px}
+ .strona-uklad .budowa-box{margin:5px 0;padding:22px 18px}
+}
