@@ -2,10 +2,10 @@
 (function () {
   'use strict';
   var FALLBACK = {
-    hero: { title: 'Z miłości do drewna', copy: 'Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.', image: 'assets/media/sklep/szyld.jpg' },
+    hero: { title: 'Z miłości do drewna', copy: 'Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.', image: 'assets/media/sklep/szyld-czesc-profesjonalne.jpg' },
     cards: [
       { category: 'Dekoracje świąteczne', title: 'Szopka bożonarodzeniowa (warstwowa)', description: '', price: '319 zł / szt.', cta: 'Zapytaj o produkt →', image: 'assets/media/sklep/szopka.jpg' },
-      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Prześlij projekt do wyceny →', image: 'assets/media/sklep/szyld.jpg' },
+      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Prześlij projekt do wyceny →', image: 'assets/media/sklep/szyld-czesc-profesjonalne.jpg' },
       { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '269 zł / szt.', cta: 'Zapytaj o metryczkę →' }
     ]
   };
@@ -13,6 +13,7 @@
   function image(id, src) {
     var e = document.getElementById(id);
     src = String(src || '').trim();
+    if (src.replace(/^\.\//, '') === 'assets/media/sklep/szyld.jpg') src = 'assets/media/sklep/szyld-czesc-profesjonalne.jpg';
     if (e && (/^https:\/\//i.test(src) || /^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)$/i.test(src))) e.src = src;
   }
   function description(id, value) {
