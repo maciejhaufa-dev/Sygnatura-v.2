@@ -2,10 +2,10 @@
 (function () {
   'use strict';
   var FALLBACK = {
-    hero: { title: 'Z miłości do drewna', copy: 'Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.', image: 'assets/media/sklep/szyld-czesc-profesjonalne.jpg' },
+    hero: { title: 'Z miłości do drewna', copy: 'Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
     cards: [
       { category: 'Dekoracje świąteczne', title: 'Szopka bożonarodzeniowa (warstwowa)', description: '', price: '319 zł / szt.', cta: 'Zapytaj o produkt →', image: 'assets/media/sklep/szopka.jpg' },
-      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Prześlij projekt do wyceny →', image: 'assets/media/sklep/szyld-czesc-profesjonalne.jpg' },
+      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Prześlij projekt do wyceny →', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
       { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '269 zł / szt.', cta: 'Zapytaj o metryczkę →' }
     ]
   };
@@ -13,11 +13,11 @@
   function image(id, src) {
     var e = document.getElementById(id);
     src = String(src || '').trim();
-    var path = src.replace(/^\.\//, ''), polished = 'assets/media/sklep/szyld-czesc-profesjonalne.jpg';
-    /* Migrate the previously uploaded angled photo too, not only the old local fallback.
-       Otherwise the delayed settings response would replace the clean first paint. */
-    if (path === 'assets/media/sklep/szyld.jpg' || /(?:^|\/)uploads\/home-(?:hero|card2)-czesc-[A-Za-z0-9._-]+\.jpg$/i.test(path)) src = polished;
-    if (e && (/^https:\/\//i.test(src) || /^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)$/i.test(src))) e.src = src;
+    var path = src.replace(/^\.\//, ''), pathNoQuery = path.split('?')[0], polished = 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1';
+    /* Migrate the previously uploaded angled photo and cache-old local image too,
+       so the settings response can never replace the exact-color first paint. */
+    if (pathNoQuery === 'assets/media/sklep/szyld.jpg' || pathNoQuery === 'assets/media/sklep/szyld-czesc-profesjonalne.jpg' || /(?:^|\/)uploads\/home-(?:hero|card2)-czesc-[A-Za-z0-9._-]+\.jpg$/i.test(pathNoQuery)) src = polished;
+    if (e && (/^https:\/\//i.test(src) || /^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)(?:\?v=[A-Za-z0-9_-]+)?$/i.test(src))) e.src = src;
   }
   function description(id, value) {
     var e = document.getElementById(id);
