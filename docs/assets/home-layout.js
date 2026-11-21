@@ -10,11 +10,12 @@
       { title: 'Wysyłamy w całej Polsce', copy: 'bezpiecznie pod Twoje drzwi' }
     ],
     cards: [
-      { category: 'Dekoracje świąteczne', title: 'Szopka bożonarodzeniowa (warstwowa)', description: '', price: '', cta: 'Zobacz realizację →', image: 'assets/media/sklep/szopka.jpg' },
-      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Zobacz realizację →', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
-      { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '', cta: 'Zobacz realizację →' }
+      { category: 'Dekoracje świąteczne', title: 'Szopka bożonarodzeniowa (warstwowa)', description: '', price: '', cta: 'Sprawdź!', image: 'assets/media/sklep/szopka.jpg' },
+      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Sprawdź!', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
+      { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '', cta: 'Sprawdź!' }
     ]
   };
+  var realizacjeRequest = null;
   function text(id, value) { var e = document.getElementById(id); if (e) e.textContent = String(value == null ? '' : value); }
   function image(id, src) {
     var e = document.getElementById(id);
@@ -86,7 +87,8 @@
       if(photo&&photo.dataset.adminOverride!=='true')ustawZdjecieMetryczki(wpis.okladka, wpis.galeria);
       return true;
     }
-    SYG.wezwij('blog-lista',{}).then(function(r){
+    if(!realizacjeRequest)realizacjeRequest=SYG.wezwij('blog-lista',{});
+    realizacjeRequest.then(function(r){
       var posts=r&&r.ok&&Array.isArray(r.wpisy)?r.wpisy:[];
       [['szopka','home-card1-link','home-card1-cta'],['szyld','home-card2-link','home-card2-cta']].forEach(function(item){
         var wpis=dopasujRealizacje(posts,item[0]);if(!wpis)return;
@@ -136,7 +138,7 @@
         price.hidden = true;
         price.style.display = 'none';
       }
-      text('home-card' + n + '-cta', 'Zobacz realizację →');
+      text('home-card' + n + '-cta', 'Sprawdź!');
       var fallbackHref = i === 0 ? 'blog-wpis.html?id=1' : (i === 1 ? 'blog-wpis.html?id=2' : 'realizacje.html');
       var photoLink = document.getElementById(i === 2 ? 'metryczka-link' : 'home-card' + n + '-link');
       var ctaLink = document.getElementById('home-card' + n + '-cta');
@@ -154,7 +156,10 @@
       }
     }
   }
+  /* Seed current defaults synchronously; keep changing hero copy hidden until the saved CMS text is ready. */
+  render(FALLBACK);
   if (!window.SYG || typeof window.SYG.wezwij !== 'function') { revealHeroCopy(); return; }
+  polaczKartyRealizacjami();
   window.SYG.wezwij('strona-glowna-pobierz', {}).then(function (response) {
     if (response && response.ok && response.dane && response.dane.landing) render(response.dane.landing);
     polaczKartyRealizacjami();
