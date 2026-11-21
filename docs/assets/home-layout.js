@@ -150,7 +150,7 @@
         var metricPhoto = document.getElementById('metryczka-photo');
         if (metricPhoto && c.image) {
           metricPhoto.dataset.adminOverride = 'true';
-          ustawZdjecieMetryczki(c.image);
+          ustawZdjecieMetryczki(c.image, [defaults.cards[2].image]);
         } else if (metricPhoto) {
           delete metricPhoto.dataset.adminOverride;
         }
