@@ -185,3 +185,24 @@
  .brand-wordmark small{font-size:7.5px;letter-spacing:0}
  .product-card,.product-card.featured{grid-template-columns:94px minmax(0,1fr)}
 }
+
+/* Compact home story: tighter headline spacing and editable three-step process. */
+.hero-copy{padding:22px 0 18px}
+.hero-copy>p{margin:8px 0 16px}
+.home-process{max-width:680px;margin-top:24px}
+.home-process h2{margin:0 0 9px;color:#a87942;font:700 9px/1.2 var(--sans);letter-spacing:.16em;text-transform:uppercase}
+.home-process-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0;padding:0;list-style:none}
+.home-process-steps li{position:relative;display:flex;min-width:0;align-items:center;gap:8px;padding-right:7px;color:var(--forest);font-size:11px;font-weight:700;line-height:1.28}
+.home-process-steps li:not(:last-child)::after{content:"→";position:absolute;right:-7px;top:50%;transform:translateY(-50%);color:#b27d43;font-size:13px}
+.home-process-number{display:grid;width:27px;height:27px;flex:0 0 27px;place-items:center;border:1px solid #d7bf9f;border-radius:50%;color:#a87942;font-size:8px;letter-spacing:.05em}
+.home-process-steps li>span:last-child{min-width:0}
+.hero-points{margin-top:22px}
+@media(max-width:700px){
+ .hero-copy{padding:21px 18px 20px}
+ .hero-copy>p{margin:7px 0 15px}
+ .home-process{margin-top:20px}
+ .home-process-steps{gap:6px}
+ .home-process-steps li{align-items:flex-start;gap:5px;font-size:9px}
+ .home-process-number{width:23px;height:23px;flex-basis:23px;font-size:7px}
+ .hero-points{margin-top:20px}
+}

@@ -46,3 +46,13 @@ body.admin-page.admin-authenticated .live-home-editor{padding:22px!important;bor
 .admin-legacy-note strong{flex:0 0 auto;color:#715733}
 @media(max-width:900px){.live-home-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.live-home-product-editor:last-child{grid-column:1/-1}.live-home-product-editor:last-child>img{max-width:320px}}
 @media(max-width:640px){.live-home-editor{padding:14px!important}.live-home-heading{display:block}.live-home-badge{display:inline-block;margin-top:10px}.live-home-image-row{grid-template-columns:1fr}.live-home-image-row>img{height:170px}.live-home-text-grid,.live-home-product-grid{grid-template-columns:1fr}.live-home-product-editor:last-child{grid-column:auto}.live-home-product-editor:last-child>img{max-width:none}.live-home-actions{display:block}.live-home-actions>div{margin-top:9px}.live-home-actions button{width:100%}.live-home-preview>div{flex-wrap:wrap}.admin-legacy-note{display:block}.admin-legacy-note strong{display:block;margin-bottom:3px}}
+
+/* Editable fields for every homepage-only block added to the hero. */
+.live-home-custom-home-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px;margin-top:14px}
+.live-home-custom-section{min-width:0;padding:13px;border:1px solid #e7ded2;border-radius:9px;background:#fbf8f2}
+.live-home-custom-section h4{margin:0 0 10px;color:#1f3a32;font-size:10px}
+.live-home-custom-section>label,.live-home-step-fields label,.live-home-feature-fields label{display:grid;gap:5px;color:#514c42;font-size:9px;font-weight:700}
+.live-home-step-fields,.live-home-feature-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
+.live-home-feature-fields>div{display:grid;gap:8px;min-width:0}
+@media(max-width:900px){.live-home-custom-home-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.live-home-step-fields,.live-home-feature-fields{grid-template-columns:1fr}.live-home-feature-fields>div{gap:8px}}

@@ -62,8 +62,8 @@
 /* Project detail: large restrained gallery, readable story and clear contact action. */
 .interior-content #blog-tresc>h1{max-width:1000px;margin:0;color:var(--interior-forest);font:600 clamp(34px,4.3vw,52px)/1.04 "Cormorant Garamond",Georgia,serif}
 .interior-content .wpis-galeria{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:20px 0 12px}
-.interior-content .wpis-okladka{width:100%;min-width:0;max-height:660px;overflow:hidden;background:#f2ece2;cursor:zoom-in}
-.interior-content .wpis-okladka img{width:100%;height:min(68vh,620px);min-height:300px;object-fit:contain;background:#f2ece2;border:1px solid var(--interior-line)}
+.interior-content .wpis-okladka{width:100%;min-width:0;max-height:660px;overflow:hidden;background:#fbf8f4;cursor:zoom-in}
+.interior-content .wpis-okladka img{width:100%;height:min(68vh,620px);min-height:300px;object-fit:contain;background:#fbf8f4;border:1px solid var(--interior-line)}
 .interior-content .wpis-miniatury{display:flex;flex-direction:row;gap:9px;flex-wrap:wrap}
 .interior-content .wpis-mini{width:86px;height:68px;border:1px solid var(--interior-line);border-radius:2px;overflow:hidden}
 .interior-content .wpis-mini:hover{border-color:var(--interior-gold)}

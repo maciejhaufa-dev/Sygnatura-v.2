@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="assets/style.css?v=358">
 <link rel="stylesheet" href="assets/admin-refresh.css?v=admin-login-3">
 <link rel="stylesheet" href="assets/admin-dashboard.css?v=dashboard-1">
-<link rel="stylesheet" href="assets/admin-landing-editor.css?v=landing-editor-1">
+<link rel="stylesheet" href="assets/admin-landing-editor.css?v=landing-editor-2">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -131,7 +131,7 @@
       <section class="admin-card live-home-editor" aria-labelledby="live-home-title">
         <div class="live-home-heading">
           <div><span class="live-home-kicker">AKTUALNY UKŁAD STRONY</span><h3 id="live-home-title">Edytor widocznej strony głównej</h3>
-          <p class="mala">Te ustawienia sterują dokładnie tym układem, który widzą klienci: zdjęciem głównym i trzema kartami produktów. Zmiany zapisują się we wspólnej bazie.</p></div>
+          <p class="mala">Te ustawienia sterują układem widocznym dla klientów: zdjęciem głównym, etapami „Jak działamy”, atutami oraz trzema kartami realizacji. Zmiany zapisują się we wspólnej bazie.</p></div>
           <span class="live-home-badge">● Edycja na żywo</span>
         </div>
         <div class="live-home-fields">
@@ -141,13 +141,21 @@
               <label for="nh-hero-image">Adres zdjęcia</label><input id="nh-hero-image" type="url" value="assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1" placeholder="https://… lub assets/…">
               <div class="live-home-upload"><input id="nh-hero-file" type="file" accept="image/*"><button class="btn outline" id="nh-hero-upload" type="button">Wgraj zdjęcie do biblioteki</button></div>
             </div></div>
-            <div class="live-home-text-grid"><label>Tytuł<input id="nh-hero-title" value="Z miłości do drewna" maxlength="90"></label><label>Opis<textarea id="nh-hero-copy" rows="2" maxlength="240">Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.</textarea></label></div>
+            <div class="live-home-text-grid"><label>Tytuł<input id="nh-hero-title" value="Z miłości do drewna" maxlength="90"></label><label>Opis<textarea id="nh-hero-copy" rows="2" maxlength="240">Personalizowane dekoracje na wyjątkowe chwile.</textarea></label></div>
+            <div class="live-home-custom-home-grid">
+              <section class="live-home-custom-section"><h4>Jak działamy — treści kroków</h4><label>Nagłówek<input id="nh-flow-title" value="Jak działamy" maxlength="45"></label><div class="live-home-step-fields"><label>Krok 1<input id="nh-flow-step1" value="Pomysł i kontakt" maxlength="48"></label><label>Krok 2<input id="nh-flow-step2" value="Przygotowanie projektu" maxlength="48"></label><label>Krok 3<input id="nh-flow-step3" value="Wykonanie i odbiór" maxlength="48"></label></div></section>
+              <section class="live-home-custom-section"><h4>Atuty — teksty pod procesem</h4><div class="live-home-feature-fields">
+                <div><label>Atut 1<input id="nh-point1-title" value="Wykonujemy wszystko sami" maxlength="48"></label><label>Opis 1<input id="nh-point1-copy" value="od projektu po wykończenie" maxlength="70"></label></div>
+                <div><label>Atut 2<input id="nh-point2-title" value="Personalizacja" maxlength="48"></label><label>Opis 2<input id="nh-point2-copy" value="stworzona dla Ciebie" maxlength="70"></label></div>
+                <div><label>Atut 3<input id="nh-point3-title" value="Wysyłamy w całej Polsce" maxlength="48"></label><label>Opis 3<input id="nh-point3-copy" value="bezpiecznie pod Twoje drzwi" maxlength="70"></label></div>
+              </div></section>
+            </div>
           </article>
           <div class="live-home-block-title live-home-products-title"><span>02</span><div><b>Trzy karty „Poznaj nasze realizacje”</b><small>Edytuj treści i zdjęcia; każda karta prowadzi do wpisu realizacji</small></div></div>
           <div class="live-home-product-grid">
             <article class="live-home-product-editor"><img id="nh-card1-thumb" src="assets/media/sklep/szopka.jpg" alt="Podgląd zdjęcia karty pierwszej"><label>Kategoria<input id="nh-card1-category" value="Dekoracje świąteczne"></label><label>Nazwa produktu<input id="nh-card1-title" value="Szopka bożonarodzeniowa (warstwowa)"></label><label>Opis<input id="nh-card1-description" value=""></label><label>Cena (niepokazywana przy realizacjach)<input id="nh-card1-price" value=""></label><label>Tekst linku<input id="nh-card1-cta" value="Zobacz realizację →" readonly></label><label>Adres zdjęcia<input id="nh-card1-image" type="url" value="assets/media/sklep/szopka.jpg" placeholder="https://… lub assets/…"></label><div class="live-home-upload"><input id="nh-card1-file" type="file" accept="image/*"><button class="btn outline" id="nh-card1-upload" type="button">Wgraj zdjęcie</button></div></article>
             <article class="live-home-product-editor"><img id="nh-card2-thumb" src="assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1" alt="Podgląd zdjęcia karty drugiej"><label>Kategoria<input id="nh-card2-category" value="Szyldy i tablice"></label><label>Nazwa produktu<input id="nh-card2-title" value="Szyld powitalny „Cześć!”"></label><label>Opis<input id="nh-card2-description" value="To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu."></label><label>Cena (niepokazywana przy realizacjach)<input id="nh-card2-price" value=""></label><label>Tekst linku<input id="nh-card2-cta" value="Zobacz realizację →" readonly></label><label>Adres zdjęcia<input id="nh-card2-image" type="url" value="assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1" placeholder="https://… lub assets/…"></label><div class="live-home-upload"><input id="nh-card2-file" type="file" accept="image/*"><button class="btn outline" id="nh-card2-upload" type="button">Wgraj zdjęcie</button></div></article>
-            <article class="live-home-product-editor"><img id="nh-card3-thumb" alt="Podgląd zdjęcia karty trzeciej" hidden><label>Kategoria<input id="nh-card3-category" value="Prezenty personalizowane"></label><label>Nazwa produktu<input id="nh-card3-title" value="Metryczka"></label><label>Opis<input id="nh-card3-description" value=""></label><label>Cena (niepokazywana przy realizacjach)<input id="nh-card3-price" value=""></label><label>Tekst linku<input id="nh-card3-cta" value="Zobacz realizację →" readonly></label><label>Zdjęcie (puste = zdjęcie realizacji #14)<input id="nh-card3-image" type="url" value="" placeholder="Własne zdjęcie lub puste dla zdjęcia realizacji"></label><div class="live-home-upload"><input id="nh-card3-file" type="file" accept="image/*"><button class="btn outline" id="nh-card3-upload" type="button">Wgraj zdjęcie</button></div><p class="live-home-photo-note">Możesz zostawić zdjęcie realizacji #14 albo ustawić własny adres lub wgrać inne zdjęcie.</p></article>
+            <article class="live-home-product-editor"><img id="nh-card3-thumb" alt="Podgląd zdjęcia karty trzeciej" hidden><label>Kategoria<input id="nh-card3-category" value="Prezenty personalizowane"></label><label>Nazwa produktu<input id="nh-card3-title" value="Metryczka"></label><label>Opis<input id="nh-card3-description" value=""></label><label>Cena (niepokazywana przy realizacjach)<input id="nh-card3-price" value=""></label><label>Tekst linku<input id="nh-card3-cta" value="Zobacz realizację →" readonly></label><label>Zdjęcie (puste = zdjęcie wpisu metryczki)<input id="nh-card3-image" type="url" value="" placeholder="Własne zdjęcie lub puste dla zdjęcia realizacji"></label><div class="live-home-upload"><input id="nh-card3-file" type="file" accept="image/*"><button class="btn outline" id="nh-card3-upload" type="button">Wgraj zdjęcie</button></div><p class="live-home-photo-note">Możesz zostawić zdjęcie puste — karta automatycznie dobierze okładkę wpisu o metryczce — lub ustawić własny adres / wgrać zdjęcie.</p></article>
           </div>
           <div class="live-home-preview"><b>Podgląd zdjęć</b><div><img id="nh-preview-hero" src="assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1" alt="Hero"><img id="nh-preview-card1" src="assets/media/sklep/szopka.jpg" alt="Karta 1"><img id="nh-preview-card2" src="assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1" alt="Karta 2"><img id="nh-preview-card3" alt="Karta 3 — metryczka" hidden></div></div>
           <div class="live-home-actions"><p id="nh-status" role="status" aria-live="polite">Wczytuję zapisane ustawienia…</p><div><button class="btn outline" id="nh-discard" type="button">Odrzuć niezapisane</button><button class="btn-zapisz-duzy" id="nh-save" type="button">Zapisz nowy układ strony głównej</button></div></div>
@@ -766,7 +774,9 @@
   /* Edytor aktualnego, statycznego layoutu landing page (hero + 3 karty).
      Ustawienia są trzymane jako osobny klucz `landing` w istniejącym JSON-ie strony głównej. */
   var NH_DEFAULTS = {
-    hero:{title:'Z miłości do drewna',copy:'Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.',image:'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1'},
+    hero:{title:'Z miłości do drewna',copy:'Personalizowane dekoracje na wyjątkowe chwile.',image:'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1'},
+    flow:{title:'Jak działamy',steps:['Pomysł i kontakt','Przygotowanie projektu','Wykonanie i odbiór']},
+    points:[{title:'Wykonujemy wszystko sami',copy:'od projektu po wykończenie'},{title:'Personalizacja',copy:'stworzona dla Ciebie'},{title:'Wysyłamy w całej Polsce',copy:'bezpiecznie pod Twoje drzwi'}],
     cards:[
       {category:'Dekoracje świąteczne',title:'Szopka bożonarodzeniowa (warstwowa)',description:'',price:'',cta:'Zobacz realizację →',image:'assets/media/sklep/szopka.jpg'},
       {category:'Szyldy i tablice',title:'Szyld powitalny „Cześć!”',description:'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.',price:'',cta:'Zobacz realizację →',image:'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1'},
@@ -785,7 +795,7 @@
     return (/^https:\/\//i.test(src)||/^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)(?:\?v=[A-Za-z0-9_-]+)?$/i.test(src))?src:'';
   }
   function nhReadForm(){
-    var d={hero:{title:document.getElementById('nh-hero-title').value.trim(),copy:document.getElementById('nh-hero-copy').value.trim(),image:document.getElementById('nh-hero-image').value.trim()},cards:[]};
+    var d={hero:{title:document.getElementById('nh-hero-title').value.trim(),copy:document.getElementById('nh-hero-copy').value.trim(),image:document.getElementById('nh-hero-image').value.trim()},flow:{title:document.getElementById('nh-flow-title').value.trim(),steps:[1,2,3].map(function(i){return document.getElementById('nh-flow-step'+i).value.trim();})},points:[1,2,3].map(function(i){return {title:document.getElementById('nh-point'+i+'-title').value.trim(),copy:document.getElementById('nh-point'+i+'-copy').value.trim()};}),cards:[]};
     for(var i=1;i<=3;i++){
       var card={};['category','title','description','price','cta'].forEach(function(key){card[key]=document.getElementById('nh-card'+i+'-'+key).value.trim();});
       card.image=document.getElementById('nh-card'+i+'-image').value.trim();
@@ -795,8 +805,14 @@
   }
   function nhRenderForm(d){
     var hero=Object.assign({},NH_DEFAULTS.hero,d&&d.hero||{}), cards=(d&&Array.isArray(d.cards))?d.cards:[];
+    var staleCopy=['Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.','Personalizowane drewniane dekoracje na wyjątkowe chwile.'];
+    if(staleCopy.indexOf(String(hero.copy||'').trim())>=0)hero.copy=NH_DEFAULTS.hero.copy;
+    var flow=Object.assign({},NH_DEFAULTS.flow,d&&d.flow||{}),steps=Array.isArray(flow.steps)?flow.steps:NH_DEFAULTS.flow.steps;
+    var points=Array.isArray(d&&d.points)?d.points:NH_DEFAULTS.points;
     hero.image=nhHomePhoto(hero.image);
     nhInput('nh-hero-title',hero.title);nhInput('nh-hero-copy',hero.copy);nhInput('nh-hero-image',hero.image);
+    nhInput('nh-flow-title',flow.title);for(var step=0;step<3;step++)nhInput('nh-flow-step'+(step+1),steps[step]||NH_DEFAULTS.flow.steps[step]);
+    for(var point=0;point<3;point++){var feature=Object.assign({},NH_DEFAULTS.points[point],points[point]||{});nhInput('nh-point'+(point+1)+'-title',feature.title);nhInput('nh-point'+(point+1)+'-copy',feature.copy);}
     for(var i=0;i<3;i++){
       var c=Object.assign({},NH_DEFAULTS.cards[i],cards[i]||{}),n=i+1;
       c.image=nhHomePhoto(c.image);
@@ -804,7 +820,7 @@
       ['category','title','description','price','cta'].forEach(function(key){nhInput('nh-card'+n+'-'+key,c[key]);});
       nhInput('nh-card'+n+'-image',c.image);
     }
-    NH_DATA={hero:hero,cards:[0,1,2].map(function(i){return Object.assign({},NH_DEFAULTS.cards[i],cards[i]||{});})};
+    NH_DATA={hero:hero,flow:{title:flow.title,steps:steps.slice(0,3)},points:[0,1,2].map(function(i){return Object.assign({},NH_DEFAULTS.points[i],points[i]||{});}),cards:[0,1,2].map(function(i){return Object.assign({},NH_DEFAULTS.cards[i],cards[i]||{});})};
     nhUpdatePreview();
   }
   function nhUpdatePreview(){
@@ -822,7 +838,7 @@
       nhRenderForm(r.dane&&r.dane.landing?r.dane.landing:NH_DEFAULTS);
       nhText('nh-status',r.dane&&r.dane.landing?'Załadowano zapisany układ.':'Załadowano bieżące ustawienia domyślne.');
       if(!NH_DATA.cards[2].image){
-        try{var post=await SYG.wezwij('blog-pobierz',{id:14}),entry=post&&post.ok&&post.wpis;NH_THIRD_CURRENT_IMAGE=entry&&(entry.okladka||(Array.isArray(entry.galeria)&&entry.galeria.find(Boolean)))||'';nhUpdatePreview();}catch(ignore){}
+        try{var list=await SYG.wezwij('blog-lista',{}),posts=list&&list.ok&&Array.isArray(list.wpisy)?list.wpisy:[],entry=posts.find(function(w){return w&&w.widoczny!==false&&(/metryczk/i.test(String(w.tytul||''))||/metryczk/i.test(String(w.produkt&&w.produkt.nazwa||'')));});NH_THIRD_CURRENT_IMAGE=entry&&(entry.okladka||(Array.isArray(entry.galeria)&&entry.galeria.find(Boolean)))||'';nhUpdatePreview();}catch(ignore){}
       }
     }catch(e){nhText('nh-status','Błąd odczytu: '+(e.message||'brak połączenia'));}
     finally{NH_LOADING=false;}
@@ -846,6 +862,7 @@
     try{
       var current=await SYG.wezwij('strona-glowna-pobierz',{});if(!current||!current.ok)throw new Error((current&&current.blad)||'Nie udało się pobrać aktualnej konfiguracji.');
       var data=nhReadForm();if(!data.hero.title||!data.hero.copy)throw new Error('Uzupełnij tytuł i opis zdjęcia głównego.');
+      if(!data.flow.title||data.flow.steps.some(function(step){return !step;})||data.points.some(function(point){return !point.title||!point.copy;}))throw new Error('Uzupełnij etapy procesu i trzy atuty strony głównej.');
       if(!nhSafeImage(data.hero.image)||!nhSafeImage(data.cards[0].image)||!nhSafeImage(data.cards[1].image)||(data.cards[2].image&&!nhSafeImage(data.cards[2].image)))throw new Error('Uzupełnij poprawne adresy zdjęć.');
       if(data.cards.some(function(c){return !c.title||!c.category||!c.cta;}))throw new Error('Każda karta musi mieć nazwę, kategorię i tekst linku.');
       var merged=Object.assign({},current.dane||{});merged.landing=data;
