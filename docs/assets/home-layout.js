@@ -104,16 +104,37 @@
     }).catch(function(){/* A missing story never shows a fake loading message or an unrelated photo. */});
   }
   function revealHeroCopy() {
-    ['hero-title','home-hero-copy','home-process','home-points'].forEach(function(id){
-      var node=document.getElementById(id);
-      if(node)node.style.visibility='visible';
+    document.documentElement.classList.remove('home-cms-loading');
+  }
+  function waitForHeroImage() {
+    var node=document.getElementById('home-hero-image');
+    if(!node)return Promise.resolve();
+    node.loading='eager';
+    return new Promise(function(resolve){
+      var finished=false;
+      function done(){if(finished)return;finished=true;resolve();}
+      function loaded(){
+        if(finished)return;
+        if(node.naturalWidth>0){
+          finished=true;
+          Promise.resolve(node.decode?node.decode():null).catch(function(){}).then(resolve);
+          return;
+        }
+        var current=node.getAttribute('src')||'';
+        if(current!==FALLBACK.hero.image&&image('home-hero-image',FALLBACK.hero.image)){
+          node.addEventListener('load',loaded,{once:true});
+          node.addEventListener('error',done,{once:true});
+          if(node.complete)loaded();
+        }else done();
+      }
+      if(node.complete){loaded();return;}
+      node.addEventListener('load',loaded,{once:true});
+      node.addEventListener('error',loaded,{once:true});
     });
   }
   function render(data) {
     var defaults = FALLBACK;
     var hero = Object.assign({}, defaults.hero, data && data.hero || {});
-    var staleCopy=['Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.','Personalizowane drewniane dekoracje na wyjątkowe chwile.'];
-    if(staleCopy.indexOf(String(hero.copy||'').trim())>=0)hero.copy=defaults.hero.copy;
     var flow=Object.assign({},defaults.flow,data&&data.flow||{});
     var flowSteps=Array.isArray(flow.steps)?flow.steps:defaults.flow.steps;
     var points=Array.isArray(data&&data.points)?data.points:defaults.points;
@@ -127,7 +148,7 @@
       text('home-point'+(point+1)+'-title',feature.title);
       text('home-point'+(point+1)+'-copy',feature.copy);
     }
-    image('home-hero-image', hero.image);
+    if(!image('home-hero-image', hero.image))image('home-hero-image', defaults.hero.image);
     for (var i = 0; i < 3; i++) {
       var c = Object.assign({}, defaults.cards[i], cards[i] || {}), n = i + 1;
       if (i === 2 && !String(c.image || '').trim()) c.image = defaults.cards[2].image;
@@ -158,18 +179,22 @@
       }
     }
   }
-  /* Seed current defaults synchronously; keep changing hero copy hidden until the saved CMS text is ready. */
-  render(FALLBACK);
-  revealHeroCopy();
-  if (!window.SYG || typeof window.SYG.wezwij !== 'function') return;
+  /* Keep the hero hidden until the saved CMS version is applied and its image is ready. */
+  if (!window.SYG || typeof window.SYG.wezwij !== 'function') {
+    render(FALLBACK);
+    waitForHeroImage().then(revealHeroCopy);
+    return;
+  }
   polaczKartyRealizacjami();
   window.SYG.wezwij('strona-glowna-pobierz', {}).then(function (response) {
-    if (response && response.ok && response.dane && response.dane.landing) render(response.dane.landing);
+    var saved=response&&response.ok&&response.dane&&response.dane.landing?response.dane.landing:FALLBACK;
+    render(saved);
     polaczKartyRealizacjami();
-    revealHeroCopy();
+    return waitForHeroImage();
   }).catch(function (error) {
     console.warn('Nie udało się pobrać ustawień nowego układu strony głównej.', error);
+    render(FALLBACK);
     polaczKartyRealizacjami();
-    revealHeroCopy();
-  });
+    return waitForHeroImage();
+  }).then(revealHeroCopy);
 })();

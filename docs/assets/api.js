@@ -312,16 +312,16 @@
     const seedy = [
       {
         slug: 'pracownia', tytul: 'Pracownia', menu: 1, kol: 3,
-        tresc: '<h2>Kim jesteśmy</h2>' +
-          '<p>Studio Sygnatura to <b>rodzinna manufaktura</b> — w naszych rzeczach spotykają się drewno, światło i detal.</p>' +
-          '<h2>Co robimy</h2>' +
-          '<ul><li><b>Dekoracje na wydarzenia</b> — tablice powitalne, plany stołów, litery przestrzenne, krzyżówki z imionami.</li>' +
-          '<li><b>Personalizowane prezenty</b> — grawerowane wkładki, winietki, ramki z sentencją.</li>' +
-          '<li><b>Produkty do domu</b> — szopki warstwowe, szyldy powitalne, podświetlane litery.</li></ul>' +
-          '<h2>Nasza zasada</h2>' +
-          '<p>Najpierw rozumiemy, po co dana rzecz powstaje — potem projektujemy, a na końcu tniemy, malujemy i podświetlamy.</p>' +
-          '<p><a href="realizacje.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">Zobacz nasze realizacje →</a> · ' +
-          '<a href="kontakt.html" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">Zapytaj o wycenę →</a></p>'
+        tresc: '<h2>Od majsterkowania do własnej pracowni</h2>' +
+          '<p>Studio Sygnatura zrodziło się z pasji do drewna, majsterkowania i projektowania. Zawsze cieszyło nas tworzenie rzeczy dopracowanych, estetycznych i pomyślanych tak, by dobrze służyły. Z czasem te zainteresowania przerodziły się w rodzinną pracownię w Poznaniu.</p>' +
+          '<p>Lubimy cały proces: od pierwszego szkicu i rozmowy o potrzebach, przez wybór materiału, aż po cięcie, szlifowanie i wykończenie. Dzięki temu każdy przedmiot powstaje u nas z dbałością o formę i detal.</p>' +
+          '<h2>Ładne rzeczy, które są też przydatne</h2>' +
+          '<p>Nie skupiamy się wyłącznie na dekoracjach do wnętrz. Projektujemy i wykonujemy również przedmioty funkcjonalne — takie, z których korzysta się na co dzień albo które pomagają podczas ważnych okazji.</p>' +
+          '<ul><li><b>Do domu i na co dzień</b> — praktyczne dodatki z drewna, szyldy, organizery i dekoracje.</li>' +
+          '<li><b>Na ważne chwile</b> — tablice powitalne, plany stołów, litery przestrzenne i krzyżówki z imionami.</li>' +
+          '<li><b>Na osobisty prezent</b> — grawerowane pamiątki, ramki i przedmioty z imieniem, datą lub własnym tekstem.</li></ul>' +
+          '<h2>Każdy projekt zaczyna się od rozmowy</h2>' +
+          '<p>Chcemy wiedzieć, jak przedmiot będzie używany i co ma dla Ciebie znaczyć. Potem wspólnie dobieramy formę i personalizację, a my wykonujemy go od pierwszego cięcia po ostatni szlif. <a href="kontakt.html">Opowiedz nam o swoim pomyśle</a> — chętnie go zaprojektujemy.</p>'
       }
     ];
     if (odswiez) {

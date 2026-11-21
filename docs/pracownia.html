@@ -18,7 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/home.css?v=brand-split-2">
+<link rel="stylesheet" href="assets/home.css?v=about-proportions-1">
+<style>html.about-cms-loading #podstrona-tresc{visibility:hidden}</style>
+<script>document.documentElement.classList.add('about-cms-loading');</script>
 
 <script src="assets/metricool.js?v=metricool-1" defer></script>
 </head>
@@ -37,20 +39,22 @@
 </header>
 <main class="about-main">
   <section class="about-hero" aria-labelledby="about-title">
-    <div class="about-hero-copy"><span class="realizations-eyebrow">Pracownia w Poznaniu</span><h1 id="about-title">Drewno.<br>Światło.<br>Detal.</h1><p>Studio Sygnatura to rodzinna pracownia, w której tworzymy drewniane szyldy, dekoracje i prezenty personalizowane. Każdy projekt przechodzi przez nasze ręce — od pierwszego pomysłu po ostatni szlif.</p></div>
-    <div class="about-hero-photo"><img src="assets/media/sklep/szopka.jpg" alt="Ręcznie wykonana, warstwowa dekoracja z drewna" fetchpriority="high"></div>
+    <div class="about-hero-copy"><span class="realizations-eyebrow">Pracownia w Poznaniu</span><h1 id="about-title">Drewno.<br>Światło.<br>Detal.</h1><p>Pasja do majsterkowania i projektowania przerodziła się w rodzinną pracownię w Poznaniu. Tworzymy drewniane rzeczy, które cieszą oko i dobrze służą — w domu, na co dzień i podczas ważnych chwil.</p></div>
+    <div class="about-hero-photo about-brand-placeholder" role="img" aria-label="Logo Studio Sygnatura — Pracownia rzemiosła i dekoracji"><div class="about-brand-lockup"><img class="about-brand-symbol" src="assets/sygnet.svg" alt=""><span class="about-brand-wordmark"><strong><span class="brand-syg">SYG</span><span class="brand-natura">NATURA</span></strong><small>Pracownia rzemiosła i dekoracji</small></span></div></div>
   </section>
-  <section class="about-story" id="podstrona-tresc" aria-label="O pracowni">
-    <h2>Kim jesteśmy</h2>
-    <p>Studio Sygnatura to rodzinna manufaktura — w naszych rzeczach spotykają się drewno, światło i detal. Nie jesteśmy fabryką: każdy szyld, każda szopka i każda tablica przechodzi przez nasze ręce od deski do ostatniego szlifu. Dlatego nie ma dwóch identycznych egzemplarzy.</p>
-    <h2>Co tworzymy</h2>
+  <section class="about-story" id="podstrona-tresc" aria-label="O pracowni" aria-busy="true">
+    <h2>Od majsterkowania do własnej pracowni</h2>
+    <p>Studio Sygnatura zrodziło się z pasji do drewna, majsterkowania i projektowania. Zawsze cieszyło nas tworzenie rzeczy dopracowanych, estetycznych i pomyślanych tak, by dobrze służyły. Z czasem te zainteresowania przerodziły się w rodzinną pracownię w Poznaniu.</p>
+    <p>Lubimy cały proces: od pierwszego szkicu i rozmowy o potrzebach, przez wybór materiału, aż po cięcie, szlifowanie i wykończenie. Dzięki temu każdy przedmiot powstaje u nas z dbałością o formę i detal.</p>
+    <h2>Ładne rzeczy, które są też przydatne</h2>
+    <p>Nie skupiamy się wyłącznie na dekoracjach do wnętrz. Projektujemy i wykonujemy również przedmioty funkcjonalne — takie, z których korzysta się na co dzień albo które pomagają podczas ważnych okazji.</p>
     <ul>
-      <li><b>Dekoracje na wydarzenia</b> — tablice powitalne, plany stołów, litery przestrzenne, krzyżówki z imionami i elementy stref powitalnych.</li>
-      <li><b>Prezenty personalizowane</b> — grawerowane wkładki, winietki, ramki z sentencją i panele z cytatem.</li>
-      <li><b>Produkty do domu</b> — szopki warstwowe z podświetleniem, szyldy powitalne i dekoracje z drewna.</li>
+      <li><b>Do domu i na co dzień</b> — praktyczne dodatki z drewna, szyldy, organizery i dekoracje.</li>
+      <li><b>Na ważne chwile</b> — tablice powitalne, plany stołów, litery przestrzenne i krzyżówki z imionami.</li>
+      <li><b>Na osobisty prezent</b> — grawerowane pamiątki, ramki i przedmioty z imieniem, datą lub własnym tekstem.</li>
     </ul>
-    <h2>Nasza zasada</h2>
-    <p>Najpierw rozumiemy, po co dana rzecz powstaje — dla kogo jest, gdzie stanie i jaki ma mieć charakter. Potem projektujemy, a na końcu tniemy, składamy warstwy i wykańczamy każdy detal. <a href="kontakt.html">Napisz do nas</a>, jeśli chcesz opowiedzieć o swoim pomyśle.</p>
+    <h2>Każdy projekt zaczyna się od rozmowy</h2>
+    <p>Chcemy wiedzieć, jak przedmiot będzie używany i co ma dla Ciebie znaczyć. Potem wspólnie dobieramy formę i personalizację, a my wykonujemy go od pierwszego cięcia po ostatni szlif. <a href="kontakt.html">Opowiedz nam o swoim pomyśle</a> — chętnie go zaprojektujemy.</p>
   </section>
   <section class="about-process" aria-labelledby="about-process-title">
     <h2 class="cooperation-block-title" id="about-process-title">Od pomysłu do gotowej pracy</h2>
@@ -88,16 +92,37 @@
 <script src="assets/main.js?v=brand-split-2"></script>
 <script>
 (function(){
-  async function loadAdminCopy(){
-    var target=document.getElementById('podstrona-tresc');
-    if(!target||!window.SYG||!SYG.wezwij)return;
-    try{
-      var response=await SYG.wezwij('strony-lista',{});
-      var page=(response&&response.strony||[]).find(function(item){return item.slug==='pracownia';});
-      if(page&&page.tresc)target.innerHTML=page.tresc;
-    }catch(e){console.warn('Nie udało się pobrać treści pracowni z panelu.',e);}
+  var target=document.getElementById('podstrona-tresc');
+  function reveal(){
+    if(target)target.setAttribute('aria-busy','false');
+    document.documentElement.classList.remove('about-cms-loading');
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadAdminCopy);else loadAdminCopy();
+  function waitForImages(root){
+    var images=Array.prototype.slice.call(root.querySelectorAll('img'));
+    images.forEach(function(img){img.loading='eager';});
+    return Promise.all(images.map(function(img){
+      if(img.complete)return Promise.resolve();
+      return new Promise(function(resolve){
+        var done=function(){resolve();};
+        img.addEventListener('load',done,{once:true});img.addEventListener('error',done,{once:true});
+      }).then(function(){if(img.naturalWidth&&img.decode)return img.decode().catch(function(){});});
+    }));
+  }
+  async function loadAdminCopy(){
+    if(!target)return reveal();
+    try{
+      if(!window.SYG||!SYG.wezwij)throw new Error('API nie jest dostępne');
+      var response=await SYG.wezwij('strony-lista',{});
+      if(!response||!response.ok||!Array.isArray(response.strony))throw new Error((response&&response.blad)||'Niepoprawna odpowiedź API');
+      var page=response.strony.find(function(item){return item.slug==='pracownia';});
+      if(page&&typeof page.tresc==='string'){
+        target.innerHTML=page.tresc;
+        await waitForImages(target);
+      }
+    }catch(e){console.warn('Nie udało się pobrać treści pracowni z panelu; pokazuję treść strony jako tryb awaryjny.',e);}
+    reveal();
+  }
+  loadAdminCopy();
 })();
 </script>
 </body>
