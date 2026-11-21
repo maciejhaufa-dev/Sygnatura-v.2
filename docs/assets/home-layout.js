@@ -5,8 +5,8 @@
     hero: { title: 'Z miłości do drewna', copy: 'Personalizowane drewniane tablice, szopki i dekoracje na wyjątkowe chwile.', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
     cards: [
       { category: 'Dekoracje świąteczne', title: 'Szopka bożonarodzeniowa (warstwowa)', description: '', price: '', cta: 'Zobacz realizację →', image: 'assets/media/sklep/szopka.jpg' },
-      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Czytaj o realizacji →', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
-      { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '269 zł / szt.', cta: 'Zapytaj o metryczkę →' }
+      { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Zobacz realizację →', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
+      { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '', cta: 'Zobacz realizację →' }
     ]
   };
   function text(id, value) { var e = document.getElementById(id); if (e) e.textContent = String(value == null ? '' : value); }
@@ -42,7 +42,7 @@
         if(product.indexOf('czesc')>=0||product.indexOf('szyld')>=0)score+=12;
         if(title.indexOf('lustro')>=0)score-=80;
       }
-      return {w:w,score:score,text:text};
+      return {w:w,score:score};
     }).sort(function(a,b){return b.score-a.score;});
     return ranking.length&&ranking[0].score>0?ranking[0].w:null;
   }
@@ -55,6 +55,10 @@
         [item[1],item[2]].forEach(function(id){var a=document.getElementById(id);if(a)a.href=href;});
       });
     }).catch(function(){/* realizacje.html pozostaje bezpiecznym fallbackiem */});
+  }
+  function revealHeroCopy() {
+    var copy = document.getElementById('home-hero-copy');
+    if (copy) copy.style.visibility = 'visible';
   }
   function render(data) {
     var defaults = FALLBACK;
@@ -70,20 +74,17 @@
       description('home-card' + n + '-description', c.description);
       var price = document.getElementById('home-card' + n + '-price');
       if (price) {
-        var shownPrice = i < 2 ? '' : String(c.price || '');
-        price.textContent = shownPrice;
-        price.hidden = !shownPrice.trim();
-        price.style.display = price.hidden ? 'none' : '';
+        price.textContent = '';
+        price.hidden = true;
+        price.style.display = 'none';
       }
-      text('home-card' + n + '-cta', i === 0 ? 'Zobacz realizację →' : (i === 1 ? 'Czytaj o realizacji →' : c.cta));
-      if (i < 2) {
-        image('home-card' + n + '-image', c.image);
-        var photoLink = document.getElementById('home-card' + n + '-link');
-        var ctaLink = document.getElementById('home-card' + n + '-cta');
-        var fallbackHref = i === 0 ? 'blog-wpis.html?id=1' : 'blog-wpis.html?id=2';
-        if (photoLink) photoLink.href = fallbackHref;
-        if (ctaLink) ctaLink.href = fallbackHref;
-      }
+      text('home-card' + n + '-cta', 'Zobacz realizację →');
+      var fallbackHref = i === 0 ? 'blog-wpis.html?id=1' : (i === 1 ? 'blog-wpis.html?id=2' : 'blog-wpis.html?id=14');
+      var photoLink = document.getElementById(i === 2 ? 'metryczka-link' : 'home-card' + n + '-link');
+      var ctaLink = document.getElementById('home-card' + n + '-cta');
+      if (photoLink) photoLink.href = fallbackHref;
+      if (ctaLink) ctaLink.href = fallbackHref;
+      if (i < 2) image('home-card' + n + '-image', c.image);
       if (i === 2) {
         var metricPhoto = document.getElementById('metryczka-photo');
         var metricPlaceholder = document.getElementById('metryczka-placeholder');
@@ -98,9 +99,13 @@
       }
     }
   }
-  if (!window.SYG || typeof window.SYG.wezwij !== 'function') return;
+  if (!window.SYG || typeof window.SYG.wezwij !== 'function') { revealHeroCopy(); return; }
   polaczKartyRealizacjami();
   window.SYG.wezwij('strona-glowna-pobierz', {}).then(function (response) {
     if (response && response.ok && response.dane && response.dane.landing) render(response.dane.landing);
-  }).catch(function (error) { console.warn('Nie udało się pobrać ustawień nowego układu strony głównej.', error); });
+    revealHeroCopy();
+  }).catch(function (error) {
+    console.warn('Nie udało się pobrać ustawień nowego układu strony głównej.', error);
+    revealHeroCopy();
+  });
 })();

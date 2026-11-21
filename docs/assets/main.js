@@ -174,7 +174,7 @@
       '<button type="submit" aria-label="Szukaj">' + ikonaSvg(SVG_SZUKAJ) + '</button></form>';
     return '<header class="interior-site-header">' +
       '<div class="interior-header-top">' +
-      '<a class="interior-brand" href="index.html" aria-label="Studio Sygnatura — strona główna"><img src="assets/brand-header.png" alt="Sygnatura — Studio Artystyczne"></a>' +
+      '<a class="interior-brand" href="index.html" aria-label="Studio Sygnatura — strona główna"><img class="brand-symbol" src="assets/sygnet.svg" alt=""><span class="brand-wordmark"><strong>SYGNATURA</strong><small>Pracownia rzemiosła i dekoracji</small></span></a>' +
       query +
       '<a class="interior-phone" href="' + tel + '">' + ikonaSvg('<path d="M7 3h3l2 5-2.2 1.5a15 15 0 0 0 4.7 4.7L16 12l5 2v3c0 1.1-.9 2-2 2C10 18.5 5.5 14 5 5c0-1.1.9-2 2-2Z"/>') + '<span><b>' + SYG.TEL + '</b><small>Odpowiedź 1–2 dni robocze</small></span></a>' +
       '<div class="interior-utilities">' +
