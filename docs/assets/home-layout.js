@@ -13,7 +13,10 @@
   function image(id, src) {
     var e = document.getElementById(id);
     src = String(src || '').trim();
-    if (src.replace(/^\.\//, '') === 'assets/media/sklep/szyld.jpg') src = 'assets/media/sklep/szyld-czesc-profesjonalne.jpg';
+    var path = src.replace(/^\.\//, ''), polished = 'assets/media/sklep/szyld-czesc-profesjonalne.jpg';
+    /* Migrate the previously uploaded angled photo too, not only the old local fallback.
+       Otherwise the delayed settings response would replace the clean first paint. */
+    if (path === 'assets/media/sklep/szyld.jpg' || /(?:^|\/)uploads\/home-(?:hero|card2)-czesc-[A-Za-z0-9._-]+\.jpg$/i.test(path)) src = polished;
     if (e && (/^https:\/\//i.test(src) || /^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)$/i.test(src))) e.src = src;
   }
   function description(id, value) {

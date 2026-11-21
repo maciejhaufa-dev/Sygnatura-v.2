@@ -779,7 +779,7 @@
   var NH_THIRD_CURRENT_IMAGE = '';
   function nhInput(id,value){var e=document.getElementById(id);if(e)e.value=value==null?'':String(value);}
   function nhText(id,value){var e=document.getElementById(id);if(e)e.textContent=value==null?'':String(value);}
-  function nhHomePhoto(src){src=String(src||'').trim();return src.replace(/^\.\//,'')==='assets/media/sklep/szyld.jpg'?'assets/media/sklep/szyld-czesc-profesjonalne.jpg':src;}
+  function nhHomePhoto(src){src=String(src||'').trim();var path=src.replace(/^\.\//,'');return path==='assets/media/sklep/szyld.jpg'||/(?:^|\/)uploads\/home-(?:hero|card2)-czesc-[A-Za-z0-9._-]+\.jpg$/i.test(path)?'assets/media/sklep/szyld-czesc-profesjonalne.jpg':src;}
   function nhSafeImage(src){
     src=String(src||'').trim();
     return (/^https:\/\//i.test(src)||/^(assets|uploads)\/[A-Za-z0-9._/-]+\.(?:jpe?g|png|webp|gif)$/i.test(src))?src:'';
