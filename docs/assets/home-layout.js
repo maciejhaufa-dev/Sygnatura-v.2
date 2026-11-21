@@ -12,7 +12,7 @@
     cards: [
       { category: 'Dekoracje świąteczne', title: 'Szopka bożonarodzeniowa (warstwowa)', description: '', price: '', cta: 'Sprawdź!', image: 'assets/media/sklep/szopka.jpg' },
       { category: 'Szyldy i tablice', title: 'Szyld powitalny „Cześć!”', description: 'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.', price: '', cta: 'Sprawdź!', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
-      { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '', cta: 'Sprawdź!' }
+      { category: 'Prezenty personalizowane', title: 'Metryczka', description: '', price: '', cta: 'Sprawdź!', image: 'assets/media/sklep/metryczka-fryderyk.jpg' }
     ]
   };
   var realizacjeRequest = null;
@@ -129,6 +129,7 @@
     image('home-hero-image', hero.image);
     for (var i = 0; i < 3; i++) {
       var c = Object.assign({}, defaults.cards[i], cards[i] || {}), n = i + 1;
+      if (i === 2 && !String(c.image || '').trim()) c.image = defaults.cards[2].image;
       text('home-card' + n + '-category', c.category);
       text('home-card' + n + '-title', c.title);
       description('home-card' + n + '-description', c.description);

@@ -780,7 +780,7 @@
     cards:[
       {category:'Dekoracje świąteczne',title:'Szopka bożonarodzeniowa (warstwowa)',description:'',price:'',cta:'Sprawdź!',image:'assets/media/sklep/szopka.jpg'},
       {category:'Szyldy i tablice',title:'Szyld powitalny „Cześć!”',description:'To wzór pokazowy — nie jest na sprzedaż. Przygotujemy szyld według Twojego projektu.',price:'',cta:'Sprawdź!',image:'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1'},
-      {category:'Prezenty personalizowane',title:'Metryczka',description:'',price:'',cta:'Sprawdź!'}
+      {category:'Prezenty personalizowane',title:'Metryczka',description:'',price:'',cta:'Sprawdź!',image:'assets/media/sklep/metryczka-fryderyk.jpg'}
     ]
   };
   var NH_DATA = null;
@@ -815,12 +815,13 @@
     for(var point=0;point<3;point++){var feature=Object.assign({},NH_DEFAULTS.points[point],points[point]||{});nhInput('nh-point'+(point+1)+'-title',feature.title);nhInput('nh-point'+(point+1)+'-copy',feature.copy);}
     for(var i=0;i<3;i++){
       var c=Object.assign({},NH_DEFAULTS.cards[i],cards[i]||{}),n=i+1;
+      if(i===2&&!String(c.image||'').trim())c.image=NH_DEFAULTS.cards[2].image;
       c.image=nhHomePhoto(c.image);
       c.price='';c.cta='Sprawdź!';
       ['category','title','description','price','cta'].forEach(function(key){nhInput('nh-card'+n+'-'+key,c[key]);});
       nhInput('nh-card'+n+'-image',c.image);
     }
-    NH_DATA={hero:hero,flow:{title:flow.title,steps:steps.slice(0,3)},points:[0,1,2].map(function(i){return Object.assign({},NH_DEFAULTS.points[i],points[i]||{});}),cards:[0,1,2].map(function(i){return Object.assign({},NH_DEFAULTS.cards[i],cards[i]||{});})};
+    NH_DATA={hero:hero,flow:{title:flow.title,steps:steps.slice(0,3)},points:[0,1,2].map(function(i){return Object.assign({},NH_DEFAULTS.points[i],points[i]||{});}),cards:[0,1,2].map(function(i){var card=Object.assign({},NH_DEFAULTS.cards[i],cards[i]||{});if(i===2&&!String(card.image||'').trim())card.image=NH_DEFAULTS.cards[2].image;return card;})};
     nhUpdatePreview();
   }
   function nhUpdatePreview(){
