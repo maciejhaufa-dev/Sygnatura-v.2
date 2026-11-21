@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var FALLBACK = {
-    hero: { title: 'Z miłości do drewna', copy: 'Personalizowane dekoracje na wyjątkowe chwile.', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
+    hero: { title: 'Z miłości do piękna', copy: 'Personalizowane dekoracje na wyjątkowe chwile.', image: 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1' },
     flow: { title: 'Jak działamy', steps: ['Pomysł i kontakt', 'Przygotowanie projektu', 'Wykonanie i odbiór'] },
     points: [
       { title: 'Wykonujemy wszystko sami', copy: 'od projektu po wykończenie' },
@@ -90,6 +90,7 @@
     if(!realizacjeRequest)realizacjeRequest=SYG.wezwij('blog-lista',{});
     realizacjeRequest.then(function(r){
       var posts=r&&r.ok&&Array.isArray(r.wpisy)?r.wpisy:[];
+      if(posts.length){try{sessionStorage.setItem('syg-public-blog-cache-v1',JSON.stringify(posts));}catch(ignore){}}
       [['szopka','home-card1-link','home-card1-cta'],['szyld','home-card2-link','home-card2-cta']].forEach(function(item){
         var wpis=dopasujRealizacje(posts,item[0]);if(!wpis)return;
         var href='blog-wpis.html?id='+encodeURIComponent(wpis.id);
@@ -159,7 +160,8 @@
   }
   /* Seed current defaults synchronously; keep changing hero copy hidden until the saved CMS text is ready. */
   render(FALLBACK);
-  if (!window.SYG || typeof window.SYG.wezwij !== 'function') { revealHeroCopy(); return; }
+  revealHeroCopy();
+  if (!window.SYG || typeof window.SYG.wezwij !== 'function') return;
   polaczKartyRealizacjami();
   window.SYG.wezwij('strona-glowna-pobierz', {}).then(function (response) {
     if (response && response.ok && response.dane && response.dane.landing) render(response.dane.landing);

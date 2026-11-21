@@ -19,6 +19,12 @@
   }
   function dzien(value){const d=parsujDateBlog(value);return d?d.toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'}):'';}
   function sortDodano(w){return Number(w.dodanoSort)||Number(w.id)||0;}
+  function okladkaRealizacji(w){
+    const opis=[w&&w.tytul,w&&w.kategoria,w&&w.zajawka,w&&w.tresc,w&&w.produkt&&w.produkt.nazwa].join(' ').toLowerCase();
+    const normalized=opis.normalize?opis.normalize('NFD').replace(/[\u0300-\u036f]/g,''):opis;
+    if(/szyld|tablic/.test(normalized)&&/czesc|powitaln/.test(normalized))return 'assets/media/sklep/szyld-czesc-profesjonalne.png?v=sitecream-1';
+    return String(w&&w.okladka||'');
+  }
 
   function videoId(url) {
     const m = String(url || '').match(/(?:v=|youtu\.be\/)([\w-]{6,})/);
@@ -28,6 +34,7 @@
   /* ---------- lista (kafle) ---------- */
   async function lista(kontener) {
     const odp = await SYG.wezwij('blog-lista', {});
+    if(odp&&odp.ok&&Array.isArray(odp.wpisy)){try{sessionStorage.setItem('syg-public-blog-cache-v1',JSON.stringify(odp.wpisy));}catch(e){}}
     if (!odp || !odp.ok){
       kontener.innerHTML = '<p class="mala" role="alert" style="padding:14px 0">Nie udało się pobrać realizacji. Odśwież stronę za chwilę.</p>';
       return;
@@ -56,7 +63,7 @@
       siatka.innerHTML = widoczne.filter(function (w) { return !kat || w.kategoria === kat; }).map(function (w) {
         const data=dzien(w.data);
         return '<a class="blog-kafel" href="blog-wpis.html?id=' + encodeURIComponent(w.id) + '">' +
-          '<figure class="blog-kafel-foto"><img src="' + esc(w.okladka) + '" alt="' + esc(w.tytul) + '" loading="lazy">' +
+          '<figure class="blog-kafel-foto"><img src="' + esc(okladkaRealizacji(w)) + '" alt="' + esc(w.tytul) + '" loading="lazy">' +
           (w.zajawka ? '<figcaption class="blog-zajawka">' + esc(w.zajawka) + '</figcaption>' : '') + '</figure>' +
           (!SYG.LAUNCH && w.produkt && w.produkt.sklep ? '<span class="blog-badge">dostępny w sklepie</span>' : '') +
           '<span class="blog-kafel-tresc">' +
@@ -104,15 +111,30 @@
   }
 
   /* ---------- strona wpisu ---------- */
+  function cachedBlogEntry(id){
+    try{var rows=JSON.parse(sessionStorage.getItem('syg-public-blog-cache-v1')||'[]');return Array.isArray(rows)?rows.find(function(w){return w&&String(w.id)===String(id)&&w.widoczny!==false;}):null;}catch(e){return null;}
+  }
+  function renderCachedBlogEntry(kontener,w){
+    const cover=okladkaRealizacji(w);
+    kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header><div class="wpis-uklad"><div class="blog-tresc">'+(w.tresc||'')+'</div><div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div></div></article>';
+  }
   async function wpis(kontener) {
     const id = SYG.param('id');
-    const odp = await SYG.wezwij('blog-pobierz', { id: id });
+    const cached=cachedBlogEntry(id);
+    if(cached)renderCachedBlogEntry(kontener,cached);
+    let odp;
+    try{odp=await SYG.wezwij('blog-pobierz', { id: id });}catch(error){
+      if(!cached)kontener.innerHTML='<div class="sukces"><h2>Nie udało się wczytać realizacji</h2><p>Sprawdź połączenie i spróbuj ponownie.</p></div>';
+      return;
+    }
     if (!odp.ok || !odp.wpis) {
-      kontener.innerHTML = '<div class="sukces"><h2>Nie znaleziono wpisu</h2>' +
+      if(!cached)kontener.innerHTML = '<div class="sukces"><h2>Nie znaleziono wpisu</h2>' +
         '<p><a class="btn" href="blog.html" style="margin-top:12px">← Wróć do realizacji</a></p></div>';
       return;
     }
+    try{var entryRows=JSON.parse(sessionStorage.getItem('syg-public-blog-cache-v1')||'[]');if(!Array.isArray(entryRows))entryRows=[];entryRows=entryRows.filter(function(x){return String(x&&x.id)!==String(odp.wpis.id)});entryRows.push(odp.wpis);sessionStorage.setItem('syg-public-blog-cache-v1',JSON.stringify(entryRows));}catch(e){}
     const w = odp.wpis;
+    const cover = okladkaRealizacji(w);
     if (w.widoczny === false) {
       kontener.innerHTML = '<div class="sukces"><h2>Ten wpis jest obecnie niedostępny</h2>' +
         '<p><a class="btn" href="blog.html" style="margin-top:12px">← Wróć do realizacji</a></p></div>';
@@ -133,8 +155,8 @@
     setMeta('meta[property="og:title"]', 'og:title', document.title, true);
     setMeta('meta[property="og:description"]', 'og:description', opisTekst, true);
     setMeta('meta[property="og:url"]', 'og:url', canonicalUrl, true);
-    if (w.okladka) setMeta('meta[property="og:image"]', 'og:image', new URL(w.okladka, location.href).href, true);
-    const article = {"@context":"https://schema.org","@type":"Article","headline":w.tytul || 'Realizacja Studio Sygnatura',"description":opisTekst,"image":w.okladka ? [new URL(w.okladka, location.href).href] : undefined,"datePublished":w.data || undefined,"author":{"@type":"Organization","name":"Studio Sygnatura","url":"https://studiosygnatura.pl/"},"publisher":{"@type":"Organization","name":"Studio Sygnatura","url":"https://studiosygnatura.pl/"},"mainEntityOfPage":canonicalUrl};
+    if (cover) setMeta('meta[property="og:image"]', 'og:image', new URL(cover, location.href).href, true);
+    const article = {"@context":"https://schema.org","@type":"Article","headline":w.tytul || 'Realizacja Studio Sygnatura',"description":opisTekst,"image":cover ? [new URL(cover, location.href).href] : undefined,"datePublished":w.data || undefined,"author":{"@type":"Organization","name":"Studio Sygnatura","url":"https://studiosygnatura.pl/"},"publisher":{"@type":"Organization","name":"Studio Sygnatura","url":"https://studiosygnatura.pl/"},"mainEntityOfPage":canonicalUrl};
     let articleLd = document.getElementById('seo-article-jsonld');
     if (!articleLd) { articleLd = document.createElement('script'); articleLd.type = 'application/ld+json'; articleLd.id = 'seo-article-jsonld'; document.head.appendChild(articleLd); }
     articleLd.textContent = JSON.stringify(article);
@@ -148,7 +170,7 @@
       const video = type === 'video' || type === 'film' || !!yt || /\.(mp4|webm|ogg)(?:[?#]|$)/i.test(src);
       return { src: src, thumb: String(item.thumbnail || item.miniatura || (isCover ? src : src)), video: video, youtube: yt };
     }
-    const media = [mediaItem(w.okladka, true)].concat((Array.isArray(w.galeria) ? w.galeria : []).map(function (g) { return mediaItem(g, false); }));
+    const media = [mediaItem(cover, true)].concat((Array.isArray(w.galeria) ? w.galeria : []).map(function (g) { return mediaItem(g, false); }));
     if (w.video) media.push(mediaItem({ src: w.video, type: 'video' }, false));
     const wszystkie = media.filter(function (m, i, a) { return m && a.findIndex(function (x) { return x && x.src === m.src; }) === i; });
     function renderMainMedia(index) {
@@ -156,7 +178,7 @@
       if (!m) return '';
       if (m.youtube) return '<div class="wpis-okladka wpis-okladka-video"><iframe src="https://www.youtube.com/embed/' + esc(m.youtube) + '" title="Film: ' + esc(w.tytul) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>';
       if (m.video) return '<div class="wpis-okladka wpis-okladka-video"><video controls playsinline preload="metadata" poster="' + esc(m.thumb || '') + '"><source src="' + esc(m.src) + '"></video></div>';
-      return '<figure class="wpis-okladka"><img src="' + esc(m.src) + '" alt="' + esc(w.tytul) + '"></figure>';
+      return '<figure class="wpis-okladka"><img src="' + esc(m.src) + '" alt="' + esc(w.tytul) + '" loading="eager" fetchpriority="high" decoding="async"></figure>';
     }
     let galeria = '<div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">' + renderMainMedia(0);
     if (wszystkie.length > 1) {
