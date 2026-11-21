@@ -4,43 +4,43 @@ body.admin-page{font-family:var(--sans);background:#f7f4ed;color:#292b25;min-hei
 body.admin-page button,body.admin-page input,body.admin-page select,body.admin-page textarea,
 .admin-tabs,.admin-tab,.admin-card,.admin-action-bar,.tabela,.forma,.btn,.btn-zapisz-duzy,.btn-odrzuc-duzy,
 .edtr-bar,.edtr-grupa,.edtr-grupa-etyk,.sg-slajd-opis,.sg-slajd-nr,.sg-canvas-topbar{font-family:var(--sans)!important}
-body.admin-page:not(:has(#panel[style*="display: block"])){background:#f7f4ed}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad{display:block;min-height:100vh;width:100%;padding:0;background:radial-gradient(ellipse at 50% 15%,#fffdf8 0,#f7f4ed 62%,#f1ede4 100%)}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad>.srodek{display:block;min-height:100vh}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad .side,
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad>.srodek>.listwa,
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad>.listwa-poziom,
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad>.stopka{display:none!important}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad .prawa{display:block;min-height:100vh;background:transparent}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad .head{display:block;max-width:600px;margin:0 auto;padding:40px 22px 0;background:transparent;text-align:center}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad .head-gora{display:none!important}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad h1.strona-tytul{position:relative;margin:0;padding:86px 0 0;color:#1f3a32;font:600 clamp(34px,5vw,47px)/1.02 var(--serif);letter-spacing:-.02em;text-align:center}
-body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad h1.strona-tytul:before{content:"";position:absolute;left:50%;top:31px;width:54px;height:48px;transform:translateX(-50%);background:url("sygnet.svg") center/contain no-repeat;filter:sepia(.35) saturate(.75)}
-body.admin-page:not(:has(#panel[style*="display: block"])) main.wrap{width:min(100%,600px);max-width:600px;margin:0 auto;padding:14px 22px 55px}
-body.admin-page:not(:has(#panel[style*="display: block"])) main.wrap>.tag{display:block;margin:0 0 18px;color:#a67d49;font-size:9px;font-weight:700;letter-spacing:.17em;text-align:center;text-transform:uppercase}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie.forma{max-width:none!important;margin:0;padding:31px 34px 26px;border:1px solid #e7dfd3;border-radius:17px;background:#fffdf9;box-shadow:0 17px 42px rgba(41,50,41,.075)}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie>.sub{margin:0 0 22px;color:#6c6a61;font-size:12px;line-height:1.7;text-align:center}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .pole{margin:16px 0}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .pole>label{display:block;margin:0 0 7px;color:#514c42;font-size:10px;font-weight:700;letter-spacing:.06em}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie input{width:100%;min-height:45px;padding:10px 13px;border:1px solid #ded6ca;border-radius:8px;background:#fff;color:#292b25;font:12px var(--sans);transition:border .18s,box-shadow .18s}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie input:focus{outline:0;border-color:#1f3a32;box-shadow:0 0 0 3px rgba(31,58,50,.1)}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .przyciski{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .btn{min-height:41px;padding:10px 18px;border:1px solid #1f3a32;border-radius:999px;background:#1f3a32;color:#fff;font:700 10px var(--sans);letter-spacing:.02em;text-transform:none;cursor:pointer}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .btn:hover{background:#2b5042;border-color:#2b5042}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .btn.outline{border-color:#ddcdb8;background:transparent;color:#1f3a32}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .btn.outline:hover{background:#f4efe7}
-body.admin-page:not(:has(#panel[style*="display: block"])) #pokaz-admin-haslo{width:42px;min-width:42px;padding:0!important}
-body.admin-page:not(:has(#panel[style*="display: block"])) #admin-odzyskaj{padding:16px!important;border:1px solid #e6dbca!important;border-radius:11px;background:#f8f4ed!important;color:#1f3a32}
-body.admin-page:not(:has(#panel[style*="display: block"])) #admin-odzyskaj .mala{font-size:11px}
-body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie-blad{border-radius:8px}
-body.admin-page:not(:has(#panel[style*="display: block"])) .admin-concept-link{margin:21px 0 0;padding-top:15px;border-top:1px solid #ece5da;text-align:center}
-body.admin-page:not(:has(#panel[style*="display: block"])) .admin-concept-link a{color:#1f3a32;font-size:10px;font-weight:700;text-decoration:underline;text-decoration-color:#c4a582;text-underline-offset:4px}
-body.admin-page:not(:has(#panel[style*="display: block"])) .admin-concept-link small{display:block;margin-top:5px;color:#8b8277;font-size:8px}
+body.admin-page:not(.admin-authenticated){background:#f7f4ed}
+body.admin-page:not(.admin-authenticated) .strona-uklad{display:block;min-height:100vh;width:100%;padding:0;background:radial-gradient(ellipse at 50% 15%,#fffdf8 0,#f7f4ed 62%,#f1ede4 100%)}
+body.admin-page:not(.admin-authenticated) .strona-uklad>.srodek{display:block;min-height:100vh}
+body.admin-page:not(.admin-authenticated) .strona-uklad .side,
+body.admin-page:not(.admin-authenticated) .strona-uklad>.srodek>.listwa,
+body.admin-page:not(.admin-authenticated) .strona-uklad>.listwa-poziom,
+body.admin-page:not(.admin-authenticated) .strona-uklad>.stopka{display:none!important}
+body.admin-page:not(.admin-authenticated) .strona-uklad .prawa{display:block;min-height:100vh;background:transparent}
+body.admin-page:not(.admin-authenticated) .strona-uklad .head{display:block;max-width:600px;margin:0 auto;padding:40px 22px 0;background:transparent;text-align:center}
+body.admin-page:not(.admin-authenticated) .strona-uklad .head-gora{display:none!important}
+body.admin-page:not(.admin-authenticated) .strona-uklad h1.strona-tytul{position:relative;margin:0;padding:86px 0 0;color:#1f3a32;font:600 clamp(34px,5vw,47px)/1.02 var(--serif);letter-spacing:-.02em;text-align:center}
+body.admin-page:not(.admin-authenticated) .strona-uklad h1.strona-tytul:before{content:"";position:absolute;left:50%;top:31px;width:54px;height:48px;transform:translateX(-50%);background:url("sygnet.svg") center/contain no-repeat;filter:sepia(.35) saturate(.75)}
+body.admin-page:not(.admin-authenticated) main.wrap{width:min(100%,600px);max-width:600px;margin:0 auto;padding:14px 22px 55px}
+body.admin-page:not(.admin-authenticated) main.wrap>.tag{display:block;margin:0 0 18px;color:#a67d49;font-size:9px;font-weight:700;letter-spacing:.17em;text-align:center;text-transform:uppercase}
+body.admin-page:not(.admin-authenticated) #logowanie.forma{max-width:none!important;margin:0;padding:31px 34px 26px;border:1px solid #e7dfd3;border-radius:17px;background:#fffdf9;box-shadow:0 17px 42px rgba(41,50,41,.075)}
+body.admin-page:not(.admin-authenticated) #logowanie>.sub{margin:0 0 22px;color:#6c6a61;font-size:12px;line-height:1.7;text-align:center}
+body.admin-page:not(.admin-authenticated) #logowanie .pole{margin:16px 0}
+body.admin-page:not(.admin-authenticated) #logowanie .pole>label{display:block;margin:0 0 7px;color:#514c42;font-size:10px;font-weight:700;letter-spacing:.06em}
+body.admin-page:not(.admin-authenticated) #logowanie input{width:100%;min-height:45px;padding:10px 13px;border:1px solid #ded6ca;border-radius:8px;background:#fff;color:#292b25;font:12px var(--sans);transition:border .18s,box-shadow .18s}
+body.admin-page:not(.admin-authenticated) #logowanie input:focus{outline:0;border-color:#1f3a32;box-shadow:0 0 0 3px rgba(31,58,50,.1)}
+body.admin-page:not(.admin-authenticated) #logowanie .przyciski{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+body.admin-page:not(.admin-authenticated) #logowanie .btn{min-height:41px;padding:10px 18px;border:1px solid #1f3a32;border-radius:999px;background:#1f3a32;color:#fff;font:700 10px var(--sans);letter-spacing:.02em;text-transform:none;cursor:pointer}
+body.admin-page:not(.admin-authenticated) #logowanie .btn:hover{background:#2b5042;border-color:#2b5042}
+body.admin-page:not(.admin-authenticated) #logowanie .btn.outline{border-color:#ddcdb8;background:transparent;color:#1f3a32}
+body.admin-page:not(.admin-authenticated) #logowanie .btn.outline:hover{background:#f4efe7}
+body.admin-page:not(.admin-authenticated) #pokaz-admin-haslo{width:42px;min-width:42px;padding:0!important}
+body.admin-page:not(.admin-authenticated) #admin-odzyskaj{padding:16px!important;border:1px solid #e6dbca!important;border-radius:11px;background:#f8f4ed!important;color:#1f3a32}
+body.admin-page:not(.admin-authenticated) #admin-odzyskaj .mala{font-size:11px}
+body.admin-page:not(.admin-authenticated) #logowanie-blad{border-radius:8px}
+body.admin-page:not(.admin-authenticated) .admin-concept-link{margin:21px 0 0;padding-top:15px;border-top:1px solid #ece5da;text-align:center}
+body.admin-page:not(.admin-authenticated) .admin-concept-link a{color:#1f3a32;font-size:10px;font-weight:700;text-decoration:underline;text-decoration-color:#c4a582;text-underline-offset:4px}
+body.admin-page:not(.admin-authenticated) .admin-concept-link small{display:block;margin-top:5px;color:#8b8277;font-size:8px}
 @media(max-width:600px){
- body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad .head{padding-top:29px}
- body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad h1.strona-tytul{padding-top:74px;font-size:38px}
- body.admin-page:not(:has(#panel[style*="display: block"])) .strona-uklad h1.strona-tytul:before{top:20px;width:46px;height:42px}
- body.admin-page:not(:has(#panel[style*="display: block"])) main.wrap{padding:10px 15px 35px}
- body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie.forma{padding:25px 20px 22px;border-radius:14px}
- body.admin-page:not(:has(#panel[style*="display: block"])) #logowanie .przyciski .btn{flex:1 1 auto}
+ body.admin-page:not(.admin-authenticated) .strona-uklad .head{padding-top:29px}
+ body.admin-page:not(.admin-authenticated) .strona-uklad h1.strona-tytul{padding-top:74px;font-size:38px}
+ body.admin-page:not(.admin-authenticated) .strona-uklad h1.strona-tytul:before{top:20px;width:46px;height:42px}
+ body.admin-page:not(.admin-authenticated) main.wrap{padding:10px 15px 35px}
+ body.admin-page:not(.admin-authenticated) #logowanie.forma{padding:25px 20px 22px;border-radius:14px}
+ body.admin-page:not(.admin-authenticated) #logowanie .przyciski .btn{flex:1 1 auto}
 }

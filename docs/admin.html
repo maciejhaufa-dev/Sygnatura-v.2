@@ -12,7 +12,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css?v=358">
-<link rel="stylesheet" href="assets/admin-refresh.css?v=admin-login-2">
+<link rel="stylesheet" href="assets/admin-refresh.css?v=admin-login-3">
+<link rel="stylesheet" href="assets/admin-dashboard.css?v=dashboard-1">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -2502,6 +2503,7 @@
   function pokazPanel(){
     logowanie.style.display = 'none';
     panel.style.display = 'block';
+    document.body.classList.add('admin-authenticated');
     document.getElementById('admin-tytul').textContent = 'Panel administracyjny';
 
     /* Domyślnie otwórz edycję strony głównej, aby właściciel widział slider od razu */
@@ -2522,6 +2524,7 @@
   else logowanie.style.display = 'block';
   window.addEventListener('syg-admin-session-expired', function(){
     panel.style.display = 'none';
+    document.body.classList.remove('admin-authenticated');
     logowanie.style.display = 'block';
     document.getElementById('admin-tytul').textContent = 'Logowanie do panelu';
     komunikatLogowania('Sesja wygasła — zaloguj się ponownie. Niezapisane zmiany mogą wymagać ponownego wprowadzenia.', false);
