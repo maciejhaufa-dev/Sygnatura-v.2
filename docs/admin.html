@@ -1,0 +1,2683 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Panel — Studio Sygnatura</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Playfair+Display:wght@500;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=358">
+</head>
+<body data-strona="" class="admin-page">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <span class="tag">Panel administracyjny</span>
+  <h1 id="admin-tytul">Logowanie do panelu</h1>
+
+  <!-- EKRAN LOGOWANIA: wymuszany po każdym zamknięciu strony (sesja przeglądarki) -->
+  <div id="logowanie" class="forma" style="max-width:480px">
+    <p class="sub">Dostęp tylko dla właścicieli. Zaloguj się, aby zobaczyć zamówienia, wiadomości, blog i ustawienia strony.</p>
+    <div class="flash" id="logowanie-blad" style="display:none;background:#8a2f1d"></div>
+    <div class="pole">
+      <label for="admin-login">Login *</label>
+      <input type="text" id="admin-login" autocomplete="username">
+    </div>
+    <div class="pole">
+      <label for="admin-haslo">Hasło *</label>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input type="password" id="admin-haslo" autocomplete="current-password" style="flex:1">
+        <button type="button" class="btn outline" id="pokaz-admin-haslo" style="padding:11px 16px;flex:none" aria-label="Pokaż hasło">👁</button>
+      </div>
+    </div>
+    <div class="przyciski">
+      <button class="btn" type="button" id="zaloguj">Zaloguj się</button>
+      <button class="btn outline" type="button" id="admin-odzyskaj-toggle">Nie pamiętam hasła</button>
+    </div>
+    <div id="admin-odzyskaj" style="display:none;margin-top:16px;padding:14px;border:1px solid #d7c6b4;background:#fbf7f0">
+      <b>Odzyskiwanie dostępu</b>
+      <p class="mala">Wyślemy jednorazowy kod na e-mail administratora wpisany powyżej. Kod jest ważny 10 minut.</p>
+      <div class="pole">
+        <label for="admin-reset-kod">Kod z e-maila</label>
+        <input id="admin-reset-kod" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+      </div>
+      <div class="pole">
+        <label for="admin-reset-haslo">Nowe hasło (min. 10 znaków)</label>
+        <input id="admin-reset-haslo" type="password" autocomplete="new-password">
+      </div>
+      <div class="pole">
+        <label for="admin-reset-haslo-powtorz">Powtórz nowe hasło</label>
+        <input id="admin-reset-haslo-powtorz" type="password" autocomplete="new-password">
+      </div>
+      <div class="przyciski">
+        <button class="btn outline" type="button" id="admin-reset-wyslij">Wyślij kod</button>
+        <button class="btn" type="button" id="admin-reset-zapisz">Ustaw nowe hasło</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL: widoczny po zalogowaniu -->
+  <div id="panel" style="display:none">
+    <p class="sub" id="tryb-info"></p>
+    <div class="flash" id="bled" style="display:none"></div>
+
+    <!-- ZAKŁADKI -->
+    <div class="admin-tabs" id="admin-tabs">
+      <button class="admin-tab on" data-tab="podsumowanie" type="button">Podsumowanie</button>
+      <button class="admin-tab" data-tab="strona-glowna" type="button">Strona główna</button>
+      <button class="admin-tab" data-tab="zamowienia" type="button">Zamówienia</button>
+      <button class="admin-tab" data-tab="wiadomosci" type="button">Wiadomości</button>
+      <button class="admin-tab" data-tab="blog" type="button">Nasze realizacje</button>
+      <button class="admin-tab" data-tab="produkty" type="button">Produkty</button>
+      <button class="admin-tab" data-tab="strony" type="button">Podstrony</button>
+      <button class="admin-tab" data-tab="ustawienia" type="button">Ustawienia</button>
+    </div>
+
+    <!-- PODSUMOWANIE (kwartał) -->
+    <section class="admin-sekcja" id="tab-podsumowanie">
+      <div class="admin-action-bar">
+        <div>
+          <h2 style="font-size:20px;color:var(--butelkowa);margin:0 0 4px">Podsumowanie pracowni</h2>
+          <p class="mala" style="margin:0">Bieżące statystyki zamówień ze sklepu, wynajmu dekoracji oraz wiadomości od klientów.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <a class="btn outline" href="ulotka-a6.html" target="_blank" rel="noopener" style="text-decoration:none">🖨️ Ulotka do paczki (A6)</a>
+          <button class="btn outline" type="button" onclick="document.querySelector('[data-tab=zamowienia]').click()">Zobacz zamówienia →</button>
+        </div>
+      </div>
+      <div class="podsum-karty">
+        <div class="podsum-karta"><span class="num">01</span><h3>Zapytania</h3>
+          <b id="ps-zapytania">0</b>
+          <p class="mala">wynajem + wiadomości z formularza</p></div>
+        <div class="podsum-karta"><span class="num">02</span><h3>Zamówienia</h3>
+          <b id="ps-zamowienia">0</b>
+          <p class="mala">złożone w sklepie i wynajmie</p></div>
+        <div class="podsum-karta"><span class="num">03</span><h3>Suma kwot zamówień</h3>
+          <b id="ps-suma">0 zł</b>
+          <p class="mala">kwoty szacunkowe z rachunków</p></div>
+        <div class="podsum-karta"><span class="num">04</span><h3>Baza Google Sheets</h3>
+          <b style="font-size:18px;color:var(--butelkowa);padding-top:8px">Połączona na żywo</b>
+          <p class="mala">Wszystkie rekordy synchronizowane z arkuszem Google.</p></div>
+      </div>
+    </section>
+
+    <!-- STRONA GŁÓWNA -->
+    <section class="admin-sekcja" id="tab-strona-glowna" style="display:none">
+      <div class="admin-action-bar">
+        <div>
+          <h2 style="font-size:20px;color:var(--butelkowa);margin:0 0 4px">Strona główna — podgląd i edycja na żywo</h2>
+          <p class="mala" style="margin:0">Wszystkie zmiany widzisz na żywo na podglądzie poniżej. Kliknij «Zapisz zmiany», aby opublikować je na stronie.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn-odrzuc-duzy" type="button" id="sg-odrzuc-strona">↩ Odrzuć zmiany</button>
+          <button class="btn-zapisz-duzy" type="button" id="sg-zapisz">💾 Zapisz zmiany strony głównej</button>
+        </div>
+      </div>
+
+      <div class="flash" id="sg-info" style="display:none"></div>
+      <div class="flash" id="sg-sukces" style="display:none;background:var(--butelkowa);color:#fff;font-weight:700;padding:12px 18px;border-radius:6px;margin:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.15)">✓ Wszystkie zmiany strony głównej zostały pomyślnie zapisane!</div>
+      <div class="flash" id="sg-brudny" style="display:none;background:#8a5a1d">
+        Masz <b>niezapisane zmiany</b> — strona główna zostanie zapisana i opublikowana po kliknięciu „Zapisz zmiany strony głównej”.
+      </div>
+
+      <!-- KARTA 1: SLIDER -->
+      <div class="admin-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+          <div>
+            <h3 style="font-size:17px;color:var(--butelkowa);margin:0 0 4px">1. Slider na stronie głównej (slajdy)</h3>
+            <p class="mala" style="margin:0">Wybierz slajd do edycji. Kolejność zmienisz strzałkami albo chwytając uchwyt ⠿ — również na telefonie.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <label style="font-size:13px;font-weight:700;color:var(--brunatny)">Czas slajdu (sekundy):</label>
+            <input type="number" id="sg-autoplay" min="0" step="0.5" style="width:75px;padding:6px 10px;border:1px solid #C4A582;border-radius:4px">
+          </div>
+        </div>
+
+        <!-- Pasek miniatur slajdów -->
+        <div class="sg-slajdy-pasek" id="sg-kafle">
+          <div class="sg-slajd-karta" draggable="false" data-sg-kafel="nowosci">
+            <div class="sg-slajd-mini" style="background-image:url('assets/media/sklep/szopka.jpg')"><span class="sg-slajd-nr">Slajd 1</span></div>
+            <div class="sg-slajd-opis" title="Nowości Najnowsze produkty z pracowni">Nowości — Najnowsze produkty...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <div class="sg-slajd-karta aktywny" draggable="false" data-sg-kafel="bestsellery">
+            <div class="sg-slajd-mini" style="background-image:url('assets/media/sklep/szyld.jpg')"><span class="sg-slajd-nr">Slajd 2</span></div>
+            <div class="sg-slajd-opis" title="Bestsellery Najczęściej zamawiane">Bestsellery — Najczęściej zamawiane...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <div class="sg-slajd-karta" draggable="false" data-sg-kafel="aktualnosci">
+            <div class="sg-slajd-mini" style="background-image:linear-gradient(135deg,#1F3A32,#6B4530)"><span class="sg-slajd-nr">Slajd 3</span></div>
+            <div class="sg-slajd-opis" title="Aktualności z pracowni">Aktualności — Z pracowni...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <div class="sg-slajd-karta" draggable="false" data-sg-kafel="sezonowa">
+            <div class="sg-slajd-mini" style="background-image:url('assets/hero.jpg')"><span class="sg-slajd-nr">Slajd 4</span></div>
+            <div class="sg-slajd-opis" title="Oferta sezonowa">Oferta sezonowa — Sezon świąteczny...</div>
+            <div class="sg-slajd-akcje">
+              <button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>
+              <button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>
+              <button type="button" class="km-prawo" title="Przesuń w prawo">›</button>
+              <button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>
+            </div>
+          </div>
+          <button type="button" class="sg-dodaj-btn" id="sg-dodaj-kafel">
+            <span style="font-size:28px;line-height:1">+</span>
+            <span>Nowy slajd</span>
+          </button>
+        </div>
+
+        <!-- Canva Slide Canvas Frame -->
+        <div id="sg-edycja" style="margin-top:16px">
+          <div class="sg-canvas-frame">
+            <div class="sg-canvas-topbar">
+              <span class="status-badge status-platnosc" id="sg-edycja-tytul">Slajd 2 (bestsellery)</span>
+              <label style="margin-left:8px">Zdjęcie w tle:
+                <select id="sg-obraz" style="max-width:260px"></select>
+              </label>
+              <button class="btn outline" type="button" id="sg-obraz-wgraj" style="padding:4px 10px;font-size:12px;background:#36393F;color:#FFF;border-color:#555">+ Wgraj zdjęcie…</button>
+              <button class="btn outline" type="button" id="sg-obraz-zmien" style="display:none;padding:4px 8px;font-size:12px;background:#36393F;color:#FFF;border-color:#555">✏ Nazwa</button>
+              <button class="btn outline" type="button" id="sg-obraz-usun" style="display:none;padding:4px 8px;font-size:12px;background:#5A2B2B;color:#FFF;border-color:#733">🗑 Usuń</button>
+
+              <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+                <label style="cursor:pointer;font-weight:600">
+                  <input type="checkbox" id="sg-karty" checked style="width:auto;margin-right:6px">
+                  Pasek produktów
+                </label>
+                <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-kafel" style="padding:6px 14px;font-size:12.5px;border-radius:4px;box-shadow:none">💾 Zapisz stronę główną</button>
+              </div>
+            </div>
+            <div id="sg-karty-opcje" class="sg-karty-opcje" style="display:none">
+              <div class="sg-karty-ustawienia">
+                <label>Liczba produktów <input type="number" id="sg-karty-liczba" min="1" max="6" value="2"></label>
+                <label>Rozmiar kart <select id="sg-karty-rozmiar"><option value="small">Kompaktowe</option><option value="medium" selected>Średnie</option><option value="large">Duże</option></select></label>
+              </div>
+              <p class="mala" style="margin:5px 0 8px">Zaznacz widoczne produkty i przeciągnij je za uchwyt ⠿, aby ustawić kolejność. Na stronie pokaże się podana liczba pierwszych pozycji.</p>
+              <ol id="sg-karty-lista" class="sg-karty-lista" aria-label="Produkty wyświetlane pod slajdem"></ol>
+              <p class="mala" id="sg-karty-info" role="status" aria-live="polite" style="margin:6px 0 0"></p>
+            </div>
+
+            <!-- Upload panel -->
+            <div id="sg-obraz-wgraj-box" style="display:none;background:#2B2F33;color:#FFF;padding:12px 16px;border-bottom:1px solid #444">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:200px">
+                  <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;color:#DDD">Krótka nazwa zdjęcia:</label>
+                  <input type="text" id="sg-obraz-nazwa" placeholder="np. tlo-nowosci" style="width:100%;padding:6px 10px;background:#1E2124;border:1px solid #4F545C;color:#FFF;border-radius:4px">
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;color:#DDD">Wybierz plik ze zdjęciem:</label>
+                  <input type="file" id="sg-obraz-plik" accept="image/*" style="color:#CCC;font-size:13px">
+                </div>
+                <button class="btn" type="button" id="sg-obraz-zapisz" style="padding:7px 14px;background:#1C3A27;color:#FFF;font-weight:700">Dodaj do biblioteki</button>
+              </div>
+              <div id="sg-obraz-upload-info" role="status" aria-live="polite" style="display:none;margin-top:10px;padding:9px 12px;border-radius:4px;font-size:13px"></div>
+            </div>
+            <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;background:#24272A;color:#FFF;border-bottom:1px solid #444">
+              <strong style="font-size:12px">Kadrowanie zdjęcia:</strong>
+              <label style="display:flex;gap:8px;align-items:center;font-size:12px">Rozmiar zdjęcia
+                <input type="range" id="sg-tlo-zoom" min="50" max="200" step="1" value="100" style="width:140px">
+                <output id="sg-tlo-zoom-wartosc">100%</output>
+              </label>
+              <span style="font-size:11px;color:#BBB">Złap widoczne zdjęcie i przeciągnij. Kadr przytnie brzegi, bez pustych pól.</span>
+            </div>
+
+            <!-- Edytor treści ze wstążką i podglądem na żywo -->
+            <div id="sg-tresc-edytor" style="background:var(--butelkowa)">
+              <div class="slider sg-slider-podglad" id="sg-slider-preview" style="border-radius:0 0 8px 8px;border-top:none">
+                <div class="sl-bg" id="sg-tresc-bg" style="background-image:url('assets/media/sklep/szyld.jpg')"></div>
+                <img id="sg-crop-image" class="sg-crop-image" alt="" aria-label="Zdjęcie do kadrowania — przeciągnij, aby przesunąć" draggable="false">
+                <div class="sl-cien"></div>
+                <div class="sl-tresc">
+                  <div class="edtr-tresc" id="sg-tresc-pole" contenteditable="true">
+                    <p class="sl-tag">Bestsellery</p>
+                    <h2>Najczęściej zamawiane</h2>
+                    <p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p>
+                    <a class="sl-btn" href="kontakt.html">Zapytaj o wycenę →</a>
+                  </div>
+                  <div class="sl-karty" id="sg-karty-podglad">
+                    <a class="sl-karta" href="sklep.html" onclick="return false;">
+                      <img src="assets/media/sklep/szyld.jpg" alt="Szyld powitalny">
+                      <span><span class="nazwa">Szyld powitalny „Witajcie”</span><br><span class="cena">189 zł / szt.</span></span>
+                    </a>
+                    <a class="sl-karta" href="sklep.html" onclick="return false;">
+                      <img src="assets/media/sklep/szopka.jpg" alt="Szopka bożonarodzeniowa">
+                      <span><span class="nazwa">Szopka bożonarodzeniowa (warstwowa)</span><br><span class="cena">249 zł / szt.</span></span>
+                    </a>
+                    <span class="sl-karta sl-karta-pusta">
+                      <span><span class="nazwa">Wkrótce</span><br><span class="cena">nowe prace w drodze</span></span>
+                    </span>
+                  </div>
+                </div>
+                <button class="sl-nav prev" id="sg-nav-prev" type="button" aria-label="Poprzedni slajd">‹</button>
+                <button class="sl-nav next" id="sg-nav-next" type="button" aria-label="Następny slajd">›</button>
+                <div class="sl-dots" id="sg-dots"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:none" id="sg-obraz-podglad"></div>
+          <div class="przyciski" style="justify-content:flex-start;margin-top:10px">
+            <button class="btn-odrzuc" type="button" id="sg-odrzuc">↩ Odrzuć zmiany w bieżącym slajdzie</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KARTA 2: TREŚĆ POD SLIDEREM -->
+      <div class="admin-card">
+        <h3 style="font-size:17px;color:var(--butelkowa);margin:0 0 4px">2. Sekcja pod sliderem („Jak działamy”)</h3>
+        <p class="mala" style="margin:0 0 14px">Sekcja z trzema krokami i przyciskami zamówień. Kliknij i edytuj treść bezpośrednio na podglądzie poniżej.</p>
+        <label style="display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:12px 14px;font-weight:700;color:var(--butelkowa);background:#eef3ef;border:1px solid #c5d3c9;border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="sg-cta-widoczny" style="width:20px;height:20px;flex:none"> Pokaż sekcję „Jak działamy” na stronie głównej
+          <span style="font-weight:400;color:#536158">(zapisz przyciskiem „Zapisz stronę główną”)</span>
+        </label>
+        <div id="sg-cta-edytor">
+          <div class="jak" style="border:1px solid #D5C4B1;border-radius:0 0 8px 8px;border-top:none;margin:0">
+            <div id="sg-cta-pole" contenteditable="true" style="outline:none;cursor:text">
+              <h2>Jak działamy</h2>
+              <p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>
+              <div class="kroki">
+                <div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>
+                <div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>
+                <div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>
+              </div>
+              <div class="cta-btn">
+                <a class="btn" href="zamowienia.html">Zarezerwuj termin</a>
+                <a class="btn outline" href="zamowienia.html">Złóż zamówienie</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-action-bar">
+        <div>
+          <span style="font-weight:700;color:var(--butelkowa)">Publikacja strony głównej</span>
+          <p class="mala" style="margin:0">Kliknij „Zapisz zmiany”, aby wysłać uaktualnione slajdy i treści do serwisu.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn-odrzuc-duzy" type="button" id="sg-odrzuc-strona-dol">↩ Odrzuć zmiany</button>
+          <button class="btn-zapisz-duzy" type="button" id="sg-zapisz-dol">💾 Zapisz zmiany strony głównej</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZAMÓWIENIA -->
+    <section class="admin-sekcja" id="tab-zamowienia" style="display:none">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Zamówienia</h2>
+        <table class="tabela" id="tabela-zamowien">
+          <thead><tr><th>Sygnatura</th><th>Data</th><th>Klient</th><th>Pozycje</th><th>Razem</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Treść strony „Zamówienia" (Kreator zamówień)</h2>
+      <p class="mala">Edytujesz treść, którą klient widzi po wejściu w „Zamówienia" — ten sam
+      EDYTOR TREŚCI co pod sliderem strony głównej: tekst i akapity, kolumny, tabele, rysowanie
+      obiektów, grupowanie, warstwy, wyrównywanie. Przycisk to właściwość obiektu (checkbox + link).</p>
+      <div id="sz-tresc-edytor">
+        <div class="edtr-podglad edtr-podglad-jasny">
+          <div class="edtr-tresc edtr-tresc-jasna" id="sz-tresc-pole" contenteditable="true"></div>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px">
+        <button class="btn-odrzuc" type="button" id="sz-odrzuc">ODRZUĆ ZMIANY STRONY ZAMÓWIENIA</button>
+        <button class="btn-zapisz" type="button" id="sz-zapisz">ZAPISZ ZMIANY STRONY ZAMÓWIENIA</button>
+      </div>
+      <p class="mala" id="sz-brudny" style="display:none;color:#8a2f1d;font-weight:700">Masz niezapisane zmiany na stronie Zamówienia.</p>
+      <div class="flash" id="sz-info" style="display:none"></div>
+    </section>
+
+    <!-- WIADOMOŚCI -->
+    <section class="admin-sekcja" id="tab-wiadomosci" style="display:none">
+      <div class="tabela-wrap">
+        <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Wiadomości z formularza</h2>
+        <table class="tabela" id="tabela-wiadomosci">
+          <thead><tr><th>Data</th><th>Od</th><th>Temat</th><th>Treść</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <h2 style="font-size:19px;color:var(--brunatny);margin:26px 0 6px">Zapytania o termin wynajmu</h2>
+        <p class="mala" style="margin-bottom:8px">Wybrany termin NIE jest blokowany — rezerwację potwierdzamy po wpłacie.</p>
+        <table class="tabela" id="tabela-wynajem-zapytania">
+          <thead><tr><th>Data</th><th>Od</th><th>Wydarzenie</th><th>Pakiet</th><th>Termin</th><th>Personalizacja</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOG -->
+    <section class="admin-sekcja" id="tab-blog" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Nasze realizacje</h2>
+      <p class="mala">Lista jest początkowo ułożona od najnowszego dodanego wpisu. Przeciągnij wpis za uchwyt ⠿, aby zmienić kolejność na stronie; kliknij wiersz, aby zobaczyć podgląd po lewej. Checkbox „widoczny" pokazuje albo ukrywa wpis na stronie.
+      Wpis może jednocześnie być produktem sklepu — w trybie edycji zaznacz „Produkt w sklepie",
+      a pozycja pojawi się w zakładce Produkty. Zapisane wpisy trafiają do bazy i są pobierane przez stronę realizacji.</p>
+      <div class="flash" id="blog-info" style="display:none"></div>
+      <div class="admin-dwie" style="grid-template-columns:1.55fr 1fr">
+        <div>
+          <div class="przyciski" id="blog-przyciski" style="justify-content:flex-start;margin-top:0">
+            <button class="btn" type="button" id="blog-nowy">+ Dodaj nowy wpis</button>
+            <button class="btn outline" type="button" id="blog-edytuj">Przejdź w tryb edycji</button>
+          </div>
+          <!-- PODGLĄD zaznaczonego wpisu -->
+          <div class="forma" id="blog-podglad" style="margin-top:10px"></div>
+          <!-- TRYB EDYCJI -->
+          <div class="forma" id="blog-form" style="display:none;margin-top:10px">
+            <h3 id="blog-form-tytul">Nowy wpis</h3>
+            <div class="pole" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
+              <b style="display:block;margin-bottom:8px;color:var(--butelkowa)">Opcje wpisu</b>
+              <label style="cursor:pointer;display:block;margin-bottom:6px">
+                <input type="checkbox" id="bf-widoczny"> Widoczny na stronie
+              </label>
+              <label style="cursor:pointer;display:block;font-weight:700">
+                <input type="checkbox" id="bf-sklep"> Produkt w sklepie (wpis z historią)
+              </label>
+              <div id="bf-produkt" style="display:none;margin-top:10px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-nazwa">Nazwa produktu</label>
+                    <input type="text" id="bf-p-nazwa">
+                  </div>
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-link">Połącz z produktem (albo nowy)</label>
+                    <select id="bf-p-link"><option value="">— nowy produkt —</option></select>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-cena">Cena (zł)</label>
+                    <input type="number" id="bf-p-cena" step="0.01" min="0">
+                  </div>
+                  <div class="pole" style="margin:0">
+                    <label for="bf-p-gabaryt">Gabaryt / rozmiar paczki</label>
+                    <input type="text" id="bf-p-gabaryt" placeholder="np. 20×20×8 cm">
+                  </div>
+                </div>
+                <p class="mala" style="margin-bottom:0">Cenę i widoczność produktu możesz potem dopracować w zakładce „Produkty".</p>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+                <div class="pole" style="margin:0">
+                  <label for="bf-kategoria">Kategoria</label>
+                  <input type="text" id="bf-kategoria" list="bf-kategorie" placeholder="np. Szyldy i tablice">
+                  <datalist id="bf-kategorie"></datalist>
+                </div>
+                <div class="pole" style="margin:0">
+                  <label for="bf-data">Data wpisu</label>
+                  <input type="date" id="bf-data">
+                </div>
+              </div>
+            </div>
+            <div class="pole">
+              <label for="bf-tytul">Tytuł wpisu *</label>
+              <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
+            </div>
+            <div class="pole">
+              <label for="bf-zajawka">Podpis zdjęcia / krótka notka na kafelku</label>
+              <textarea id="bf-zajawka" rows="2" placeholder="Krótki podpis zdjęcia widoczny pod fotografią…"></textarea>
+            </div>
+            <div class="pole">
+              <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
+              <div class="bf-mini" id="bf-mini"></div>
+              <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
+              <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
+            </div>
+            <div class="pole">
+              <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
+              <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
+            </div>
+            <div class="pole">
+              <label>Treść wpisu — zaznacz tekst i formatuj jak w edytorze forum</label>
+              <div class="editor" id="bf-tresc" style="min-height:180px"></div>
+              <input type="hidden" id="bf-zrodlo">
+            </div>
+            <div class="przyciski">
+              <button class="btn" type="button" id="blog-zapisz">Zapisz wpis</button>
+              <button class="btn outline" type="button" id="blog-anuluj">Anuluj</button>
+              <button class="btn niebez" type="button" id="blog-usun-wpis">Usuń wpis</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="mala" id="blog-sort-info" role="status" aria-live="polite" style="margin:0 0 6px"></p>
+          <div class="tabela-wrap">
+            <table class="tabela" id="tabela-blog">
+              <thead><tr><th>Przesuń</th><th>Dodano</th><th>Tytuł</th><th>Widoczny</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUKTY -->
+    <section class="admin-sekcja" id="tab-produkty" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Produkty w katalogu</h2>
+      <p class="mala">Zmień cenę, widoczność i tagi wyszukiwania. Wpisz tagi rozdzielone przecinkami, np. „wesele, drewno, prezent”. „Usuń produkt” usuwa go z katalogu; powiązana historia/realizacja pozostaje.</p>
+      <div class="flash" id="produkty-info" style="display:none"></div>
+      <div class="tabela-wrap">
+        <table class="tabela" id="tabela-produkty">
+          <thead><tr><th>Produkt</th><th>Cena (zł)</th><th>W sklepie</th><th>Tagi do wyszukiwarki</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="forma" id="produkt-nowy-form" style="max-width:720px;margin-top:16px;display:none">
+        <h3>Nowy produkt (bez historii)</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="pole">
+            <label for="pn-nazwa">Nazwa *</label>
+            <input type="text" id="pn-nazwa" placeholder="np. Winietki papierowe — komplet 20 szt.">
+          </div>
+          <div class="pole">
+            <label for="pn-cena">Cena (zł)</label>
+            <input type="number" id="pn-cena" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="pole">
+          <label for="pn-opis">Krótki opis</label>
+          <input type="text" id="pn-opis">
+        </div>
+        <div class="pole">
+          <label for="pn-obraz">Zdjęcie (plik)</label>
+          <input type="file" id="pn-obraz" accept="image/*">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="pn-zapisz">Dodaj produkt</button>
+        </div>
+      </div>
+      <div class="przyciski" style="justify-content:flex-start">
+        <button class="btn outline" type="button" id="produkt-nowy">+ Produkt bez historii</button>
+      </div>
+    </section>
+
+    <!-- PODSTRONY -->
+    <section class="admin-sekcja" id="tab-strony" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Podstrony</h2>
+      <p class="mala">Zarządzaj własnymi podstronami i kolejnością menu. „Strona główna” jest przypięta na górze; przeciągnij pozostałe pozycje za uchwyt ⠿. Zmiany zapisują się automatycznie.</p>
+      <div class="flash" id="strony-info" style="display:none"></div>
+      <div class="admin-card" style="margin:12px 0"><h3 style="margin:0 0 4px;color:var(--butelkowa)">Menu strony</h3>
+        <p class="mala" style="margin:0 0 10px">Przeciągnij pozycje za uchwyt, aby zmienić kolejność.</p>
+        <ol id="menu-sortable-list" class="menu-sortable-list" aria-label="Kolejność pozycji menu"></ol>
+        <p class="mala" id="menu-sort-info" role="status" aria-live="polite" style="margin:8px 0 0"></p>
+      </div>
+      <h3 style="font-size:16px;color:var(--butelkowa);margin:18px 0 6px">Własne podstrony</h3>
+      <div class="admin-dwie">
+        <div>
+          <div class="przyciski" style="justify-content:flex-start">
+            <button class="btn" type="button" id="strona-nowa">+ Nowa podstrona</button>
+          </div>
+          <div class="tabela-wrap" style="margin-top:10px">
+            <table class="tabela" id="tabela-stron">
+              <thead><tr><th>Tytuł</th><th>W menu</th><th>Kolejność</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="forma" id="strona-form" style="display:none">
+          <h3 id="strona-form-tytul">Nowa podstrona</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="pole">
+              <label for="sf-slug">Identyfikator (slug)</label>
+              <input type="text" id="sf-slug" placeholder="np. o-nas">
+            </div>
+            <div class="pole">
+              <label for="sf-kol">Kolejność w menu</label>
+              <input type="number" id="sf-kol" min="1" value="10">
+            </div>
+          </div>
+          <div class="pole">
+            <label for="sf-tytul">Tytuł (widoczny w MENU i nagłówku)</label>
+            <input type="text" id="sf-tytul">
+          </div>
+          <div class="pole">
+            <label style="cursor:pointer"><input type="checkbox" id="sf-menu" checked> Pokaż w menu</label>
+          </div>
+          <div class="pole">
+            <label>Treść — jak sformatujesz, tak się wyświetli na stronie</label>
+            <div class="editor" id="sf-tresc" style="min-height:180px"></div>
+            <input type="hidden" id="sf-zrodlo">
+          </div>
+          <div class="przyciski">
+            <button class="btn" type="button" id="strona-zapisz">Zapisz podstronę</button>
+            <button class="btn outline" type="button" id="strona-anuluj">Anuluj</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- USTAWIENIA -->
+    <section class="admin-sekcja" id="tab-ustawienia" style="display:none">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Cennik dostawy</h2>
+      <p class="mala">Stawki za wysyłkę wg rozmiarów paczek — używane w formularzu zamówienia
+      (InPost paczkomat i kurier). Zapisane stawki są wspólne dla wszystkich klientów.</p>
+      <div class="flash" id="ustawienia-info" style="display:none"></div>
+      <div class="forma" style="max-width:520px">
+        <div class="pole">
+          <label>Paczkomat InPost — paczka S (zł)</label>
+          <input type="number" id="u-paczkomat-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka M (zł)</label>
+          <input type="number" id="u-paczkomat-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Paczkomat InPost — paczka L (zł)</label>
+          <input type="number" id="u-paczkomat-l" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka S (zł)</label>
+          <input type="number" id="u-kurier-s" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka M (zł)</label>
+          <input type="number" id="u-kurier-m" step="0.01" min="0">
+        </div>
+        <div class="pole">
+          <label>Kurier — paczka L (zł)</label>
+          <input type="number" id="u-kurier-l" step="0.01" min="0">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="zapisz-dostawe" disabled>Zapisz cennik</button>
+        </div>
+      </div>
+      <hr style="margin:28px 0;border:0;border-top:1px solid #d7c6b4">
+      <h2 style="font-size:19px;color:var(--brunatny);margin:18px 0 6px">Dane logowania administratora</h2>
+      <p class="mala">Możesz zmienić login (adres e-mail), hasło albo oba. Wymagane jest obecne hasło. Nowe hasło musi mieć co najmniej 10 znaków.</p>
+      <div class="forma" style="max-width:520px">
+        <div class="pole">
+          <label for="admin-zmien-login">Nowy login (e-mail, opcjonalnie)</label>
+          <input type="email" id="admin-zmien-login" autocomplete="username">
+        </div>
+        <div class="pole">
+          <label for="admin-zmien-obecne">Obecne hasło *</label>
+          <input type="password" id="admin-zmien-obecne" autocomplete="current-password">
+        </div>
+        <div class="pole">
+          <label for="admin-zmien-haslo">Nowe hasło (opcjonalnie)</label>
+          <input type="password" id="admin-zmien-haslo" autocomplete="new-password">
+        </div>
+        <div class="pole">
+          <label for="admin-zmien-haslo-powtorz">Powtórz nowe hasło</label>
+          <input type="password" id="admin-zmien-haslo-powtorz" autocomplete="new-password">
+        </div>
+        <div class="przyciski">
+          <button class="btn" type="button" id="admin-zmien-zapisz">Zmień dane logowania</button>
+        </div>
+        <div class="flash" id="admin-zmien-info" style="display:none"></div>
+      </div>
+    </section>
+
+    <div class="przyciski">
+      <button class="btn outline" type="button" id="odswiez">Odśwież</button>
+      <a class="btn" href="admin.html">Wyczyść filtr</a>
+      <button class="btn niebez" type="button" id="wyloguj">Wyloguj</button>
+    </div>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=356"></script>
+<script src="assets/koszyk.js?v=356"></script>
+<script src="assets/api.js?v=358"></script>
+<script src="assets/editor.js?v=356"></script>
+<script src="assets/edytor.js?v=356"></script>
+<script src="data/katalog.js?v=356"></script>
+<script src="assets/main.js?v=357"></script>
+<script>
+(function(){
+  var info = document.getElementById('tryb-info');
+  var bled = document.getElementById('bled');
+  var logowanie = document.getElementById('logowanie');
+  var panel = document.getElementById('panel');
+  var logowanieBlad = document.getElementById('logowanie-blad');
+
+  if (SYG.TRYB_DEMO){
+    info.textContent = 'Panel zablokowany: brak połączenia z bazą produkcyjną. Niczego nie zapisujemy lokalnie. Odśwież stronę lub zgłoś problem z konfiguracją API.';
+    info.style.cssText += ';display:block;background:#8a2f1d;color:#fff;padding:12px;border-radius:6px';
+    document.getElementById('zaloguj').disabled = true;
+    document.getElementById('admin-login').disabled = true;
+    document.getElementById('admin-haslo').disabled = true;
+  } else {
+    info.textContent = 'Panel produkcyjny — zmiany zapisują się we wspólnej bazie.';
+  }
+
+  var STAN_NAZWA = {
+    zapytanie: 'zapytanie',
+    platnosc_w_toku: 'płatność w toku',
+    zarezerwowany: 'zarezerwowany',
+    odrzucono: 'odrzucono'
+  };
+
+  /* ============ zakładki ============ */
+  var tabs = document.querySelectorAll('.admin-tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      t.classList.add('on');
+      document.querySelectorAll('.admin-sekcja').forEach(function(s){ s.style.display = 'none'; });
+      var target = t.getAttribute('data-tab');
+      var el = document.getElementById('tab-' + target);
+      if (el) el.style.display = 'block';
+      if (target === 'podsumowanie') ladujPodsumowanie();
+      if (target === 'strona-glowna') ladujStronaGlowna();
+      if (target === 'zamowienia') ladujZamowienia();
+      if (target === 'wiadomosci') ladujWiadomosci();
+      if (target === 'blog') ladujBlog();
+      if (target === 'produkty') ladujProdukty();
+      if (target === 'strony') ladujStrony();
+      if (target === 'ustawienia') ladujUstawienia();
+    });
+  });
+
+  /* ============ PODSUMOWANIE ============ */
+  async function ladujPodsumowanie(){
+    var zapCount = 0;
+    var zamCount = 0;
+    var suma = 0;
+    if (SYG.TRYB_DEMO){
+      var zam = SYG.demoDb.zamowienia();
+      var zap = SYG.demoDb.wynajemZapytania();
+      var wiad = SYG.demoDb.wiadomosci();
+      zapCount = zap.length + wiad.length;
+      zamCount = zam.length;
+      suma = zam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
+    } else {
+      try {
+        var odpZam = await SYG.wezwij('zamowienia-lista', {});
+        var odpWiad = await SYG.wezwij('wiadomosci-lista', {});
+        var odpZap = await SYG.wezwij('wynajem-zapytania-lista', {});
+        var listaZam = (odpZam && odpZam.ok && odpZam.zamowienia) ? odpZam.zamowienia : [];
+        var listaWiad = (odpWiad && odpWiad.ok && odpWiad.wiadomosci) ? odpWiad.wiadomosci : [];
+        var listaZap = (odpZap && odpZap.ok && odpZap.zapytania) ? odpZap.zapytania : [];
+        zamCount = listaZam.length;
+        zapCount = listaWiad.length + listaZap.length;
+        suma = listaZam.reduce(function(s,z){ return s + (Number((z.kwoty||{}).razem)||0); }, 0);
+      } catch (e) {
+        console.warn('Błąd pobierania podsumowania live:', e);
+      }
+    }
+    document.getElementById('ps-zapytania').textContent = zapCount;
+    document.getElementById('ps-zamowienia').textContent = zamCount;
+    document.getElementById('ps-suma').textContent = SYG.zl(suma);
+  }
+
+  /* ============ STRONA GŁÓWNA: slider (kafle) + treści ============ */
+  var SG_DANE = null;   /* robocza kopia danych strony głównej (zapis TYLKO przyciskiem) */
+  var SG_BAZA_GOTOWA = !!SYG.TRYB_DEMO; /* blokuje zapis danych domyślnych, jeśli odczyt live nie powiódł się */
+  var SG_EDYCJA = null; /* { id, kopia, nowy } — edytowany kafel */
+  var SG_PRODUKTY_PASKA = [];
+  var SG_PASEK_CONFIGURED = false;
+  var SG_EDYTOR = null;     /* instancja EDYTORA TREŚCI (kafel) */
+  var SG_EDYTOR_CTA = null; /* instancja EDYTORA TREŚCI (treść pod sliderem) */
+  var SG_BRUDNY = false;/* czy są niezapisane zmiany */
+  var SG_SLIDE_DRAG = null;
+  var SG_GITHUB_MEDIA_SESJA = {};
+
+  function ustawBrudny(){
+    SG_BRUDNY = true;
+    var b = document.getElementById('sg-brudny');
+    if (b) b.style.display = 'block';
+  }
+  function wyczyscBrudny(){
+    SG_BRUDNY = false;
+    var b = document.getElementById('sg-brudny');
+    if (b) b.style.setProperty('display', 'none', 'important');
+  }
+
+  var SG_DOMYS = {
+    slider: {
+      autoplay: 4.5,
+      kafle: [
+        { id:'nowosci', obraz:'assets/media/sklep/szopka.jpg', karty:true,
+          tresc:'<p class="sl-tag">Nowości</p><h2>Najnowsze produkty z pracowni</h2><p>Świeżo po szlifie i malowaniu — rzeczy, które właśnie trafiły do naszych realizacji.</p><a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>' },
+        { id:'bestsellery', obraz:'assets/media/sklep/szyld.jpg', karty:true,
+          tresc:'<p class="sl-tag">Bestsellery</p><h2>Najczęściej zamawiane</h2><p>Te rzeczy zamawiacie najchętniej — sprawdzone przez Was i przez nas.</p><a class="sl-btn" href="kontakt.html">Zapytaj o wycenę →</a>' },
+        { id:'aktualnosci', obraz:'gradient', karty:false,
+          tresc:'<p class="sl-tag">Aktualności z pracowni</p><h2>Z pracowni prosto do Was</h2><p>Publikujemy wpisy o naszych realizacjach: z czego i jak powstają dekoracje, szyldy i prezenty.</p><a class="sl-btn" href="realizacje.html">Zobacz realizacje →</a>' },
+        { id:'sezonowa', obraz:'assets/hero.jpg', karty:false,
+          tresc:'<p class="sl-tag">Oferta sezonowa</p><h2>Sezon świąteczny — czas na szopkę</h2><p>Nasz flagowy produkt: ręcznie cięta szopka warstwowa 20×20 cm z podświetleniem LED 2700 K. Zamów z wyprzedzeniem — personalizacja wymaga min. 2 tygodni.</p><a class="sl-btn" href="kontakt.html">Zapytaj o szopkę →</a>' }
+      ]
+    },
+    ctaWidoczny: true,
+    ctaTresc: '<h2>Jak działamy</h2><p class="pod">Trzy kroki dzielą Cię od dekoracji z naszą sygnaturą.</p>' +
+      '<div class="kroki">' +
+      '<div class="krok"><span class="num">01</span><b>Wybierz i zamów online</b><p>Kreator prowadzi krok po kroku: katalog, personalizacja, dane i podsumowanie w formie czytelnego rachunku.</p></div>' +
+      '<div class="krok"><span class="num">02</span><b>Dostajesz sygnaturę sprawy</b><p>W 1–2 dni robocze wysyłamy potwierdzenie, wycenę i dane do przelewu — wszystko pod Twoją sygnaturą.</p></div>' +
+      '<div class="krok"><span class="num">03</span><b>Płacisz — my działamy</b><p>Przedpłata lub kaucja uruchamia realizację. Przy wynajmie montujemy dekoracje dzień przed imprezą.</p></div>' +
+      '</div>' +
+      '<div class="cta-btn"><a class="btn" href="zamowienia.html">Zarezerwuj termin</a><a class="btn outline" href="zamowienia.html">Złóż zamówienie</a></div>'
+  };
+
+  var SG_OBRAZY = [
+    'assets/media/sklep/szopka.jpg', 'assets/media/sklep/szyld.jpg', 'assets/media/sklep/love.jpg',
+    'assets/media/sklep/ramka.jpg', 'assets/media/sklep/pers-winietki.jpg', 'assets/media/sklep/pers-litery.jpg',
+    'assets/media/sklep/pers-wkladka-tablica.jpg', 'assets/media/sklep/pers-plan-stolow.jpg',
+    'assets/media/sklep/pers-numery-stolow.jpg', 'assets/media/sklep/pers-kafelki-krzyzowka.jpg',
+    'assets/media/sklep/pers-grawer.jpg', 'assets/hero.jpg', 'assets/forest.jpg',
+    'gradient'
+  ];
+
+  function sgEsc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  /* ---------- biblioteka zdjęć ----------
+     Tryb demo używa localStorage. W trybie API zdjęcia trafiają do
+     assets/media/przeslane/ w repozytorium GitHub (przez Apps Script). */
+  var SG_MEDIA_KLUCZ = 'syg-media-v1';
+  var SG_GITHUB_MEDIA_KLUCZ = 'syg-github-media-v1';
+  function sgMediaBiblioteka(){
+    try { return JSON.parse(localStorage.getItem(SG_MEDIA_KLUCZ) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function sgMediaZapisz(bib){ localStorage.setItem(SG_MEDIA_KLUCZ, JSON.stringify(bib)); }
+  function sgGitHubMediaBiblioteka(){
+    var bib = {};
+    try { bib = JSON.parse(localStorage.getItem(SG_GITHUB_MEDIA_KLUCZ) || '{}') || {}; }
+    catch (e) { /* Safari/prywatny tryb może blokować localStorage */ }
+    return Object.assign(bib, SG_GITHUB_MEDIA_SESJA);
+  }
+  function sgGitHubMediaZapisz(bib){
+    SG_GITHUB_MEDIA_SESJA = Object.assign({}, SG_GITHUB_MEDIA_SESJA, bib || {});
+    try { localStorage.setItem(SG_GITHUB_MEDIA_KLUCZ, JSON.stringify(SG_GITHUB_MEDIA_SESJA)); }
+    catch (e) { /* zdjęcie nadal jest dostępne w tej sesji */ }
+  }
+  function sgMediaRozwiaz(o){
+    if (String(o).indexOf('media:') === 0){
+      var d = sgMediaBiblioteka()[o.slice(6)];
+      return d || 'assets/hero.jpg';
+    }
+    return o;
+  }
+  function sgMediaNazwa(z){
+    var n = String(z || '').toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/gi, '-')
+      .replace(/^-+|-+$/g, '').slice(0, 40);
+    return n || 'obraz';
+  }
+  function sgPrawidlowyHtml(html){
+    if (!html || typeof html !== 'string') return false;
+    var czysty = html.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+    return czysty.length > 20;
+  }
+  /* stare dataURL („tasiemce") w kafelkach -> wpisy w bibliotece z nazwą */
+  function sgNaprawObrazy(dane){
+    if (!dane) dane = JSON.parse(JSON.stringify(SG_DOMYS));
+    if (!dane.slider) dane.slider = JSON.parse(JSON.stringify(SG_DOMYS.slider));
+    if (!Array.isArray(dane.slider.kafle) || dane.slider.kafle.length === 0){
+      dane.slider.kafle = JSON.parse(JSON.stringify(SG_DOMYS.slider.kafle));
+    }
+    var bib = sgMediaBiblioteka();
+    var zmiana = false;
+    dane.slider.kafle.forEach(function (k, i) {
+      if (!k) return;
+      if (k.obraz && String(k.obraz).indexOf('data:image') === 0){
+        var baza = sgMediaNazwa('wgrany-' + (i + 1));
+        var n = baza, j = 2;
+        while (bib[n]) n = baza + '-' + (j++);
+        bib[n] = k.obraz;
+        k.obraz = 'media:' + n;
+        zmiana = true;
+      }
+    });
+    if (zmiana) sgMediaZapisz(bib);
+    return dane;
+  }
+  /* rozwijana lista zdjęć: stałe ścieżki + własne z biblioteki (same nazwy) */
+  function sgObrazOpcje(wybor){
+    var sel = document.getElementById('sg-obraz');
+    var bib = sgMediaBiblioteka();
+    var gitBib = sgGitHubMediaBiblioteka();
+    var opcje = SG_OBRAZY.slice();
+    var jestGit = Object.keys(gitBib).some(function(n){ return gitBib[n] === wybor; });
+    if (wybor && opcje.indexOf(wybor) < 0 && String(wybor).indexOf('media:') !== 0 && !jestGit) opcje.push(wybor);
+    var html = opcje.map(function (o) {
+      return '<option value="' + sgEsc(o) + '"' + (o === wybor ? ' selected' : '') + '>' +
+        (o === 'gradient' ? 'Gradient butelkowo-brązowy (bez zdjęcia)' : sgEsc(o)) + '</option>';
+    }).join('');
+    html += Object.keys(bib).sort().map(function (nazwa) {
+      var val = 'media:' + nazwa;
+      return '<option value="' + sgEsc(val) + '"' + (val === wybor ? ' selected' : '') +
+        '>📁 ' + sgEsc(nazwa) + ' (lokalne zdjęcie)</option>';
+    }).join('');
+    html += Object.keys(gitBib).sort().map(function (nazwa) {
+      var val = gitBib[nazwa];
+      return '<option value="' + sgEsc(val) + '"' + (val === wybor ? ' selected' : '') +
+        '>☁ ' + sgEsc(nazwa) + ' (GitHub)</option>';
+    }).join('');
+    sel.innerHTML = html;
+    sgObrazGuziki();
+  }
+  function sgObrazGuziki(){
+    var wlasne = String(document.getElementById('sg-obraz').value).indexOf('media:') === 0;
+    document.getElementById('sg-obraz-zmien').style.display = wlasne ? '' : 'none';
+    document.getElementById('sg-obraz-usun').style.display = wlasne ? '' : 'none';
+  }
+
+  /* migracja starego formatu (slajdy tag/tytul/opis/btn i jak/cta) na kafle + ctaTresc */
+  function sgMigrujStare(dane){
+    var kopia = null;
+    if (dane && dane.slajdy && !dane.slider){
+      var obrazWg = { nowosci:'assets/media/sklep/szopka.jpg', bestellery:'assets/media/sklep/szyld.jpg',
+                      aktualnosci:'gradient', sezonowa:'assets/hero.jpg' };
+      kopia = JSON.parse(JSON.stringify(dane));
+      dane = kopia;
+      dane.slider = { autoplay: 4.5, kafle: dane.slajdy.map(function(sl){
+        return { id: sl.id || 'k', obraz: obrazWg[sl.id] || 'assets/hero.jpg',
+                 karty: sl.id === 'nowosci' || sl.id === 'bestsellery',
+                 tresc: '<p class="sl-tag">' + sgEsc(sl.tag) + '</p><h2>' + sgEsc(sl.tytul) + '</h2><p>' + sgEsc(sl.opis) + '</p>' +
+                        '<a class="sl-btn" href="' + sgEsc(sl.link || 'sklep.html') + '">' + sgEsc(sl.btn || 'Zobacz →') + '</a>' };
+      }) };
+      delete dane.slajdy;
+    }
+    if (dane && dane.jak && !dane.ctaTresc){
+      if (!kopia){ kopia = JSON.parse(JSON.stringify(dane)); dane = kopia; }
+      var jak = dane.jak || {};
+      var h = '<h2>' + sgEsc(jak.tytul) + '</h2><p class="pod">' + sgEsc(jak.pod) + '</p><div class="kroki">';
+      (jak.kroki || []).forEach(function(kr, i){
+        h += '<div class="krok"><span class="num">0' + (i + 1) + '</span><b>' + sgEsc(kr.t) + '</b><p>' + sgEsc(kr.o) + '</p></div>';
+      });
+      h += '</div><div class="cta-btn"><a class="btn" href="zamowienia.html">' + sgEsc(dane.cta1) +
+           '</a><a class="btn outline" href="zamowienia.html">' + sgEsc(dane.cta2) + '</a></div>';
+      dane.ctaTresc = h;
+    }
+    return dane;
+  }
+
+  function sgKafle(){
+    if (!SG_DANE || !SG_DANE.slider || !Array.isArray(SG_DANE.slider.kafle) || SG_DANE.slider.kafle.length === 0){
+      if (!SG_DANE) SG_DANE = JSON.parse(JSON.stringify(SG_DOMYS));
+      if (!SG_DANE.slider) SG_DANE.slider = JSON.parse(JSON.stringify(SG_DOMYS.slider));
+      if (!Array.isArray(SG_DANE.slider.kafle) || SG_DANE.slider.kafle.length === 0){
+        SG_DANE.slider.kafle = JSON.parse(JSON.stringify(SG_DOMYS.slider.kafle));
+      }
+    }
+    return SG_DANE.slider.kafle;
+  }
+
+  function kafelObrazCss(obraz){
+    /* pojedyncze apostrofy: podwójne łamały atrybut style="background-image:url(...)" */
+    obraz = sgMediaRozwiaz(obraz);
+    return obraz === 'gradient' ? 'linear-gradient(135deg,#1F3A32,#6B4530)'
+      : "url('" + String(obraz || '').replace(/'/g, '%27') + "')";
+  }
+
+  function sgInfo(txt, zle){
+    var info = document.getElementById('sg-info');
+    info.style.display = 'block';
+    info.textContent = txt;
+    info.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    setTimeout(function(){ info.style.display = 'none'; }, 5000);
+  }
+
+  async function sgZapiszWszystko(){
+    if (!SG_BAZA_GOTOWA){
+      sgInfo('Nie zapisano: najpierw trzeba poprawnie pobrać aktualne dane ze wspólnej bazy.', true);
+      return false;
+    }
+    var btnGora = document.getElementById('sg-zapisz');
+    var btnDol = document.getElementById('sg-zapisz-dol');
+    var btnKafel = document.getElementById('sg-zapisz-kafel');
+    var btnKafelDol = document.getElementById('sg-zapisz-kafel-dol');
+    var allBtns = [btnGora, btnDol, btnKafel, btnKafelDol].filter(Boolean);
+
+    allBtns.forEach(function(b){
+      b.disabled = true;
+      if (!b.dataset.origText) b.dataset.origText = b.innerHTML;
+      b.innerHTML = '⏳ Zapisywanie...';
+    });
+
+    if (SG_EDYCJA && SG_EDYTOR){
+      var kafle = sgKafle();
+      var idx = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (idx >= 0){
+        var selObraz = document.getElementById('sg-obraz');
+        if (selObraz) kafle[idx].obraz = selObraz.value;
+        var chkK = document.getElementById('sg-karty');
+        if (chkK) kafle[idx].karty = chkK.checked;
+        kafle[idx].tresc = SG_EDYTOR.pobierz();
+      }
+    }
+    var ctaVal = SG_EDYTOR_CTA ? SG_EDYTOR_CTA.pobierz() : (SG_DANE ? SG_DANE.ctaTresc : '');
+    if (!sgPrawidlowyHtml(ctaVal)) ctaVal = SG_DOMYS.ctaTresc;
+    var ctaToggle = document.getElementById('sg-cta-widoczny');
+    var ctaWidoczny = ctaToggle ? ctaToggle.checked : true;
+
+    var autoplayVal = Number(document.getElementById('sg-autoplay').value);
+    if (isNaN(autoplayVal) || autoplayVal <= 0) autoplayVal = 4.5;
+
+    var dane = {
+      slider: { autoplay: autoplayVal, kafle: sgKafle() },
+      ctaTresc: ctaVal,
+      ctaWidoczny: ctaWidoczny,
+      menuKolejnosc: SG_DANE && Array.isArray(SG_DANE.menuKolejnosc) ? SG_DANE.menuKolejnosc : [],
+      blogKolejnosc: SG_DANE && Array.isArray(SG_DANE.blogKolejnosc) ? SG_DANE.blogKolejnosc : [],
+      pasekProduktow: SG_DANE && SG_DANE.pasekProduktow ? SG_DANE.pasekProduktow : { ids: [], liczba: 3, rozmiar: 'medium' }
+    };
+    SG_DANE = dane;
+
+    rysujKafle();
+    var suk = document.getElementById('sg-sukces');
+    if (suk) suk.style.display = 'none';
+    var zapisano = false;
+    try {
+      var odp = await SYG.wezwij('strona-glowna-zapisz', {dane: dane });
+      if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Serwer nie potwierdził zapisu.');
+      zapisano = true;
+      wyczyscBrudny();
+      if (suk){
+        suk.style.display = 'block';
+        setTimeout(function(){ suk.style.display = 'none'; }, 4000);
+      }
+      allBtns.forEach(function(b){ b.innerHTML = '✓ Zapisano!'; });
+      sgInfo('Zmiany strony głównej zapisano w bazie.', false);
+    } catch (err){
+      ustawBrudny();
+      allBtns.forEach(function(b){ b.innerHTML = '⚠ Nie zapisano'; });
+      sgInfo('Nie udało się zapisać w bazie. Zmiany pozostają niezapisane — spróbuj ponownie. ' + (err.message || ''), true);
+    } finally {
+      setTimeout(function(){
+        allBtns.forEach(function(b){
+          b.disabled = false;
+          b.innerHTML = b.dataset.origText || '💾 Zapisz zmiany strony głównej';
+        });
+      }, 2500);
+    }
+    return zapisano;
+  }
+
+  /* ---------- wybór i kolejność produktów w pasku strony głównej ---------- */
+  function sgPasekProduktow(){
+    if (!SG_DANE) SG_DANE = JSON.parse(JSON.stringify(SG_DOMYS));
+    var p = SG_DANE.pasekProduktow;
+    if (!p || typeof p !== 'object') { p = SG_DANE.pasekProduktow = { ids: [], liczba: 3, rozmiar: 'medium' }; SG_PASEK_CONFIGURED = false; }
+    else SG_PASEK_CONFIGURED = true;
+    if (!Array.isArray(p.ids)) p.ids = [];
+    p.ids = p.ids.map(String);
+    p.liczba = Math.max(1, Math.min(6, Number(p.liczba) || 3));
+    if (['small','medium','large'].indexOf(p.rozmiar) < 0) p.rozmiar = 'medium';
+    return p;
+  }
+  function sgProduktKarta(p){
+    var src = p.obraz && /^https?:\/\//i.test(String(p.obraz)) ? p.obraz : 'assets/media/sklep/' + (p.obraz || '');
+    var cena = Number(p.cena) > 0 ? sgEsc(p.cena) + ' zł / szt.' : 'na zamówienie';
+    return '<a class="sl-karta" href="sklep.html" onclick="return false">' +
+      (p.obraz ? '<img src="' + sgEsc(src) + '" alt="' + sgEsc(p.nazwa) + '">' : '<span class="pusty">' + sgEsc((p.nazwa || '?').slice(0,1)) + '</span>') +
+      '<span><span class="nazwa">' + sgEsc(p.nazwa) + '</span><br><span class="cena">' + cena + '</span></span></a>';
+  }
+  function sgRenderPasekProduktow(){
+    var p = sgPasekProduktow(), list = document.getElementById('sg-karty-lista');
+    if (!list) return;
+    var available = SG_PRODUKTY_PASKA.filter(function(x){ return x.dostepny; });
+    if (!p.ids.length && !SG_PASEK_CONFIGURED && available.length){
+      p.ids = available.slice(0,3).map(function(x){ return String(x.id); });
+      SG_PASEK_CONFIGURED = true;
+    }
+    var wybrane = p.ids.map(function(id){ return available.find(function(x){ return String(x.id) === id; }); }).filter(Boolean);
+    if (wybrane.length !== p.ids.length) p.ids = wybrane.map(function(x){ return String(x.id); });
+    document.getElementById('sg-karty-liczba').value = p.liczba;
+    document.getElementById('sg-karty-rozmiar').value = p.rozmiar;
+    list.innerHTML = available.map(function(x){
+      var chosen = p.ids.indexOf(String(x.id)) >= 0;
+      return '<li class="sg-karty-item' + (chosen ? ' wybrany' : '') + '" draggable="' + chosen + '" data-id="' + sgEsc(x.id) + '">' +
+        '<button type="button" class="sg-karty-drag" aria-label="Przeciągnij ' + sgEsc(x.nazwa) + '" title="Przeciągnij, aby zmienić kolejność"' + (chosen ? '' : ' disabled') + '>⠿</button>' +
+        '<label><input type="checkbox" class="sg-karty-check"' + (chosen ? ' checked' : '') + '> <span>' + sgEsc(x.nazwa) + '</span></label>' +
+        '<span class="sg-karty-cena">' + (Number(x.cena) > 0 ? sgEsc(x.cena) + ' zł' : 'na zamówienie') + '</span>' +
+        '<button type="button" class="sg-karty-up" aria-label="Przenieś wyżej" title="Przenieś wyżej"' + (chosen ? '' : ' disabled') + '>↑</button>' +
+        '<button type="button" class="sg-karty-down" aria-label="Przenieś niżej" title="Przenieś niżej"' + (chosen ? '' : ' disabled') + '>↓</button></li>';
+    }).join('') || '<li class="mala">Brak widocznych produktów w katalogu.</li>';
+    var preview = document.getElementById('sg-karty-podglad');
+    if (preview){
+      var pokazane = wybrane.slice(0,p.liczba);
+      preview.className = 'sl-karty sl-karty-' + p.rozmiar + ' sl-karty-col-' + Math.min(Math.max(pokazane.length,1),3);
+      preview.innerHTML = pokazane.map(sgProduktKarta).join('') || '<span class="sl-karta sl-karta-pusta">Brak wybranych produktów</span>';
+      var aktywny = SG_EDYCJA ? sgKafle().find(function(k){return String(k.id)===SG_EDYCJA.id;}) : null;
+      preview.style.display = aktywny && aktywny.karty ? 'grid' : 'none';
+    }
+    var info = document.getElementById('sg-karty-info');
+    if (info) info.textContent = wybrane.length ? wybrane.length + ' zaznaczonych · wyświetli się maksymalnie ' + Math.min(p.liczba, wybrane.length) : 'Nie wybrano produktów — pasek będzie pusty.';
+  }
+  function sgZapiszPasekProduktow(){
+    var p = sgPasekProduktow();
+    SG_PASEK_CONFIGURED = true;
+    SG_DANE.pasekProduktow = { ids: p.ids.slice(), liczba: p.liczba, rozmiar: p.rozmiar };
+    ustawBrudny();
+    sgRenderPasekProduktow();
+  }
+  function sgPrzesunProdukt(id, delta){
+    var ids = sgPasekProduktow().ids, i = ids.indexOf(String(id)), j = i + delta;
+    if (i < 0 || j < 0 || j >= ids.length) return;
+    var x = ids[i]; ids[i] = ids[j]; ids[j] = x;
+    sgZapiszPasekProduktow();
+  }
+  (function(){
+    var list = document.getElementById('sg-karty-lista');
+    if (!list) return;
+    list.addEventListener('change', function(e){
+      if (!e.target.matches('.sg-karty-check')) return;
+      var id = String(e.target.closest('[data-id]').getAttribute('data-id')), p = sgPasekProduktow();
+      if (e.target.checked){ if (p.ids.indexOf(id) < 0) p.ids.push(id); }
+      else p.ids = p.ids.filter(function(x){ return x !== id; });
+      sgZapiszPasekProduktow();
+    });
+    list.addEventListener('click', function(e){
+      var row = e.target.closest('[data-id]'); if (!row) return;
+      var delta = e.target.closest('.sg-karty-up') ? -1 : (e.target.closest('.sg-karty-down') ? 1 : 0);
+      if (delta) sgPrzesunProdukt(row.getAttribute('data-id'), delta);
+    });
+    var dragged = null;
+    list.addEventListener('dragstart', function(e){
+      var row=e.target.closest('.sg-karty-item'); if(!row||sgPasekProduktow().ids.indexOf(row.dataset.id)<0)return;
+      dragged=row.dataset.id; e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragged);
+    });
+    list.addEventListener('dragover', function(e){if(dragged&&e.target.closest('.sg-karty-item')){e.preventDefault();e.dataTransfer.dropEffect='move';}});
+    list.addEventListener('drop', function(e){
+      var row=e.target.closest('.sg-karty-item'); if(!dragged||!row)return;e.preventDefault();
+      var ids=sgPasekProduktow().ids, from=ids.indexOf(dragged),to=ids.indexOf(row.dataset.id);
+      if(from>=0&&to>=0&&from!==to){ids.splice(from,1);ids.splice(to,0,dragged);sgZapiszPasekProduktow();}
+      dragged=null;
+    });
+    list.addEventListener('dragend', function(){dragged=null;});
+  })();
+  var kartyLiczba = document.getElementById('sg-karty-liczba');
+  if(kartyLiczba) kartyLiczba.addEventListener('change', function(){sgPasekProduktow().liczba=Math.max(1,Math.min(6,Number(this.value)||1));sgZapiszPasekProduktow();});
+  var kartyRozmiar = document.getElementById('sg-karty-rozmiar');
+  if(kartyRozmiar) kartyRozmiar.addEventListener('change', function(){sgPasekProduktow().rozmiar=this.value;sgZapiszPasekProduktow();});
+
+  /* ---------- rysowanie paska kafli ---------- */
+  function rysujKafle(){
+    var pasek = document.getElementById('sg-kafle');
+    if (!pasek) return;
+    var kafle = sgKafle();
+    var html = '';
+    kafle.forEach(function(k, i){
+      var isAkt = SG_EDYCJA && String(SG_EDYCJA.id) === String(k.id);
+      var czystyTekst = (k.tresc || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      var tytulKrotki = czystyTekst.slice(0, 32) || ('Slajd ' + (i + 1));
+      html += '<div class="sg-slajd-karta' + (isAkt ? ' aktywny' : '') + '" draggable="false" data-sg-kafel="' + sgEsc(k.id) + '">' +
+        '<div class="sg-slajd-mini" style="background-image:' + kafelObrazCss(k.obraz) + '">' +
+          '<span class="sg-slajd-nr">Slajd ' + (i + 1) + '</span>' +
+        '</div>' +
+        '<div class="sg-slajd-opis" title="' + sgEsc(czystyTekst) + '">' + sgEsc(tytulKrotki) + '</div>' +
+        '<div class="sg-slajd-akcje">' +
+          '<button type="button" class="km-drag" title="Przeciągnij, aby zmienić kolejność" aria-label="Przeciągnij slajd, aby zmienić kolejność">⠿</button>' +
+          '<button type="button" class="km-edycja" title="Edytuj ten slajd">✏️ Edytuj</button>' +
+          '<button type="button" class="km-lewo" title="Przesuń w lewo">‹</button>' +
+          '<button type="button" class="km-prawo" title="Przesuń w prawo">›</button>' +
+          '<button type="button" class="km-usun" title="Usuń slajd" style="color:#8A2F1D">🗑</button>' +
+        '</div></div>';
+    });
+    html += '<button type="button" class="sg-dodaj-btn" id="sg-dodaj-kafel"><span style="font-size:28px;line-height:1">+</span>' +
+      '<span>Nowy slajd</span></button>';
+    pasek.innerHTML = html;
+
+    pasek.querySelectorAll('.sg-slajd-karta').forEach(function(el, i){
+      var id = el.getAttribute('data-sg-kafel');
+      var kafel = kafle.find(function(k){ return String(k.id) === id; });
+      el.addEventListener('click', function(e){
+        if (e.target.closest('button')) return;
+        otworzEdycje(kafel, i);
+      });
+      el.querySelector('.km-edycja').addEventListener('click', function(){ otworzEdycje(kafel, i); });
+      el.querySelector('.km-usun').addEventListener('click', function(){
+        if (kafle.length <= 1){
+          alert('W sliderze musi pozostać przynajmniej jeden slajd.');
+          return;
+        }
+        if (!confirm('Usunąć ten slajd?')) return;
+        SG_DANE.slider.kafle = kafle.filter(function(k){ return String(k.id) !== id; });
+        var reszta = sgKafle();
+        otworzEdycje(reszta[0], 0);
+        ustawBrudny(); rysujKafle();
+      });
+      el.querySelector('.km-lewo').addEventListener('click', function(){
+        if (i === 0) return;
+        var t = kafle[i - 1]; kafle[i - 1] = kafle[i]; kafle[i] = t;
+        ustawBrudny(); rysujKafle();
+      });
+      el.querySelector('.km-prawo').addEventListener('click', function(){
+        if (i === kafle.length - 1) return;
+        var t = kafle[i + 1]; kafle[i + 1] = kafle[i]; kafle[i] = t;
+        ustawBrudny(); rysujKafle();
+      });
+      /* Drag & drop slajdów przez uchwyt — działa myszą i dotykiem. */
+      var dragHandle = el.querySelector('.km-drag');
+      if (dragHandle) {
+        dragHandle.style.touchAction = 'none';
+        dragHandle.addEventListener('pointerdown', function(e){
+          if (e.button !== undefined && e.button !== 0) return;
+          e.preventDefault();
+          var rect = el.getBoundingClientRect();
+          var ghost = el.cloneNode(true);
+          ghost.classList.add('sg-drag-ghost');ghost.setAttribute('aria-hidden','true');
+          ghost.style.width = rect.width + 'px';
+          ghost.style.left = rect.left + 'px';
+          ghost.style.top = rect.top + 'px';
+          document.body.appendChild(ghost);
+          var state = { pointerId:e.pointerId, sourceId:id, source:el, ghost:ghost,
+                        startX:e.clientX, startY:e.clientY, target:null, x:e.clientX, moved:false };
+          SG_SLIDE_DRAG = state;
+          el.classList.add('sg-sort-source');el.setAttribute('aria-grabbed','true');
+          try { dragHandle.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+        dragHandle.addEventListener('pointermove', function(e){
+          var d=SG_SLIDE_DRAG;if(!d||d.pointerId!==e.pointerId)return;
+          if(!d.moved && Math.hypot(e.clientX-d.startX,e.clientY-d.startY)<5)return;
+          d.moved=true;d.x=e.clientX;
+          d.ghost.style.left=(e.clientX-d.ghost.offsetWidth/2)+'px';
+          d.ghost.style.top=(e.clientY-d.ghost.offsetHeight/2)+'px';
+          var under=document.elementFromPoint(e.clientX,e.clientY);
+          var target=under&&under.closest?under.closest('.sg-slajd-karta'):null;
+          if(target&&target.parentNode!==pasek)target=null;
+          if(d.target&&d.target!==target)d.target.classList.remove('drag-nad');
+          d.target=target;
+          if(target&&target!==d.source)target.classList.add('drag-nad');
+        });
+        function stopSlideDrag(e){
+          var d=SG_SLIDE_DRAG;if(!d||d.pointerId!==e.pointerId)return;
+          SG_SLIDE_DRAG=null;
+          if(d.target)d.target.classList.remove('drag-nad');
+          d.source.classList.remove('sg-sort-source');d.source.setAttribute('aria-grabbed','false');
+          d.ghost.remove();
+          if(d.moved&&d.target&&d.target!==d.source){
+            var r=d.target.getBoundingClientRect();
+            var after=d.x>r.left+r.width/2;
+            var lista=sgKafle(),from=lista.findIndex(function(k){return String(k.id)===d.sourceId;});
+            var targetId=d.target.getAttribute('data-sg-kafel');
+            var to=lista.findIndex(function(k){return String(k.id)===targetId;});
+            if(from>=0&&to>=0){
+              var moved=lista.splice(from,1)[0];
+              to=lista.findIndex(function(k){return String(k.id)===targetId;});
+              lista.splice(to+(after?1:0),0,moved);
+              ustawBrudny();rysujKafle();
+            }
+          }
+        }
+        dragHandle.addEventListener('pointerup',stopSlideDrag);
+        dragHandle.addEventListener('pointercancel',stopSlideDrag);
+      }
+    });
+
+    var dodaj = document.getElementById('sg-dodaj-kafel');
+    if (dodaj) dodaj.addEventListener('click', function(){
+      var nowyKafel = {
+        id: 'slajd-' + Date.now(),
+        obraz: 'assets/hero.jpg',
+        karty: false,
+        tresc: '<p class="sl-tag">Nowość</p><h2>Tytuł nowego slajdu</h2><p>Opis oferty lub nowości z pracowni — kliknij i edytuj w edytorze powyżej.</p><a class="sl-btn" href="sklep.html">Zobacz więcej →</a>'
+      };
+      sgKafle().push(nowyKafel);
+      ustawBrudny();
+      rysujKafle();
+      otworzEdycje(nowyKafel, sgKafle().length - 1, true);
+    });
+  }
+
+  /* ---------- okno edycji kafla ---------- */
+  function pokazEdycje(widoczna){
+    var el = document.getElementById('sg-edycja');
+    if (el) el.style.display = 'block';
+  }
+
+  function odswiezKropki(aktIdx){
+    var dots = document.getElementById('sg-dots');
+    if (!dots) return;
+    var kafle = sgKafle();
+    dots.innerHTML = '';
+    kafle.forEach(function(k, i){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      if (i === aktIdx) btn.className = 'akt';
+      btn.title = 'Przejdź do slajdu ' + (i + 1);
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        otworzEdycje(kafle[i], i);
+      });
+      dots.appendChild(btn);
+    });
+  }
+
+  function otworzEdycje(kafel, i, nowy){
+    if (!kafel) return;
+    if (SG_EDYCJA && SG_EDYTOR){
+      var kafle = sgKafle();
+      var poprzIdx = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (poprzIdx >= 0 && poprzIdx !== i){
+        kafle[poprzIdx].tresc = SG_EDYTOR.pobierz();
+      }
+    }
+    SG_EDYCJA = { id: String(kafel.id), kopia: JSON.parse(JSON.stringify(kafel)), nowy: !!nowy };
+    var tytulEl = document.getElementById('sg-edycja-tytul');
+    if (tytulEl) tytulEl.textContent = 'Slajd ' + (i + 1) + ' (' + (kafel.id || '') + ')';
+    
+    /* tło */
+    sgObrazOpcje(kafel.obraz);
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    
+    var chkKarty = document.getElementById('sg-karty');
+    if (chkKarty) chkKarty.checked = !!kafel.karty;
+    var opcjeKarty = document.getElementById('sg-karty-opcje');
+    if (opcjeKarty) opcjeKarty.style.display = kafel.karty ? 'block' : 'none';
+    var podgladKarty = document.getElementById('sg-karty-podglad');
+    if (podgladKarty) podgladKarty.style.display = kafel.karty ? 'grid' : 'none';
+
+    if (!SG_EDYTOR) {
+      var stareBary = document.querySelectorAll('#sg-tresc-edytor > .edtr-bar');
+      stareBary.forEach(function(b){ b.remove(); });
+      SG_EDYTOR = SYG.edytorTresci.stworz(
+        document.getElementById('sg-tresc-edytor'), document.getElementById('sg-tresc-pole'));
+    }
+    SG_EDYTOR.ustaw(kafel.tresc || '');
+    pokazEdycje(true);
+    odswiezKropki(i);
+    rysujKafle();
+  }
+
+  function odswiezPodgladObrazu(){
+    var sel = document.getElementById('sg-obraz');
+    var v = sel ? sel.value : 'assets/media/sklep/szyld.jpg';
+    var el = document.getElementById('sg-obraz-podglad');
+    if (el){
+      el.style.backgroundImage = kafelObrazCss(v);
+      el.textContent = v === 'gradient' ? 'gradient' : '';
+    }
+  }
+  var SG_CROP_GEOM={maxX:0,maxY:0,baseLeft:0,baseTop:0};
+  var SG_CROP_REQUEST=0;
+  function odswiezTloEdytora(){
+    var sel=document.getElementById('sg-obraz'),v=sel?sel.value:'assets/media/sklep/szyld.jpg';
+    var bg=document.getElementById('sg-tresc-bg'),img=document.getElementById('sg-crop-image');
+    var k=SG_EDYCJA?sgKafle().find(function(x){return String(x.id)===SG_EDYCJA.id;}):null;
+    var zoom=Math.max(50,Math.min(200,Number(k&&k.zoomTla)||100));
+    var x=Math.max(-100,Math.min(100,Number(k&&k.przesuniecieTlaX)||0));
+    var legacyY=k?(k.przesuniecieTlaY!=null?k.przesuniecieTlaY:k.przesuniecieTla):0;
+    var y=Math.max(-100,Math.min(100,Number(legacyY)||0));
+    var z=document.getElementById('sg-tlo-zoom'),out=document.getElementById('sg-tlo-zoom-wartosc');
+    if(z)z.value=zoom;if(out)out.textContent=zoom+'%';if(!bg||!img)return;
+    var request=++SG_CROP_REQUEST;
+    bg.style.backgroundColor='#1a2f26';
+    bg.style.backgroundRepeat='no-repeat';
+    img.style.display='none';img.removeAttribute('src');
+    var src=sgMediaRozwiaz(v);
+    if(src==='gradient'){
+      bg.style.backgroundImage=kafelObrazCss(v);bg.style.backgroundSize='cover';bg.style.backgroundPosition='center';
+      SG_CROP_GEOM={maxX:0,maxY:0,baseLeft:0,baseTop:0};return;
+    }
+    var probe=new Image();
+    probe.onload=function(){
+      if(request!==SG_CROP_REQUEST)return;
+      var box=bg.getBoundingClientRect();if(!box.width||!box.height)return;
+      var minZoom=Math.max(50,box.width/probe.naturalWidth*100,box.height/probe.naturalHeight*100);
+      var actual=Math.max(zoom,minZoom),iw=probe.naturalWidth*actual/100,ih=probe.naturalHeight*actual/100;
+      SG_CROP_GEOM={maxX:Math.max(0,(iw-box.width)/2),maxY:Math.max(0,(ih-box.height)/2),baseLeft:(box.width-iw)/2,baseTop:(box.height-ih)/2};
+      bg.style.backgroundImage='none';
+      img.style.position='absolute';img.style.maxWidth='none';img.style.maxHeight='none';
+      img.style.width=iw+'px';img.style.height=ih+'px';
+      img.style.left=(SG_CROP_GEOM.baseLeft+SG_CROP_GEOM.maxX*x/100)+'px';
+      img.style.top=(SG_CROP_GEOM.baseTop+SG_CROP_GEOM.maxY*y/100)+'px';
+      img.style.display='block';img.src=src;
+      if(out)out.textContent=zoom+'%'+(actual>zoom?' (dopasowane do kadru)':'');
+    };
+    probe.onerror=function(){if(request===SG_CROP_REQUEST){img.style.display='none';bg.style.backgroundImage=kafelObrazCss(v);bg.style.backgroundSize='cover';bg.style.backgroundPosition='center';}};
+    probe.src=src;
+  }
+
+  function sgUploadInfo(tresc, blad){
+    var el = document.getElementById('sg-obraz-upload-info');
+    if (!el) return;
+    el.style.display = 'block';
+    el.style.background = blad ? '#8a2f1d' : '#1C3A27';
+    el.style.color = '#fff';
+    el.textContent = tresc;
+  }
+
+  /* ODRZUĆ ZMIANY W SLAJDZIE */
+  var btnOdrzucKafel = document.getElementById('sg-odrzuc');
+  if (btnOdrzucKafel) btnOdrzucKafel.addEventListener('click', function(){
+    if (!SG_EDYCJA) return;
+    var kafle = sgKafle();
+    var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+    if (SG_EDYCJA.nowy){
+      if (i >= 0) kafle.splice(i, 1);
+      rysujKafle();
+      if (kafle.length > 0) otworzEdycje(kafle[0], 0);
+      else pokazEdycje(false);
+    } else if (i >= 0){
+      kafle[i] = JSON.parse(JSON.stringify(SG_EDYCJA.kopia));
+      otworzEdycje(kafle[i], i);
+    }
+    ustawBrudny();
+    sgInfo('Zmiany w bieżącym slajdzie odrzucone.', false);
+  });
+
+  /* ZAPISZ ZMIANY — jednolita akcja zapisu całej strony głównej */
+  var btnZapiszKafel = document.getElementById('sg-zapisz-kafel');
+  if (btnZapiszKafel) btnZapiszKafel.addEventListener('click', sgZapiszWszystko);
+  var btnZapiszKafelDol = document.getElementById('sg-zapisz-kafel-dol');
+  if (btnZapiszKafelDol) btnZapiszKafelDol.addEventListener('click', sgZapiszWszystko);
+
+  /* Checkbox karty produktów */
+  var chkKarty = document.getElementById('sg-karty');
+  if (chkKarty) chkKarty.addEventListener('change', function(){
+    var podgladKarty = document.getElementById('sg-karty-podglad');
+    var opcjeKarty = document.getElementById('sg-karty-opcje');
+    if (opcjeKarty) opcjeKarty.style.display = this.checked ? 'block' : 'none';
+    if (podgladKarty) podgladKarty.style.display = this.checked ? 'grid' : 'none';
+    if (SG_EDYCJA){
+      var kafle = sgKafle();
+      var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (i >= 0) kafle[i].karty = this.checked;
+    }
+    ustawBrudny();
+  });
+
+  /* Nawigacja slajdami (strzałki ‹ ›) */
+  var btnNavPrev = document.getElementById('sg-nav-prev');
+  if (btnNavPrev) btnNavPrev.addEventListener('click', function(e){
+    e.stopPropagation();
+    var kafle = sgKafle();
+    if (!kafle.length) return;
+    var idx = SG_EDYCJA ? kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; }) : 0;
+    var nowyIdx = (idx - 1 + kafle.length) % kafle.length;
+    otworzEdycje(kafle[nowyIdx], nowyIdx);
+  });
+  var btnNavNext = document.getElementById('sg-nav-next');
+  if (btnNavNext) btnNavNext.addEventListener('click', function(e){
+    e.stopPropagation();
+    var kafle = sgKafle();
+    if (!kafle.length) return;
+    var idx = SG_EDYCJA ? kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; }) : 0;
+    var nowyIdx = (idx + 1) % kafle.length;
+    otworzEdycje(kafle[nowyIdx], nowyIdx);
+  });
+
+  /* ---------- biblioteka własnych zdjęć: panel wgrywania ---------- */
+  var btnWgraj = document.getElementById('sg-obraz-wgraj');
+  if (btnWgraj) btnWgraj.addEventListener('click', function(){
+    var box = document.getElementById('sg-obraz-wgraj-box');
+    if (box){
+      var otwieram = box.style.display === 'none';
+      box.style.display = otwieram ? 'block' : 'none';
+      if (otwieram){
+        var statusUpload = document.getElementById('sg-obraz-upload-info');
+        if (statusUpload) statusUpload.style.display = 'none';
+      }
+    }
+  });
+  var inpPlik = document.getElementById('sg-obraz-plik');
+  if (inpPlik) inpPlik.addEventListener('change', function(){
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var inpNazwa = document.getElementById('sg-obraz-nazwa');
+    if (inpNazwa) inpNazwa.value = sgMediaNazwa(String(f.name).replace(/\.[^.]+$/, ''));
+  });
+  function sgObrazDoJpeg(plik){
+    return new Promise(function(resolve, reject){
+      var fr = new FileReader();
+      fr.onerror = function(){ reject(new Error('Nie udało się odczytać zdjęcia.')); };
+      fr.onload = function(){
+        var img = new Image();
+        img.onerror = function(){ reject(new Error('Nieprawidłowy plik zdjęcia.')); };
+        img.onload = function(){
+          var skala = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.naturalWidth * skala));
+          canvas.height = Math.max(1, Math.round(img.naturalHeight * skala));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(function(blob){
+            if (!blob){ reject(new Error('Nie udało się przygotować zdjęcia do wysłania.')); return; }
+            var fr2 = new FileReader();
+            fr2.onerror = function(){ reject(new Error('Nie udało się przygotować zdjęcia do wysłania.')); };
+            fr2.onload = function(){ resolve(String(fr2.result)); };
+            fr2.readAsDataURL(blob);
+          }, 'image/jpeg', 0.82);
+        };
+        img.src = String(fr.result);
+      };
+      fr.readAsDataURL(plik);
+    });
+  }
+
+  var btnZapiszObraz = document.getElementById('sg-obraz-zapisz');
+  if (btnZapiszObraz) btnZapiszObraz.addEventListener('click', async function(){
+    var f = document.getElementById('sg-obraz-plik').files &&
+            document.getElementById('sg-obraz-plik').files[0];
+    var nazwa = sgMediaNazwa(document.getElementById('sg-obraz-nazwa').value);
+    if (!f){
+      sgUploadInfo('Wybierz plik ze zdjęciem, a potem ponownie kliknij „Dodaj do biblioteki”.', true);
+      return;
+    }
+    var bib = sgMediaBiblioteka();
+    if (SYG.TRYB_DEMO && bib[nazwa] && !confirm('Zdjęcie „' + nazwa + '" już jest w bibliotece. Nadpisać?')) return;
+    btnZapiszObraz.disabled = true;
+    var obrazOryginalny = btnZapiszObraz.textContent;
+    btnZapiszObraz.textContent = 'Wysyłanie…';
+    sgUploadInfo('Przygotowuję zdjęcie do wysłania…', false);
+    try {
+      var dataUrl = await sgObrazDoJpeg(f);
+      var obraz = '';
+      if (SYG.TRYB_DEMO){
+        bib[nazwa] = dataUrl;
+        sgMediaZapisz(bib);
+        obraz = 'media:' + nazwa;
+      } else {
+        var czesc = dataUrl.split(',')[1] || '';
+        var odp = await SYG.wezwij('media-upload', { nazwa: nazwa, base64: czesc });
+        if (!odp || !odp.ok){
+          var bladUpload = (odp && odp.blad) || 'Serwer nie potwierdził zapisu zdjęcia.';
+          sgUploadInfo('Błąd: ' + bladUpload, true);
+          sgInfo(bladUpload, true);
+          return;
+        }
+        if (!/^https:\/\/raw\.githubusercontent\.com\/maciejhaufa-dev\/Sygnatura-v\.2\/main\/uploads\/[A-Za-z0-9._-]+\.jpg$/.test(String(odp.obraz || ''))){
+          var bladOdp = 'Apps Script zwrócił nieprawidłowy adres zdjęcia. Sprawdź, czy wdrożona wersja obsługuje media-upload.';
+          sgUploadInfo('Błąd: ' + bladOdp, true);
+          sgInfo(bladOdp, true);
+          return;
+        }
+        obraz = odp.obraz;
+        var gitBib = sgGitHubMediaBiblioteka();
+        gitBib[nazwa] = obraz;
+        sgGitHubMediaZapisz(gitBib);
+      }
+      sgObrazOpcje(obraz);
+      odswiezPodgladObrazu();
+      odswiezTloEdytora();
+      if (SG_EDYCJA){
+        var kafle = sgKafle();
+        var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+        if (i >= 0){ kafle[i].obraz = obraz; ustawBrudny(); rysujKafle(); }
+      }
+      var sukcesUpload = SYG.TRYB_DEMO
+        ? 'Zdjęcie dodano. Jest już wybrane i widoczne na liście zdjęć.'
+        : 'Zdjęcie dodano do GitHub i wybrano w liście. Kliknij „Zapisz zmiany strony głównej”, aby opublikować baner.';
+      sgUploadInfo('✓ ' + sukcesUpload, false);
+      sgInfo(sukcesUpload, false);
+    } catch (err){
+      var bladNieoczekiwany = err && err.message ? err.message : 'Nie udało się przygotować zdjęcia.';
+      sgUploadInfo('Błąd: ' + bladNieoczekiwany, true);
+      sgInfo(bladNieoczekiwany, true);
+    } finally {
+      btnZapiszObraz.disabled = false;
+      btnZapiszObraz.textContent = obrazOryginalny;
+    }
+  });
+  var btnZmienObraz = document.getElementById('sg-obraz-zmien');
+  if (btnZmienObraz) btnZmienObraz.addEventListener('click', function(){
+    var val = document.getElementById('sg-obraz').value;
+    if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby zmienić nazwę.'); return; }
+    var stara = val.slice(6);
+    var nowa = sgMediaNazwa(prompt('Nowa nazwa zdjęcia:', stara) || '');
+    if (!nowa || nowa === stara) return;
+    var bib = sgMediaBiblioteka();
+    if (bib[nowa] && !confirm('Zdjęcie „' + nowa + '" już jest w bibliotece. Nadpisać?')) return;
+    bib[nowa] = bib[stara];
+    delete bib[stara];
+    sgMediaZapisz(bib);
+    var nowaRef = 'media:' + nowa;
+    sgKafle().forEach(function(k){ if (k.obraz === val) k.obraz = nowaRef; });
+    if (SG_EDYCJA && SG_EDYCJA.kopia && SG_EDYCJA.kopia.obraz === val) SG_EDYCJA.kopia.obraz = nowaRef;
+    ustawBrudny();
+    sgObrazOpcje(nowaRef);
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    rysujKafle();
+    sgInfo('Nazwa zmieniona na „' + nowa + '".', false);
+  });
+  var btnUsunObraz = document.getElementById('sg-obraz-usun');
+  if (btnUsunObraz) btnUsunObraz.addEventListener('click', function(){
+    var val = document.getElementById('sg-obraz').value;
+    if (String(val).indexOf('media:') !== 0){ alert('Wybierz własne zdjęcie (📁 na liście), aby je usunąć.'); return; }
+    var nazwa = val.slice(6);
+    if (!confirm('Usunąć zdjęcie „' + nazwa + '" z biblioteki? Kafle, które go używają, dostaną domyślne tło.')) return;
+    var bib = sgMediaBiblioteka();
+    delete bib[nazwa];
+    sgMediaZapisz(bib);
+    sgKafle().forEach(function(k){ if (k.obraz === val) k.obraz = 'assets/hero.jpg'; });
+    ustawBrudny();
+    sgObrazOpcje('assets/hero.jpg');
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    rysujKafle();
+    sgInfo('Zdjęcie „' + nazwa + '" usunięte z biblioteki.', false);
+  });
+  var zoomCtl=document.getElementById('sg-tlo-zoom');
+  if(zoomCtl)zoomCtl.addEventListener('input',function(){
+    if(!SG_EDYCJA)return;var ks=sgKafle(),i=ks.findIndex(function(k){return String(k.id)===SG_EDYCJA.id;});if(i<0)return;
+    ks[i].zoomTla=Number(this.value)||100;odswiezTloEdytora();ustawBrudny();
+  });
+  (function(){
+    var preview=document.getElementById('sg-slider-preview'),bg=document.getElementById('sg-tresc-bg');
+    var img=document.getElementById('sg-crop-image');if(!preview||!bg||!img)return;
+    var shade=preview.querySelector('.sl-cien'),drag=null;
+    preview.style.touchAction='none';
+    img.style.pointerEvents='auto';img.style.cursor='grab';img.style.touchAction='none';img.style.userSelect='none';
+    img.style.webkitUserDrag='none';
+    if(shade)shade.style.pointerEvents='none';
+    preview.addEventListener('pointerdown',function(e){
+      if(!SG_EDYCJA||img.style.display!=='block'||(e.button!==undefined&&e.button!==0))return;
+      if(e.target.closest('a,button,input,textarea,select,[contenteditable="true"],.sl-karty'))return;
+      if(!e.target.closest('#sg-crop-image,.sl-bg,.sl-cien,.sl-tresc'))return;
+      e.preventDefault();
+      try{preview.setPointerCapture(e.pointerId);}catch(err){}
+      drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};img.style.cursor='grabbing';
+    });
+    preview.addEventListener('pointermove',function(e){
+      if(!drag||drag.id!==e.pointerId||!SG_EDYCJA)return;
+      var ks=sgKafle(),i=ks.findIndex(function(k){return String(k.id)===SG_EDYCJA.id;});if(i<0)return;
+      var dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
+      if(Math.abs(dx)+Math.abs(dy)>0)drag.moved=true;
+      var mx=SG_CROP_GEOM.maxX,my=SG_CROP_GEOM.maxY,x=Number(ks[i].przesuniecieTlaX)||0;
+      var oldY=ks[i].przesuniecieTlaY!=null?ks[i].przesuniecieTlaY:ks[i].przesuniecieTla;
+      var y=Number(oldY)||0;
+      ks[i].przesuniecieTlaX=mx?Math.max(-100,Math.min(100,x+dx/mx*100)):0;
+      ks[i].przesuniecieTlaY=my?Math.max(-100,Math.min(100,y+dy/my*100)):0;
+      img.style.left=(SG_CROP_GEOM.baseLeft+mx*ks[i].przesuniecieTlaX/100)+'px';
+      img.style.top=(SG_CROP_GEOM.baseTop+my*ks[i].przesuniecieTlaY/100)+'px';
+    });
+    function stop(e){if(!drag||drag.id!==e.pointerId)return;var moved=drag.moved;drag=null;img.style.cursor='grab';if(moved)ustawBrudny();}
+    preview.addEventListener('pointerup',stop);preview.addEventListener('pointercancel',stop);
+    window.addEventListener('resize',function(){if(SG_EDYCJA)odswiezTloEdytora();});
+  })();
+  var selObraz = document.getElementById('sg-obraz');
+  if (selObraz) selObraz.addEventListener('change', function(){
+    odswiezPodgladObrazu();
+    odswiezTloEdytora();
+    sgObrazGuziki();
+    if (SG_EDYCJA){
+      var kafle = sgKafle();
+      var i = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (i >= 0){
+        kafle[i].obraz = this.value;
+        ustawBrudny();
+        rysujKafle();
+      }
+    }
+  });
+
+  function odswiezWidokStronyGlownej(){
+    if (!SG_DANE) return;
+    var autoplayEl = document.getElementById('sg-autoplay');
+    if (autoplayEl){
+      autoplayEl.value = (SG_DANE.slider && SG_DANE.slider.autoplay != null)
+        ? SG_DANE.slider.autoplay : SG_DOMYS.slider.autoplay;
+    }
+    if (!SG_EDYTOR_CTA) {
+      var stareBary = document.querySelectorAll('#sg-cta-edytor > .edtr-bar');
+      stareBary.forEach(function(b){ b.remove(); });
+      SG_EDYTOR_CTA = SYG.edytorTresci.stworz(
+        document.getElementById('sg-cta-edytor'), document.getElementById('sg-cta-pole'));
+    }
+    var ctaToggle = document.getElementById('sg-cta-widoczny');
+    if (ctaToggle) ctaToggle.checked = SG_DANE.ctaWidoczny !== false;
+    var ctaHtml = (SG_DANE && sgPrawidlowyHtml(SG_DANE.ctaTresc))
+      ? SG_DANE.ctaTresc
+      : SG_DOMYS.ctaTresc;
+    if (SG_DANE) SG_DANE.ctaTresc = ctaHtml;
+    SG_EDYTOR_CTA.ustaw(ctaHtml);
+
+    rysujKafle();
+    var kafle = sgKafle();
+    if (kafle.length > 0) {
+      /* Zachowaj aktywny slajd lub otwórz Bestsellery/pierwszy slajd */
+      var aktIdx = 0;
+      if (SG_EDYCJA) {
+        var found = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+        if (found >= 0) aktIdx = found;
+      } else {
+        var bIdx = kafle.findIndex(function(k){ return k.id === 'bestsellery'; });
+        if (bIdx >= 0) aktIdx = bIdx;
+      }
+      otworzEdycje(kafle[aktIdx], aktIdx);
+    }
+  }
+
+  async function ladujStronaGlowna(){
+    if (!SG_DANE){
+      var lokalne = null;
+      if (SYG.TRYB_DEMO){
+        try {
+          var raw = localStorage.getItem('syg-demo-strona-glowna');
+          if (raw) lokalne = JSON.parse(raw);
+        } catch(e){}
+      }
+      SG_DANE = sgNaprawObrazy(sgMigrujStare(lokalne) || JSON.parse(JSON.stringify(SG_DOMYS)));
+      if (!SG_DANE.slider) SG_DANE.slider = JSON.parse(JSON.stringify(SG_DOMYS.slider));
+      if (!sgPrawidlowyHtml(SG_DANE.ctaTresc)) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
+    }
+    odswiezWidokStronyGlownej();
+
+    if (!SYG.TRYB_DEMO){
+      try {
+        var odp = await SYG.wezwij('strona-glowna-pobierz', {});
+        if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Brak odpowiedzi bazy.');
+        SG_BAZA_GOTOWA = true;
+        if (odp.dane && !SG_BRUDNY){
+          var zserwera = sgNaprawObrazy(sgMigrujStare(odp.dane));
+          SG_DANE = Object.assign({}, SG_DANE, zserwera);
+          SG_PASEK_CONFIGURED = !!zserwera.pasekProduktow;
+          if (SG_DANE.slider && Array.isArray(SG_DANE.slider.kafle) && SG_DANE.slider.kafle.length > 0){
+            if (!sgPrawidlowyHtml(SG_DANE.ctaTresc)) SG_DANE.ctaTresc = SG_DOMYS.ctaTresc;
+            odswiezWidokStronyGlownej();
+          }
+        }
+      } catch (err){
+        SG_BAZA_GOTOWA = false;
+        console.warn('Błąd pobierania strony głównej z serwera:', err);
+        sgInfo('Nie udało się pobrać zapisanej wersji z bazy. Sprawdź połączenie; zapisywanie jest zablokowane.', true);
+      }
+    }
+    try {
+      var produktyPaska = await SYG.katalog();
+      SG_PRODUKTY_PASKA = Array.isArray(produktyPaska) ? produktyPaska : [];
+      sgRenderPasekProduktow();
+    } catch (errKatalog){
+      sgRenderPasekProduktow();
+      var pInfo = document.getElementById('sg-karty-info');
+      if (pInfo && !SG_PRODUKTY_PASKA.length) pInfo.textContent = 'Nie udało się pobrać katalogu produktów. Sprawdź połączenie i odśwież panel.';
+    }
+    wyczyscBrudny();
+  }
+
+  ['sg-autoplay'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', ustawBrudny);
+  });
+  var ctaToggle = document.getElementById('sg-cta-widoczny');
+  if (ctaToggle) ctaToggle.addEventListener('change', function(){ if (SG_DANE) SG_DANE.ctaWidoczny=this.checked; ustawBrudny(); });
+  var ctaPole = document.getElementById('sg-cta-pole');
+  if (ctaPole) ctaPole.addEventListener('input', function(){
+    if (SG_DANE && SG_EDYTOR_CTA) SG_DANE.ctaTresc = SG_EDYTOR_CTA.pobierz();
+    ustawBrudny();
+  });
+  var poleSlider = document.getElementById('sg-tresc-pole');
+  if (poleSlider) poleSlider.addEventListener('input', function(){
+    if (SG_EDYCJA && SG_EDYTOR){
+      var kafle = sgKafle();
+      var idx = kafle.findIndex(function(k){ return String(k.id) === SG_EDYCJA.id; });
+      if (idx >= 0) kafle[idx].tresc = SG_EDYTOR.pobierz();
+    }
+    ustawBrudny();
+  });
+
+  var btnZapiszHome = document.getElementById('sg-zapisz');
+  if (btnZapiszHome) btnZapiszHome.addEventListener('click', sgZapiszWszystko);
+  var btnZapiszHomeDol = document.getElementById('sg-zapisz-dol');
+  if (btnZapiszHomeDol) btnZapiszHomeDol.addEventListener('click', sgZapiszWszystko);
+
+  var btnOdrzucHome = document.getElementById('sg-odrzuc-strona');
+  if (btnOdrzucHome) btnOdrzucHome.addEventListener('click', function(){
+    if (!confirm('Odrzucić WSZYSTKIE niezapisane zmiany strony głównej? Wróci wersja zapisana.')) return;
+    ladujStronaGlowna();
+    sgInfo('Wszystkie niezapisane zmiany strony głównej odrzucone.', false);
+  });
+  var btnOdrzucHomeDol = document.getElementById('sg-odrzuc-strona-dol');
+  if (btnOdrzucHomeDol) btnOdrzucHomeDol.addEventListener('click', function(){
+    if (!confirm('Odrzucić WSZYSTKIE niezapisane zmiany strony głównej? Wróci wersja zapisana.')) return;
+    ladujStronaGlowna();
+    sgInfo('Wszystkie niezapisane zmiany strony głównej odrzucone.', false);
+  });
+
+  /* ============ treść strony Zamówienia (EDYTOR TREŚCI) ============ */
+  var SZ_EDYTOR = null;
+  var SZ_DOMYS = '<span class="tag">Kreator zamówień</span>' +
+    '<h1>Zamówienia</h1>' +
+    '<p class="lead">Wybierz, czego potrzebujesz. Każdą ścieżkę prowadzimy krok po kroku — z podsumowaniem i jasnymi zasadami na końcu. Bez niespodzianek.</p>' +
+    '<div class="hub">' +
+    '<div class="hub-col"><div class="hub-head">Wynajem dekoracji</div><div class="hub-body">' +
+    '<p>Stwórz niepowtarzalny klimat swojego wydarzenia, dodając mu wyjątkowego wymiaru za pomocą naszych dekoracji. Wybierz jeden z dostępnych pakietów, sprawdź dostępność terminów i zarezerwuj. Możesz też dodać do wystroju personalizowane elementy i detale, które sprawią, że będą to niezapomniane chwile dla wszystkich.</p>' +
+    '</div><a class="btn" href="wynajem.html">Zarezerwuj termin</a></div>' +
+    '<div class="hub-col"><div class="hub-head">Personalizacja</div><div class="hub-body">' +
+    '<p>Pragniesz obdarować kogoś wyjątkowym prezentem, którego nigdy nie zapomni, a może szukasz miejsca, które zrealizuje Twoją wizję? Jeśli tak, to dobrze trafiłeś — w Sygnaturze specjalizujemy się w personalizowanych prezentach i dekoracjach, gdzie każdy detal pozwala poczuć się wyjątkowo i jest niepowtarzalny. Nie jesteśmy fabryką, tylko rodzinną manufakturą tworzącą unikaty — dzięki temu nasze wyroby są wyjątkowe.</p>' +
+    '</div><a class="btn" href="personalizacja.html">Zamów personalizację</a></div>' +
+    '<div class="hub-col"><div class="hub-head">Sklep</div><div class="hub-body">' +
+    '<p>Wiele z naszych prac zdobi prywatne domy i lokale eventowe. Wybierz coś dla siebie i stwórz niepowtarzalny klimat dla swojego wnętrza.</p>' +
+    '</div><a class="btn" href="sklep.html">Katalog produktów</a></div>' +
+    '</div>';
+  function szUstawBrudny(){ document.getElementById('sz-brudny').style.display = 'block'; }
+  function szCzyscBrudny(){ document.getElementById('sz-brudny').style.display = 'none'; }
+  function szInfo(txt, zle){
+    var info = document.getElementById('sz-info');
+    info.style.display = 'block';
+    info.textContent = txt;
+    info.style.background = zle ? '#8a2f1d' : 'var(--butelkowa)';
+    setTimeout(function(){ info.style.display = 'none'; }, 5000);
+  }
+  async function ladujStronaZamowienia(){
+    var dane = null;
+    if (!SYG.TRYB_DEMO){
+      try {
+        var odp = await SYG.wezwij('strona-zamowienia-pobierz', {});
+        if (odp && odp.ok && odp.dane) dane = odp.dane;
+      } catch (err){
+        console.warn('Błąd pobierania strony zamówień z serwera:', err);
+      }
+    }
+    if (!dane && SYG.demoDb && SYG.demoDb.stronaZamowienia) dane = SYG.demoDb.stronaZamowienia();
+    if (!SZ_EDYTOR) SZ_EDYTOR = SYG.edytorTresci.stworz(
+      document.getElementById('sz-tresc-edytor'), document.getElementById('sz-tresc-pole'));
+    SZ_EDYTOR.ustaw((dane && dane.tresc) || SZ_DOMYS);
+    szCzyscBrudny();
+  }
+  async function szZapisz(){
+    var odp = await SYG.wezwij('strona-zamowienia-zapisz', {dane: { tresc: SZ_EDYTOR.pobierz() } });
+    if (odp.ok){ szCzyscBrudny(); szInfo('Strona Zamówienia zapisana.', false); }
+    else szInfo(odp.blad || 'Nie udało się zapisać.', true);
+    return odp.ok;
+  }
+  function szOdrzuc(){
+    if (!confirm('Odrzucić wszystkie niezapisane zmiany strony Zamówienia? Wróci wersja zapisana.')) return;
+    ladujStronaZamowienia();
+    szInfo('Niezapisane zmiany strony Zamówienia odrzucone.', false);
+  }
+  var btnSzZapisz = document.getElementById('sz-zapisz');
+  if (btnSzZapisz) btnSzZapisz.addEventListener('click', szZapisz);
+  var btnSzOdrzuc = document.getElementById('sz-odrzuc');
+  if (btnSzOdrzuc) btnSzOdrzuc.addEventListener('click', szOdrzuc);
+  var inpSzTresc = document.getElementById('sz-tresc-pole');
+  if (inpSzTresc) inpSzTresc.addEventListener('input', szUstawBrudny);
+
+  /* ============ zamówienia ============ */
+  async function ladujZamowienia(){
+    var odp = await SYG.wezwij('zamowienia-lista', {});
+    if (!odp.ok){
+      bled.textContent = odp.blad || 'Brak dostępu lub wygasła sesja.';
+      bled.style.display = 'block';
+      return;
+    }
+    bled.style.display = 'none';
+    ladujStronaZamowienia();
+    var lista = odp.zamowienia || [];
+    var tbody = document.querySelector('#tabela-zamowien tbody');
+    tbody.innerHTML = lista.map(function(z){
+      var pozycje = (z.pozycje || []).map(function(p){ return '<b>' + sgEsc(p.nazwa) + '</b>' + (p.ile > 1 ? ' ×' + p.ile : ''); }).join(', ');
+      var razem = (z.kwoty && z.kwoty.razem) ? SYG.zl(z.kwoty.razem) : '—';
+      var opcje = Object.keys(STAN_NAZWA).map(function(s){
+        return '<option value="' + s + '"' + (z.status === s ? ' selected' : '') + '>' + STAN_NAZWA[s] + '</option>';
+      }).join('');
+      var klientTel = (z.klient && z.klient.telefon) ? ' · ' + sgEsc(z.klient.telefon) : '';
+      return '<tr><td><b>' + sgEsc(z.sygnatura) + '</b></td>' +
+        '<td><b>' + (z.data || '').slice(0, 10) + '</b></td>' +
+        '<td><b>' + sgEsc((z.klient && z.klient.imie) || 'Klient') + ' ' + sgEsc((z.klient && z.klient.nazwisko) || '') + '</b><br><span class="mala">' + sgEsc((z.klient && z.klient.email) || '') + klientTel + '</span></td>' +
+        '<td>' + (pozycje || '—') + '</td>' +
+        '<td><b style="color:var(--butelkowa);font-size:14.5px">' + razem + '</b></td>' +
+        '<td><select data-syg="' + sgEsc(z.sygnatura) + '" data-stary="' + sgEsc(z.status || 'zapytanie') + '">' + opcje + '</select></td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#777">Brak zamówień w systemie. Złożone w sklepie zamówienia pojawią się w tym miejscu.</td></tr>';
+
+    tbody.querySelectorAll('select').forEach(function(sel){
+      sel.addEventListener('change', async function(){
+        var stary = sel.getAttribute('data-stary');
+        var odp2 = await SYG.wezwij('zamowienie-status', {sygnatura: sel.getAttribute('data-syg'), status: sel.value });
+        if (odp2 && odp2.ok) sel.setAttribute('data-stary', sel.value);
+        else {
+          sel.value = stary;
+          alert((odp2 && odp2.blad) || 'Nie zapisano. Zmiana została cofnięta.');
+        }
+      });
+    });
+  }
+
+  /* ============ wiadomości ============ */
+  async function ladujWiadomosci(){
+    var wbody = document.querySelector('#tabela-wiadomosci tbody');
+    var zbody = document.querySelector('#tabela-wynajem-zapytania tbody');
+    wbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:#888">Ładowanie wiadomości…</td></tr>';
+    zbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#888">Ładowanie zapytań o wynajem…</td></tr>';
+    
+    var wiadomosci = [];
+    var zap = [];
+    if (SYG.TRYB_DEMO){
+      wiadomosci = SYG.demoDb.wiadomosci();
+      zap = SYG.demoDb.wynajemZapytania();
+    } else {
+      try {
+        var odpW = await SYG.wezwij('wiadomosci-lista', {});
+        if (odpW && odpW.ok && Array.isArray(odpW.wiadomosci)) wiadomosci = odpW.wiadomosci;
+        var odpZ = await SYG.wezwij('wynajem-zapytania-lista', {});
+        if (odpZ && odpZ.ok && Array.isArray(odpZ.zapytania)) zap = odpZ.zapytania;
+      } catch (err){
+        console.warn('Błąd ładowania wiadomości z serwera:', err);
+      }
+    }
+
+    wbody.innerHTML = wiadomosci.map(function(w){
+      return '<tr><td><b>' + (w.data || '').slice(0, 10) + '</b></td><td><b>' + sgEsc(w.imie || '') + '</b><br><span class="mala">' + sgEsc(w.email || '') + (w.telefon ? ' · ' + sgEsc(w.telefon) : '') + '</span></td>' +
+        '<td><span class="status-badge status-platnosc">' + sgEsc(w.temat || 'Wiadomość') + '</span></td><td>' + sgEsc(w.tresc || '') + '</td></tr>';
+    }).join('') || '<tr><td colspan="4" style="text-align:center;padding:22px;color:#777">Brak wiadomości z formularza kontaktowego.</td></tr>';
+
+    var evMap = { weselny: 'Wesele', komunijny: 'Komunia / chrzest', firmowy: 'Event firmowy', jubileuszowy: 'Jubileusz / urodziny' };
+    zbody.innerHTML = zap.map(function(z){
+      var persTxt = '';
+      if (Array.isArray(z.pers)) {
+        persTxt = z.pers.map(function(p){ return (p.nazwa || '') + (p.opis ? ': ' + p.opis.slice(0,60) : ''); }).join('; ');
+      } else if (z.szczegoly && z.szczegoly.pers) {
+        persTxt = Array.isArray(z.szczegoly.pers) ? z.szczegoly.pers.map(function(p){ return p.nazwa || p; }).join(', ') : String(z.szczegoly.pers);
+      }
+      var pakietNazwa = (z.pakiet && z.pakiet.nazwa) ? z.pakiet.nazwa : (z.pakietId || '—');
+      var terminData = (z.termin && z.termin.data) ? z.termin.data : (z.termin || '—');
+      var klientImie = (z.klient && z.klient.imie) ? z.klient.imie : (z.imie || '—');
+      var klientEmail = (z.klient && z.klient.email) ? z.klient.email : (z.email || '');
+      var klientTel = (z.klient && z.klient.telefon) ? z.klient.telefon : (z.telefon || '');
+      return '<tr><td><b>' + (z.data || '').slice(0, 10) + '</b></td><td><b>' + sgEsc(klientImie) + '</b><br><span class="mala">' + sgEsc(klientEmail) +
+        (klientTel ? ' · ' + sgEsc(klientTel) : '') + '</span></td>' +
+        '<td>' + (evMap[z.ev] || z.ev || '—') + '</td>' +
+        '<td><b style="color:var(--butelkowa)">' + sgEsc(pakietNazwa) + '</b></td>' +
+        '<td><b>' + sgEsc(terminData) + '</b></td>' +
+        '<td>' + (sgEsc(persTxt) || '—') + '</td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:22px;color:#777">Brak zapytań o rezerwację terminu dekoracji.</td></tr>';
+  }
+
+  /* ============ produkty ============ */
+  async function ladujProdukty(){
+    var kat = await SYG.katalog();
+    SG_PRODUKTY_PASKA = Array.isArray(kat) ? kat : [];
+    sgRenderPasekProduktow();
+    var tbody = document.querySelector('#tabela-produkty tbody');
+    tbody.innerHTML = kat.map(function(p){
+      return '<tr>' +
+        '<td><b>' + sgEsc(p.nazwa) + '</b><br><span class="mala">#' + sgEsc(p.id) +
+        (p.storyId ? ' · <a href="blog-wpis.html?id=' + p.storyId + '" target="_blank" rel="noopener" style="color:var(--butelkowa);border-bottom:1px solid var(--zloty)">historia →</a>' : '') +
+        '</span></td>' +
+        '<td><input type="number" step="0.01" min="0" class="p-cena" data-id="' + p.id + '" value="' + p.cena + '" style="width:110px"></td>' +
+        '<td><label style="cursor:pointer;font-size:14px"><input type="checkbox" class="p-dost" data-id="' + p.id + '"' + (p.dostepny ? ' checked' : '') + '> widoczny</label></td>' +
+        '<td><input type="text" class="p-tagi" data-id="' + p.id + '" value="' + sgEsc(p.tagi || '') + '" placeholder="np. drewno, ślub, prezent" style="min-width:210px"></td>' +
+        '<td class="produkt-akcje"><button class="btn outline" type="button" style="padding:8px 12px" data-akcja="zapisz" data-id="' + Number(p.id) + '">Zapisz</button> ' +
+        '<button class="btn niebez" type="button" style="padding:8px 10px" data-akcja="usun" data-id="' + Number(p.id) + '">Usuń produkt</button></td>' +
+      '</tr>';
+    }).join('') || '<tr><td colspan="5">Brak produktów.</td></tr>';
+
+    tbody.querySelectorAll('button[data-akcja="zapisz"]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        var id = Number(b.getAttribute('data-id'));
+        var cena = Number(tbody.querySelector('.p-cena[data-id="' + id + '"]').value) || 0;
+        var dost = tbody.querySelector('.p-dost[data-id="' + id + '"]').checked ? 1 : 0;
+        var tagi = tbody.querySelector('.p-tagi[data-id="' + id + '"]').value;
+        var odp = await SYG.wezwij('produkty-zapisz', { id: id, cena: cena, dostepny: dost, tagi: tagi });
+        var f = document.getElementById('produkty-info');
+        f.style.display = 'block';
+        f.textContent = odp.ok ? 'Zapisano: produkt #' + id + ' (' + cena + ' zł, ' + (dost ? 'widoczny' : 'ukryty') + ').' : (odp.blad || 'Nie zapisano.');
+        setTimeout(function(){ f.style.display = 'none'; }, 4000);
+      });
+    });
+    tbody.querySelectorAll('button[data-akcja="usun"]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        var id = Number(b.getAttribute('data-id'));
+        var produkt = kat.find(function(x){ return Number(x.id) === id; });
+        if (!confirm('Usunąć produkt „' + (produkt ? produkt.nazwa : '#' + id) + '” z katalogu? Tego działania nie można cofnąć. Powiązana historia/realizacja pozostanie.')) return;
+        b.disabled = true;
+        var f = document.getElementById('produkty-info');
+        f.style.display = 'block'; f.textContent = 'Usuwanie produktu…';
+        try {
+          var odp = await SYG.wezwij('produkt-usun', { id: id });
+          if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Serwer nie potwierdził usunięcia.');
+          f.textContent = 'Produkt #' + id + ' usunięto z katalogu.';
+          await ladujProdukty();
+        } catch (err){ f.textContent = 'Nie udało się usunąć produktu: ' + (err.message || 'błąd serwera.'); b.disabled = false; }
+        setTimeout(function(){ f.style.display = 'none'; }, 5000);
+      });
+    });
+  }
+
+  /* produkt bez historii */
+  var pnPlikObrazu = null;
+  document.getElementById('pn-obraz').addEventListener('change', function(){
+    pnPlikObrazu = this.files && this.files[0] ? this.files[0] : null;
+  });
+  document.getElementById('produkt-nowy').addEventListener('click', function(){
+    document.getElementById('produkt-nowy-form').style.display = 'block';
+  });
+  document.getElementById('pn-zapisz').addEventListener('click', async function(){
+    var btn = this;
+    var nazwa = document.getElementById('pn-nazwa').value.trim();
+    if (!nazwa){ alert('Podaj nazwę produktu.'); return; }
+    var cena = Number(document.getElementById('pn-cena').value) || 0;
+    var opis = document.getElementById('pn-opis').value.trim();
+    var f = document.getElementById('produkty-info');
+    var obraz = 'szopka.jpg';
+    btn.disabled = true;
+    btn.textContent = 'Zapisywanie…';
+    try {
+      if (pnPlikObrazu){
+        var dataUrl = await sgObrazDoJpeg(pnPlikObrazu);
+        var upload = await SYG.wezwij('media-upload', { nazwa: nazwa, base64: dataUrl.split(',')[1] || '' });
+        if (!upload || !upload.ok) throw new Error((upload && upload.blad) || 'Nie udało się zapisać zdjęcia.');
+        if (!/^https:\/\/raw\.githubusercontent\.com\/maciejhaufa-dev\/Sygnatura-v\.2\/main\/uploads\/[A-Za-z0-9._-]+\.jpg$/.test(String(upload.obraz || ''))){
+          throw new Error('Backend Apps Script wymaga aktualizacji. Produkt nie został dodany.');
+        }
+        obraz = upload.obraz;
+      }
+      var odp = await SYG.wezwij('produkt-nowy', {
+        nazwa: nazwa, cena: cena, opis: opis, obraz: obraz
+      });
+      if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Nie udało się zapisać produktu w bazie.');
+      f.style.background = 'var(--butelkowa)';
+      f.style.color = '#fff';
+      f.textContent = 'Produkt „' + nazwa + '” zapisano we wspólnym katalogu.';
+      document.getElementById('pn-nazwa').value = '';
+      document.getElementById('pn-cena').value = '';
+      document.getElementById('pn-opis').value = '';
+      document.getElementById('pn-obraz').value = '';
+      pnPlikObrazu = null;
+      document.getElementById('produkt-nowy-form').style.display = 'none';
+      ladujProdukty();
+    } catch(err){
+      f.style.background = '#8a2f1d';
+      f.style.color = '#fff';
+      f.textContent = err.message || 'Nie udało się dodać produktu.';
+    } finally {
+      f.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Dodaj produkt';
+      setTimeout(function(){ f.style.display = 'none'; }, 6000);
+    }
+  });
+
+  /* ============ BLOG ============ */
+  var blogEdytor = SYG.edytor('bf-tresc', 'bf-zrodlo');
+  var wpisyBlog = [];
+  var wybranyId = null;
+  var trybEdycji = false;
+  var nowySzkic = false;
+  var galeria = [];
+
+  function escB(s){
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function infoBlog(txt){
+    var f = document.getElementById('blog-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  function rysujMini(){
+    var kont = document.getElementById('bf-mini');
+    kont.innerHTML = '';
+    galeria.forEach(function(g, i){
+      var el = document.createElement('div');
+      el.className = 'bf-mini-el';
+      el.innerHTML = '<img src="' + g.src + '" alt="">' +
+        '<label><input type="radio" name="bf-glowna" ' + (g.glowna ? 'checked' : '') + '> główne</label>' +
+        '<button type="button" class="bf-mini-x" title="Usuń zdjęcie">✕</button>';
+      el.querySelector('input').addEventListener('change', function(){
+        galeria.forEach(function(x){ x.glowna = false; });
+        g.glowna = true;
+        rysujMini();
+      });
+      el.querySelector('.bf-mini-x').addEventListener('click', function(){
+        galeria.splice(i, 1);
+        if (!galeria.length) galeria = [];
+        else if (!galeria.some(function(x){ return x.glowna; })) galeria[0].glowna = true;
+        rysujMini();
+      });
+      kont.appendChild(el);
+    });
+  }
+
+  var blogUploadWTrakcie = false;
+  var BLOG_MEDIA_URL = /^https:\/\/raw\.githubusercontent\.com\/maciejhaufa-dev\/Sygnatura-v\.2\/main\/uploads\/[A-Za-z0-9._-]+\.jpg$/;
+
+  async function blogObrazDoBiblioteki(blob, nazwa){
+    var dataUrl = await sgObrazDoJpeg(blob);
+    if (SYG.TRYB_DEMO) return dataUrl;
+    var odp = await SYG.wezwij('media-upload', {
+      nazwa: sgMediaNazwa(nazwa || 'wpis-zdjecie'),
+      base64: dataUrl.split(',')[1] || ''
+    });
+    if (!odp || !odp.ok) throw new Error((odp && odp.blad) || 'Nie udało się wysłać zdjęcia.');
+    if (!BLOG_MEDIA_URL.test(String(odp.obraz || ''))){
+      throw new Error('Apps Script nie zwrócił poprawnego adresu zdjęcia. Sprawdź wdrożenie akcji media-upload.');
+    }
+    return odp.obraz;
+  }
+
+  function blogBlobZDataUrl(src){
+    var m = /^data:(image\/[A-Za-z0-9.+-]+);base64,([\s\S]+)$/.exec(String(src || ''));
+    if (!m) throw new Error('Nie udało się odczytać osadzonego zdjęcia. Usuń je i dodaj ponownie jako plik.');
+    var binary = atob(m[2]);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new Blob([bytes], { type: m[1] });
+  }
+
+  async function blogZamienZdjeciaOsadzone(){
+    for (var i = 0; i < galeria.length; i++){
+      if (/^data:image\//i.test(String(galeria[i].src || ''))){
+        infoBlog('Wysyłam zdjęcie wpisu ' + (i + 1) + ' do biblioteki…');
+        galeria[i].src = await blogObrazDoBiblioteki(blogBlobZDataUrl(galeria[i].src), 'wpis-' + wybranyId + '-' + (i + 1));
+        rysujMini();
+      }
+    }
+    var kont = document.createElement('div');
+    kont.innerHTML = blogEdytor.pobierz();
+    var obrazy = Array.prototype.slice.call(kont.querySelectorAll('img[src^="data:image/"]'));
+    for (var j = 0; j < obrazy.length; j++){
+      infoBlog('Wysyłam zdjęcie osadzone w treści ' + (j + 1) + ' z ' + obrazy.length + '…');
+      obrazy[j].src = await blogObrazDoBiblioteki(blogBlobZDataUrl(obrazy[j].getAttribute('src')), 'wpis-' + wybranyId + '-tresc-' + (j + 1));
+      blogEdytor.ustaw(kont.innerHTML);
+    }
+    return blogEdytor.pobierz();
+  }
+
+  document.getElementById('bf-pliki').addEventListener('change', async function(){
+    var files = Array.prototype.slice.call(this.files || []);
+    this.value = '';
+    if (!files.length) return;
+    if (blogUploadWTrakcie){ infoBlog('Poczekaj na zakończenie poprzedniego wysyłania zdjęć.'); return; }
+    blogUploadWTrakcie = true;
+    try {
+      for (var i = 0; i < files.length; i++){
+        if (galeria.length >= 10){ infoBlog('Osiągnięto limit 10 zdjęć. Reszta plików nie została dodana.'); break; }
+        infoBlog('Przygotowuję zdjęcie ' + (i + 1) + ' z ' + files.length + '…');
+        var src = await blogObrazDoBiblioteki(files[i], 'wpis-' + wybranyId + '-' + (galeria.length + 1));
+        galeria.push({ src: src, glowna: galeria.length === 0 });
+        rysujMini();
+        infoBlog('Zdjęcie dodano do wpisu' + (SYG.TRYB_DEMO ? ' (lokalnie).' : ' i biblioteki.'));
+      }
+    } catch (err){
+      infoBlog('Nie dodano zdjęcia: ' + (err.message || 'błąd wysyłania.'));
+    } finally {
+      blogUploadWTrakcie = false;
+    }
+  });
+
+  document.getElementById('bf-sklep').addEventListener('change', function(){
+    document.getElementById('bf-produkt').style.display = this.checked ? 'block' : 'none';
+  });
+
+  async function wypelnijLinkProdukty(){
+    var kat = await SYG.katalog();
+    var sel = document.getElementById('bf-p-link');
+    sel.innerHTML = '<option value="">— nowy produkt —</option>' +
+      kat.map(function(p){ return '<option value="' + p.id + '">' + p.nazwa + ' (#' + p.id + ')</option>'; }).join('');
+    /* kategorie do datalisty */
+    var odp = await SYG.wezwij('blog-lista', {});
+    var katLista = [];
+    (odp.wpisy || []).forEach(function(w){ if (w.kategoria && katLista.indexOf(w.kategoria) < 0) katLista.push(w.kategoria); });
+    document.getElementById('bf-kategorie').innerHTML = katLista.map(function(k){
+      return '<option value="' + k.replace(/"/g, '&quot;') + '">';
+    }).join('');
+  }
+
+  var _katCache = null;
+  async function katCache(){
+    if (_katCache) return _katCache;
+    _katCache = await SYG.katalog();
+    return _katCache;
+  }
+  function katProduktIstnieje(id){
+    return (_katCache || []).some(function(p){ return Number(p.id) === Number(id); });
+  }
+
+  function wpisWybrany(){
+    return wpisyBlog.find(function(x){ return Number(x.id) === Number(wybranyId); }) || null;
+  }
+
+  async function ladujBlog(){
+    await wypelnijLinkProdukty();
+    var odp = await SYG.wezwij('blog-lista', {});
+    if (!odp || !odp.ok){
+      infoBlog((odp && odp.blad) || 'Nie udało się pobrać wpisów z bazy. Lista nie została zmieniona.');
+      return;
+    }
+    wpisyBlog=odp.wpisy||[];
+    var cfg=null;try{cfg=await SYG.wezwij('strona-glowna-pobierz',{});}catch(ignore){}
+    var order=cfg&&cfg.ok&&cfg.dane&&Array.isArray(cfg.dane.blogKolejnosc)?cfg.dane.blogKolejnosc.map(String):[];
+    wpisyBlog.sort(function(a,b){var ai=order.indexOf(String(a.id)),bi=order.indexOf(String(b.id));if(ai>=0&&bi>=0)return ai-bi;if(ai<0&&bi>=0)return -1;if(ai>=0&&bi<0)return 1;return (Number(b.dodanoSort)||Number(b.id)||0)-(Number(a.dodanoSort)||Number(a.id)||0);});
+    if (!wpisWybrany()) wybranyId = wpisyBlog.length ? wpisyBlog[0].id : null;
+    rysujListeBlog();
+    if (trybEdycji) wypelnijFormularz(wpisWybrany());
+    else pokazPodglad();
+  }
+
+  /* Lista realizacji z uchwytem do zmiany kolejności. */
+  function rysujListeBlog(){
+    var tbody=document.querySelector('#tabela-blog tbody');
+    tbody.innerHTML=wpisyBlog.map(function(w){
+      var raw=String(w.utworzono||'').trim(),label='—',m=/^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
+      if(raw&&/[T ]/.test(raw)){var ts=new Date(raw);if(!isNaN(ts.getTime()))label=ts.toLocaleDateString('pl-PL');}
+      else if(m){var y=+m[1],mo=+m[2]-1,day=+m[3],d=new Date(y,mo,day,12);if(d.getFullYear()===y&&d.getMonth()===mo&&d.getDate()===day)label=d.toLocaleDateString('pl-PL');}
+      var wid=w.widoczny!==false;
+      return '<tr data-wiersz="'+escB(w.id)+'" data-sort-label="'+escB(w.tytul)+'"'+(Number(w.id)===Number(wybranyId)?' class="wybrany"':'')+'>'+
+        '<td><button type="button" class="sort-handle" aria-label="Przeciągnij wpis '+escB(w.tytul)+'" title="Przeciągnij, aby zmienić kolejność">⠿</button></td>'+
+        '<td>'+escB(label)+'</td><td><b>'+escB(w.tytul)+'</b>'+(w.produkt&&w.produkt.sklep?'<br><span class="mala" style="color:var(--butelkowa)">✓ produkt w sklepie</span>':'')+'</td>'+
+        '<td><label style="cursor:pointer;font-size:14px;white-space:nowrap"><input type="checkbox" class="w-wid" data-id="'+escB(w.id)+'"'+(wid?' checked':'')+'> widoczny</label></td></tr>';
+    }).join('')||'<tr><td colspan="4">Brak wpisów.</td></tr>';
+    tbody.querySelectorAll('tr[data-wiersz]').forEach(function(tr){tr.addEventListener('click',function(){
+      var id=Number(tr.getAttribute('data-wiersz'));if(Number(wybranyId)===id&&!trybEdycji)return;
+      if(trybEdycji&&!confirm('Porzucić niezapisane zmiany i przejść do innego wpisu?'))return;
+      wybranyId=id;wyjdzZTrybuEdycji();rysujListeBlog();pokazPodglad();
+    });});
+    tbody.querySelectorAll('.w-wid').forEach(function(ch){
+      ch.addEventListener('click',function(e){e.stopPropagation();});
+      ch.addEventListener('change',async function(){
+        var id=Number(ch.getAttribute('data-id')),out=await SYG.wezwij('blog-widocznosc',{id:id,widoczny:ch.checked}),w=wpisyBlog.find(function(x){return Number(x.id)===id;});
+        if(out&&out.ok&&w)w.widoczny=ch.checked;else ch.checked=!!(w&&w.widoczny!==false);
+        infoBlog(out&&out.ok?'Wpis „'+(w?w.tytul:'')+'” jest teraz '+(ch.checked?'WIDOCZNY na stronie.':'UKRYTY.'):((out&&out.blad)||'Nie zapisano. Zmiana została cofnięta.'));
+        if(Number(wybranyId)===id&&!trybEdycji)pokazPodglad();
+      });
+    });
+    sgPodlaczSortowanie(tbody,'tr[data-wiersz]','.sort-handle','data-wiersz',function(ids){
+      sgZapiszPoleStronyGlownej('blogKolejnosc',ids.map(Number),document.getElementById('blog-sort-info')).then(function(ok){
+        if(ok){var pos={};ids.forEach(function(id,i){pos[String(id)]=i;});wpisyBlog.sort(function(a,b){return pos[String(a.id)]-pos[String(b.id)];});}rysujListeBlog();
+      });
+    },true);
+    document.getElementById('blog-edytuj').disabled=!wpisWybrany();
+  }
+
+  /* podgląd zaznaczonego wpisu — jak na stronie */
+  function pokazPodglad(){
+    var kont = document.getElementById('blog-podglad');
+    var w = wpisWybrany();
+    if (!w){
+      kont.innerHTML = '<p class="mala">Brak wpisów — kliknij „+ Dodaj nowy wpis", aby utworzyć pierwszy.</p>';
+      return;
+    }
+    var wid = w.widoczny !== false;
+    var wszystkie = [w.okladka].concat((w.galeria || []).filter(function(g){ return g && g !== w.okladka; }));
+    var mini = wszystkie.length > 1
+      ? '<div class="bf-podglad-mini">' + wszystkie.map(function(g){ return '<img src="' + escB(g) + '" alt="">'; }).join('') + '</div>'
+      : '';
+    kont.innerHTML =
+      (wid ? '' : '<div class="w-ukryty-ban">UKRYTY — niewidoczny na stronie „Nasze realizacje"</div>') +
+      '<span class="tag">' + escB(w.kategoria || 'Realizacje') + '</span>' +
+      '<h1 style="font-size:24px;margin:6px 0 2px">' + escB(w.tytul) + '</h1>' +
+      '<p class="sub">' + escB(String(w.data || '').slice(0, 10)) +
+      (w.produkt && w.produkt.sklep ? ' · <b style="color:var(--butelkowa)">✓ produkt w sklepie</b>' : '') + '</p>' +
+      (w.okladka ? '<figure class="wpis-okladka" style="margin:10px 0"><img src="' + escB(w.okladka) + '" alt="" style="max-width:100%;height:auto"></figure>' : '') +
+      mini +
+      (w.zajawka ? '<p><i>' + escB(w.zajawka) + '</i></p>' : '') +
+      '<div class="blog-tresc">' + (w.tresc || '<p class="mala">(brak treści)</p>') + '</div>' +
+      (w.video ? '<p class="mala">Film: <a href="' + escB(w.video) + '" target="_blank" rel="noopener">' + escB(w.video) + '</a></p>' : '') +
+      ((w.produkt && w.produkt.sklep)
+        ? '<p class="mala">Sklep: <b>' + escB(w.produkt.nazwa) + '</b> — ' + SYG.zl(w.produkt.cena) +
+          (w.produkt.gabaryt ? ' · ' + escB(w.produkt.gabaryt) : '') + '</p>' : '') +
+      '<p style="margin-top:10px"><a class="btn outline" style="padding:6px 12px;font-size:13px" href="blog-wpis.html?id=' + w.id + '" target="_blank" rel="noopener">Zobacz na stronie →</a></p>';
+  }
+
+  function wypelnijFormularz(w){
+    if (!w) return;
+    galeria = [].concat([w.okladka], (w.galeria || [])).filter(function(g, i, a){ return g && a.indexOf(g) === i; })
+      .map(function(g, i){ return { src: g, glowna: i === 0 }; });
+    document.getElementById('blog-form-tytul').textContent = nowySzkic ? 'Nowy wpis' : 'Edycja wpisu #' + w.id;
+    document.getElementById('bf-tytul').value = nowySzkic ? '' : (w.tytul || '');
+    document.getElementById('bf-kategoria').value = nowySzkic ? '' : (w.kategoria || '');
+    document.getElementById('bf-data').value = w.data || new Date().toISOString().slice(0, 10);
+    document.getElementById('bf-zajawka').value = nowySzkic ? '' : (w.zajawka || '');
+    document.getElementById('bf-video').value = w.video || '';
+    blogEdytor.ustaw(nowySzkic ? '' : (w.tresc || ''));
+    document.getElementById('bf-widoczny').checked = w.widoczny !== false;
+    var prod = w.produkt || {};
+    document.getElementById('bf-sklep').checked = !!prod.sklep;
+    document.getElementById('bf-produkt').style.display = prod.sklep ? 'block' : 'none';
+    document.getElementById('bf-p-nazwa').value = prod.nazwa || '';
+    document.getElementById('bf-p-link').value = prod.sklep && katProduktIstnieje(prod.id) ? String(prod.id) : '';
+    document.getElementById('bf-p-cena').value = prod.cena || '';
+    document.getElementById('bf-p-gabaryt').value = prod.gabaryt || '';
+    rysujMini();
+  }
+
+  function wejdzWTrybEdycji(){
+    var w = wpisWybrany();
+    if (!w) return;
+    trybEdycji = true;
+    wypelnijFormularz(w);
+    document.getElementById('blog-podglad').style.display = 'none';
+    document.getElementById('blog-przyciski').style.display = 'none';
+    document.getElementById('blog-form').style.display = 'block';
+  }
+
+  function wyjdzZTrybuEdycji(){
+    trybEdycji = false;
+    nowySzkic = false;
+    document.getElementById('blog-form').style.display = 'none';
+    document.getElementById('blog-podglad').style.display = 'block';
+    document.getElementById('blog-przyciski').style.display = '';
+  }
+
+  /* „Dodaj nowy wpis" — od razu tworzy rekord w tabeli i otwiera edycję */
+  document.getElementById('blog-nowy').addEventListener('click', async function(){
+    var dzis = new Date().toISOString().slice(0, 10);
+    var odp = await SYG.wezwij('blog-zapisz', { wpis: {
+      id: null, tytul: '(Nowy wpis)', kategoria: 'Realizacje', data: dzis,
+      zajawka: '', okladka: 'assets/media/sklep/szopka.jpg', galeria: [], video: '',
+      tresc: '', produkt: { sklep: false, id: 0, nazwa: '', cena: 0, gabaryt: '' },
+      widoczny: false
+    } });
+    if (!odp.ok){ infoBlog(odp.blad || 'Nie utworzono wpisu.'); return; }
+    _katCache = null;
+    wybranyId = odp.id;
+    nowySzkic = true;
+    await ladujBlog();
+    infoBlog('Utworzono nowy wpis — uzupełnij go i zapisz.');
+    wejdzWTrybEdycji();
+  });
+
+  document.getElementById('blog-edytuj').addEventListener('click', function(){
+    wejdzWTrybEdycji();
+  });
+
+  document.getElementById('blog-anuluj').addEventListener('click', async function(){
+    if (nowySzkic && wybranyId){
+      var usun = await SYG.wezwij('blog-usun', { id: wybranyId });
+      if (!usun || !usun.ok){
+        infoBlog((usun && usun.blad) || 'Nie udało się usunąć szkicu z bazy.');
+        return;
+      }
+      wybranyId = null;
+      infoBlog('Nowy wpis odrzucony.');
+    }
+    wyjdzZTrybuEdycji();
+    ladujBlog();
+  });
+
+  document.getElementById('blog-usun-wpis').addEventListener('click', async function(){
+    var w = wpisWybrany();
+    if (!w) return;
+    if (!confirm('Usunąć wpis „' + w.tytul + '"?')) return;
+    var odp = await SYG.wezwij('blog-usun', { id: w.id });
+    infoBlog(odp.ok ? 'Wpis usunięty.' : (odp.blad || 'Nie usunięto.'));
+    if (odp.ok){
+      wybranyId = null;
+      wyjdzZTrybuEdycji();
+      ladujBlog();
+    }
+  });
+
+  document.getElementById('blog-zapisz').addEventListener('click', async function(){
+    var tytul = document.getElementById('bf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł wpisu.'); return; }
+    var widoczny = document.getElementById('bf-widoczny').checked;
+    if (blogUploadWTrakcie){ infoBlog('Poczekaj, aż zdjęcia zostaną wysłane.'); return; }
+    var sklep = document.getElementById('bf-sklep').checked;
+    var link = document.getElementById('bf-p-link').value;
+    var kat = await katCache();
+    var istniejacy = kat.find(function(p){ return Number(p.id) === Number(link); });
+    var w = wpisWybrany() || {};
+    var glowna = galeria.find(function(g){ return g.glowna; }) || galeria[0];
+    var trescWpisu;
+    var przyciskZapisu = document.getElementById('blog-zapisz');
+    przyciskZapisu.disabled = true;
+    var oryginalnyTekstZapisu = przyciskZapisu.textContent;
+    przyciskZapisu.textContent = 'Zapisywanie…';
+    try {
+      trescWpisu = await blogZamienZdjeciaOsadzone();
+    } catch (errUpload){
+      infoBlog('Nie zapisano wpisu — problem ze zdjęciem: ' + (errUpload.message || 'błąd wysyłania.'));
+      przyciskZapisu.disabled = false;
+      przyciskZapisu.textContent = oryginalnyTekstZapisu;
+      return;
+    }
+    var wpis = {
+      id: wybranyId,
+      tytul: tytul,
+      widoczny: widoczny,
+      kategoria: document.getElementById('bf-kategoria').value.trim() || 'Realizacje',
+      data: document.getElementById('bf-data').value || new Date().toISOString().slice(0, 10),
+      zajawka: document.getElementById('bf-zajawka').value.trim(),
+      okladka: glowna ? glowna.src : 'assets/media/sklep/szopka.jpg',
+      galeria: galeria.map(function(g){ return g.src; }),
+      video: document.getElementById('bf-video').value.trim(),
+      tresc: trescWpisu,
+      produkt: {
+        sklep: sklep,
+        id: istniejacy ? Number(link) : (w.produkt && w.produkt.id ? w.produkt.id : 0),
+        nazwa: document.getElementById('bf-p-nazwa').value.trim() || tytul,
+        cena: Number(document.getElementById('bf-p-cena').value) || (istniejacy ? istniejacy.cena : 0),
+        gabaryt: document.getElementById('bf-p-gabaryt').value.trim()
+      }
+    };
+    var najdluzszePole = Math.max(wpis.tresc.length, JSON.stringify(wpis.galeria).length,
+      String(wpis.okladka || '').length, JSON.stringify(wpis.produkt || {}).length);
+    if (!SYG.TRYB_DEMO && najdluzszePole >= 49000){
+      infoBlog('Nie zapisano: jedno z pól wpisu nadal jest zbyt duże dla arkusza. Usuń bardzo długi tekst lub ponownie dodaj zdjęcie jako plik.');
+      przyciskZapisu.disabled = false;
+      przyciskZapisu.textContent = oryginalnyTekstZapisu;
+      return;
+    }
+    var odp = await SYG.wezwij('blog-zapisz', { wpis: wpis });
+    przyciskZapisu.disabled = false;
+    przyciskZapisu.textContent = oryginalnyTekstZapisu;
+    if (odp.ok){
+      _katCache = null;
+      wybranyId = odp.id;
+      wyjdzZTrybuEdycji();
+      await ladujBlog();
+      ladujProdukty();
+      infoBlog('Wpis zapisany' + (sklep ? ' i dodany do sklepu.' : '.') +
+        (widoczny ? '' : ' (UKRYTY — zaznacz „widoczny", aby pokazać go na stronie.)'));
+    } else {
+      infoBlog(odp.blad || 'Nie zapisano.');
+    }
+  });
+
+  /* ============ PODSTRONY ============ */
+  var stronaEdytor = SYG.edytor('sf-tresc', 'sf-zrodlo');
+  var edycjaStrona = null;
+
+  function infoStrony(txt){
+    var f = document.getElementById('strony-info');
+    f.style.display = 'block';
+    f.textContent = txt;
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  }
+
+  var SG_MENU_BASE=(SYG&&SYG.LAUNCH)?[
+    {key:'index.html',href:'index.html',title:'Strona główna',pinned:true},{key:'realizacje.html',href:'realizacje.html',title:'Nasze realizacje'},
+    {key:'szukaj.html',href:'szukaj.html',title:'Szukaj'},{key:'kontakt.html',href:'kontakt.html',title:'Kontakt'}
+  ]:[
+    {key:'index.html',href:'index.html',title:'Strona główna',pinned:true},{key:'sklep.html',href:'sklep.html',title:'Sklep'},
+    {key:'zamowienia.html',href:'zamowienia.html',title:'Zamówienia'},{key:'wynajem.html',href:'wynajem.html',title:'Wynajem'},
+    {key:'pracownia.html',href:'pracownia.html',title:'Pracownia'},{key:'realizacje.html',href:'realizacje.html',title:'Nasze realizacje'},
+    {key:'wspolpraca.html',href:'wspolpraca.html',title:'Współpraca'},{key:'kontakt.html',href:'kontakt.html',title:'Kontakt'}
+  ];
+  function sgZapiszPoleStronyGlownej(key,value,status){
+    if(status){status.textContent='Zapisywanie…';status.style.color='';}
+    return (async function(){try{var r=await SYG.wezwij('strona-glowna-pobierz',{});if(!r||!r.ok)throw new Error((r&&r.blad)||'Nie udało się odczytać ustawień.');var data=Object.assign({},r.dane||{});data[key]=value;var w=await SYG.wezwij('strona-glowna-zapisz',{dane:data});if(!w||!w.ok)throw new Error((w&&w.blad)||'Serwer nie potwierdził zapisu.');if(SG_DANE)SG_DANE[key]=value.slice();if(status){status.textContent='✓ Zapisano';status.style.color='#24613c';}return true;}catch(e){if(status){status.textContent='Nie zapisano: '+(e.message||'błąd połączenia');status.style.color='#8a2f1d';}return false;}})();
+  }
+  function sgPodlaczSortowanie(container,selector,handleSelector,attribute,save,vertical){
+    if(!container)return;
+    container.querySelectorAll(handleSelector).forEach(function(handle){
+      handle.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();});
+      handle.addEventListener('pointerdown',function(e){if(e.button!==undefined&&e.button!==0)return;var source=handle.closest(selector);if(!source||source.getAttribute('data-sort-pinned')==='1')return;e.preventDefault();var r=source.getBoundingClientRect(),ghost=document.createElement('div');ghost.className='sort-drag-ghost';ghost.textContent=source.getAttribute('data-sort-label')||source.textContent.trim();ghost.style.width=Math.max(170,r.width)+'px';ghost.style.left=r.left+'px';ghost.style.top=r.top+'px';document.body.appendChild(ghost);container._sgDrag={id:e.pointerId,source:source,ghost:ghost,x:e.clientX,y:e.clientY,target:null,moved:false};source.classList.add('sort-source');source.setAttribute('aria-grabbed','true');try{handle.setPointerCapture(e.pointerId);}catch(ignore){}});
+      handle.addEventListener('pointermove',function(e){var st=container._sgDrag;if(!st||st.id!==e.pointerId)return;if(!st.moved&&Math.hypot(e.clientX-st.x,e.clientY-st.y)<5)return;st.moved=true;st.ghost.style.left=(e.clientX-st.ghost.offsetWidth/2)+'px';st.ghost.style.top=(e.clientY-st.ghost.offsetHeight/2)+'px';var hit=document.elementFromPoint(e.clientX,e.clientY),target=hit&&hit.closest?hit.closest(selector):null;if(target&&target.parentNode!==container)target=null;if(target&&target.getAttribute('data-sort-pinned')==='1')target=null;if(st.target&&st.target!==target)st.target.classList.remove('sort-target');st.target=target;if(target&&target!==st.source)target.classList.add('sort-target');});
+      function end(e){var st=container._sgDrag;if(!st||st.id!==e.pointerId)return;container._sgDrag=null;if(st.target)st.target.classList.remove('sort-target');st.source.classList.remove('sort-source');st.source.setAttribute('aria-grabbed','false');st.ghost.remove();if(!st.moved||!st.target||st.target===st.source)return;var r=st.target.getBoundingClientRect(),p=vertical?e.clientY:e.clientX,m=vertical?r.top+r.height/2:r.left+r.width/2,before=p>m?st.target.nextElementSibling:st.target;if(before===st.source)return;container.insertBefore(st.source,before);save(Array.prototype.map.call(container.querySelectorAll(selector),function(item){return item.getAttribute(attribute);}));}
+      handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);
+    });
+  }
+  function rysujMenuSortowalne(pages,order){
+    var list=document.getElementById('menu-sortable-list');if(!list)return;
+    var custom=(pages||[]).filter(function(x){return x.menu&&x.slug!=='pracownia';}).map(function(x){return {key:'podstrona:'+x.slug,href:'podstrona.html?s='+encodeURIComponent(x.slug),title:x.tytul||x.slug,custom:true};});
+    var items=SG_MENU_BASE.concat(custom),home=items.find(function(x){return x.key==='index.html';}),rest=items.filter(function(x){return x.key!=='index.html';});order=Array.isArray(order)?order.map(String):[];
+    rest.sort(function(a,b){var ai=order.indexOf(a.key),bi=order.indexOf(b.key);if(ai>=0&&bi>=0)return ai-bi;if(ai>=0)return -1;if(bi>=0)return 1;return 0;});
+    list.innerHTML=(home?[home]:[]).concat(rest).map(function(x){return '<li class="menu-sort-item'+(x.pinned?' menu-sort-pinned':'')+'" data-menu-key="'+escB(x.key)+'" data-sort-label="'+escB(x.title)+'"'+(x.pinned?' data-sort-pinned="1"':'')+'>'+(x.pinned?'<span class="menu-sort-pin" aria-hidden="true">⌂</span>':'<button class="sort-handle" type="button" aria-label="Przeciągnij '+escB(x.title)+'" title="Przeciągnij, aby zmienić kolejność">⠿</button>')+'<span class="menu-sort-name">'+escB(x.title)+'</span><span class="menu-sort-type">'+(x.custom?'Podstrona':'Strona')+'</span><a class="menu-sort-preview" href="'+escB(x.href)+'" target="_blank" rel="noopener">Podgląd</a></li>';}).join('');
+    sgPodlaczSortowanie(list,'li[data-menu-key]','.sort-handle','data-menu-key',function(keys){sgZapiszPoleStronyGlownej('menuKolejnosc',keys.filter(function(k){return k!=='index.html';}),document.getElementById('menu-sort-info'));},true);
+  }
+  async function ladujStrony(){
+    var response=null,cfg=null;try{response=await SYG.wezwij('strony-lista',{});}catch(e){infoStrony('Nie udało się pobrać podstron: '+(e.message||'błąd połączenia'));}try{cfg=await SYG.wezwij('strona-glowna-pobierz',{});}catch(ignore){}
+    var valid=!!(response&&response.ok&&Array.isArray(response.strony)),pages=valid?response.strony:[];if(!valid)infoStrony((response&&response.blad)||'API nie zwróciło listy podstron w oczekiwanym formacie. Pozycje menu stałego nadal są dostępne.');
+    rysujMenuSortowalne(pages,cfg&&cfg.ok&&cfg.dane&&cfg.dane.menuKolejnosc);
+    var tbody=document.querySelector('#tabela-stron tbody');
+    tbody.innerHTML=pages.map(function(x){return '<tr><td><b>'+escB(x.tytul)+'</b><br><span class="mala">/'+escB(x.slug)+'</span></td><td>'+(x.menu?'✓':'—')+'</td><td>'+escB(x.kol)+'</td><td style="white-space:nowrap"><a class="btn outline" style="padding:6px 12px;font-size:13px" href="podstrona.html?s='+encodeURIComponent(x.slug)+'" target="_blank" rel="noopener">Podgląd</a> <button class="btn outline" type="button" style="padding:6px 12px;font-size:13px" data-edit="'+escB(x.slug)+'">Edytuj</button> <button class="btn niebez" type="button" style="padding:6px 12px;font-size:13px" data-usun="'+escB(x.slug)+'">Usuń</button></td></tr>';}).join('')||(valid?'<tr><td colspan="4">Brak własnych podstron. Pozycje menu są widoczne powyżej.</td></tr>':'<tr><td colspan="4">Nie można wyświetlić podstron: błędna odpowiedź API. Szczegóły podano powyżej.</td></tr>');
+    tbody.querySelectorAll('button[data-edit]').forEach(function(b){b.addEventListener('click',function(){var x=pages.find(function(y){return y.slug===b.getAttribute('data-edit');});if(!x)return;edycjaStrona=x.slug;document.getElementById('strona-form-tytul').textContent='Edycja: '+x.tytul;document.getElementById('sf-slug').value=x.slug;document.getElementById('sf-tytul').value=x.tytul||'';document.getElementById('sf-menu').checked=x.menu!==0;document.getElementById('sf-kol').value=x.kol||10;stronaEdytor.ustaw(x.tresc||'');document.getElementById('strona-form').style.display='block';});});
+    tbody.querySelectorAll('button[data-usun]').forEach(function(b){b.addEventListener('click',async function(){if(!confirm('Usunąć podstronę „'+b.getAttribute('data-usun')+'”? Zniknie też z menu.'))return;var out=await SYG.wezwij('strona-usun',{slug:b.getAttribute('data-usun')});infoStrony(out&&out.ok?'Podstrona usunięta.':((out&&out.blad)||'Nie usunięto.'));ladujStrony();});});
+  }
+
+  document.getElementById('strona-nowa').addEventListener('click', function(){
+    edycjaStrona = null;
+    document.getElementById('strona-form-tytul').textContent = 'Nowa podstrona';
+    document.getElementById('sf-slug').value = '';
+    document.getElementById('sf-tytul').value = '';
+    document.getElementById('sf-menu').checked = true;
+    document.getElementById('sf-kol').value = 10;
+    stronaEdytor.ustaw('');
+    document.getElementById('strona-form').style.display = 'block';
+  });
+
+  document.getElementById('strona-anuluj').addEventListener('click', function(){
+    document.getElementById('strona-form').style.display = 'none';
+  });
+
+  document.getElementById('strona-zapisz').addEventListener('click', async function(){
+    var slug = document.getElementById('sf-slug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+    var tytul = document.getElementById('sf-tytul').value.trim();
+    if (!tytul){ alert('Podaj tytuł podstrony.'); return; }
+    if (!slug){ slug = tytul.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40); }
+    var odp = await SYG.wezwij('strona-zapisz', {
+      strona: {
+        slug: slug, tytul: tytul,
+        menu: document.getElementById('sf-menu').checked ? 1 : 0,
+        kol: Number(document.getElementById('sf-kol').value) || 10,
+        tresc: stronaEdytor.pobierz()
+      }
+    });
+    infoStrony(odp.ok ? 'Podstrona zapisana („/' + slug + '").' : (odp.blad || 'Nie zapisano.'));
+    if (odp.ok){ edycjaStrona = null; ladujStrony(); }
+  });
+
+  /* ============ ustawienia (cennik dostawy) ============ */
+  async function ladujUstawienia(){
+    var loginInput = document.getElementById('admin-zmien-login');
+    try {
+      var aktualnyLogin = sessionStorage.getItem('syg-admin-email') || '';
+      if (loginInput && !loginInput.value) loginInput.value = aktualnyLogin;
+    } catch (e) {}
+    var f = document.getElementById('ustawienia-info');
+    try {
+      var c = await SYG.ustawieniaDostawa();
+      document.getElementById('u-paczkomat-s').value = c.paczkomat.S;
+      document.getElementById('u-paczkomat-m').value = c.paczkomat.M;
+      document.getElementById('u-paczkomat-l').value = c.paczkomat.L;
+      document.getElementById('u-kurier-s').value = c.kurier.S;
+      document.getElementById('u-kurier-m').value = c.kurier.M;
+      document.getElementById('u-kurier-l').value = c.kurier.L;
+      f.style.display = 'none';
+      document.getElementById('zapisz-dostawe').disabled = false;
+    } catch(err){
+      document.getElementById('zapisz-dostawe').disabled = true;
+      f.style.display = 'block';
+      f.style.background = '#8a2f1d';
+      f.style.color = '#fff';
+      f.textContent = 'Nie udało się pobrać stawek z bazy. Nie zmieniaj ani nie zapisuj domyślnych wartości. ' + (err.message || '');
+    }
+  }
+  document.getElementById('zapisz-dostawe').addEventListener('click', async function(){
+    var cennik = {
+      paczkomat: { S: Number(document.getElementById('u-paczkomat-s').value) || 0,
+                   M: Number(document.getElementById('u-paczkomat-m').value) || 0,
+                   L: Number(document.getElementById('u-paczkomat-l').value) || 0 },
+      kurier: { S: Number(document.getElementById('u-kurier-s').value) || 0,
+                M: Number(document.getElementById('u-kurier-m').value) || 0,
+                L: Number(document.getElementById('u-kurier-l').value) || 0 }
+    };
+    var odp = await SYG.wezwij('ustawienia-dostawa-zapisz', { cennik: cennik });
+    var f = document.getElementById('ustawienia-info');
+    f.style.display = 'block';
+    f.style.background = odp && odp.ok ? 'var(--butelkowa)' : '#8a2f1d';
+    f.style.color = '#fff';
+    f.textContent = odp && odp.ok ? 'Cennik dostawy zapisany we wspólnej bazie.' : ((odp && odp.blad) || 'Nie zapisano.');
+    setTimeout(function(){ f.style.display = 'none'; }, 4000);
+  });
+
+  /* ============ logowanie wymuszane po każdym zamknięciu strony (sesja) ============ */
+  function pokazPanel(){
+    logowanie.style.display = 'none';
+    panel.style.display = 'block';
+    document.getElementById('admin-tytul').textContent = 'Panel administracyjny';
+
+    /* Domyślnie otwórz edycję strony głównej, aby właściciel widział slider od razu */
+    tabs.forEach(function(x){ x.classList.remove('on'); });
+    var tabStronaGlowna = document.querySelector('.admin-tab[data-tab="strona-glowna"]');
+    if (tabStronaGlowna) tabStronaGlowna.classList.add('on');
+    document.querySelectorAll('.admin-sekcja').forEach(function(s){ s.style.display = 'none'; });
+    var sekcjaSG = document.getElementById('tab-strona-glowna');
+    if (sekcjaSG) sekcjaSG.style.display = 'block';
+
+    ladujStronaGlowna();
+  }
+
+  // Tylko znacznik po poprawnym loginie i podpisana sesja otwierają panel.
+  var zalogowany = false;
+  try { zalogowany = sessionStorage.getItem('syg-admin') === '1'; } catch(e){}
+  if (zalogowany && !SYG.TRYB_DEMO) pokazPanel();
+  else logowanie.style.display = 'block';
+  window.addEventListener('syg-admin-session-expired', function(){
+    panel.style.display = 'none';
+    logowanie.style.display = 'block';
+    document.getElementById('admin-tytul').textContent = 'Logowanie do panelu';
+    komunikatLogowania('Sesja wygasła — zaloguj się ponownie. Niezapisane zmiany mogą wymagać ponownego wprowadzenia.', false);
+  });
+
+  document.getElementById('pokaz-admin-haslo').addEventListener('click', function(){
+    var inp = document.getElementById('admin-haslo');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    this.classList.toggle('aktywne', inp.type === 'text');
+  });
+
+  async function sprobujZalogowac(){
+    var l = document.getElementById('admin-login').value.trim();
+    var h = document.getElementById('admin-haslo').value;
+    if (!l || !h){
+      logowanieBlad.textContent = 'Podaj login i hasło.';
+      logowanieBlad.style.display = 'block';
+      return;
+    }
+    logowanieBlad.style.display = 'none';
+
+    var passOk = false;
+    if (!SYG.TRYB_DEMO){
+      try {
+        var odp = await SYG.wezwij('admin-login', { login: l, haslo: h });
+        if (odp && odp.ok) passOk = true;
+        else if (odp && odp.blad) {
+          logowanieBlad.textContent = odp.blad;
+          logowanieBlad.style.display = 'block';
+          return;
+        }
+      } catch (err){
+        console.warn('Błąd sieci podczas logowania administratora:', err);
+      }
+    }
+
+    if (passOk){
+      try {
+        if (odp && odp.sessionToken) sessionStorage.setItem('syg-admin-session', odp.sessionToken);
+        else sessionStorage.removeItem('syg-admin-session'); // kompatybilność ze starszym Apps Script
+        if (odp && odp.admin && odp.admin.email) sessionStorage.setItem('syg-admin-email', odp.admin.email);
+        sessionStorage.setItem('syg-admin', '1');
+      } catch(e){}
+      logowanieBlad.style.display = 'none';
+      pokazPanel();
+    } else {
+      logowanieBlad.textContent = 'Nieprawidłowy login lub hasło.';
+      logowanieBlad.style.display = 'block';
+    }
+  }
+
+  document.getElementById('zaloguj').addEventListener('click', sprobujZalogowac);
+  document.getElementById('admin-login').addEventListener('keydown', function(e){ if (e.key === 'Enter') sprobujZalogowac(); });
+  document.getElementById('admin-haslo').addEventListener('keydown', function(e){ if (e.key === 'Enter') sprobujZalogowac(); });
+
+  function komunikatLogowania(txt, ok){
+    logowanieBlad.textContent = txt;
+    logowanieBlad.style.display = 'block';
+    logowanieBlad.style.background = ok ? 'var(--butelkowa)' : '#8a2f1d';
+  }
+  document.getElementById('admin-odzyskaj-toggle').addEventListener('click', function(){
+    var box = document.getElementById('admin-odzyskaj');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('admin-reset-wyslij').addEventListener('click', async function(){
+    var loginReset = document.getElementById('admin-login').value.trim();
+    if (!loginReset){ komunikatLogowania('Wpisz login administratora (adres e-mail) powyżej.', false); return; }
+    var btn = this; btn.disabled = true; btn.textContent = 'Wysyłanie…';
+    try {
+      var odpReset = await SYG.wezwij('admin-reset-kod', { login: loginReset });
+      var tekstReset = odpReset && odpReset.ok
+        ? 'Jeśli ten login jest aktywny, kod wysłaliśmy na przypisany e-mail. Sprawdź też folder Spam; kod ważny 10 minut.'
+        : ((odpReset && odpReset.blad) || 'Nie udało się wysłać kodu.');
+      komunikatLogowania(tekstReset, !!(odpReset && odpReset.ok));
+    } catch (e){ komunikatLogowania('Nie udało się połączyć z serwerem. Spróbuj ponownie.', false); }
+    finally { btn.disabled = false; btn.textContent = 'Wyślij kod'; }
+  });
+  document.getElementById('admin-reset-zapisz').addEventListener('click', async function(){
+    var loginReset = document.getElementById('admin-login').value.trim();
+    var kod = document.getElementById('admin-reset-kod').value.trim();
+    var haslo1 = document.getElementById('admin-reset-haslo').value;
+    var haslo2 = document.getElementById('admin-reset-haslo-powtorz').value;
+    if (haslo1.length < 10){ komunikatLogowania('Nowe hasło musi mieć co najmniej 10 znaków.', false); return; }
+    if (haslo1 !== haslo2){ komunikatLogowania('Wpisane nowe hasła nie są takie same.', false); return; }
+    var btn = this; btn.disabled = true; btn.textContent = 'Zapisywanie…';
+    try {
+      var odpReset = await SYG.wezwij('admin-reset-haslo', {
+        login: loginReset, kod: kod, noweHaslo: haslo1
+      });
+      if (odpReset && odpReset.ok){
+        document.getElementById('admin-haslo').value = '';
+        document.getElementById('admin-reset-kod').value = '';
+        document.getElementById('admin-reset-haslo').value = '';
+        document.getElementById('admin-reset-haslo-powtorz').value = '';
+        document.getElementById('admin-odzyskaj').style.display = 'none';
+        komunikatLogowania('Hasło zmienione. Zaloguj się teraz nowym hasłem.', true);
+      } else komunikatLogowania((odpReset && odpReset.blad) || 'Nie udało się zmienić hasła.', false);
+    } catch (e){ komunikatLogowania('Nie udało się połączyć z serwerem. Spróbuj ponownie.', false); }
+    finally { btn.disabled = false; btn.textContent = 'Ustaw nowe hasło'; }
+  });
+
+  document.getElementById('admin-zmien-zapisz').addEventListener('click', async function(){
+    var loginNowy = document.getElementById('admin-zmien-login').value.trim();
+    var stare = document.getElementById('admin-zmien-obecne').value;
+    var nowe = document.getElementById('admin-zmien-haslo').value;
+    var powtorz = document.getElementById('admin-zmien-haslo-powtorz').value;
+    var infoZmiany = document.getElementById('admin-zmien-info');
+    function statusZmiany(txt, ok){
+      infoZmiany.style.display = 'block';
+      infoZmiany.style.background = ok ? 'var(--butelkowa)' : '#8a2f1d';
+      infoZmiany.style.color = '#fff';
+      infoZmiany.textContent = txt;
+    }
+    if (!stare){ statusZmiany('Wpisz obecne hasło.', false); return; }
+    if (nowe && nowe.length < 10){ statusZmiany('Nowe hasło musi mieć co najmniej 10 znaków.', false); return; }
+    if (nowe && nowe !== powtorz){ statusZmiany('Wpisane nowe hasła nie są takie same.', false); return; }
+    if (!loginNowy && !nowe){ statusZmiany('Wpisz nowy login lub nowe hasło.', false); return; }
+    var btn = this; btn.disabled = true; btn.textContent = 'Zapisywanie…';
+    try {
+      var wynik = await SYG.wezwij('admin-zmien-dane', {
+        obecneHaslo: stare, nowyLogin: loginNowy, noweHaslo: nowe
+      });
+      if (wynik && wynik.ok){
+        try {
+          if (wynik.sessionToken) sessionStorage.setItem('syg-admin-session', wynik.sessionToken);
+          if (wynik.login) sessionStorage.setItem('syg-admin-email', wynik.login);
+        } catch (e) {}
+        document.getElementById('admin-zmien-login').value = wynik.login || loginNowy;
+        document.getElementById('admin-zmien-obecne').value = '';
+        document.getElementById('admin-zmien-haslo').value = '';
+        document.getElementById('admin-zmien-haslo-powtorz').value = '';
+        statusZmiany('Dane logowania zostały zmienione.', true);
+      } else statusZmiany((wynik && wynik.blad) || 'Nie udało się zmienić danych logowania.', false);
+    } catch (e){ statusZmiany('Nie udało się połączyć z serwerem. Spróbuj ponownie.', false); }
+    finally { btn.disabled = false; btn.textContent = 'Zmień dane logowania'; }
+  });
+
+  document.getElementById('wyloguj').addEventListener('click', function(){
+    try {
+      sessionStorage.removeItem('syg-admin');
+      sessionStorage.removeItem('syg-admin-session');
+      sessionStorage.removeItem('syg-admin-email');
+    } catch(e){}
+    window.location.reload();
+  });
+
+  document.getElementById('odswiez').addEventListener('click', function(){
+    _katCache = null;
+    ladujPodsumowanie();
+    ladujStronaGlowna();
+    ladujZamowienia();
+    ladujWiadomosci();
+    ladujProdukty();
+    ladujBlog();
+    ladujStrony();
+  });
+})();
+</script>
+</body>
+</html>

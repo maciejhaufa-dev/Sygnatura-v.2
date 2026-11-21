@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szukaj — Studio Sygnatura</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Studio Sygnatura">
+<meta property="og:locale" content="pl_PL">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=358">
+</head>
+<body data-strona="">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <h1>Szukaj</h1>
+  <p class="sub">Wyszukaj produkty po nazwie, opisie lub tagach.</p>
+  <form action="szukaj.html" method="get" role="search" style="display:flex;gap:8px;margin:16px 0;max-width:640px">
+    <input type="search" name="q" id="pole-szukaj" minlength="2" placeholder="np. szopka, szyld, grawer…" aria-label="Szukaj produktów" style="flex:1;min-width:0;padding:12px;border:1px solid #b8aa99;border-radius:4px;font:inherit">
+    <button type="submit" class="btn">Szukaj</button>
+  </form>
+
+  <p class="mala" id="info" style="margin-top:12px"></p>
+  <div class="katalog" id="wyniki"></div>
+  <div class="sukces" id="brak" style="display:none">
+    <h2>Nic nie znaleźliśmy</h2>
+    <p>Nie ma produktu o takiej nazwie lub opisie. Opisz, czego szukasz, w
+    <a href="kontakt.html?temat=projekt" style="color:var(--krem);border-bottom:1px solid var(--zloty)">formularzu kontaktowym</a>
+    — wycenimy Twój pomysł w ciągu 2 dni roboczych.</p>
+  </div>
+</main>
+
+<div id="stopka"></div>
+
+<script src="assets/config.js?v=356"></script>
+<script src="assets/koszyk.js?v=356"></script>
+<script src="assets/api.js?v=358"></script>
+<script src="data/katalog.js?v=356"></script>
+<script src="assets/main.js?v=358"></script>
+<script>
+(async function(){
+  var q = (SYG.param('q') || '').trim();
+  var pole = document.getElementById('pole-szukaj'); if (pole) pole.value = q;
+  var info = document.getElementById('info');
+  var wyniki = document.getElementById('wyniki');
+  var brak = document.getElementById('brak');
+
+  if (q.length < 2){
+    info.textContent = 'Wpisz nazwę lub tag produktu (min. 2 znaki).';
+    return;
+  }
+  function norm(s){return String(s||'').toLocaleLowerCase('pl-PL').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l');}
+  var ql = norm(q);
+  var kat;
+  try { kat = await SYG.katalog(); }
+  catch (e) { console.warn('Błąd pobierania katalogu:', e); kat = window.SYG_KATALOG; }
+  if (!Array.isArray(kat)) kat = [];
+  var traf = kat.filter(function(p){
+    var tags=p.tagi||p.tags||p.tag||p.kategoria||p.kategorie||''; if(Array.isArray(tags))tags=tags.join(' ');
+    var stan = String(p.dostepny).toLowerCase();
+    var dostepny = p.dostepny !== false && p.dostepny !== 0 && stan !== '0' && stan !== 'false';
+    return dostepny && norm([p.nazwa,p.opis,tags].join(' ')).indexOf(ql)!==-1;
+  });
+
+  /* komunikat z poprawną odmianą */
+  function komunikat(n){
+    if (n === 0) return 'Nie znaleziono żadnych wyników odpowiadających hasłu: ' + q;
+    if (n === 1) return 'Znaleziono 1 wynik odpowiadający hasłu: ' + q;
+    if (n < 5) return 'Znaleziono ' + n + ' wyniki odpowiadające hasłu: ' + q;
+    return 'Znaleziono ' + n + ' wyników odpowiadających hasłu: ' + q;
+  }
+  info.textContent = komunikat(traf.length);
+
+  if (!traf.length){ brak.style.display = 'block'; return; }
+
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  var html = '';
+  traf.forEach(function(p){
+    var foto = (p.obraz && /^https?:/.test(p.obraz)) ? p.obraz : 'assets/media/sklep/' + (p.obraz || 'szopka.jpg');
+    html += '<article class="karta"><img class="foto" src="' + esc(foto) + '" alt="' + esc(p.nazwa) + '">' +
+      '<h2 class="nazwa">' + esc(p.nazwa) + '</h2>' +
+      '<p class="opis">' + esc(p.opis) + '</p>' +
+      '<p class="cena">' + SYG.zl(p.cena) + ' / szt.</p>' +
+      '<div class="przyciski"><a class="btn" href="' + ((window.SYG && window.SYG.LAUNCH) ? 'realizacje.html' : 'sklep.html') + '">' + ((window.SYG && window.SYG.LAUNCH) ? 'Zobacz realizacje →' : 'Do sklepu →') + '</a></div></article>';
+  });
+  wyniki.innerHTML = html;
+})();
+</script>
+</body>
+</html>

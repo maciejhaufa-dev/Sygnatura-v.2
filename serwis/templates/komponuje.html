@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Komponuję własny zestaw — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  <a class="powrot" href="{{ url_for('wynajem') }}">← wszystkie wydarzenia</a>
+  <h1>Komponuję własny zestaw</h1>
+  <p class="sub">Zaznacz produkty z katalogu — suma i rabat liczą się na żywo w podsumowaniu. Potem wybierz termin od–do i wyślij zapytanie.</p>
+  {% with wiad = get_flashed_messages() %}
+    {% for w in wiad %}<div class="flash">{{ w }}</div>{% endfor %}
+  {% endwith %}
+  <div class="reguly">
+    <b>Zasady zestawu własnego:</b> bez rabatu −10% i bez darmowej personalizacji — rabat <b>−5%</b> nalicza się dopiero od
+    <b>10 pozycji</b>; personalizację wybierasz i płacisz osobno. Termin blokuje całą pulę towaru (jedna data = wszystkie pakiety).
+    Najem od–do: domyślnie dzień przed (montaż) i dzień po (demontaż), min. 3 doby.
+  </div>
+
+  <div class="komp">
+    <div class="kat">
+      {% for k in kategorie %}
+      {% if produkty_wg.get(k.id) %}
+      <h4>{{ k.nazwa }}</h4>
+      <div class="kat-grid">
+        {% for pr in produkty_wg[k.id] %}
+        <label class="komp-it">
+          <input type="checkbox" value="{{ pr.id }}" data-cena="{{ pr.cena_doba }}" data-nazwa="{{ pr.nazwa }}">
+          <span class="ik">{{ pr.nazwa[0] }}</span>
+          <span>
+            <b>{{ pr.nazwa }}</b>
+            <small>{{ pr.opis or '' }}</small>
+            <span class="cena">{{ '%.0f'|format(pr.cena_doba) }} zł / doba</span>
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="pod" id="pod">
+      <h3>Twoje podsumowanie</h3>
+      <p class="n" id="komp-n">0 z {{ produkty_wg|length * 4 }} pozycji</p>
+      <p class="rabat" id="komp-rab">Rabat −5% dopiero od 10 pozycji (masz 0)</p>
+      <div class="suma" id="komp-suma"><small>suma / doba</small>0 zł</div>
+      <div class="suma" id="komp-total" style="font-size:20px"><small>za wybrane dni</small>—</div>
+      <div class="linia"><span>Kaucja zwrotna (najem)</span><b>300 zł</b></div>
+      <div class="linia"><span id="pod-pers-txt">Personalizacja: 0</span><b id="pod-pers">—</b></div>
+      <div class="razem"><span>RAZEM</span><span id="komp-razem">—</span></div>
+      <div class="wybrane" id="komp-lista"></div>
+      <p class="note">+ kaucja zwrotna 300 zł · + personalizacja wg wybranych pozycji. Kwoty szacunkowe — potwierdzimy w odpowiedzi na zapytanie.</p>
+      <a class="btn" href="#formularz">Przejdź do terminu i formularza</a>
+    </div>
+  </div>
+
+  <div class="cal" id="kalendarz">
+    <div class="calhead">
+      <b>Zajętość całej puli — {{ mies_nazwa }} {{ rok }}</b>
+      <span class="calnav">
+        <a href="{{ url_for('komponuje', rok=poprz[0], mies=poprz[1]) }}#kalendarz">&#8249;</a>
+        <a href="{{ url_for('komponuje', rok=nast[0], mies=nast[1]) }}#kalendarz">&#8250;</a>
+      </span>
+    </div>
+    <div class="calgrid">
+      {% for d in ['Pn','Wt','Śr','Cz','Pt','So','Nd'] %}<i>{{ d }}</i>{% endfor %}
+      {% for dzien in dni %}
+        {% if not dzien.nr %}<span class="cal-d pusty"></span>
+        {% else %}<button type="button" class="cal-d {{ dzien.klasa }}" data-d="{{ dzien.data }}" title="{{ dzien.tytul or 'Kliknij, aby ustawić jako datę imprezy' }}">{{ dzien.nr }}</button>{% endif %}
+      {% endfor %}
+    </div>
+    <div class="callegend">
+      <span><i></i> wolny</span>
+      <span><i class="st-zapytanie"></i> wysłano zapytanie — nadal można pytać</span>
+      <span><i class="st-platnosc"></i> płatność w toku</span>
+      <span><i class="st-zarezerwowany"></i> zarezerwowany</span>
+    </div>
+  </div>
+
+  <div class="forma" id="formularz">
+    <h2 style="color:var(--brunatny);margin:0 0 4px">Rezerwacja terminu</h2>
+    <p class="sub" style="margin-bottom:16px">Wypełnij dane — po wysłaniu dostaniesz e-mail z podsumowaniem, sygnaturą sprawy i dokumentami.</p>
+
+    <form method="post" action="{{ url_for('api_rezerwuj') }}">
+      <input type="hidden" name="pakiet_id" value="0">
+      <input type="hidden" name="pozycje" id="pozycje" value="[]">
+
+      <div class="pole">
+        <label for="temat">Temat zapytania</label>
+        <select id="temat" name="temat">
+          <option value="Rezerwacja terminu" selected>Rezerwacja terminu</option>
+          <option value="Pytanie o zestaw">Pytanie o zestaw</option>
+          <option value="Wynajem indywidualny">Wynajem indywidualny</option>
+          <option value="Inne">Inne</option>
+        </select>
+      </div>
+
+      <div class="terminy">
+        <label for="data">Data imprezy</label>
+        <input type="date" id="data" name="data" value="{{ data }}" required>
+        <div class="rzad">
+          <div>
+            <label for="data_od">Termin od (montaż)</label>
+            <input type="date" id="data_od" name="data_od" value="{{ data_od }}" required>
+          </div>
+          <div>
+            <label for="data_do">Termin do (demontaż)</label>
+            <input type="date" id="data_do" name="data_do" value="{{ data_do }}" required>
+          </div>
+        </div>
+        <p class="info"><b>Domyślnie: dzień przed imprezą (montaż) i dzień po (demontaż) — min. 3 doby.</b>
+        Najem 1-dniowy tylko wyjątkowo — uzasadnij w wiadomości.</p>
+        <div class="dni-sum" id="dni-sum"></div>
+      </div>
+
+      <div class="pers-sekcja">
+        <label>Produkty spersonalizowane <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcjonalnie)</span></label>
+        <input type="hidden" name="pers" id="pers" value="{{ pers_ids }}">
+        {% if personalizacje %}
+          {% for pr in personalizacje %}
+          <div class="pers-it" data-cena="{{ pr.cena }}">
+            <b>{{ pr.nazwa }}</b>
+            <div class="meta"><span class="cena">{{ '%.0f'|format(pr.cena) }} zł</span> · <span class="bez">płatne z góry, bezzwrotne</span></div>
+            <textarea name="pers_opis_{{ pr.id }}" rows="2" required
+                      placeholder="Opisz, co i jak ma być spersonalizowane..."></textarea>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="mala" style="margin:8px 0 0">Nic nie wybrano. Każdy dodany produkt dostanie tu osobne pole opisu.</p>
+        {% endif %}
+        <a class="pers-link" id="pers-link" href="/personalizacja/">+ Dodaj produkty spersonalizowane</a>
+        <p class="mala" style="margin:8px 0 0">Rabat −5% od 3 produktów · personalizacja płatna z góry, kaucja za wynajem obowiązuje zawsze.</p>
+      </div>
+
+      <div class="opcje">
+        <div class="rzad">
+          <input type="checkbox" id="tryb-nowa" name="tryb_sygnatury" value="nowa" checked>
+          <div>
+            <div class="etyk"><label for="tryb-nowa" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Nadaj nową sygnaturę</label></div>
+            <div class="opis">System automatycznie nada numer sprawy (np. SYG-2026-001) i wyśle go w e-mailu z podsumowaniem.</div>
+          </div>
+        </div>
+        <div class="rzad">
+          <input type="checkbox" id="tryb-istniejaca" name="tryb_sygnatury" value="istniejaca">
+          <div>
+            <div class="etyk"><label for="tryb-istniejaca" style="display:inline;text-transform:none;letter-spacing:0;margin:0">Mam sygnaturę sprawy</label></div>
+            <div class="opis">Jeśli już z nami rozmawiałeś i masz numer sprawy — dopiszemy do niej to zapytanie.</div>
+            <div id="pole-syg">
+              <label for="sygnatura">Twoja sygnatura sprawy</label>
+              <input type="text" id="sygnatura" name="sygnatura" placeholder="np. SYG-2026-001">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pole">
+        <label for="tresc">Twoja wiadomość</label>
+        <textarea id="tresc" name="tresc" placeholder="Opisz okazję, liczbę gości, miejsce imprezy..."></textarea>
+      </div>
+
+      <div class="pole">
+        <label for="imie">Imię i nazwisko</label>
+        <input type="text" id="imie" name="imie" required>
+      </div>
+
+      <div class="pole">
+        <label for="email">Twój adres e-mail do kontaktu</label>
+        <input type="email" id="email" name="email" placeholder="adres@poczta.pl" required>
+      </div>
+
+      <div class="pole">
+        <label for="telefon">Telefon (opcjonalnie)</label>
+        <input type="tel" id="telefon" name="telefon" placeholder="opcjonalnie">
+      </div>
+
+      <div class="kwoty-note">
+        <b>Doby najmu liczymy od podpisania protokołu zdawczo-odbiorczego (przekazanie dekoracji) do ich odbioru — płatność za każdą rozpoczętą dobę.</b>
+        Personalizacja płatna z góry i bezzwrotna; kaucja za najem zawsze 300 zł. Kwoty potwierdzimy w odpowiedzi na zapytanie.
+      </div>
+      <div class="przyciski">
+        <a class="btn btn-line" href="{{ url_for('komponuje') }}">Zacznij od nowa</a>
+        <button class="btn" type="submit">Wyślij zapytanie</button>
+      </div>
+      <p class="mala" style="margin-top:14px">Wysyłając formularz akceptujesz kontakt e-mail w sprawie zapytania (art. 398 PKE). Termin rezerwuje kaucja w terminie 7 dni.</p>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  var LICZBA_PRODUKTOW = {{ liczba }};
+
+  /* podsumowanie */
+  function przelicz(){
+    var cbs = document.querySelectorAll('.komp-it input');
+    var n = 0, suma = 0, lista = '';
+    cbs.forEach(function(cb){
+      if (cb.checked){
+        n++;
+        suma += parseFloat(cb.dataset.cena || 0);
+        lista += '<div><span>' + cb.dataset.nazwa + '</span><span>' + parseInt(cb.dataset.cena) + ' zł</span></div>';
+      }
+    });
+    var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+    document.getElementById('komp-n').textContent = n + ' z ' + LICZBA_PRODUKTOW + ' pozycji';
+    var rab = document.getElementById('komp-rab');
+    rab.classList.toggle('on', rabat > 0);
+    rab.textContent = rabat > 0 ? ('✔ Rabat −5% naliczony (−' + rabat + ' zł)') : ('Rabat −5% dopiero od 10 pozycji (masz ' + n + ')');
+    document.getElementById('komp-suma').innerHTML = '<small>suma / doba</small>' + (suma - rabat) + ' zł';
+    document.getElementById('komp-lista').innerHTML = lista || '<div><span>Nic jeszcze nie wybrano</span></div>';
+    var ids = [];
+    cbs.forEach(function(cb){ if (cb.checked) ids.push(parseInt(cb.value)); });
+    document.getElementById('pozycje').value = JSON.stringify(ids);
+    przeliczDni();
+  }
+  document.querySelectorAll('.komp-it input').forEach(function(cb){
+    cb.addEventListener('change', przelicz);
+  });
+
+  /* preselekcja pozycji (powrót z /personalizacja/) */
+  var POZ_IDS = {{ poz_ids|tojson }};
+  POZ_IDS.forEach(function(pid){
+    var cb = document.querySelector('.komp-it input[value="' + pid + '"]');
+    if (cb) cb.checked = true;
+  });
+
+  /* link do personalizacji niesie aktualny stan (termin + pozycje + personalizacje) */
+  function aktualizujLink(){
+    var a = document.getElementById('pers-link');
+    if (!a) return;
+    var ids = [];
+    document.querySelectorAll('.komp-it input:checked').forEach(function(cb){ ids.push(parseInt(cb.value)); });
+    var persIds = [];
+    try { persIds = JSON.parse(document.getElementById('pers').value || '[]'); } catch(e){ persIds = []; }
+    var q = [];
+    if (dEv.value) q.push('data=' + dEv.value);
+    if (dOd.value) q.push('data_od=' + dOd.value);
+    if (dDo.value) q.push('data_do=' + dDo.value);
+    q.push('pozycje=' + encodeURIComponent(JSON.stringify(ids)));
+    if (persIds.length) q.push('pers=' + persIds.join(','));
+    var p = (persIds.length ? ('pers=' + persIds.join(',') + '&') : '');
+    a.href = '/personalizacja/?' + p + 'next=' + encodeURIComponent('/wynajem/komponuje/?' + q.join('&'));
+  }
+
+  /* dni najmu */
+  var dEv = document.getElementById('data');
+  var dOd = document.getElementById('data_od');
+  var dDo = document.getElementById('data_do');
+  function przesun(d, k){
+    var x = new Date(d + 'T12:00:00');
+    x.setDate(x.getDate() + k);
+    return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+  }
+  function dniN(){
+    if (dOd.value && dDo.value && dOd.value <= dDo.value){
+      return Math.round((new Date(dDo.value) - new Date(dOd.value)) / 86400000) + 1;
+    }
+    return 0;
+  }
+  function przeliczDni(){
+    var dni = dniN();
+    var el = document.getElementById('dni-sum');
+    el.textContent = dni ? ('Łącznie: ' + dni + (dni === 1 ? ' doba' : dni < 5 ? ' doby' : ' dób') + ' najmu') : '';
+    var cbs = document.querySelectorAll('.komp-it input');
+    var n = 0, suma = 0;
+    cbs.forEach(function(cb){ if (cb.checked){ n++; suma += parseFloat(cb.dataset.cena || 0); } });
+    var rabat = (n >= 10) ? Math.round(suma * 0.05) : 0;
+    var total = dni ? (suma - rabat) * dni : 0;
+    document.getElementById('komp-total').innerHTML = '<small>za wybrane dni</small>' + (dni ? total + ' zł' : '—');
+    /* personalizacje */
+    var pn = 0, psuma = 0;
+    document.querySelectorAll('.pers-it').forEach(function(it){
+      pn++;
+      psuma += parseFloat(it.dataset.cena || 0);
+    });
+    var prabat = (pn >= 3) ? Math.round(psuma * 0.05) : 0;
+    var pnetto = psuma - prabat;
+    document.getElementById('pod-pers-txt').textContent = 'Personalizacja: ' + pn
+      + (pn === 1 ? ' produkt' : pn < 5 ? ' produkty' : ' produktów')
+      + (prabat ? ' (z rabatem −5%)' : '');
+    document.getElementById('pod-pers').textContent = pn ? (pnetto + ' zł') : '—';
+    document.getElementById('komp-razem').textContent = dni ? ((total + 300 + pnetto) + ' zł') : '—';
+    aktualizujLink();
+  }
+  dEv.addEventListener('change', function(){
+    if (dEv.value){
+      dOd.value = przesun(dEv.value, -1);
+      dDo.value = przesun(dEv.value, 1);
+      przeliczDni();
+    }
+  });
+  dOd.addEventListener('change', przeliczDni);
+  dDo.addEventListener('change', przeliczDni);
+
+  /* mini-kalendarz: klik dnia ustawia datę imprezy (i domyślny zakres) */
+  document.querySelectorAll('.cal-d[data-d]').forEach(function(b){
+    if (b.classList.contains('przeszly') || b.classList.contains('st-platnosc') || b.classList.contains('st-zarezerwowany')) return;
+    b.addEventListener('click', function(){
+      dEv.value = b.dataset.d;
+      dOd.value = przesun(b.dataset.d, -1);
+      dDo.value = przesun(b.dataset.d, 1);
+      przeliczDni();
+      document.getElementById('formularz').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  /* sygnatura checkboxy */
+  var nowa = document.getElementById('tryb-nowa');
+  var ist  = document.getElementById('tryb-istniejaca');
+  var pole = document.getElementById('pole-syg');
+  function aktualizujSyg(){
+    if (ist.checked) nowa.checked = false;
+    pole.style.display = ist.checked ? 'block' : 'none';
+    document.getElementById('sygnatura').required = ist.checked;
+  }
+  nowa.addEventListener('change', function(){ if (nowa.checked) ist.checked = false; aktualizujSyg(); });
+  ist.addEventListener('change', aktualizujSyg);
+  aktualizujSyg();
+
+  przelicz();
+  aktualizujLink();
+})();
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{# _kroki.html — pasek postępu zamówienia (klient zawsze wie, na którym jest etapie).
+   Przed dołączeniem ustaw:
+     {% set krok = 2 %}   (1 = wybór pakietu, 2 = termin, 3 = Twoje dane, 4 = potwierdzenie)
+   Opcjonalnie (żeby krok 2 był klikalny z kroków 3–4):
+     {% set krok2_url = url_for('pakiet_szczegoly', pid=p.id) %}
+#}
+<div class="kroki-bar" aria-label="Postęp zamówienia">
+  <span class="krok-it {% if krok == 1 %}akt{% elif krok > 1 %}zrob{% endif %}">
+    {%- if krok > 1 %}<a href="{{ url_for('wynajem') }}">{% endif -%}
+    <i>1</i> Pakiet
+    {%- if krok > 1 %}</a>{% endif -%}
+  </span>
+  <span class="krok-sep" aria-hidden="true"></span>
+  <span class="krok-it {% if krok == 2 %}akt{% elif krok > 2 %}zrob{% endif %}">
+    {%- if krok > 2 and krok2_url %}<a href="{{ krok2_url }}">{% endif -%}
+    <i>2</i> Termin
+    {%- if krok > 2 and krok2_url %}</a>{% endif -%}
+  </span>
+  <span class="krok-sep" aria-hidden="true"></span>
+  <span class="krok-it {% if krok == 3 %}akt{% elif krok > 3 %}zrob{% endif %}">
+    <i>3</i> Twoje dane
+  </span>
+  <span class="krok-sep" aria-hidden="true"></span>
+  <span class="krok-it {% if krok == 4 %}akt{% elif krok > 4 %}zrob{% endif %}">
+    <i>4</i> Potwierdzenie
+  </span>
+</div>

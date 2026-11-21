@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krok 3: Personalizacja — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] %}{% set etap = 3 %}{% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('z_wynajem_pakiet', data=data, data_od=data_od, data_do=data_do) }}">← zmień pakiet</a>
+  <h1>Krok 3 · Dodaj personalizację</h1>
+  <p class="sub">Pakiet: <b>{{ p.nazwa }}</b> ({{ p.tier }}). Personalizacja to osobne produkty — jednorazówki wykonywane pod Ciebie: <b>płatne z góry i bezzwrotne</b> (po imprezie zostają u Ciebie). Rabat −5% od 3 produktów. <b>Wymagają zamówienia min. 2 tygodnie przed terminem imprezy.</b></p>
+
+  {% if bledy %}
+  <div class="bledy-box">
+    <ul>{% for b in bledy %}<li>{{ b }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('z_wynajem_pers', w=w) if w else url_for('z_wynajem_pers') }}" id="f-pers">
+    {% if w %}<input type="hidden" name="w" value="{{ w }}">{% endif %}
+    <div class="bledy-box" id="js-bledy" hidden><ul id="js-bledy-list"></ul></div>
+    <input type="hidden" name="data" value="{{ data }}">
+    <input type="hidden" name="data_od" value="{{ data_od }}">
+    <input type="hidden" name="data_do" value="{{ data_do }}">
+    <input type="hidden" name="pakiet" value="{{ p.id }}">
+
+    <div class="z-skip">
+      <span>Nie potrzebujesz personalizacji?</span>
+      <button class="btn btn-line" type="submit" name="akcja" value="pomijam">Pomiń ten krok →</button>
+    </div>
+
+    <div class="pers z-3">
+      {% for pr in pozycje %}
+      <div class="pers-it z-pers-it">
+        <input type="checkbox" name="pers" value="{{ pr.id }}" id="pers-{{ pr.id }}" data-cena="{{ pr.cena }}"
+               {% if pr.id in wybrane %}checked{% endif %}>
+        <div class="z-pers-tresc">
+          <b>{{ pr.nazwa }}</b>
+          <small>{{ pr.opis or 'Co możemy zrobić: dodać napis, imiona, datę, przygotować wydruki, grawer…' }}</small>
+          <span class="cena">{{ '%.0f'|format(pr.cena) }} zł</span> <span class="bez">· bezzwrotne, płatne z góry</span>
+          <div class="z-pers-opis" {% if pr.id not in wybrane %}hidden{% endif %}>
+            <label for="pers_opis_{{ pr.id }}">Opisz, co i jak ma być spersonalizowane (np. imiona, data, treść napisu…)</label>
+            <textarea name="pers_opis_{{ pr.id }}" id="pers_opis_{{ pr.id }}" rows="2"
+                      placeholder="np. „Antoś i Marysia, 14.06.2026, napis: Niech Cię prowadzą gwiazdy…"">{{ opisy.get(pr.id, '') }}</textarea>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="pole" style="margin-top:18px">
+      <label for="pomysl">Nie znalazłeś tego, czego szukasz? Opisz nam swój pomysł, a my zajmiemy się jego realizacją.</label>
+      <textarea id="pomysl" name="pomysl" rows="3" placeholder="Np. drewniana ramka z imionami chrzestnych, tablica z sentencją wg własnego tekstu…">{{ pomysl }}</textarea>
+    </div>
+
+    <div class="przyciski" style="justify-content:flex-end">
+      <button class="btn" type="submit" name="akcja" value="dalej">Dalej: Twoje dane →</button>
+    </div>
+  </form>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var form = document.getElementById('f-pers');
+  var boxBledy = document.getElementById('js-bledy');
+  var lista = document.getElementById('js-bledy-list');
+  var wymaganyPomysl = {{ 'true' if typ_sklep is defined and False else 'false' }};
+
+  document.querySelectorAll('.z-pers-it input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      var it = cb.closest('.pers-it');
+      var box = it.querySelector('.z-pers-opis');
+      var ta = box.querySelector('textarea');
+      box.hidden = !cb.checked;
+      ta.required = cb.checked;
+      ta.classList.remove('pole-blad');
+      if (cb.checked) ta.focus();
+    });
+  });
+
+  // przycisk „Pomiń ten krok" nie wymaga walidacji (działa też w Safari)
+  form.querySelectorAll('button[name=akcja]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      form.dataset.pomijam = btn.value === 'pomijam' ? '1' : '';
+    });
+  });
+
+  form.addEventListener('submit', function(ev){
+    if (form.dataset.pomijam === '1') return;
+    var bledy = [];
+    document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').forEach(function(cb){
+      var ta = cb.closest('.pers-it').querySelector('.z-pers-opis textarea');
+      if (!ta.value || ta.value.trim().length < 3){
+        bledy.push({ta: ta, nazwa: cb.closest('.pers-it').querySelector('b').textContent.trim()});
+      }
+    });
+    var pomysl = document.getElementById('pomysl');
+    if (wymaganyPomysl){
+      var ileZaznaczonych = document.querySelectorAll('.z-pers-it input[type=checkbox]:checked').length;
+      if (!ileZaznaczonych && (!pomysl || pomysl.value.trim().length < 10)){
+        bledy.push({ta: pomysl, nazwa: 'opisz swój pomysł (min. 10 znaków) albo zaznacz produkt'});
+      }
+    }
+    if (bledy.length){
+      ev.preventDefault();
+      lista.innerHTML = '';
+      bledy.forEach(function(b){
+        var li = document.createElement('li');
+        li.textContent = 'Uzupełnij pole „' + b.nazwa + '\" — co i jak ma być spersonalizowane.';
+        lista.appendChild(li);
+      });
+      boxBledy.hidden = false;
+      boxBledy.scrollIntoView({behavior: 'smooth', block: 'center'});
+      bledy[0].ta.focus();
+      bledy.forEach(function(b){ b.ta.classList.add('pole-blad'); });
+    }
+  });
+})();
+</script>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

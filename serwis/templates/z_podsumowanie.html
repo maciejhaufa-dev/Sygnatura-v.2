@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podsumowanie zamówienia — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=6">
+</head>
+<body>
+{% include '_nav.html' %}
+
+<div class="wrap">
+  {% set typ = szkic.get('typ') or 'wynajem' %}
+  {% set etapy = ['Termin','Pakiet','Personalizacja','Dane','Podsumowanie'] if typ == 'wynajem' else (['Personalizacja','Dane','Podsumowanie'] if typ == 'personalizacja' else ['Katalog','Personalizacja','Dane','Podsumowanie']) %}
+  {% set etap = etapy|length %}
+  {% set pominiety = 3 if typ == 'wynajem' else (2 if typ == 'sklep' else 0) %}
+  {% if not szkic.get('pers_pom') %}{% set pominiety = 0 %}{% endif %}
+  {% include '_progress.html' %}
+  <a class="powrot" href="{{ url_for('zamowienia_dane', w=szkic['_klucz']) }}">← popraw dane</a>
+  <h1>Podsumowanie zamówienia</h1>
+  <p class="sub">Sprawdź wszystko raz jeszcze. Poniżej znajdziesz pełne zestawienie (rachunek) — pozycja po pozycji. Po wysłaniu dostaniesz e-mail z sygnaturą sprawy, dokumentami i danymi do przelewu.</p>
+
+  {% if msg %}<div class="flash">{{ msg }}</div>{% endif %}
+
+  <div class="z-pod-sec kwoty rachunek-sec">
+    {% include '_kwoty_box.html' %}
+  </div>
+
+  <div class="z-pod">
+    {% if typ == 'wynajem' %}
+    <div class="z-pod-sec">
+      <h2>Termin</h2>
+      <p>Impreza: <b>{{ szkic['data'] }}</b><br>
+         Najem: <b>{{ szkic['data_od'] }} – {{ szkic['data_do'] }}</b> ({{ szkic['dni'] }} {{ 'doba' if szkic['dni'] == 1 else ('doby' if szkic['dni'] < 5 else 'dób') }})<br>
+         <span class="mala">dzień przed — montaż · dzień po — demontaż i zwrot</span></p>
+    </div>
+    <div class="z-pod-sec">
+      <h2>Pakiet</h2>
+      <p><b>{{ szkic['pakiet']['nazwa'] }}</b> ({{ szkic['pakiet']['tier'] }}) — {{ szkic['pakiet']['cena'] }}
+         {% if szkic['pakiet']['opis'] %}<br><span class="mala">{{ szkic['pakiet']['opis'] }}</span>{% endif %}</p>
+      <ul class="z-ul">
+        {% for poz in szkic['pakiet']['pozycje'].splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}
+      </ul>
+    </div>
+    {% elif typ == 'sklep' %}
+    <div class="z-pod-sec">
+      <h2>Produkty ze sklepu</h2>
+      <ul class="z-ul">
+        {% for pr in szkic['pozycje'] %}
+        <li><b>{{ pr['nazwa'] }}</b> — {{ '%.0f'|format(pr['cena']) }} zł{% if pr['ile'] > 1 %} × {{ pr['ile'] }} szt.{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="z-pod-sec">
+      <h2>Personalizacja</h2>
+      {% if szkic['pers'] %}
+        <ul class="z-ul">
+          {% for pr in szkic['pers'] %}
+          <li><b>{{ pr['nazwa'] }}</b> — {{ '%.0f'|format(pr['cena']) }} zł{% if pr['opis'] %}<br><span class="mala">Opis: {{ pr['opis'] }}</span>{% endif %}</li>
+          {% endfor %}
+        </ul>
+        <p class="mala">Produkty spersonalizowane: płatne z góry, bezzwrotne{% if typ == 'wynajem' %} — po imprezie zostają u Ciebie{% endif %}. <b>Wymagają zamówienia min. 2 tygodnie przed terminem.</b></p>
+      {% else %}
+        <p class="mala">{% if typ == 'wynajem' or typ == 'sklep' %}Bez personalizacji (krok pominięty).{% else %}—{% endif %}</p>
+      {% endif %}
+      {% if szkic['pomysl'] %}
+      <div class="pomysl-box">
+        <b>Twój pomysł (spoza katalogu):</b><br>{{ szkic['pomysl'] }}<br>
+        <span class="pomysl-uw">Ta część zamówienia zostanie <b>wyceniona osobno</b> — ofertę wyślemy e-mailem pod tą samą sygnaturą sprawy w ciągu <b>2 dni roboczych</b>. Kwoty w podsumowaniu jej nie obejmują.</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="z-pod-sec">
+      <h2>Dane i dostawa</h2>
+      <p>
+        {{ szkic['klient']['imie'] }} · {{ szkic['klient']['email'] }}{% if szkic['klient']['telefon'] %} · tel. {{ szkic['klient']['telefon'] }}{% endif %}<br>
+        Sygnatura: {% if szkic['sygnatura'] %}{{ szkic['sygnatura'] }}{% else %}nadamy nową{% endif %}<br>
+        Dostawa: <b>{{ dostawa_label }}</b>
+        {% if szkic.get('adres') and szkic.get('dostawa') in ('dowoz', 'wysylka') %}<br>Adres: {{ szkic['adres'] }}{% endif %}
+      </p>
+    </div>
+
+    <form method="post" action="{{ url_for('zamowienia_zamow') }}" class="forma">
+      <input type="hidden" name="w" value="{{ szkic['_klucz'] }}">
+      <div class="pole">
+        <label for="tresc">Wiadomość dla nas (opcjonalnie)</label>
+        <textarea id="tresc" name="tresc" rows="4" placeholder="Kilka słów od Ciebie — instrukcje, liczba gości, pytania…"></textarea>
+      </div>
+      <p class="mala">Wysyłając zamówienie zobowiązujesz się do zapłaty zgodnie z podsumowaniem (przelew — dane otrzymasz w e-mailu z potwierdzeniem). Kliknięcie poniżej = akceptacja powyższego podsumowania.</p>
+      <div class="przyciski" style="justify-content:flex-end">
+        <button class="btn" type="submit">Zamawiam z obowiązkiem zapłaty</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer class="stopka">
+  <div class="wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js?v=5"></script>
+</body>
+</html>

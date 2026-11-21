@@ -1,0 +1,39 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}Autorespondery — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>Autorespondery (e-maile automatyczne)</h1>
+<p class="mala">Treści wysyłane klientom automatycznie. Każdy szablon możesz dowolnie zmienić —
+odznaczenie „Aktywny" wyłącza wysyłkę tego maila (reszta działa dalej).
+Zmienne w treści i temacie: {{ zmienne|join(' ') }}</p>
+
+{% for s in rows %}
+<div class="forma" style="max-width:860px">
+  <h3>{{ s['nazwa'] }} <span class="mala">(klucz: {{ s['klucz'] }}{% if not s['aktywny'] %} · WYŁĄCZONY{% endif %})</span></h3>
+  <form method="post" action="{{ url_for('szablon_zapisz', klucz=s['klucz']) }}">
+    <label>Temat e-maila</label>
+    <input type="text" name="temat" value="{{ s['temat'] }}">
+    <label>Treść</label>
+    <textarea name="tresc" style="min-height:220px;font-family:Georgia,serif;font-size:15px">{{ s['tresc'] }}</textarea>
+    <div class="rzad" style="margin-top:10px">
+      <label><input type="checkbox" name="aktywny" {% if s['aktywny'] %}checked{% endif %}> Aktywny (wysyłać automatycznie)</label>
+      <button class="btn" type="submit">Zapisz szablon</button>
+    </div>
+    <p class="mala" style="margin-top:8px">Ostatnia zmiana: {{ s['zmieniono'] or '—' }}</p>
+  </form>
+</div>
+{% endfor %}
+
+<div class="uwaga">
+  <b>Kiedy który szablon jest wysyłany:</b>
+  <ul class="zwykla">
+    <li><b>zapytanie</b> — klient wysłał zapytanie o wynajem (formularz pakietu / kompozytora),</li>
+    <li><b>rezerwacja-terminu</b> — formularz miał temat „Rezerwacja terminu",</li>
+    <li><b>zamowienie</b> — zapytanie zawiera produkty spersonalizowane (potwierdzenie zamówienia),</li>
+    <li><b>kaucja</b> — status zmieniony na „płatność w toku",</li>
+    <li><b>potwierdzenie</b> — status „zarezerwowany" (kaucja zaksięgowana),</li>
+    <li><b>odrzucono</b> — status „odrzucono" (można dopisać powód w polu przy zmianie statusu),</li>
+    <li><b>kontakt</b> — autoresponder formularza kontaktowego,</li>
+    <li><b>test</b> — e-mail testowy SMTP z Ustawień.</li>
+  </ul>
+</div>
+{% endblock %}

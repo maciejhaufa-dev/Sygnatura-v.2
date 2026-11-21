@@ -1,0 +1,89 @@
+{% extends 'admin_base.html' %}
+{% block tytul %}{{ r['sygnatura'] }} — Studio Sygnatura{% endblock %}
+{% block tresc %}
+<h1>{{ r['sygnatura'] }}</h1>
+<p class="mala"><a href="{{ url_for('admin_rezerwacje') }}">← wszystkie zgłoszenia</a></p>
+
+<div class="forma">
+  <h3>Dane zgłoszenia</h3>
+  <div class="t-scroll"><table class="tabela">
+    <tr><th>Sygnatura</th><td>{{ r['sygnatura'] }}</td></tr>
+    <tr><th>Utworzono</th><td>{{ r['utworzono'] }}</td></tr>
+    {% if r['data'] %}<tr><th>Najem od–do</th><td><b>{{ r['data_od'] or r['data'] }} – {{ r['data_do'] or r['data'] }}</b> ({{ r['dni'] }} dn.)</td></tr>
+    <tr><th>Data imprezy</th><td>{{ r['data'] }}</td></tr>{% endif %}
+    <tr><th>Pakiet</th><td>{{ r['pakiet_nazwa'] }}</td></tr>
+    <tr><th>Temat</th><td>{{ r['temat'] }}</td></tr>
+    <tr><th>Imię i nazwisko</th><td>{{ r['imie'] or '—' }}</td></tr>
+    <tr><th>E-mail</th><td><a href="mailto:{{ r['email'] }}">{{ r['email'] }}</a></td></tr>
+    <tr><th>Telefon</th><td>{{ r['telefon'] or '—' }}</td></tr>
+    <tr><th>Dostawa</th><td>{{ r['dostawa'] or '—' }}</td></tr>
+    {% if r['adres'] %}<tr><th>Adres</th><td>{{ r['adres'] }}</td></tr>{% endif %}
+    {% if r['kod'] %}<tr><th>Kod rabatowy</th><td>{{ r['kod'] }}</td></tr>{% endif %}
+    <tr><th>Treść zapytania</th><td style="white-space:pre-wrap">{{ r['tresc'] or '—' }}</td></tr>
+    {% if pozycje %}
+    <tr><th>Skład zestawu własnego</th><td>
+      <ul class="zwykla">
+        {% for pz in pozycje %}<li>{{ pz.nazwa }} — {{ '%.0f'|format(pz.cena) }} zł</li>{% endfor %}
+      </ul>
+      {% set suma = pozycje|sum(attribute='cena') %}
+      <b>Suma: {{ '%.0f'|format(suma) }} zł / doba</b>{% if pozycje|length >= 10 %} · rabat −5%: {{ '%.0f'|format(suma*0.05) }} zł{% endif %}
+      {% if r['dni'] %} · szacunkowo za {{ r['dni'] }} dn.: {{ '%.0f'|format((suma - (suma*0.05 if pozycje|length >= 10 else 0)) * r['dni']) }} zł{% endif %}
+    </td></tr>
+    {% endif %}
+    {% if personalizacje %}
+    <tr><th>Produkty spersonalizowane (płatne z góry, bezzwrotne)</th><td>
+      <ul class="zwykla">
+        {% for pz in personalizacje %}
+        <li><b>{{ pz.nazwa }}</b> — {{ '%.0f'|format(pz.cena) }} zł{% if pz.opis %}<br><span class="mala">opis: {{ pz.opis }}</span>{% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% set suma = personalizacje|sum(attribute='cena') %}
+      <b>Suma: {{ '%.0f'|format(suma) }} zł</b>{% if personalizacje|length >= 3 %} · rabat −5%: {{ '%.0f'|format(suma*0.05) }} zł → <b>{{ '%.0f'|format(suma*0.95) }} zł</b>{% endif %}
+    </td></tr>
+    {% endif %}
+    <tr><th>Priorytet (stały partner)</th><td>{% if r['priorytet'] %}★ tak{% else %}nie{% endif %}</td></tr>
+    <tr><th>Aktualny status</th><td><b>{{ statusy[r['status']] }}</b></td></tr>
+    <tr><th>Ostatnia zmiana</th><td class="mala">{{ r['zmieniono'] }}</td></tr>
+  </table></div>
+</div>
+
+<div class="forma">
+  <h3>Rozliczenie przychodu (arkusz + podsumowanie kwartałów)</h3>
+  <form method="post" action="{{ url_for('rezerwacja_rozliczenie', rid=r['id']) }}">
+    <label>Na kogo wpływa przychód z tej rezerwacji</label>
+    <select name="rozliczenie">
+      <option value="wspolne" {% if r['rozliczenie']=='wspolne' %}selected{% endif %}>Wspólne</option>
+      <option value="maz" {% if r['rozliczenie']=='maz' %}selected{% endif %}>Mąż</option>
+      <option value="zona" {% if r['rozliczenie']=='zona' %}selected{% endif %}>Żona</option>
+    </select>
+    <p class="mala" style="margin-top:8px">Ustawia kolumnę w arkuszu Google i dzieli sumy w podsumowaniu kwartałów (do rozliczeń podatkowych).</p>
+    <p><button class="btn" type="submit">Zapisz rozliczenie</button></p>
+  </form>
+</div>
+
+<div class="forma">
+  <h3>Zmień status</h3>
+  <form method="post" action="{{ url_for('rezerwacja_status', rid=r['id']) }}">
+    <label>Nowy status</label>
+    <select name="status">
+      {% for st in statusy %}<option value="{{ st }}" {% if st==r['status'] %}selected{% endif %}>{{ statusy[st] }}</option>{% endfor %}
+    </select>
+    <label>Powód / uwaga (wymagane przy „odrzucono" — leci do klienta)</label>
+    <input type="text" name="powod" placeholder="np. termin zajęty u stałego partnera">
+    <p class="mala" style="margin-top:8px">Po zmianie statusu serwis automatycznie wysyła autoresponder do klienta i aktualizuje arkusz Google (gdy podpięty).</p>
+    <p><button class="btn" type="submit">Zapisz status</button></p>
+  </form>
+</div>
+
+<div class="forma">
+  <h3>Historia zmian</h3>
+  <div class="t-scroll"><table class="tabela">
+    <tr><th>Kiedy</th><th>Status</th><th>Uwaga</th></tr>
+    {% for h in historia %}
+    <tr><td class="mala">{{ h['kiedy'] }}</td><td>{{ statusy.get(h['status'], h['status']) }}</td><td class="mala">{{ h['uwaga'] or '' }}</td></tr>
+    {% else %}
+    <tr><td colspan="3" class="mala">Brak wpisów.</td></tr>
+    {% endfor %}
+  </table></div>
+</div>
+{% endblock %}

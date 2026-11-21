@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>Kontakt — Studio Sygnatura</title>
+<meta name="description" content="Napisz do Studio Sygnatura — odpowiadamy w ciągu 2 dni roboczych.">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=6">
+<style>
+:root{
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C;
+  --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+.menu a:hover{background:rgba(196,165,130,.14)}
+main{flex:1;max-width:1000px;width:100%;margin:0 auto;padding:clamp(26px,5vw,54px) clamp(16px,4vw,44px)}
+.tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:600;margin:6px 0 10px;line-height:1.15}
+.lead{font-size:clamp(16px,1.8vw,19px);line-height:1.6;color:rgba(51,38,28,.9);max-width:620px}
+.siatka{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(20px,4vw,44px);margin-top:30px}
+@media(max-width:820px){.siatka{grid-template-columns:1fr}}
+.dane{background:#fff;border:1px solid rgba(107,69,48,.25);padding:24px 26px;align-self:start}
+.dane h2{font-size:21px;font-weight:600;color:var(--brunatny);margin-bottom:14px}
+.dane p{font-size:16.5px;line-height:1.6;margin-bottom:10px}
+.dane b{color:var(--butelkowa)}
+.dane a.mail{color:var(--butelkowa);border-bottom:1px solid var(--zloty)}
+.forma{background:#fff;border:1px solid rgba(107,69,48,.25);padding:24px 26px}
+.forma h2{font-size:21px;font-weight:600;color:var(--brunatny);margin-bottom:14px}
+.forma label{display:block;font-size:13px;color:var(--brunatny);margin:12px 0 4px;
+  text-transform:uppercase;letter-spacing:.05em}
+.forma input[type=text],.forma input[type=email],.forma input[type=tel],.forma textarea{
+  width:100%;padding:10px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);
+  font-family:inherit;font-size:16.5px}
+.forma select{width:100%;padding:10px 12px;border:1px solid rgba(107,69,48,.45);background:var(--krem);
+  font-family:inherit;font-size:16.5px;color:var(--ink)}
+.forma textarea{min-height:130px;resize:vertical}
+.forma .zgoda{display:flex;gap:10px;align-items:flex-start;margin:16px 0 6px}
+.forma .zgoda input{width:17px;height:17px;flex:none;margin-top:3px;accent-color:var(--butelkowa)}
+.forma .zgoda label{margin:0;text-transform:none;letter-spacing:0;font-size:14.5px;color:rgba(51,38,28,.85);line-height:1.5}
+.btn{background:var(--butelkowa);color:var(--zloty);border:1.5px solid var(--butelkowa);
+  padding:12px 28px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;cursor:pointer;transition:all .25s;margin-top:8px}
+.btn:hover{background:var(--zloty);color:var(--butelkowa)}
+.bledy{background:#FFF4E0;border:1px solid var(--zloty);padding:12px 16px;margin-bottom:16px}
+.bledy ul{margin:0;padding-left:20px;font-size:15.5px}
+.bledy li{margin:4px 0}
+.sukces{background:var(--butelkowa);color:var(--zloty);padding:26px 28px;margin-top:26px;text-align:center}
+.sukces h2{font-size:24px;font-weight:600;margin-bottom:8px}
+.sukces p{font-size:16.5px;line-height:1.6}
+.anty-spam{display:none}
+.site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
+  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px);font-size:15px}
+.site-foot a{color:var(--zloty)}
+.foot-sep{opacity:.5;margin:0 8px}
+</style>
+</head>
+<body>
+{% include '_nav.html' %}
+<main>
+  <span class="tag">Jesteśmy do dyspozycji</span>
+  <h1>Napisz do nas</h1>
+  <p class="lead">Odpowiadamy w ciągu 2 dni roboczych — zwykle szybciej. W pilnych sprawach
+  dopisz „pilne" w wiadomości.</p>
+
+  {% if ok %}
+  <div class="sukces">
+    <h2>Dziękujemy za wiadomość!</h2>
+    <p>Trafiła do naszej skrzynki. Odpowiemy na adres {{ dane['email'] }} najpóźniej w ciągu 2 dni roboczych.</p>
+  </div>
+  {% else %}
+  <div class="siatka">
+    <div class="dane">
+      <h2>Studio Sygnatura</h2>
+      <p><b>E-mail:</b> <a class="mail" href="mailto:kontakt@studiosygnatura.pl">kontakt@studiosygnatura.pl</a></p>
+      <p>Pracownia: Polska, woj. mazowieckie<br>(szczegóły prześlemy w odpowiedzi)</p>
+      <p>Zapytania o <b>wynajem dekoracji</b> prosimy kierować przez stronę
+      <a class="mail" href="/wynajem/">Wynajem</a> — tam możesz od razu wybrać pakiet i termin.</p>
+    </div>
+    <div class="forma">
+      <h2>Formularz kontaktowy</h2>
+      {% if bledy %}
+      <div class="bledy">
+        <ul>{% for b in bledy %}<li>{{ b }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+      <form method="post" action="/kontakt/">
+        {# pułapka antyspamowa — człowiek tego nie widzi i nie wypełnia #}
+        <div class="anty-spam"><label>Zostaw puste<input type="text" name="strona_www"></label></div>
+        <label for="imie">Imię i nazwisko *</label>
+        <input type="text" id="imie" name="imie" value="{{ dane['imie'] }}" required>
+        <label for="email">Adres e-mail *</label>
+        <input type="email" id="email" name="email" value="{{ dane['email'] }}" required>
+        <label for="telefon">Telefon (opcjonalnie)</label>
+        <input type="tel" id="telefon" name="telefon" value="{{ dane['telefon'] }}">
+        <label for="temat">Temat zapytania *</label>
+        <select id="temat" name="temat">
+          {% for klucz, nazwa in tematy.items() %}
+          <option value="{{ klucz }}" {% if dane['temat'] == klucz %}selected{% endif %}>{{ nazwa }}</option>
+          {% endfor %}
+        </select>
+        <label for="tresc">Wiadomość *</label>
+        <textarea id="tresc" name="tresc" required>{{ dane['tresc'] }}</textarea>
+        <div class="zgoda">
+          <input type="checkbox" id="zgoda" name="zgoda" required>
+          <label for="zgoda">Wyrażam zgodę na kontakt ze strony Studio Sygnatura w sprawie mojego
+          zapytania (podstawa: PKE art. 398). Bez tej zgody nie możemy odpowiedzieć.</label>
+        </div>
+        <button class="btn" type="submit">Wyślij wiadomość</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</main>
+<footer class="site-foot">
+  <span>© Studio Sygnatura</span>
+  <span>
+    <a href="/realizacje/">Realizacje</a><span class="foot-sep">/</span><a href="/">Strona główna</a>
+  </span>
+</footer>
+</body>
+</html>

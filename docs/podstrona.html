@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio Sygnatura</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Studio Sygnatura">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:title" content="Studio Sygnatura">
+<meta property="og:description" content="Studio Sygnatura — pracownia z Poznania. Dekoracje, szyldy i prezenty wykonywane na zamówienie.">
+<meta name="description" content="Studio Sygnatura — pracownia z Poznania. Dekoracje, szyldy i prezenty wykonywane na zamówienie.">
+<meta property="og:image" content="https://studiosygnatura.pl/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=358">
+</head>
+<body data-strona="" data-podstrona="1">
+<div id="naglowek"></div>
+
+<main class="wrap">
+  <div class="regulamin" id="podstrona-tresc">
+    <p class="mala">Wczytywanie…</p>
+  </div>
+</main>
+
+<div id="stopka"></div>
+<script src="assets/config.js?v=355"></script>
+<script src="assets/koszyk.js?v=355"></script>
+<script src="assets/api.js?v=355"></script>
+<script src="assets/main.js?v=358"></script>
+<script>
+(function(){
+  async function laduj(){
+    var slug = SYG.param('s');
+    var kontener = document.getElementById('podstrona-tresc');
+    if (!slug){
+      kontener.innerHTML = '<h2>Nie znaleziono podstrony</h2><p><a href="index.html" class="btn">← Strona główna</a></p>';
+      return;
+    }
+    var odp = await SYG.wezwij('strony-lista', {});
+    var strona = (odp.strony || []).find(function(s){ return s.slug === slug; });
+    if (!strona){
+      kontener.innerHTML = '<h2>Nie znaleziono podstrony</h2><p class="mala">Podstrona „/' + slug + '" nie istnieje (albo została usunięta).</p>' +
+        '<p><a href="index.html" class="btn">← Strona główna</a></p>';
+      return;
+    }
+    document.title = strona.tytul + ' — Studio Sygnatura Poznań';
+    var canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+    canonical.href = 'https://studiosygnatura.pl/podstrona.html?s=' + encodeURIComponent(strona.slug);
+    var opis = String(strona.tresc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155);
+    var desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.content = opis || 'Studio Sygnatura z Poznania — informacje o pracowni i ofercie.';
+    var ogUrl = document.querySelector('meta[property="og:url"]');
+    if (!ogUrl) { ogUrl = document.createElement('meta'); ogUrl.setAttribute('property','og:url'); document.head.appendChild(ogUrl); }
+    ogUrl.content = canonical.href;
+    var ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.content = document.title;
+    var ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.content = desc.content;
+    document.body.setAttribute('data-strona', strona.tytul);
+    kontener.innerHTML = strona.tresc || '<p class="mala">Ta podstrona nie ma jeszcze treści.</p>';
+    var h1 = document.getElementById('strona-tytul');
+    if (h1) h1.textContent = strona.tytul;
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', laduj);
+  else laduj();
+})();
+</script>
+</body>
+</html>

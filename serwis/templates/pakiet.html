@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ p.nazwa }} — Studio Sygnatura</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+{% include '_nav.html' %}
+
+{% set pers_str = pers_ids|map('string')|join(',') %}
+<div class="wrap">
+  {% set krok = 2 %}{% include '_kroki.html' %}
+  {% set pers_nastepny = url_for('pakiet_szczegoly', pid=p.id, pers=pers_str) %}
+  {% set pers_bez = url_for('pakiet_szczegoly', pid=p.id) %}
+  {% include '_pers_bar.html' %}
+
+  <a class="powrot" href="{{ url_for('wynajem_wydarzenie', ev=p.ev, pers=pers_str) }}">← {{ ev_nazwa }}</a>
+
+  <div class="glowna">
+    <div class="karta">
+      <span class="tag">{{ p.tier or 'pakiet' }}</span>
+      <h1>{{ p.nazwa }}</h1>
+      <p class="sub">{{ p.opis or '' }}</p>
+      <div class="cena">{{ p.cena }}</div>
+      <ul>{% for poz in p.pozycje.splitlines() %}{% if poz.strip() %}<li>{{ poz.strip() }}</li>{% endif %}{% endfor %}</ul>
+      <a class="btn" href="#kalendarz">Wybierz termin w kalendarzu ↓</a>
+      <a class="btn" style="background:transparent;color:var(--butelkowa);border:1px solid var(--butelkowa);margin-top:10px;text-align:center"
+         href="{{ url_for('personalizacja', next=url_for('pakiet_szczegoly', pid=p.id, pers=pers_str), pers=pers_str) }}">+ Dodaj produkty spersonalizowane</a>
+      <p style="margin:10px 0 0;font-size:13px;color:rgba(51,38,28,.65)">Personalizacja (imiona, daty, treści) to osobne produkty — jednorazówki płatne z góry, niepodlegające zwrotowi.</p>
+    </div>
+
+    <div class="cal" id="kalendarz">
+      <h2>Kalendarz dostępności</h2>
+      <div class="calhead">
+        <b>{{ mies_nazwa }} {{ rok }}</b>
+        <span class="calnav">
+          <a href="{{ url_for('pakiet_szczegoly', pid=p.id, rok=poprz[0], mies=poprz[1], pers=pers_str) }}#kalendarz">&#8249;</a>
+          <a href="{{ url_for('pakiet_szczegoly', pid=p.id, rok=nast[0], mies=nast[1], pers=pers_str) }}#kalendarz">&#8250;</a>
+        </span>
+      </div>
+      <div class="calgrid">
+        {% for d in ['Pn','Wt','Śr','Cz','Pt','So','Nd'] %}<i>{{ d }}</i>{% endfor %}
+        {% for dzien in dni %}
+          {% if not dzien.nr %}
+            <span class="cal-d pusty"></span>
+          {% elif dzien.zajety %}
+            <span class="cal-d {{ dzien.klasa }}" title="{{ dzien.tytul }}">{{ dzien.nr }}</span>
+          {% else %}
+            <a class="cal-d {{ dzien.klasa }}" href="{{ url_for('rezerwuj', pid=p.id, data=dzien.data, pers=pers_str) }}" title="{{ dzien.tytul or 'Wolny termin — kliknij, aby zarezerwować' }}">{{ dzien.nr }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="callegend">
+        <span><i></i> wolny</span>
+        <span><i class="st-zapytanie"></i> wysłano zapytanie — nadal można pytać</span>
+        <span><i class="st-platnosc"></i> płatność w toku</span>
+        <span><i class="st-zarezerwowany"></i> zarezerwowany</span>
+      </div>
+      <div class="hint">
+        <b>Kliknij datę imprezy.</b> Domyślnie zarezerwujemy również <b>dzień przed</b> (montaż dekoracji)
+        i <b>dzień po</b> (demontaż) — razem min. 3 doby. Zakres od–do zmienisz w formularzu.
+      </div>
+      <p class="hint" style="margin-top:8px;background:transparent;border-style:dashed">
+        Nie wiesz, który pakiet wybrać? <a href="/kontakt/" style="font-weight:700">Napisz przez formularz kontaktowy</a> — doradzimy bez zobowiązań.
+      </p>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--butelkowa);color:rgba(251,247,240,.75);margin-top:48px;padding:26px 0;font-size:15px">
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <span>© Studio Sygnatura · kontakt@studiosygnatura.pl</span>
+    <a href="/kontakt/" style="color:var(--zloty)">Napisz do nas →</a>
+  </div>
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

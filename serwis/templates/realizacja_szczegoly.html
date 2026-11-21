@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>{{ r['tytul'] }} — Studio Sygnatura</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=5">
+<style>
+:root{
+  --butelkowa:#1F3A32; --brunatny:#6B4530; --zloty:#C4A582; --zloty-soft:#DCC9AC;
+  --krem:#FBF7F0; --krem-2:#F3EDE2; --ink:#33261C;
+  --serif:"Cormorant Garamond","Playfair Display",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--krem);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+.menu a:hover{background:rgba(196,165,130,.14)}
+main{flex:1;max-width:1000px;width:100%;margin:0 auto;padding:clamp(26px,5vw,54px) clamp(16px,4vw,44px)}
+.powrot{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--brunatny)}
+.powrot:hover{color:var(--butelkowa)}
+.foto{background:linear-gradient(135deg,var(--krem-2),var(--zloty-soft));border:1px solid rgba(107,69,48,.25);
+  margin:18px 0 26px;display:grid;place-items:center}
+.foto img{width:100%;max-height:72vh;object-fit:contain}
+.foto .init{font-size:110px;font-weight:700;color:var(--brunatny);opacity:.5;padding:60px 0}
+.tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brunatny)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:600;margin:6px 0 16px;line-height:1.15}
+.opis{font-size:clamp(16.5px,1.9vw,19px);line-height:1.7;color:rgba(51,38,28,.92);max-width:680px}
+.cta{display:inline-block;margin-top:28px;background:var(--butelkowa);color:var(--zloty);
+  border:1.5px solid var(--butelkowa);padding:12px 26px;font-size:12px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;transition:all .25s}
+.cta:hover{background:var(--zloty);color:var(--butelkowa)}
+.site-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;
+  background:rgba(31,58,50,.94);color:var(--krem);padding:16px clamp(16px,4vw,46px);font-size:15px}
+.site-foot a{color:var(--zloty)}
+.foot-sep{opacity:.5;margin:0 8px}
+</style>
+</head>
+<body>
+{% include '_nav.html' %}
+<main>
+  <a class="powrot" href="/realizacje/">← Wszystkie realizacje</a>
+  <div class="foto">
+    {% if r['zdjecie'] %}
+    <img src="{{ r['zdjecie']|obrazek('realizacja') }}" alt="{{ r['tytul'] }}">
+    {% else %}
+    <span class="init">{{ r['tytul'][:1] }}</span>
+    {% endif %}
+  </div>
+  {% if r['kategoria'] %}<span class="tag">{{ r['kategoria'] }}</span>{% endif %}
+  <h1>{{ r['tytul'] }}</h1>
+  {% if r['opis'] %}<div class="opis">{{ r['opis']|replace('\n', '<br>')|safe }}</div>{% endif %}
+  <a class="cta" href="/kontakt/">Zapytaj o podobną realizację</a>
+</main>
+<footer class="site-foot">
+  <span>© Studio Sygnatura</span>
+  <span>
+    <a href="/kontakt/">Kontakt</a><span class="foot-sep">/</span><a href="/">Strona główna</a>
+  </span>
+</footer>
+</body>
+</html>
