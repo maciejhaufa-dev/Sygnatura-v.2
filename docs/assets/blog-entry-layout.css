@@ -28,7 +28,10 @@
 #blog-tresc .wpis-galeria-sekcja { clear: both; width: 100%; margin: 36px 0 0; padding: 22px 0 8px; border-top: 1px solid rgba(107,69,48,.35); }
 #blog-tresc .wpis-galeria-naglowek { margin: 0 0 15px; color: var(--interior-forest, var(--butelkowa)); text-align: center; font: 600 13px/1.2 system-ui, sans-serif; letter-spacing: .2em; }
 #blog-tresc .wpis-galeria-pasek { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0; }
-#blog-tresc .wpis-miniatury { display: flex; flex: 0 1 auto; justify-content: center; gap: 9px; min-width: 0; max-width: min(100%, 1000px); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scroll-behavior: smooth; padding: 2px 2px 8px; }
+#blog-tresc .wpis-miniatury { display: flex; flex: 0 1 auto; justify-content: center; gap: 12px; min-width: 0; max-width: min(100%, 1120px); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scroll-behavior: smooth; padding: 3px 3px 10px; }
+/* Larger previews make the gallery useful even before a visitor opens a photo. */
+#blog-tresc .wpis-mini { width: 148px; height: 110px; flex: 0 0 148px; }
+#blog-tresc .wpis-mini img { width: 100%; height: 100%; object-fit: cover; }
 #blog-tresc .wpis-galeria-pasek .wpis-galeria-nav { flex: 0 0 36px; }
 
 @media (max-width: 900px) {
@@ -43,11 +46,12 @@
   #blog-tresc .wpis-inline-foto, #blog-tresc .wpis-inline-foto.side-right { width: min(46%, 300px); }
   #blog-tresc .wpis-galeria-sekcja { margin-top: 28px; padding-top: 18px; }
   #blog-tresc .wpis-miniatury { flex-wrap: nowrap !important; justify-content: flex-start; overflow-x: auto; }
+  #blog-tresc .wpis-mini { width: 124px; height: 93px; flex-basis: 124px; }
 }
 @media (max-width: 520px) {
   #blog-tresc .wpis-galeria-pasek { gap: 5px; }
   #blog-tresc .wpis-galeria-pasek .wpis-galeria-nav { width: 32px; height: 34px; flex-basis: 32px; }
-  #blog-tresc .wpis-mini { width: 76px; height: 60px; flex-basis: 76px; }
+  #blog-tresc .wpis-mini { width: 108px; height: 81px; flex-basis: 108px; }
   #blog-tresc .wpis-naglowek h1 { font-size: 29px; }
   #blog-tresc .wpis-inline-foto, #blog-tresc .wpis-inline-foto.side-right, #blog-tresc .wpis-inline-foto.side-wide { width: 100%; max-width: 100%; float: none; clear: both; margin: 14px 0; }
 }
