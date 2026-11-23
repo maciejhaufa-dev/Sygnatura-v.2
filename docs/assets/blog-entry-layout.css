@@ -36,6 +36,8 @@
 #blog-tresc .wpis-mini { width: 148px; height: 110px; flex: 0 0 148px; }
 #blog-tresc .wpis-mini img { width: 100%; height: 100%; object-fit: cover; }
 #blog-tresc .wpis-galeria-pasek .wpis-galeria-nav { flex: 0 0 36px; }
+.lb-tlo iframe.lb-video, .lb-tlo video.lb-video { width: min(92vw, 1200px); height: min(82vh, 675px); max-width: 92vw; max-height: 82vh; border: 2px solid var(--zloty); background: #000; }
+.lb-tlo .lb-video-link { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 14px 18px; background: #fffdf9; color: var(--butelkowa); }
 
 @media (max-width: 900px) {
   /* Mobile: hero full width first, then the article, then its full-width gallery. */

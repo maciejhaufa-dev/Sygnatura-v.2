@@ -16,8 +16,8 @@
 <link rel="stylesheet" href="assets/admin-dashboard.css?v=dashboard-1">
 <link rel="stylesheet" href="assets/admin-landing-editor.css?v=landing-editor-2">
 <link rel="stylesheet" href="assets/interior-refresh.css?v=brand-split-2">
-<link rel="stylesheet" href="assets/blog-entry-layout.css?v=9">
-<link rel="stylesheet" href="assets/blog-editor.css?v=1">
+<link rel="stylesheet" href="assets/blog-entry-layout.css?v=10">
+<link rel="stylesheet" href="assets/blog-editor.css?v=2">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -542,6 +542,12 @@
                 <button class="btn outline" type="button" data-add-block="heading">+ Nagłówek</button>
                 <button class="btn outline" type="button" data-add-block="quote">+ Cytat</button>
                 <button class="btn outline" type="button" data-add-block="divider">+ Separator</button>
+              </div>
+              <div class="bf-gallery-modal" id="bf-gallery-modal" hidden role="dialog" aria-modal="true" aria-label="Podgląd galerii">
+                <button type="button" class="bf-gallery-close" aria-label="Zamknij podgląd">×</button>
+                <button type="button" class="bf-gallery-nav bf-gallery-prev" aria-label="Poprzednie zdjęcie">‹</button>
+                <img id="bf-gallery-modal-image" src="" alt="">
+                <button type="button" class="bf-gallery-nav bf-gallery-next" aria-label="Następne zdjęcie">›</button>
               </div>
               <input type="hidden" id="bf-zrodlo">
             </div>
@@ -2242,6 +2248,20 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  var bfGalleryPreviewItems = [], bfGalleryPreviewIndex = 0;
+  function showAdminGalleryPreview(items,index){
+    bfGalleryPreviewItems = items || [];
+    if (!bfGalleryPreviewItems.length) return;
+    bfGalleryPreviewIndex = (index + bfGalleryPreviewItems.length) % bfGalleryPreviewItems.length;
+    document.getElementById('bf-gallery-modal-image').src = bfGalleryPreviewItems[bfGalleryPreviewIndex];
+    document.getElementById('bf-gallery-modal-image').alt = 'Zdjęcie ' + (bfGalleryPreviewIndex + 1) + ' z ' + bfGalleryPreviewItems.length;
+    document.getElementById('bf-gallery-modal').hidden = false;
+  }
+  function stepAdminGalleryPreview(direction){
+    if (!bfGalleryPreviewItems.length) return;
+    showAdminGalleryPreview(bfGalleryPreviewItems,bfGalleryPreviewIndex + direction);
+  }
+
   function blogPreviewRefresh(){
     var title = document.getElementById('bf-tytul').value.trim() || 'Tytuł wpisu';
     var category = document.getElementById('bf-kategoria').value.trim();
@@ -2269,10 +2289,7 @@
     document.getElementById('bf-preview-galeria').hidden = unique.length < 2;
     thumbs.querySelectorAll('[data-preview-photo]').forEach(function(button){
       button.addEventListener('click', function(){
-        var photo = unique[Number(button.getAttribute('data-preview-photo'))];
-        if (!photo) return;
-        galeria.forEach(function(g){ g.glowna = g.src === photo.src; });
-        rysujMini();
+        showAdminGalleryPreview(unique.map(function(photo){ return photo.src; }), Number(button.getAttribute('data-preview-photo')));
       });
     });
     var cta = document.getElementById('bf-preview-cta');
@@ -2471,6 +2488,12 @@
   document.getElementById('bf-inline-after').addEventListener('change', function(){ blogSyncInlinePhoto(true); });
   document.getElementById('bf-inline-after').addEventListener('input', function(){ blogSyncInlinePhoto(true); });
   var bfEditorBody = document.getElementById('bf-editor-content');
+  var bfGalleryModal = document.getElementById('bf-gallery-modal');
+  bfGalleryModal.querySelector('.bf-gallery-close').addEventListener('click', function(){ bfGalleryModal.hidden = true; });
+  bfGalleryModal.querySelector('.bf-gallery-prev').addEventListener('click', function(){ stepAdminGalleryPreview(-1); });
+  bfGalleryModal.querySelector('.bf-gallery-next').addEventListener('click', function(){ stepAdminGalleryPreview(1); });
+  bfGalleryModal.addEventListener('click', function(e){ if (e.target === bfGalleryModal) bfGalleryModal.hidden = true; });
+  document.addEventListener('keydown', function(e){ if (!bfGalleryModal.hidden && e.key === 'Escape') bfGalleryModal.hidden = true; });
   var bfArticleCanvas = document.querySelector('.bf-article-canvas');
   bfArticleCanvas.addEventListener('click', function(e){
     if (e.target.closest && e.target.closest('a')) e.preventDefault();

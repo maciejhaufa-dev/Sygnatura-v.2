@@ -161,17 +161,48 @@
       '<img src="" alt=""><button type="button" class="lb-nav lb-next" aria-label="Następne">›</button>';
     tlo.style.display = 'none';
     document.body.appendChild(tlo);
+    function zamknij(){
+      tlo.style.display = 'none';
+      var player = tlo.querySelector('.lb-video');
+      if (player) player.remove();
+      tlo.querySelector('img').style.display = '';
+    }
     function pokaz(i) {
+      if (!lbLista.length) return;
       lbIdx = (i + lbLista.length) % lbLista.length;
-      tlo.querySelector('img').src = lbLista[lbIdx];
+      var raw = lbLista[lbIdx], item = typeof raw === 'string' ? { src: raw } : (raw || {});
+      var img = tlo.querySelector('img'), oldPlayer = tlo.querySelector('.lb-video');
+      if (oldPlayer) oldPlayer.remove();
+      if (item.video){
+        img.style.display = 'none';
+        var player, yt = item.youtube || videoId(item.src);
+        if (yt){
+          player = document.createElement('iframe');
+          player.src = 'https://www.youtube.com/embed/' + encodeURIComponent(yt) + '?autoplay=1';
+          player.title = 'Podgląd filmu z galerii';
+          player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+          player.allowFullscreen = true;
+        } else if (/\.(mp4|webm|ogg)(?:[?#]|$)/i.test(item.src || '')){
+          player = document.createElement('video');
+          player.controls = true; player.playsInline = true; player.src = item.src;
+        } else {
+          player = document.createElement('a'); player.href = item.src; player.target = '_blank'; player.rel = 'noopener';
+          player.className = 'lb-video-link'; player.textContent = 'Otwórz film w nowej karcie';
+        }
+        player.classList.add('lb-video');
+        tlo.insertBefore(player, tlo.querySelector('.lb-next'));
+      } else {
+        img.style.display = '';
+        img.src = item.src || '';
+      }
       tlo.style.display = 'grid';
     }
-    tlo.addEventListener('click', function (e) { if (e.target === tlo || e.target.classList.contains('lb-zamknij')) tlo.style.display = 'none'; });
+    tlo.addEventListener('click', function (e) { if (e.target === tlo || e.target.classList.contains('lb-zamknij')) zamknij(); });
     tlo.querySelector('.lb-prev').addEventListener('click', function (e) { e.stopPropagation(); pokaz(lbIdx - 1); });
     tlo.querySelector('.lb-next').addEventListener('click', function (e) { e.stopPropagation(); pokaz(lbIdx + 1); });
     document.addEventListener('keydown', function (e) {
       if (tlo.style.display !== 'grid') return;
-      if (e.key === 'Escape') tlo.style.display = 'none';
+      if (e.key === 'Escape') zamknij();
       if (e.key === 'ArrowLeft') pokaz(lbIdx - 1);
       if (e.key === 'ArrowRight') pokaz(lbIdx + 1);
     });
@@ -255,7 +286,7 @@
     if (wszystkie.length > 1) {
       pasekGalerii = '<section class="wpis-galeria-sekcja" aria-label="Galeria realizacji"><h2 class="wpis-galeria-naglowek">GALERIA</h2><div class="wpis-galeria-pasek"><button type="button" class="wpis-galeria-nav" data-dir="-1" aria-label="Przewiń zdjęcia w lewo">‹</button><div class="wpis-miniatury" aria-label="Zdjęcia i filmy realizacji">';
       wszystkie.forEach(function (m, i) {
-        pasekGalerii += '<button type="button" class="wpis-mini' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" aria-label="' + (m.video ? 'Odtwórz film ' : 'Pokaż zdjęcie ') + (i + 1) + '">' +
+        pasekGalerii += '<button type="button" class="wpis-mini' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" aria-label="' + (m.video ? 'Otwórz podgląd filmu ' : 'Otwórz podgląd zdjęcia ') + (i + 1) + '">' +
           (m.video ? '<span class="wpis-mini-video">▶</span>' : '<img src="' + esc(m.thumb) + '" alt="">') + '</button>';
       });
       pasekGalerii += '</div><button type="button" class="wpis-galeria-nav" data-dir="1" aria-label="Przewiń zdjęcia w prawo">›</button></div></section>';
@@ -312,8 +343,8 @@
     }
     kontener.querySelectorAll('.wpis-mini').forEach(function (button) {
       button.addEventListener('click', function () {
-        showMedia(Number(button.getAttribute('data-i')), button);
-        mainMedia.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const index = Number(button.getAttribute('data-i'));
+        lb.otworz(wszystkie.map(function (m) { return { src: m.src, video: m.video, youtube: m.youtube }; }), index);
       });
     });
     videoBack.addEventListener('click', function () {
