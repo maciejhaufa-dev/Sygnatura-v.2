@@ -32,7 +32,7 @@
   }
   function odczytajUkladWpisu(html) {
     const source = String(html || ''), marker = /<!--SYG_ARTICLE_LAYOUT:([\s\S]*?)-->/i.exec(source);
-    let config = { mode: 'newspaper', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
+    let config = { mode: 'newspaper', heroSide: 'right', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
     if (marker) {
       try {
         const stored = JSON.parse(decodeURIComponent(marker[1]));
@@ -40,6 +40,7 @@
       } catch (ignore) {}
     }
     if (config.mode !== 'stacked') config.mode = 'newspaper';
+    if (config.heroSide !== 'left') config.heroSide = 'right';
     if (['left', 'right', 'wide'].indexOf(config.inlineSide) < 0) config.inlineSide = 'left';
     config.inlineAfter = Math.max(1, Math.min(8, Number(config.inlineAfter) || 2));
     return { config: config, html: marker ? source.replace(marker[0], '') : source };
@@ -53,7 +54,6 @@
         }).filter(function (src) { return src && src !== cover; });
         parsed.config.inlineSrc = candidates[0] || '';
       }
-      if (parsed.config.inlineSrc) parsed.config.inlineSide = 'left';
     }
     return parsed;
   }
@@ -94,47 +94,6 @@
       previousSide = side === 'wide' ? 'right' : side;
     });
     return root.innerHTML;
-  }
-  function budujUkladWpisu(html, galleryHtml, mode) {
-    const root = document.createElement('div'); root.innerHTML = html || '';
-    Array.from(root.querySelectorAll('figure.wpis-inline-foto')).forEach(function (figure) {
-      if (figure.parentNode === root) return;
-      let top = figure;
-      while (top.parentNode && top.parentNode !== root) top = top.parentNode;
-      if (top.parentNode === root) {
-        root.insertBefore(figure, top.nextSibling);
-        if (top !== figure && top.nodeName === 'P' && !top.textContent.trim() && !top.querySelector('img,figure')) top.remove();
-      }
-    });
-    const chunks = [[]], photos = [];
-    Array.from(root.childNodes).forEach(function (node) {
-      if (node.nodeType === 1 && node.matches('figure.wpis-inline-foto')) {
-        photos.push(node); chunks.push([]);
-      } else chunks[chunks.length - 1].push(node);
-    });
-    const layout = document.createElement('div');
-    layout.className = 'wpis-uklad'; layout.setAttribute('data-layout', mode === 'stacked' ? 'stacked' : 'newspaper');
-    function textBlock(nodes) {
-      const block = document.createElement('div'); block.className = 'blog-tresc';
-      nodes.forEach(function (node) { block.appendChild(node); });
-      return block;
-    }
-    function section(side, mediaNode, nodes, isHero) {
-      const row = document.createElement('section');
-      row.className = 'wpis-segment ' + (isHero ? 'wpis-segment-hero' : 'wpis-segment-inline') + ' media-' + side;
-      const copy = textBlock(nodes);
-      if (side === 'left') { row.appendChild(mediaNode); row.appendChild(copy); }
-      else if (side === 'wide') { row.appendChild(mediaNode); row.appendChild(copy); }
-      else { row.appendChild(copy); row.appendChild(mediaNode); }
-      layout.appendChild(row);
-    }
-    const hero = document.createElement('div'); hero.innerHTML = galleryHtml || '';
-    section('right', hero.firstElementChild || document.createElement('div'), chunks[0], true);
-    photos.forEach(function (photo, index) {
-      const side = photo.classList.contains('side-right') ? 'right' : (photo.classList.contains('side-wide') ? 'wide' : 'left');
-      section(side, photo, chunks[index + 1] || [], false);
-    });
-    return layout.outerHTML;
   }
 
   /* ---------- lista (kafle) ---------- */
@@ -223,7 +182,7 @@
   function renderCachedBlogEntry(kontener,w){
     const cover=okladkaRealizacji(w), parsed=przygotujUkladWpisu(w,odczytajUkladWpisu(w.tresc)), mode=parsed.config.mode;
     const gallery='<div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div>';
-    kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header>'+budujUkladWpisu(wstawIlustracjeWpisu(parsed.html,parsed.config,w.tytul),gallery,mode)+'</article>';
+    kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header><div class="wpis-uklad" data-layout="'+esc(mode)+'" data-hero-side="'+esc(parsed.config.heroSide)+'"><div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div><div class="blog-tresc">'+wstawIlustracjeWpisu(parsed.html,parsed.config,w.tytul)+'</div></div></article>';
   }
   async function wpis(kontener) {
     const id = SYG.param('id');
@@ -324,8 +283,9 @@
     }
 
     const parsedBody = przygotujUkladWpisu(w, odczytajUkladWpisu(w.tresc));
-    const layoutHtml = budujUkladWpisu(
-      wstawIlustracjeWpisu(parsedBody.html, parsedBody.config, w.tytul), galeria, parsedBody.config.mode);
+    const layoutHtml = '<div class="wpis-uklad" data-layout="' + esc(parsedBody.config.mode) +
+      '" data-hero-side="' + esc(parsedBody.config.heroSide) + '">' + galeria +
+      '<div class="blog-tresc">' + wstawIlustracjeWpisu(parsedBody.html, parsedBody.config, w.tytul) + '</div></div>';
     kontener.innerHTML =
       '<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a>' +
       '<article class="wpis-artykul"><header class="wpis-naglowek">' +

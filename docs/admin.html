@@ -482,6 +482,9 @@
                 <label>Układ zdjęcia głównego i tekstu
                   <select id="bf-layout-mode"><option value="newspaper">Tekst opływa zdjęcie i przechodzi pod nim</option><option value="stacked">Zdjęcie nad tekstem bez opływania</option></select>
                 </label>
+                <label>Położenie zdjęcia głównego względem tekstu
+                  <select id="bf-hero-side"><option value="right">Zdjęcie po prawej, tekst po lewej</option><option value="left">Zdjęcie po lewej, tekst po prawej</option></select>
+                </label>
                 <label>Drugie zdjęcie w treści (opcjonalnie)
                   <select id="bf-inline-photo"><option value="">Nie dodawaj</option></select>
                 </label>
@@ -2167,9 +2170,10 @@
   }
   function odczytajUkladTresc(html){
     var source = String(html || ''), marker = /<!--SYG_ARTICLE_LAYOUT:([\s\S]*?)-->/i.exec(source);
-    var config = { mode: 'newspaper', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
+    var config = { mode: 'newspaper', heroSide: 'right', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
     if (marker) { try { config = Object.assign(config, JSON.parse(decodeURIComponent(marker[1]))); } catch (ignore) {} }
     if (config.mode !== 'stacked') config.mode = 'newspaper';
+    if (config.heroSide !== 'left') config.heroSide = 'right';
     if (['left','right','wide'].indexOf(config.inlineSide) < 0) config.inlineSide = 'left';
     config.inlineAfter = Math.max(1, Math.min(8, Number(config.inlineAfter) || 2));
     return { config: config, html: marker ? source.replace(marker[0], '') : source };
@@ -2177,6 +2181,7 @@
   function zapiszUkladTresc(html){
     var config = {
       mode: document.getElementById('bf-layout-mode').value === 'stacked' ? 'stacked' : 'newspaper',
+      heroSide: document.getElementById('bf-hero-side').value === 'left' ? 'left' : 'right',
       inlineSrc: document.getElementById('bf-inline-photo').value || '',
       inlineSide: document.getElementById('bf-inline-side').value || 'left',
       inlineAfter: Math.max(1, Math.min(8, Number(document.getElementById('bf-inline-after').value) || 2))
@@ -2422,6 +2427,7 @@
     document.getElementById('bf-inline-after').value = layoutBody.config.inlineAfter;
     rysujInlineFotoOpcje();
     document.getElementById('bf-inline-photo').value = layoutBody.config.inlineSrc;
+    document.getElementById('bf-hero-side').value = layoutBody.config.heroSide;
     blogEdytor.ustaw(layoutBody.html);
     document.getElementById('bf-widoczny').checked = w.widoczny !== false;
     var prod = w.produkt || {};
