@@ -59,7 +59,10 @@
   }
   function wstawIlustracjeWpisu(html, config, title) {
     const root = document.createElement('div'); root.innerHTML = html || '';
-    if (config && config.inlineSrc && /^(https:\/\/|assets\/|uploads\/)/i.test(config.inlineSrc)) {
+    const inlineAlreadyInBody = config && config.inlineSrc && Array.from(root.querySelectorAll('img')).some(function (img) {
+      return img.getAttribute('src') === config.inlineSrc;
+    });
+    if (config && config.inlineSrc && !inlineAlreadyInBody && /^(https:\/\/|assets\/|uploads\/)/i.test(config.inlineSrc)) {
       const figure = document.createElement('figure');
       figure.className = 'wpis-inline-foto';
       figure.innerHTML = '<img src="' + esc(config.inlineSrc) + '" alt="' + esc(title || '') + '" loading="lazy">';

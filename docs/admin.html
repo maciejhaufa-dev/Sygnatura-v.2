@@ -15,6 +15,9 @@
 <link rel="stylesheet" href="assets/admin-refresh.css?v=admin-login-3">
 <link rel="stylesheet" href="assets/admin-dashboard.css?v=dashboard-1">
 <link rel="stylesheet" href="assets/admin-landing-editor.css?v=landing-editor-2">
+<link rel="stylesheet" href="assets/interior-refresh.css?v=brand-split-2">
+<link rel="stylesheet" href="assets/blog-entry-layout.css?v=9">
+<link rel="stylesheet" href="assets/blog-editor.css?v=1">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -500,9 +503,46 @@
               <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
               <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
             </div>
-            <div class="pole">
-              <label>Treść wpisu — zaznacz tekst i formatuj jak w edytorze forum</label>
-              <div class="editor" id="bf-tresc" style="min-height:180px"></div>
+            <div class="pole bf-editor-pole">
+              <label>Treść wpisu — edytuj bezpośrednio na podglądzie strony</label>
+              <p class="bf-editor-instrukcja">To jest podgląd artykułu w układzie strony. Kliknij tekst, żeby go zmienić; przeciągnij uchwyt ⠿ przy bloku, aby zmienić kolejność. Zmiany widać od razu i zapisują się dopiero po kliknięciu „Zapisz wpis”.</p>
+              <div class="bf-preview-switch" role="group" aria-label="Szerokość podglądu">
+                <button type="button" class="btn outline on" data-preview-width="desktop">Podgląd desktop</button>
+                <button type="button" class="btn outline" data-preview-width="mobile">Podgląd telefon</button>
+              </div>
+              <div class="editor bf-article-editor" id="bf-tresc">
+                <div class="bf-preview-viewport">
+                  <div class="interior-content bf-article-canvas" id="blog-tresc">
+                    <a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a>
+                    <article class="wpis-artykul">
+                      <header class="wpis-naglowek">
+                        <span class="tag" id="bf-preview-kategoria"></span>
+                        <h1 id="bf-preview-tytul"></h1>
+                        <p class="sub" id="bf-preview-data"></p>
+                      </header>
+                      <div class="wpis-uklad" id="bf-preview-uklad" data-layout="newspaper" data-hero-side="right">
+                        <div class="wpis-galeria"><div class="wpis-media-glowny" id="bf-preview-okladka"></div></div>
+                        <div class="blog-tresc edtr-pole" id="bf-editor-content" aria-label="Treść artykułu"></div>
+                      </div>
+                      <section class="wpis-galeria-sekcja" id="bf-preview-galeria" aria-label="Galeria realizacji">
+                        <h2 class="wpis-galeria-naglowek">GALERIA</h2>
+                        <div class="wpis-galeria-pasek">
+                          <button type="button" class="wpis-galeria-nav" data-preview-scroll="-1" aria-label="Przewiń zdjęcia w lewo">‹</button>
+                          <div class="wpis-miniatury" id="bf-preview-miniatury"></div>
+                          <button type="button" class="wpis-galeria-nav" data-preview-scroll="1" aria-label="Przewiń zdjęcia w prawo">›</button>
+                        </div>
+                      </section>
+                      <div class="wpis-produkt" id="bf-preview-cta"></div>
+                    </article>
+                  </div>
+                </div>
+              </div>
+              <div class="bf-editor-block-actions" aria-label="Dodaj blok treści">
+                <button class="btn outline" type="button" data-add-block="paragraph">+ Akapit</button>
+                <button class="btn outline" type="button" data-add-block="heading">+ Nagłówek</button>
+                <button class="btn outline" type="button" data-add-block="quote">+ Cytat</button>
+                <button class="btn outline" type="button" data-add-block="divider">+ Separator</button>
+              </div>
               <input type="hidden" id="bf-zrodlo">
             </div>
             <div class="przyciski">
@@ -2157,17 +2197,13 @@
   });
 
   /* ============ BLOG ============ */
-  var blogEdytor = SYG.edytorTresci.stworz(document.getElementById('bf-tresc'));
+  var blogEdytor = SYG.edytorTresci.stworz(document.getElementById('bf-tresc'), document.getElementById('bf-editor-content'));
   var wpisyBlog = [];
   var wybranyId = null;
   var trybEdycji = false;
   var nowySzkic = false;
   var galeria = [];
 
-  function escB(s){
-    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
   function odczytajUkladTresc(html){
     var source = String(html || ''), marker = /<!--SYG_ARTICLE_LAYOUT:([\s\S]*?)-->/i.exec(source);
     var config = { mode: 'newspaper', heroSide: 'right', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
@@ -2186,7 +2222,11 @@
       inlineSide: document.getElementById('bf-inline-side').value || 'left',
       inlineAfter: Math.max(1, Math.min(8, Number(document.getElementById('bf-inline-after').value) || 2))
     };
-    return odczytajUkladTresc(html).html + '<!--SYG_ARTICLE_LAYOUT:' + encodeURIComponent(JSON.stringify(config)) + '-->';
+    var clean = document.createElement('div');
+    clean.innerHTML = odczytajUkladTresc(html).html;
+    clean.querySelectorAll('[data-bf-editor-only]').forEach(function(node){ node.remove(); });
+    clean.querySelectorAll('[data-bf-inline-generated]').forEach(function(node){ node.removeAttribute('contenteditable'); });
+    return clean.innerHTML + '<!--SYG_ARTICLE_LAYOUT:' + encodeURIComponent(JSON.stringify(config)) + '-->';
   }
   function rysujInlineFotoOpcje(){
     var select = document.getElementById('bf-inline-photo'); if (!select) return;
@@ -2197,6 +2237,123 @@
     if (galeria.some(function(g){ return g.src === current; })) select.value = current;
   }
 
+  function escB(s){
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function blogPreviewRefresh(){
+    var title = document.getElementById('bf-tytul').value.trim() || 'Tytuł wpisu';
+    var category = document.getElementById('bf-kategoria').value.trim();
+    var dateValue = document.getElementById('bf-data').value;
+    var dateText = '';
+    if (dateValue){ var date = new Date(dateValue + 'T12:00:00'); if (!isNaN(date.getTime())) dateText = date.toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'}); }
+    var categoryEl = document.getElementById('bf-preview-kategoria');
+    categoryEl.textContent = category;
+    categoryEl.hidden = !category;
+    document.getElementById('bf-preview-tytul').textContent = title;
+    document.getElementById('bf-preview-data').textContent = dateText;
+    var layout = document.getElementById('bf-preview-uklad');
+    layout.dataset.layout = document.getElementById('bf-layout-mode').value === 'stacked' ? 'stacked' : 'newspaper';
+    layout.dataset.heroSide = document.getElementById('bf-hero-side').value === 'left' ? 'left' : 'right';
+    var cover = galeria.find(function(g){ return g.glowna; }) || galeria[0];
+    document.getElementById('bf-preview-okladka').innerHTML = cover
+      ? '<figure class="wpis-okladka"><button type="button" class="bf-hero-handle" draggable="true" contenteditable="false" title="Przeciągnij zdjęcie w lewo lub prawo">⠿ Przesuń zdjęcie</button><img src="' + escB(cover.src) + '" alt="' + escB(title) + '" loading="eager" decoding="async"></figure>'
+      : '<p class="mala">Dodaj zdjęcie, aby zobaczyć je tutaj.</p>';
+    var unique = [];
+    [cover].concat(galeria).forEach(function(g){ if (g && g.src && !unique.some(function(x){ return x.src === g.src; })) unique.push(g); });
+    var thumbs = document.getElementById('bf-preview-miniatury');
+    thumbs.innerHTML = unique.map(function(g,i){
+      return '<button type="button" class="wpis-mini' + (cover && g.src === cover.src ? ' on' : '') + '" data-preview-photo="' + i + '" aria-label="Ustaw zdjęcie ' + (i+1) + ' jako główne"><img src="' + escB(g.src) + '" alt=""></button>';
+    }).join('');
+    document.getElementById('bf-preview-galeria').hidden = unique.length < 2;
+    thumbs.querySelectorAll('[data-preview-photo]').forEach(function(button){
+      button.addEventListener('click', function(){
+        var photo = unique[Number(button.getAttribute('data-preview-photo'))];
+        if (!photo) return;
+        galeria.forEach(function(g){ g.glowna = g.src === photo.src; });
+        rysujMini();
+      });
+    });
+    var cta = document.getElementById('bf-preview-cta');
+    var isProduct = document.getElementById('bf-sklep').checked;
+    if (SYG.LAUNCH){
+      var phone = String(SYG.TEL || '').replace(/\D/g,'');
+      cta.innerHTML = '<div><h2>Podoba Ci się ten projekt?</h2><p style="margin:6px 0 14px">Wykonamy taki sam — albo z Twoim napisem, imionami i datą. Napisz lub zadzwoń:</p><div class="przyciski" style="flex-wrap:wrap"><a class="btn" href="kontakt.html?projekt=' + encodeURIComponent(title) + '">Napisz / Zamówienie</a><a class="btn outline" href="tel:+' + (phone.length === 9 ? '48' + phone : phone) + '">☎ ' + escB(SYG.TEL || '') + '</a></div></div>';
+    } else if (isProduct){
+      var productName = document.getElementById('bf-p-nazwa').value.trim() || title;
+      var productId = Number(document.getElementById('bf-p-link').value || 0);
+      cta.innerHTML = '<div><h2>Podoba Ci się ten projekt?</h2><p style="margin:6px 0 14px">' + escB(productName) + ' — ' + SYG.zl(Number(document.getElementById('bf-p-cena').value)||0) + '</p><div class="przyciski" style="flex-wrap:wrap"><button type="button" class="btn" data-koszyk="' + productId + '">DODAJ DO KOSZYKA</button><a class="btn outline" href="personalizacja.html?produkt=' + encodeURIComponent(productName) + '">ZAMÓW JUŻ DZIŚ!</a></div></div>';
+    } else cta.innerHTML = '';
+    decorateBlogBlocks();
+  }
+
+  function blogSyncInlinePhoto(forcePosition){
+    var body = document.getElementById('bf-editor-content');
+    if (!body) return;
+    var src = document.getElementById('bf-inline-photo').value;
+    var existing = body.querySelector('[data-bf-inline-generated="1"]');
+    if (!src){ body.querySelectorAll('[data-bf-inline-generated="1"]').forEach(function(node){ node.remove(); }); blogPreviewRefresh(); return; }
+    if (existing && existing.querySelector('img') && existing.querySelector('img').getAttribute('src') === src && !forcePosition){ blogPreviewRefresh(); return; }
+    body.querySelectorAll('[data-bf-inline-generated="1"]').forEach(function(node){ node.remove(); });
+    var figure = document.createElement('figure');
+    figure.className = 'wpis-inline-foto side-' + (document.getElementById('bf-inline-side').value || 'left');
+    figure.setAttribute('data-bf-inline-generated','1');
+    figure.contentEditable = 'false';
+    figure.innerHTML = '<img src="' + escB(src) + '" alt="' + escB(document.getElementById('bf-tytul').value) + '" loading="lazy">';
+    var paragraphs = body.querySelectorAll('p:not([data-bf-editor-only])');
+    var after = Math.max(1, Number(document.getElementById('bf-inline-after').value) || 2);
+    var target = paragraphs[Math.min(paragraphs.length, after) - 1];
+    if (target && target.parentNode) target.parentNode.insertBefore(figure,target.nextSibling); else body.appendChild(figure);
+    blogPreviewRefresh();
+  }
+
+  var blogDraggedBlock = null;
+  function normalizeBlogInlineImages(){
+    var body = document.getElementById('bf-editor-content');
+    if (!body) return;
+    Array.prototype.slice.call(body.querySelectorAll('img')).forEach(function(img){
+      if (img.closest('.wpis-inline-foto')) return;
+      var figure = img.closest('figure');
+      if (figure){ figure.classList.add('wpis-inline-foto'); return; }
+      figure = document.createElement('figure');
+      figure.className = 'wpis-inline-foto';
+      var parent = img.parentNode;
+      if (parent && parent.nodeName === 'P' && parent.parentNode){ parent.parentNode.insertBefore(figure,parent.nextSibling); figure.appendChild(img); }
+      else if (parent){ parent.replaceChild(figure,img); figure.appendChild(img); }
+    });
+    var side = 'right';
+    Array.prototype.slice.call(body.querySelectorAll('figure.wpis-inline-foto')).forEach(function(figure,index){
+      var nextSide = index === 0 && document.getElementById('bf-inline-side').value === 'wide' ? 'wide'
+        : (index === 0 && document.getElementById('bf-inline-side').value === 'right' ? 'right' : (side === 'left' ? 'right' : 'left'));
+      figure.classList.remove('side-left','side-right','side-wide');
+      figure.classList.add('side-' + nextSide);
+      side = nextSide === 'wide' ? 'right' : nextSide;
+    });
+  }
+  function decorateBlogBlocks(){
+    var body = document.getElementById('bf-editor-content');
+    if (!body) return;
+    normalizeBlogInlineImages();
+    Array.prototype.slice.call(body.children).forEach(function(block){
+      if (block.tagName === 'TABLE'){
+        var tableWrap = document.createElement('div'); tableWrap.className = 'wpis-table-block';
+        body.insertBefore(tableWrap,block); tableWrap.appendChild(block); block = tableWrap;
+      }
+      if (!/^(P|H1|H2|H3|H4|BLOCKQUOTE|UL|OL|FIGURE|DIV|HR)$/.test(block.tagName)) return;
+      block.classList.add('bf-editor-block');
+      var handles = block.querySelectorAll(':scope > .bf-block-handle');
+      if (!handles.length){
+        var handle = document.createElement('button');
+        handle.type = 'button'; handle.className = 'bf-block-handle'; handle.setAttribute('data-bf-editor-only','1');
+        handle.setAttribute('draggable','true'); handle.setAttribute('contenteditable','false');
+        handle.setAttribute('aria-label','Przeciągnij blok, aby zmienić jego kolejność'); handle.title = 'Przeciągnij blok'; handle.textContent = '⠿';
+        block.insertBefore(handle,block.firstChild);
+      } else {
+        Array.prototype.slice.call(handles,1).forEach(function(handle){ handle.remove(); });
+      }
+    });
+  }
 
   function infoBlog(txt){
     var f = document.getElementById('blog-info');
@@ -2228,6 +2385,7 @@
       kont.appendChild(el);
     });
     rysujInlineFotoOpcje();
+    blogSyncInlinePhoto();
   }
 
   var blogUploadWTrakcie = false;
@@ -2299,6 +2457,95 @@
 
   document.getElementById('bf-sklep').addEventListener('change', function(){
     document.getElementById('bf-produkt').style.display = this.checked ? 'block' : 'none';
+    blogPreviewRefresh();
+  });
+  ['bf-tytul','bf-kategoria','bf-data','bf-p-nazwa','bf-p-cena','bf-p-gabaryt'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', blogPreviewRefresh);
+  });
+  document.getElementById('bf-p-link').addEventListener('change', blogPreviewRefresh);
+  ['bf-layout-mode','bf-hero-side'].forEach(function(id){ document.getElementById(id).addEventListener('change', blogPreviewRefresh); });
+  ['bf-inline-photo','bf-inline-side'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', function(){ blogSyncInlinePhoto(false); });
+    document.getElementById(id).addEventListener('input', function(){ blogSyncInlinePhoto(false); });
+  });
+  document.getElementById('bf-inline-after').addEventListener('change', function(){ blogSyncInlinePhoto(true); });
+  document.getElementById('bf-inline-after').addEventListener('input', function(){ blogSyncInlinePhoto(true); });
+  var bfEditorBody = document.getElementById('bf-editor-content');
+  var bfArticleCanvas = document.querySelector('.bf-article-canvas');
+  bfArticleCanvas.addEventListener('click', function(e){
+    if (e.target.closest && e.target.closest('a')) e.preventDefault();
+  });
+  bfArticleCanvas.addEventListener('dragstart', function(e){
+    if (e.target.closest && e.target.closest('.bf-hero-handle') && e.dataTransfer){
+      e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain','article-cover');
+    }
+  });
+  bfArticleCanvas.addEventListener('dragend', function(e){
+    if (!(e.target.closest && e.target.closest('.bf-hero-handle'))) return;
+    var bounds = bfArticleCanvas.getBoundingClientRect();
+    document.getElementById('bf-hero-side').value = e.clientX < bounds.left + bounds.width / 2 ? 'left' : 'right';
+    blogPreviewRefresh();
+  });
+  bfEditorBody.addEventListener('input', function(){ setTimeout(decorateBlogBlocks,0); });
+  bfEditorBody.addEventListener('dragstart', function(e){
+    var handle = e.target.closest && e.target.closest('.bf-block-handle');
+    if (!handle) { e.preventDefault(); return; }
+    blogDraggedBlock = handle.parentElement;
+    if (e.dataTransfer){ e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain','article-block'); }
+    blogDraggedBlock.classList.add('bf-dragging');
+  });
+  bfEditorBody.addEventListener('dragover', function(e){
+    var target = e.target.closest && e.target.closest('.bf-editor-block');
+    if (!blogDraggedBlock || !target || target === blogDraggedBlock || target.parentElement !== bfEditorBody) return;
+    e.preventDefault();
+    bfEditorBody.querySelectorAll('.bf-drop-before,.bf-drop-after').forEach(function(node){ node.classList.remove('bf-drop-before','bf-drop-after'); });
+    var after = e.clientY > target.getBoundingClientRect().top + target.getBoundingClientRect().height / 2;
+    target.classList.add(after ? 'bf-drop-after' : 'bf-drop-before');
+  });
+  bfEditorBody.addEventListener('drop', function(e){
+    var target = e.target.closest && e.target.closest('.bf-editor-block');
+    if (!blogDraggedBlock || !target || target === blogDraggedBlock || target.parentElement !== bfEditorBody) return;
+    e.preventDefault();
+    var after = target.classList.contains('bf-drop-after');
+    target.parentNode.insertBefore(blogDraggedBlock, after ? target.nextSibling : target);
+    blogDraggedBlock.classList.remove('bf-dragging');
+    blogDraggedBlock = null;
+    bfEditorBody.querySelectorAll('.bf-drop-before,.bf-drop-after').forEach(function(node){ node.classList.remove('bf-drop-before','bf-drop-after'); });
+    blogPreviewRefresh();
+  });
+  bfEditorBody.addEventListener('dragend', function(){
+    if (blogDraggedBlock) blogDraggedBlock.classList.remove('bf-dragging');
+    blogDraggedBlock = null;
+    bfEditorBody.querySelectorAll('.bf-drop-before,.bf-drop-after').forEach(function(node){ node.classList.remove('bf-drop-before','bf-drop-after'); });
+  });
+  document.querySelectorAll('#bf-tresc [data-preview-scroll]').forEach(function(button){
+    button.addEventListener('click', function(){
+      var strip = document.getElementById('bf-preview-miniatury');
+      strip.scrollBy({left: Number(button.getAttribute('data-preview-scroll')) * Math.max(180, strip.clientWidth * .7), behavior: 'smooth'});
+    });
+  });
+  document.querySelectorAll('#bf-tresc [data-preview-width]').forEach(function(button){
+    button.addEventListener('click', function(){
+      var mobile = button.getAttribute('data-preview-width') === 'mobile';
+      document.querySelector('.bf-preview-viewport').dataset.device = mobile ? 'mobile' : 'desktop';
+      document.querySelectorAll('#bf-tresc [data-preview-width]').forEach(function(other){ other.classList.toggle('on',other === button); });
+    });
+  });
+  document.querySelectorAll('#bf-tresc [data-add-block]').forEach(function(button){
+    button.addEventListener('click', function(){
+      var kind = button.getAttribute('data-add-block');
+      var tag = kind === 'heading' ? 'h2' : (kind === 'quote' ? 'blockquote' : (kind === 'divider' ? 'div' : 'p'));
+      var block = document.createElement(tag);
+      if (kind === 'divider'){ block.className = 'wpis-separator'; block.innerHTML = '<hr>'; }
+      else block.innerHTML = '<br>';
+      bfEditorBody.appendChild(block);
+      decorateBlogBlocks();
+      if (kind !== 'divider'){
+        var range = document.createRange(); range.selectNodeContents(block); range.collapse(false);
+        var selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range); bfEditorBody.focus();
+      }
+      blogPreviewRefresh();
+    });
   });
 
   async function wypelnijLinkProdukty(){
@@ -2422,12 +2669,17 @@
     document.getElementById('bf-zajawka').value = nowySzkic ? '' : (w.zajawka || '');
     document.getElementById('bf-video').value = w.video || '';
     var layoutBody = odczytajUkladTresc(nowySzkic ? '' : (w.tresc || ''));
+    if (String(w.id) === '1' && !layoutBody.config.inlineSrc){
+      var coverForInline = w.okladka || '';
+      var firstOtherPhoto = (Array.isArray(w.galeria) ? w.galeria : []).map(function(item){ return typeof item === 'string' ? item : String(item && (item.src || item.url || '') || ''); }).find(function(src){ return src && src !== coverForInline; });
+      layoutBody.config.inlineSrc = firstOtherPhoto || '';
+    }
     document.getElementById('bf-layout-mode').value = layoutBody.config.mode;
+    document.getElementById('bf-hero-side').value = layoutBody.config.heroSide;
     document.getElementById('bf-inline-side').value = layoutBody.config.inlineSide;
     document.getElementById('bf-inline-after').value = layoutBody.config.inlineAfter;
     rysujInlineFotoOpcje();
     document.getElementById('bf-inline-photo').value = layoutBody.config.inlineSrc;
-    document.getElementById('bf-hero-side').value = layoutBody.config.heroSide;
     blogEdytor.ustaw(layoutBody.html);
     document.getElementById('bf-widoczny').checked = w.widoczny !== false;
     var prod = w.produkt || {};
@@ -2438,12 +2690,17 @@
     document.getElementById('bf-p-cena').value = prod.cena || '';
     document.getElementById('bf-p-gabaryt').value = prod.gabaryt || '';
     rysujMini();
+    blogSyncInlinePhoto();
+    document.querySelector('.bf-preview-viewport').dataset.device = 'desktop';
+    document.querySelectorAll('#bf-tresc [data-preview-width]').forEach(function(button){ button.classList.toggle('on',button.getAttribute('data-preview-width') === 'desktop'); });
   }
 
   function wejdzWTrybEdycji(){
     var w = wpisWybrany();
     if (!w) return;
     trybEdycji = true;
+    document.body.classList.add('blog-editor-fullscreen');
+    document.getElementById('tab-blog').classList.add('blog-editing');
     wypelnijFormularz(w);
     document.getElementById('blog-podglad').style.display = 'none';
     document.getElementById('blog-przyciski').style.display = 'none';
@@ -2453,6 +2710,8 @@
   function wyjdzZTrybuEdycji(){
     trybEdycji = false;
     nowySzkic = false;
+    document.body.classList.remove('blog-editor-fullscreen');
+    document.getElementById('tab-blog').classList.remove('blog-editing');
     document.getElementById('blog-form').style.display = 'none';
     document.getElementById('blog-podglad').style.display = 'block';
     document.getElementById('blog-przyciski').style.display = '';

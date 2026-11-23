@@ -1,0 +1,62 @@
+/* WYSIWYG article editor: the canvas uses the same article structure and CSS as blog-wpis.html. */
+body.admin-page.admin-authenticated.blog-editor-fullscreen .admin-tabs { display: none !important; }
+body.admin-page.admin-authenticated.blog-editor-fullscreen .strona-uklad .head { margin-left: 0 !important; }
+body.admin-page.admin-authenticated.blog-editor-fullscreen main.wrap { margin-left: 0 !important; padding-right: clamp(12px,2vw,30px) !important; padding-left: clamp(12px,2vw,30px) !important; }
+#tab-blog.blog-editing > .admin-dwie { display: block !important; }
+#tab-blog.blog-editing > .admin-dwie > div:nth-child(2) { display: none !important; }
+#tab-blog.blog-editing #blog-form { width: 100%; max-width: none; }
+#tab-blog.blog-editing .bf-editor-pole { margin-top: 18px; }
+.bf-editor-instrukcja { margin: 4px 0 10px; color: #665d54; font-size: 13px; line-height: 1.5; }
+.bf-preview-switch,.bf-editor-block-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+.bf-preview-switch .btn,.bf-editor-block-actions .btn { min-height: 34px; padding: 7px 11px; font-size: 12px; }
+.bf-preview-switch .on { background: var(--butelkowa); color: #fff; }
+.bf-article-editor { display: block; min-height: 0; border: 1px solid #d8c9b7; background: #f1ece4; }
+.bf-article-editor .edtr-bar { position: sticky; top: 0; z-index: 40; }
+.bf-preview-viewport { max-height: min(76vh, 980px); overflow: auto; padding: 18px; background: #e6dfd5; overscroll-behavior: contain; }
+.bf-article-canvas { --interior-forest: #1f3a32; --interior-cream: #fbf7f0; --interior-paper: #fffdf9; --interior-line: #e6ddd1; --interior-gold: #b27d43; width: 100%; max-width: 1380px; min-height: 520px; margin: 0 auto; padding: 28px clamp(18px,2.5vw,36px) 48px; background: var(--interior-cream); color: #33261c; box-shadow: 0 4px 18px rgba(40,35,28,.12); transition: width .2s ease; }
+.bf-article-canvas .wpis-artykul { border-top: 0; padding-top: 0; }
+.bf-article-canvas .wpis-naglowek h1 { font: 600 clamp(27px,4vw,42px)/1.16 "Cormorant Garamond",Georgia,serif; }
+.bf-article-canvas .wpis-naglowek .sub { font: 12px "Lato",Arial,sans-serif; }
+.bf-article-canvas .wpis-galeria { margin-top: 0; }
+.bf-article-canvas .wpis-okladka { position: relative; }
+.bf-article-canvas .bf-hero-handle { position: absolute; z-index: 5; top: 8px; left: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 6px 9px; border: 1px solid rgba(107,69,48,.35); border-radius: 4px; background: rgba(255,253,249,.94); color: #755438; font: 700 11px/1.2 system-ui,sans-serif; cursor: grab; }
+.bf-article-canvas .bf-hero-handle:active { cursor: grabbing; }
+.bf-article-canvas .wpis-okladka img { height: min(68vh,620px); min-height: 300px; }
+.bf-article-canvas .wpis-uklad[data-layout="newspaper"] > .blog-tresc { font-family: "Lato",Arial,sans-serif; }
+.bf-article-canvas .edtr-pole.blog-tresc { min-height: 280px; max-height: none; overflow: visible; padding: 0; outline: none; border: 0; background: transparent; font: 15px/1.8 "Lato",Arial,sans-serif; color: #514940; }
+.bf-article-canvas .edtr-pole.blog-tresc p { margin: 8px 0; }
+.bf-article-canvas .edtr-pole.blog-tresc:empty::before { content: "Zacznij pisać tutaj albo dodaj blok tekstu poniżej…"; color: #9b8c7b; font-style: italic; pointer-events: none; }
+.bf-article-canvas .edtr-pole.blog-tresc h1,.bf-article-canvas .edtr-pole.blog-tresc h2 { color: var(--interior-forest); font: 600 30px/1.15 "Cormorant Garamond",Georgia,serif; }
+.bf-article-canvas .edtr-pole.blog-tresc h3 { color: #755438; font: 600 24px/1.2 "Cormorant Garamond",Georgia,serif; }
+.bf-article-canvas .edtr-pole.blog-tresc a { color: var(--interior-forest); }
+.bf-article-canvas .edtr-pole.blog-tresc img { max-width: 100%; max-height: 680px; object-fit: contain; }
+.bf-article-canvas .wpis-galeria-sekcja[hidden],.bf-article-canvas .wpis-produkt:empty { display: none !important; }
+.bf-article-canvas .wpis-miniatury { justify-content: flex-start; }
+.bf-article-canvas .wpis-mini { cursor: default; }
+.bf-article-canvas .wpis-mini img { border: 0; }
+.bf-article-canvas .wpis-produkt:empty { margin: 0; padding: 0; border: 0; }
+.bf-article-canvas .wpis-produkt h2 { margin: 0 0 8px; }
+.bf-article-canvas .wpis-produkt p { margin: 6px 0 14px; }
+/* Drag handles exist only inside the admin canvas and are removed before saving. */
+.bf-article-canvas .bf-editor-block { position: relative; }
+.bf-article-canvas .bf-block-handle { position: absolute; top: 2px; left: -31px; z-index: 3; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 26px; border: 1px solid #c9b9a5; border-radius: 4px; background: #fffdf9; color: #755438; font: 700 16px/1 system-ui,sans-serif; cursor: grab; user-select: none; }
+.bf-article-canvas .bf-block-handle:active { cursor: grabbing; }
+.bf-article-canvas .bf-editor-block.bf-dragging { opacity: .4; }
+.bf-article-canvas .bf-editor-block.bf-drop-before { box-shadow: 0 -3px 0 #b27d43; }
+.bf-article-canvas .bf-editor-block.bf-drop-after { box-shadow: 0 3px 0 #b27d43; }
+.bf-article-canvas .bf-inline-generated { outline: 1px dashed rgba(178,125,67,.35); }
+.bf-preview-viewport[data-device="mobile"] .bf-article-canvas { width: 390px; max-width: none; padding: 22px 18px 36px; }
+.bf-preview-viewport[data-device="mobile"] .bf-article-canvas .wpis-uklad[data-layout="newspaper"] { display: flex !important; flex-direction: column; gap: 16px !important; }
+.bf-preview-viewport[data-device="mobile"] .bf-article-canvas .wpis-uklad[data-layout="newspaper"] > .wpis-galeria { order: 0; width: 100%; margin: 0; }
+.bf-preview-viewport[data-device="mobile"] .bf-article-canvas .wpis-uklad[data-layout="newspaper"] > .blog-tresc { order: 1; width: 100%; }
+.bf-preview-viewport[data-device="mobile"] .bf-article-canvas .wpis-okladka img { height: clamp(240px,78vw,520px); min-height: 0; }
+.bf-preview-viewport[data-device="mobile"] .bf-article-canvas .wpis-miniatury { justify-content: flex-start; overflow-x: auto; }
+@media (max-width: 900px) {
+  .bf-preview-viewport { padding: 10px; }
+  .bf-article-canvas { padding: 24px 22px 38px; }
+  .bf-article-canvas .bf-block-handle { left: -27px; }
+}
+@media (max-width: 520px) {
+  .bf-article-canvas { padding: 20px 17px 32px; }
+  .bf-article-canvas .bf-block-handle { left: -24px; width: 20px; }
+}
