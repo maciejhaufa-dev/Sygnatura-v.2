@@ -44,6 +44,20 @@
     config.inlineAfter = Math.max(1, Math.min(8, Number(config.inlineAfter) || 2));
     return { config: config, html: marker ? source.replace(marker[0], '') : source };
   }
+  function przygotujUkladWpisu(w, parsed) {
+    if (!parsed.config.inlineSrc && String(w && w.id) === '1') {
+      const cover = okladkaRealizacji(w);
+      const candidates = (Array.isArray(w.galeria) ? w.galeria : []).map(function (item) {
+        return typeof item === 'string' ? item : String(item && (item.src || item.url || '') || '');
+      }).filter(function (src) { return src && src !== cover; });
+      const src = candidates[0] || '';
+      if (/^(https:\/\/|assets\/|uploads\/)/i.test(src)) {
+        parsed.config.inlineSrc = src;
+        parsed.config.inlineSide = 'right';
+      }
+    }
+    return parsed;
+  }
   function wstawIlustracjeWpisu(html, config, title) {
     if (!config || !config.inlineSrc || !/^(https:\/\/|assets\/|uploads\/)/i.test(config.inlineSrc)) return html;
     const root = document.createElement('div'); root.innerHTML = html || '';
@@ -141,7 +155,7 @@
     try{var rows=JSON.parse(sessionStorage.getItem('syg-public-blog-cache-v1')||'[]');return Array.isArray(rows)?rows.find(function(w){return w&&String(w.id)===String(id)&&w.widoczny!==false;}):null;}catch(e){return null;}
   }
   function renderCachedBlogEntry(kontener,w){
-    const cover=okladkaRealizacji(w), parsed=odczytajUkladWpisu(w.tresc), mode=parsed.config.mode;
+    const cover=okladkaRealizacji(w), parsed=przygotujUkladWpisu(w,odczytajUkladWpisu(w.tresc)), mode=parsed.config.mode;
     kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header><div class="wpis-uklad" data-layout="'+esc(mode)+'"><div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div><div class="blog-tresc">'+wstawIlustracjeWpisu(parsed.html,parsed.config,w.tytul)+'</div></div></article>';
   }
   async function wpis(kontener) {
@@ -210,12 +224,12 @@
       '<button type="button" class="wpis-video-powrot" hidden>← Wróć do zdjęć galerii</button></div>';
     let pasekGalerii = '';
     if (wszystkie.length > 1) {
-      pasekGalerii = '<div class="wpis-galeria-pasek"><button type="button" class="wpis-galeria-nav" data-dir="-1" aria-label="Przewiń zdjęcia w lewo">‹</button><div class="wpis-miniatury" aria-label="Zdjęcia i filmy realizacji">';
+      pasekGalerii = '<section class="wpis-galeria-sekcja" aria-label="Galeria realizacji"><h2 class="wpis-galeria-naglowek">GALERIA</h2><div class="wpis-galeria-pasek"><button type="button" class="wpis-galeria-nav" data-dir="-1" aria-label="Przewiń zdjęcia w lewo">‹</button><div class="wpis-miniatury" aria-label="Zdjęcia i filmy realizacji">';
       wszystkie.forEach(function (m, i) {
         pasekGalerii += '<button type="button" class="wpis-mini' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" aria-label="' + (m.video ? 'Odtwórz film ' : 'Pokaż zdjęcie ') + (i + 1) + '">' +
           (m.video ? '<span class="wpis-mini-video">▶</span>' : '<img src="' + esc(m.thumb) + '" alt="">') + '</button>';
       });
-      pasekGalerii += '</div><button type="button" class="wpis-galeria-nav" data-dir="1" aria-label="Przewiń zdjęcia w prawo">›</button></div>';
+      pasekGalerii += '</div><button type="button" class="wpis-galeria-nav" data-dir="1" aria-label="Przewiń zdjęcia w prawo">›</button></div></section>';
     }
 
     /* blok produktu — w trybie startu każda realizacja ma przycisk e-mail / kontakt */
@@ -242,7 +256,7 @@
         '</div></div>';
     }
 
-    const parsedBody = odczytajUkladWpisu(w.tresc);
+    const parsedBody = przygotujUkladWpisu(w, odczytajUkladWpisu(w.tresc));
     kontener.innerHTML =
       '<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a>' +
       '<article class="wpis-artykul"><header class="wpis-naglowek">' +
@@ -250,8 +264,8 @@
       '<h1>' + esc(w.tytul) + '</h1>' +
       '<p class="sub">' + dzien(w.data) + '</p></header>' +
       '<div class="wpis-uklad" data-layout="' + esc(parsedBody.config.mode) + '">' + galeria +
-      '<div class="blog-tresc">' + wstawIlustracjeWpisu(parsedBody.html, parsedBody.config, w.tytul) + '</div>' + pasekGalerii + '</div>' +
-      produktBlok + '</article>';
+      '<div class="blog-tresc">' + wstawIlustracjeWpisu(parsedBody.html, parsedBody.config, w.tytul) + '</div></div>' +
+      produktBlok + pasekGalerii + '</article>';
 
     const mainMedia = kontener.querySelector('.wpis-media-glowny');
     const videoBack = kontener.querySelector('.wpis-video-powrot');
@@ -269,6 +283,7 @@
     kontener.querySelectorAll('.wpis-mini').forEach(function (button) {
       button.addEventListener('click', function () {
         showMedia(Number(button.getAttribute('data-i')), button);
+        mainMedia.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     });
     videoBack.addEventListener('click', function () {
