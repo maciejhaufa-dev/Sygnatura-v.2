@@ -84,3 +84,20 @@ body.admin-page.admin-authenticated .sg-dodaj-btn:hover{background:#eee7d9}
  body.admin-page.admin-authenticated .admin-card{padding:14px}
 }
 @media(max-width:380px){body.admin-page.admin-authenticated .podsum-karty{grid-template-columns:1fr}}
+
+/* Bright, keyboard-accessible Studio Sygnatura wordmark linking to the public home page. */
+body.admin-page.admin-authenticated .admin-tabs:before{display:none!important;content:none!important}
+body.admin-page.admin-authenticated .admin-tabs .admin-brand{position:absolute;z-index:2;top:27px;left:24px;right:14px;display:flex;align-items:center;gap:11px;min-height:70px;padding:8px 7px;border-radius:10px;color:#fff8eb;text-decoration:none;transition:background .18s,color .18s}
+body.admin-page.admin-authenticated .admin-tabs .admin-brand img{display:block;width:52px;height:52px;flex:0 0 52px;object-fit:contain;filter:brightness(0) invert(1);opacity:.98}
+body.admin-page.admin-authenticated .admin-tabs .admin-brand span{color:#fff8eb;font:600 26px/1.02 var(--serif);letter-spacing:.01em}
+body.admin-page.admin-authenticated .admin-tabs .admin-brand:hover{background:rgba(255,255,255,.12);color:#fff}
+body.admin-page.admin-authenticated .admin-tabs .admin-brand:focus-visible{outline:2px solid #f3d9aa;outline-offset:2px}
+@media(max-width:900px){
+ body.admin-page.admin-authenticated .admin-tabs .admin-brand{top:18px;left:16px;right:10px;gap:9px}
+ body.admin-page.admin-authenticated .admin-tabs .admin-brand span{font-size:22px}
+}
+@media(max-width:640px){
+ body.admin-page.admin-authenticated .admin-tabs .admin-brand{position:relative;top:auto;left:auto;right:auto;flex:0 0 121px;min-height:42px;gap:7px;margin-right:4px;padding:3px}
+ body.admin-page.admin-authenticated .admin-tabs .admin-brand img{width:34px;height:34px;flex-basis:34px}
+ body.admin-page.admin-authenticated .admin-tabs .admin-brand span{font-size:17px}
+}

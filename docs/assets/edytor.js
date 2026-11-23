@@ -526,7 +526,7 @@
       fr.onload = function () {
         pole.focus();
         document.execCommand('insertHTML', false,
-          '<img src="' + fr.result + '" alt="" style="max-width:100%"><br><br>');
+          '<figure class="wpis-inline-foto"><img src="' + fr.result + '" alt="" style="max-width:100%"></figure><p><br></p>');
         zglaszaZmiane();
       };
       fr.readAsDataURL(f);
@@ -541,7 +541,7 @@
           var fr = new FileReader();
           fr.onload = function () {
             document.execCommand('insertHTML', false,
-              '<img src="' + fr.result + '" alt="" style="max-width:100%"><br>');
+              '<figure class="wpis-inline-foto"><img src="' + fr.result + '" alt="" style="max-width:100%"></figure><p><br></p>');
             zglaszaZmiane();
           };
           fr.readAsDataURL(f);

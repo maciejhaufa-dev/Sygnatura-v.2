@@ -18,10 +18,12 @@
 #blog-tresc .wpis-uklad[data-layout="stacked"] > .wpis-galeria { order: 0; width: 100%; margin: 0; }
 #blog-tresc .wpis-uklad[data-layout="stacked"] > .blog-tresc { order: 1; width: 100%; max-width: none; margin: 0; color: #514940; font-size: 17px; line-height: 1.85; text-align: justify; text-justify: inter-word; hyphens: auto; }
 #blog-tresc .blog-tresc h2, #blog-tresc .blog-tresc h3 { text-align: left; }
-#blog-tresc .wpis-inline-foto { width: min(38%, 340px); margin: 10px 20px 12px 0; float: left; clear: both; }
-#blog-tresc .wpis-inline-foto.side-right { margin: 10px 0 12px 20px; float: right; clear: both; }
-#blog-tresc .wpis-inline-foto.side-wide { width: 100%; max-width: 760px; margin: 16px auto; float: none; clear: both; }
-#blog-tresc .wpis-inline-foto img { width: 100%; height: auto; display: block; margin: 0; }
+#blog-tresc .wpis-inline-foto { position: static !important; z-index: auto !important; box-sizing: border-box; width: min(38%, 340px); max-width: 100%; margin: 10px 20px 12px 0; float: left !important; clear: none !important; }
+#blog-tresc .wpis-inline-foto.side-right { margin: 10px 0 12px 20px; float: right !important; }
+#blog-tresc .wpis-inline-foto.side-wide { width: min(46%, 380px); margin: 10px 20px 12px 0; float: left !important; clear: none !important; }
+#blog-tresc .blog-tresc:not(.edtr-pole) * { position: static !important; z-index: auto !important; transform: none !important; }
+#blog-tresc .blog-tresc img { position: static !important; z-index: auto !important; transform: none !important; box-sizing: border-box; width: min(38%, 340px); max-width: 100%; height: auto; float: left !important; display: block; margin: 10px 20px 12px 0; }
+#blog-tresc .wpis-inline-foto img { width: 100%; float: none !important; margin: 0; }
 #blog-tresc .blog-tresc .wpis-separator { clear: both; margin: 24px 0; }
 #blog-tresc .blog-tresc .wpis-separator hr { margin: 0; border: 0; border-top: 1px solid rgba(107,69,48,.28); }
 #blog-tresc .blog-tresc .wpis-table-block { clear: both; width: 100%; margin: 12px 0; }
@@ -58,5 +60,6 @@
   #blog-tresc .wpis-galeria-pasek .wpis-galeria-nav { width: 32px; height: 34px; flex-basis: 32px; }
   #blog-tresc .wpis-mini { width: 108px; height: 81px; flex-basis: 108px; }
   #blog-tresc .wpis-naglowek h1 { font-size: 29px; }
-  #blog-tresc .wpis-inline-foto, #blog-tresc .wpis-inline-foto.side-right, #blog-tresc .wpis-inline-foto.side-wide { width: 100%; max-width: 100%; float: none; clear: both; margin: 14px 0; }
+  #blog-tresc .wpis-inline-foto, #blog-tresc .wpis-inline-foto.side-right, #blog-tresc .wpis-inline-foto.side-wide { width: min(42%, 180px); max-width: 180px; float: left !important; clear: none !important; margin: 8px 12px 10px 0; }
+  #blog-tresc .wpis-inline-foto.side-right { float: right !important; margin: 8px 0 10px 12px; }
 }

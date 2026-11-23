@@ -2,8 +2,24 @@
 body.admin-page.admin-authenticated.blog-editor-fullscreen .admin-tabs { display: none !important; }
 body.admin-page.admin-authenticated.blog-editor-fullscreen .strona-uklad .head { margin-left: 0 !important; }
 body.admin-page.admin-authenticated.blog-editor-fullscreen main.wrap { margin-left: 0 !important; padding-right: clamp(12px,2vw,30px) !important; padding-left: clamp(12px,2vw,30px) !important; }
+body.admin-page.admin-authenticated .blog-admin-layout { display: grid !important; grid-template-columns: minmax(0,2fr) minmax(0,3fr) !important; gap: 20px; align-items: start; }
+.blog-admin-layout > .blog-preview-pane { order: 2; min-width: 0; }
+.blog-admin-layout > .blog-list-pane { order: 1; min-width: 0; }
+.blog-admin-layout > .blog-list-pane .tabela-wrap { overflow-x: auto; }
+#tabela-blog { min-width: 520px; }
+.blog-admin-layout #blog-podglad { max-width: none; }
+#tab-blog #blog-edytuj { min-height: 48px !important; padding: 13px 25px !important; border: 1px solid #1f3a32 !important; border-radius: 999px !important; background: #1f3a32 !important; color: #fffdf8 !important; box-shadow: 0 5px 14px rgba(31,58,50,.2); font-size: 15px !important; font-weight: 800; letter-spacing: .09em; }
+#tab-blog #blog-edytuj:hover:not(:disabled) { background: #2b5042 !important; box-shadow: 0 7px 18px rgba(31,58,50,.27); transform: translateY(-1px); }
+#tab-blog #blog-edytuj:disabled { opacity: .48; box-shadow: none; }
+#tab-blog .blog-row-delete { min-height: 32px; padding: 6px 10px; font-size: 12px; }
+@media (max-width: 760px) {
+  body.admin-page.admin-authenticated .blog-admin-layout { grid-template-columns: minmax(0,1fr) !important; }
+  .blog-admin-layout > .blog-preview-pane { order: 2; }
+  .blog-admin-layout > .blog-list-pane { order: 1; }
+}
 #tab-blog.blog-editing > .admin-dwie { display: block !important; }
 #tab-blog.blog-editing > .admin-dwie > div:nth-child(2) { display: none !important; }
+#tab-blog.blog-editing > .admin-dwie > div.blog-list-pane { display: none !important; }
 #tab-blog.blog-editing #blog-form { width: 100%; max-width: none; }
 #tab-blog.blog-editing .bf-editor-pole { margin-top: 18px; }
 .bf-editor-instrukcja { margin: 4px 0 10px; color: #665d54; font-size: 13px; line-height: 1.5; }
