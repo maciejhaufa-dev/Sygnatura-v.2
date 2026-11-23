@@ -180,7 +180,8 @@
       if (m.video) return '<div class="wpis-okladka wpis-okladka-video"><video controls playsinline preload="metadata" poster="' + esc(m.thumb || '') + '"><source src="' + esc(m.src) + '"></video></div>';
       return '<figure class="wpis-okladka"><img src="' + esc(m.src) + '" alt="' + esc(w.tytul) + '" loading="eager" fetchpriority="high" decoding="async"></figure>';
     }
-    let galeria = '<div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">' + renderMainMedia(0);
+    let galeria = '<div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">' + renderMainMedia(0) + '</div>' +
+      '<button type="button" class="wpis-video-powrot" hidden>← Wróć do zdjęć galerii</button>';
     if (wszystkie.length > 1) {
       galeria += '<div class="wpis-galeria-pasek"><button type="button" class="wpis-galeria-nav" data-dir="-1" aria-label="Przewiń zdjęcia w lewo">‹</button><div class="wpis-miniatury" aria-label="Zdjęcia i filmy realizacji">';
       wszystkie.forEach(function (m, i) {
@@ -189,7 +190,7 @@
       });
       galeria += '</div><button type="button" class="wpis-galeria-nav" data-dir="1" aria-label="Przewiń zdjęcia w prawo">›</button></div>';
     }
-    galeria += '</div></div>';
+    galeria += '</div>';
 
     /* blok produktu — w trybie startu każda realizacja ma przycisk e-mail / kontakt */
     let produktBlok = '';
@@ -225,13 +226,31 @@
       produktBlok + '</article>';
 
     const mainMedia = kontener.querySelector('.wpis-media-glowny');
+    const videoBack = kontener.querySelector('.wpis-video-powrot');
+    videoBack.hidden = !(wszystkie[0] && wszystkie[0].video);
+    function showMedia(index, selectedButton) {
+      const selected = wszystkie[index];
+      if (!selected) return;
+      mainMedia.innerHTML = renderMainMedia(index);
+      mainMedia.dataset.current = String(index);
+      videoBack.hidden = !selected.video;
+      kontener.querySelectorAll('.wpis-mini').forEach(function (thumb) {
+        thumb.classList.toggle('on', selectedButton ? thumb === selectedButton : Number(thumb.getAttribute('data-i')) === index);
+      });
+    }
     kontener.querySelectorAll('.wpis-mini').forEach(function (button) {
       button.addEventListener('click', function () {
-        const index = Number(button.getAttribute('data-i'));
-        mainMedia.innerHTML = renderMainMedia(index);
-        mainMedia.dataset.current = String(index);
-        kontener.querySelectorAll('.wpis-mini').forEach(function (thumb) { thumb.classList.toggle('on', thumb === button); });
+        showMedia(Number(button.getAttribute('data-i')), button);
       });
+    });
+    videoBack.addEventListener('click', function () {
+      const firstPhoto = wszystkie.findIndex(function (m) { return !m.video; });
+      if (firstPhoto < 0) return;
+      const firstPhotoButton = Array.from(kontener.querySelectorAll('.wpis-mini')).find(function (thumb) {
+        return Number(thumb.getAttribute('data-i')) === firstPhoto;
+      });
+      showMedia(firstPhoto, firstPhotoButton || null);
+      mainMedia.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
     kontener.querySelectorAll('.wpis-galeria-nav').forEach(function (button) {
       button.addEventListener('click', function () {

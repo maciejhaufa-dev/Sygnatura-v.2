@@ -7,12 +7,19 @@
 .interior-content .wpis-mini:hover, .interior-content .wpis-mini.on { border: 2px solid var(--interior-forest); }
 .interior-content .wpis-okladka-video { max-height: 660px; overflow: hidden; }
 .interior-content .wpis-okladka-video iframe, .interior-content .wpis-okladka-video video { height: 100%; min-height: 0; }
-@media (max-width: 760px) {
-  .wpis-uklad { grid-template-columns: 1fr; gap: 18px; }
-  .wpis-galeria { grid-row: 1; }
-  .blog-tresc { grid-row: 2; }
-  .wpis-okladka img, .wpis-okladka video { height: min(58vh, 460px); min-height: 230px; }
-  .wpis-powrot { margin-bottom: 19px; }
+.wpis-video-powrot { display: inline-flex; align-items: center; min-height: 42px; margin: 10px 0 3px; padding: 9px 13px; border: 1px solid rgba(23,57,47,.35); border-radius: 3px; background: #fff; color: var(--butelkowa); font: 600 13px/1.25 system-ui, sans-serif; cursor: pointer; }
+.wpis-video-powrot:hover, .wpis-video-powrot:focus-visible { background: var(--butelkowa); color: #fff; }
+.wpis-video-powrot[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  /* A single column keeps the full story below the gallery on phones/tablets. */
+  .wpis-uklad { display: flex !important; flex-direction: column; align-items: stretch; gap: 20px !important; }
+  .wpis-uklad > .wpis-galeria { order: 0; width: 100%; margin: 0; }
+  .wpis-uklad > .blog-tresc { order: 1; width: 100%; max-width: none; margin: 0 !important; }
+  .wpis-okladka img, .wpis-okladka video { width: 100%; height: auto; max-height: 70vh; min-height: 0; }
+  .wpis-okladka-video { width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: none; }
+  .wpis-okladka-video iframe, .wpis-okladka-video video { width: 100%; height: 100%; min-height: 0; }
+  .wpis-miniatury { flex-wrap: nowrap !important; overflow-x: auto; }
+  .wpis-video-powrot { min-height: 44px; }
 }
 @media (max-width: 420px) {
   .wpis-galeria-pasek { gap: 5px; }
