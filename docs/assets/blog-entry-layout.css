@@ -11,14 +11,14 @@
 
 /* Newspaper flow: the fixed hero photo stays separate from the selectable gallery. */
 #blog-tresc .wpis-uklad { display: flow-root; }
-#blog-tresc .wpis-uklad[data-layout="newspaper"] > .wpis-galeria { float: left; width: min(48%, 650px); margin: 0 26px 18px 0; }
+#blog-tresc .wpis-uklad[data-layout="newspaper"] > .wpis-galeria { float: right; width: min(48%, 650px); margin: 0 0 18px 26px; }
 #blog-tresc .wpis-uklad[data-layout="newspaper"] > .blog-tresc { display: block; min-width: 0; max-width: none; margin: 0; font-size: 17px; line-height: 1.85; text-align: justify; text-justify: inter-word; hyphens: auto; }
 #blog-tresc .wpis-uklad[data-layout="stacked"] { display: flex; flex-direction: column; align-items: stretch; gap: 18px; }
 #blog-tresc .wpis-uklad[data-layout="stacked"] > .wpis-galeria { order: 0; width: 100%; margin: 0; }
 #blog-tresc .wpis-uklad[data-layout="stacked"] > .blog-tresc { order: 1; width: 100%; max-width: none; margin: 0; font-size: 17px; line-height: 1.85; text-align: justify; text-justify: inter-word; hyphens: auto; }
 #blog-tresc .blog-tresc h2, #blog-tresc .blog-tresc h3 { text-align: left; }
-#blog-tresc .wpis-inline-foto { width: min(44%, 360px); margin: 10px 20px 12px 0; float: left; }
-#blog-tresc .wpis-inline-foto.side-right { margin: 10px 0 12px 20px; float: right; }
+#blog-tresc .wpis-inline-foto { width: min(38%, 340px); margin: 10px 20px 12px 0; float: left; clear: both; }
+#blog-tresc .wpis-inline-foto.side-right { margin: 10px 0 12px 20px; float: right; clear: both; }
 #blog-tresc .wpis-inline-foto.side-wide { width: 100%; max-width: 760px; margin: 16px auto; float: none; clear: both; }
 #blog-tresc .wpis-inline-foto img { width: 100%; height: auto; display: block; margin: 0; }
 #blog-tresc .blog-tresc::after { content: ""; display: block; clear: both; }

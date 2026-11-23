@@ -45,29 +45,54 @@
     return { config: config, html: marker ? source.replace(marker[0], '') : source };
   }
   function przygotujUkladWpisu(w, parsed) {
-    if (!parsed.config.inlineSrc && String(w && w.id) === '1') {
-      const cover = okladkaRealizacji(w);
-      const candidates = (Array.isArray(w.galeria) ? w.galeria : []).map(function (item) {
-        return typeof item === 'string' ? item : String(item && (item.src || item.url || '') || '');
-      }).filter(function (src) { return src && src !== cover; });
-      const src = candidates[0] || '';
-      if (/^(https:\/\/|assets\/|uploads\/)/i.test(src)) {
-        parsed.config.inlineSrc = src;
-        parsed.config.inlineSide = 'right';
+    if (String(w && w.id) === '1') {
+      if (!parsed.config.inlineSrc) {
+        const cover = okladkaRealizacji(w);
+        const candidates = (Array.isArray(w.galeria) ? w.galeria : []).map(function (item) {
+          return typeof item === 'string' ? item : String(item && (item.src || item.url || '') || '');
+        }).filter(function (src) { return src && src !== cover; });
+        parsed.config.inlineSrc = candidates[0] || '';
       }
+      if (parsed.config.inlineSrc) parsed.config.inlineSide = 'left';
     }
     return parsed;
   }
   function wstawIlustracjeWpisu(html, config, title) {
-    if (!config || !config.inlineSrc || !/^(https:\/\/|assets\/|uploads\/)/i.test(config.inlineSrc)) return html;
     const root = document.createElement('div'); root.innerHTML = html || '';
-    const figure = document.createElement('figure');
-    figure.className = 'wpis-inline-foto side-' + config.inlineSide;
-    figure.innerHTML = '<img src="' + esc(config.inlineSrc) + '" alt="' + esc(title || '') + '" loading="lazy">';
-    const paragraphs = root.querySelectorAll('p');
-    const target = paragraphs[Math.min(paragraphs.length, config.inlineAfter) - 1];
-    if (target && target.parentNode) target.parentNode.insertBefore(figure, target.nextSibling);
-    else root.appendChild(figure);
+    if (config && config.inlineSrc && /^(https:\/\/|assets\/|uploads\/)/i.test(config.inlineSrc)) {
+      const figure = document.createElement('figure');
+      figure.className = 'wpis-inline-foto';
+      figure.innerHTML = '<img src="' + esc(config.inlineSrc) + '" alt="' + esc(title || '') + '" loading="lazy">';
+      const paragraphs = root.querySelectorAll('p');
+      const target = paragraphs[Math.min(paragraphs.length, config.inlineAfter) - 1];
+      if (target && target.parentNode) target.parentNode.insertBefore(figure, target.nextSibling);
+      else root.appendChild(figure);
+    }
+    Array.from(root.querySelectorAll('img')).forEach(function (img) {
+      if (img.closest('.wpis-inline-foto') || img.closest('a')) return;
+      const existingFigure = img.closest('figure');
+      if (existingFigure) { existingFigure.classList.add('wpis-inline-foto'); return; }
+      const parent = img.parentNode, figure = document.createElement('figure');
+      figure.className = 'wpis-inline-foto';
+      if (parent && parent.nodeName === 'P' && parent.parentNode) {
+        parent.parentNode.insertBefore(figure, parent.nextSibling);
+        figure.appendChild(img);
+      } else if (parent) {
+        parent.replaceChild(figure, img);
+        figure.appendChild(img);
+      }
+    });
+    const figures = root.querySelectorAll('figure.wpis-inline-foto');
+    let previousSide = 'right';
+    figures.forEach(function (figure, index) {
+      let side;
+      if (index === 0 && config && config.inlineSide === 'wide') side = 'wide';
+      else if (index === 0 && config && config.inlineSide === 'right') side = 'right';
+      else side = previousSide === 'left' ? 'right' : 'left';
+      figure.classList.remove('side-left', 'side-right', 'side-wide');
+      figure.classList.add('side-' + side);
+      previousSide = side === 'wide' ? 'right' : side;
+    });
     return root.innerHTML;
   }
 
@@ -265,7 +290,7 @@
       '<p class="sub">' + dzien(w.data) + '</p></header>' +
       '<div class="wpis-uklad" data-layout="' + esc(parsedBody.config.mode) + '">' + galeria +
       '<div class="blog-tresc">' + wstawIlustracjeWpisu(parsedBody.html, parsedBody.config, w.tytul) + '</div></div>' +
-      produktBlok + pasekGalerii + '</article>';
+      pasekGalerii + produktBlok + '</article>';
 
     const mainMedia = kontener.querySelector('.wpis-media-glowny');
     const videoBack = kontener.querySelector('.wpis-video-powrot');
