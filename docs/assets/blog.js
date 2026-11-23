@@ -30,6 +30,32 @@
     const m = String(url || '').match(/(?:v=|youtu\.be\/)([\w-]{6,})/);
     return m ? m[1] : '';
   }
+  function odczytajUkladWpisu(html) {
+    const source = String(html || ''), marker = /<!--SYG_ARTICLE_LAYOUT:([\s\S]*?)-->/i.exec(source);
+    let config = { mode: 'newspaper', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
+    if (marker) {
+      try {
+        const stored = JSON.parse(decodeURIComponent(marker[1]));
+        if (stored && typeof stored === 'object') config = Object.assign(config, stored);
+      } catch (ignore) {}
+    }
+    if (config.mode !== 'stacked') config.mode = 'newspaper';
+    if (['left', 'right', 'wide'].indexOf(config.inlineSide) < 0) config.inlineSide = 'left';
+    config.inlineAfter = Math.max(1, Math.min(8, Number(config.inlineAfter) || 2));
+    return { config: config, html: marker ? source.replace(marker[0], '') : source };
+  }
+  function wstawIlustracjeWpisu(html, config, title) {
+    if (!config || !config.inlineSrc || !/^(https:\/\/|assets\/|uploads\/)/i.test(config.inlineSrc)) return html;
+    const root = document.createElement('div'); root.innerHTML = html || '';
+    const figure = document.createElement('figure');
+    figure.className = 'wpis-inline-foto side-' + config.inlineSide;
+    figure.innerHTML = '<img src="' + esc(config.inlineSrc) + '" alt="' + esc(title || '') + '" loading="lazy">';
+    const paragraphs = root.querySelectorAll('p');
+    const target = paragraphs[Math.min(paragraphs.length, config.inlineAfter) - 1];
+    if (target && target.parentNode) target.parentNode.insertBefore(figure, target.nextSibling);
+    else root.appendChild(figure);
+    return root.innerHTML;
+  }
 
   /* ---------- lista (kafle) ---------- */
   async function lista(kontener) {
@@ -115,8 +141,8 @@
     try{var rows=JSON.parse(sessionStorage.getItem('syg-public-blog-cache-v1')||'[]');return Array.isArray(rows)?rows.find(function(w){return w&&String(w.id)===String(id)&&w.widoczny!==false;}):null;}catch(e){return null;}
   }
   function renderCachedBlogEntry(kontener,w){
-    const cover=okladkaRealizacji(w);
-    kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header><div class="wpis-uklad"><div class="blog-tresc">'+(w.tresc||'')+'</div><div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div></div></article>';
+    const cover=okladkaRealizacji(w), parsed=odczytajUkladWpisu(w.tresc), mode=parsed.config.mode;
+    kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header><div class="wpis-uklad" data-layout="'+esc(mode)+'"><div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div><div class="blog-tresc">'+wstawIlustracjeWpisu(parsed.html,parsed.config,w.tytul)+'</div></div></article>';
   }
   async function wpis(kontener) {
     const id = SYG.param('id');
@@ -181,16 +207,16 @@
       return '<figure class="wpis-okladka"><img src="' + esc(m.src) + '" alt="' + esc(w.tytul) + '" loading="eager" fetchpriority="high" decoding="async"></figure>';
     }
     let galeria = '<div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">' + renderMainMedia(0) + '</div>' +
-      '<button type="button" class="wpis-video-powrot" hidden>← Wróć do zdjęć galerii</button>';
+      '<button type="button" class="wpis-video-powrot" hidden>← Wróć do zdjęć galerii</button></div>';
+    let pasekGalerii = '';
     if (wszystkie.length > 1) {
-      galeria += '<div class="wpis-galeria-pasek"><button type="button" class="wpis-galeria-nav" data-dir="-1" aria-label="Przewiń zdjęcia w lewo">‹</button><div class="wpis-miniatury" aria-label="Zdjęcia i filmy realizacji">';
+      pasekGalerii = '<div class="wpis-galeria-pasek"><button type="button" class="wpis-galeria-nav" data-dir="-1" aria-label="Przewiń zdjęcia w lewo">‹</button><div class="wpis-miniatury" aria-label="Zdjęcia i filmy realizacji">';
       wszystkie.forEach(function (m, i) {
-        galeria += '<button type="button" class="wpis-mini' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" aria-label="' + (m.video ? 'Odtwórz film ' : 'Pokaż zdjęcie ') + (i + 1) + '">' +
+        pasekGalerii += '<button type="button" class="wpis-mini' + (i === 0 ? ' on' : '') + '" data-i="' + i + '" aria-label="' + (m.video ? 'Odtwórz film ' : 'Pokaż zdjęcie ') + (i + 1) + '">' +
           (m.video ? '<span class="wpis-mini-video">▶</span>' : '<img src="' + esc(m.thumb) + '" alt="">') + '</button>';
       });
-      galeria += '</div><button type="button" class="wpis-galeria-nav" data-dir="1" aria-label="Przewiń zdjęcia w prawo">›</button></div>';
+      pasekGalerii += '</div><button type="button" class="wpis-galeria-nav" data-dir="1" aria-label="Przewiń zdjęcia w prawo">›</button></div>';
     }
-    galeria += '</div>';
 
     /* blok produktu — w trybie startu każda realizacja ma przycisk e-mail / kontakt */
     let produktBlok = '';
@@ -216,13 +242,15 @@
         '</div></div>';
     }
 
+    const parsedBody = odczytajUkladWpisu(w.tresc);
     kontener.innerHTML =
       '<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a>' +
       '<article class="wpis-artykul"><header class="wpis-naglowek">' +
       (w.kategoria ? '<span class="tag">' + esc(w.kategoria) + '</span>' : '') +
       '<h1>' + esc(w.tytul) + '</h1>' +
       '<p class="sub">' + dzien(w.data) + '</p></header>' +
-      '<div class="wpis-uklad"><div class="blog-tresc">' + (w.tresc || '') + '</div>' + galeria + '</div>' +
+      '<div class="wpis-uklad" data-layout="' + esc(parsedBody.config.mode) + '">' + galeria +
+      '<div class="blog-tresc">' + wstawIlustracjeWpisu(parsedBody.html, parsedBody.config, w.tytul) + '</div>' + pasekGalerii + '</div>' +
       produktBlok + '</article>';
 
     const mainMedia = kontener.querySelector('.wpis-media-glowny');

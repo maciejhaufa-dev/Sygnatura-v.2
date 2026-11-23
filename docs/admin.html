@@ -478,6 +478,20 @@
               <div class="bf-mini" id="bf-mini"></div>
               <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
               <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
+              <div class="blog-uklad-opcje" style="display:grid;gap:8px;margin-top:12px">
+                <label>Układ zdjęcia głównego i tekstu
+                  <select id="bf-layout-mode"><option value="newspaper">Tekst opływa zdjęcie i przechodzi pod nim</option><option value="stacked">Zdjęcie nad tekstem bez opływania</option></select>
+                </label>
+                <label>Drugie zdjęcie w treści (opcjonalnie)
+                  <select id="bf-inline-photo"><option value="">Nie dodawaj</option></select>
+                </label>
+                <label>Położenie drugiego zdjęcia
+                  <select id="bf-inline-side"><option value="left">Po lewej stronie tekstu</option><option value="right">Po prawej stronie tekstu</option><option value="wide">Na całą szerokość tekstu</option></select>
+                </label>
+                <label>Wstawić po akapicie
+                  <input type="number" id="bf-inline-after" min="1" max="8" value="2">
+                </label>
+              </div>
             </div>
             <div class="pole">
               <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
@@ -2151,6 +2165,33 @@
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  function odczytajUkladTresc(html){
+    var source = String(html || ''), marker = /<!--SYG_ARTICLE_LAYOUT:([\s\S]*?)-->/i.exec(source);
+    var config = { mode: 'newspaper', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
+    if (marker) { try { config = Object.assign(config, JSON.parse(decodeURIComponent(marker[1]))); } catch (ignore) {} }
+    if (config.mode !== 'stacked') config.mode = 'newspaper';
+    if (['left','right','wide'].indexOf(config.inlineSide) < 0) config.inlineSide = 'left';
+    config.inlineAfter = Math.max(1, Math.min(8, Number(config.inlineAfter) || 2));
+    return { config: config, html: marker ? source.replace(marker[0], '') : source };
+  }
+  function zapiszUkladTresc(html){
+    var config = {
+      mode: document.getElementById('bf-layout-mode').value === 'stacked' ? 'stacked' : 'newspaper',
+      inlineSrc: document.getElementById('bf-inline-photo').value || '',
+      inlineSide: document.getElementById('bf-inline-side').value || 'left',
+      inlineAfter: Math.max(1, Math.min(8, Number(document.getElementById('bf-inline-after').value) || 2))
+    };
+    return odczytajUkladTresc(html).html + '<!--SYG_ARTICLE_LAYOUT:' + encodeURIComponent(JSON.stringify(config)) + '-->';
+  }
+  function rysujInlineFotoOpcje(){
+    var select = document.getElementById('bf-inline-photo'); if (!select) return;
+    var current = select.value;
+    select.innerHTML = '<option value="">Nie dodawaj</option>' + galeria.map(function(g,i){
+      return '<option value="' + escB(g.src) + '">Zdjęcie ' + (i + 1) + (g.glowna ? ' (główne)' : '') + '</option>';
+    }).join('');
+    if (galeria.some(function(g){ return g.src === current; })) select.value = current;
+  }
+
 
   function infoBlog(txt){
     var f = document.getElementById('blog-info');
@@ -2181,6 +2222,7 @@
       });
       kont.appendChild(el);
     });
+    rysujInlineFotoOpcje();
   }
 
   var blogUploadWTrakcie = false;
@@ -2374,7 +2416,13 @@
     document.getElementById('bf-data').value = w.data || new Date().toISOString().slice(0, 10);
     document.getElementById('bf-zajawka').value = nowySzkic ? '' : (w.zajawka || '');
     document.getElementById('bf-video').value = w.video || '';
-    blogEdytor.ustaw(nowySzkic ? '' : (w.tresc || ''));
+    var layoutBody = odczytajUkladTresc(nowySzkic ? '' : (w.tresc || ''));
+    document.getElementById('bf-layout-mode').value = layoutBody.config.mode;
+    document.getElementById('bf-inline-side').value = layoutBody.config.inlineSide;
+    document.getElementById('bf-inline-after').value = layoutBody.config.inlineAfter;
+    rysujInlineFotoOpcje();
+    document.getElementById('bf-inline-photo').value = layoutBody.config.inlineSrc;
+    blogEdytor.ustaw(layoutBody.html);
     document.getElementById('bf-widoczny').checked = w.widoczny !== false;
     var prod = w.produkt || {};
     document.getElementById('bf-sklep').checked = !!prod.sklep;
@@ -2470,7 +2518,7 @@
     var oryginalnyTekstZapisu = przyciskZapisu.textContent;
     przyciskZapisu.textContent = 'Zapisywanie…';
     try {
-      trescWpisu = await blogZamienZdjeciaOsadzone();
+      trescWpisu = zapiszUkladTresc(await blogZamienZdjeciaOsadzone());
     } catch (errUpload){
       infoBlog('Nie zapisano wpisu — problem ze zdjęciem: ' + (errUpload.message || 'błąd wysyłania.'));
       przyciskZapisu.disabled = false;

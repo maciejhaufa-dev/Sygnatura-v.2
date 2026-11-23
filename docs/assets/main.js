@@ -243,11 +243,15 @@
     shell.className = 'strona-uklad';
     shell.innerHTML = szkielet(aktywna);
 
-    /* tytuł strony przenosimy POD wyszukiwarkę (górny blok, na wysokości logo) */
-    const h1 = tresc.querySelector('h1');
+    /* Szczegół realizacji ma własny tytuł artykułu; nie przenoś go drugi raz do nagłówka strony. */
     const tytulEl = shell.querySelector('#strona-tytul');
-    if (h1 && tytulEl) tytulEl.appendChild(h1);
-    else shell.querySelector('.interior-page-title').hidden = true;
+    const pageTitle = shell.querySelector('.interior-page-title');
+    if (document.body.dataset.blog === 'wpis') pageTitle.hidden = true;
+    else {
+      const h1 = tresc.querySelector('h1');
+      if (h1 && tytulEl) tytulEl.appendChild(h1);
+      else pageTitle.hidden = true;
+    }
 
     /* treść trafia do prawego boxa (segment D) */
     shell.querySelector('.prawa').appendChild(tresc);
