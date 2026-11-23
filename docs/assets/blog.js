@@ -32,7 +32,7 @@
   }
   function odczytajUkladWpisu(html) {
     const source = String(html || ''), marker = /<!--SYG_ARTICLE_LAYOUT:([\s\S]*?)-->/i.exec(source);
-    let config = { mode: 'newspaper', heroSide: 'right', inlineSrc: '', inlineSide: 'left', inlineAfter: 2 };
+    let config = { mode: 'newspaper', heroSide: 'right' };
     if (marker) {
       try {
         const stored = JSON.parse(decodeURIComponent(marker[1]));
@@ -41,36 +41,10 @@
     }
     if (config.mode !== 'stacked') config.mode = 'newspaper';
     if (config.heroSide !== 'left') config.heroSide = 'right';
-    if (['left', 'right', 'wide'].indexOf(config.inlineSide) < 0) config.inlineSide = 'left';
-    config.inlineAfter = Math.max(1, Math.min(8, Number(config.inlineAfter) || 2));
     return { config: config, html: marker ? source.replace(marker[0], '') : source };
   }
-  function przygotujUkladWpisu(w, parsed) {
-    if (String(w && w.id) === '1') {
-      if (!parsed.config.inlineSrc) {
-        const cover = okladkaRealizacji(w);
-        const candidates = (Array.isArray(w.galeria) ? w.galeria : []).map(function (item) {
-          return typeof item === 'string' ? item : String(item && (item.src || item.url || '') || '');
-        }).filter(function (src) { return src && src !== cover; });
-        parsed.config.inlineSrc = candidates[0] || '';
-      }
-    }
-    return parsed;
-  }
-  function wstawIlustracjeWpisu(html, config, title) {
+  function wstawIlustracjeWpisu(html) {
     const root = document.createElement('div'); root.innerHTML = html || '';
-    const inlineAlreadyInBody = config && config.inlineSrc && Array.from(root.querySelectorAll('img')).some(function (img) {
-      return img.getAttribute('src') === config.inlineSrc;
-    });
-    if (config && config.inlineSrc && !inlineAlreadyInBody && /^(https:\/\/|assets\/|uploads\/)/i.test(config.inlineSrc)) {
-      const figure = document.createElement('figure');
-      figure.className = 'wpis-inline-foto';
-      figure.innerHTML = '<img src="' + esc(config.inlineSrc) + '" alt="' + esc(title || '') + '" loading="lazy">';
-      const paragraphs = root.querySelectorAll('p');
-      const target = paragraphs[Math.min(paragraphs.length, config.inlineAfter) - 1];
-      if (target && target.parentNode) target.parentNode.insertBefore(figure, target.nextSibling);
-      else root.appendChild(figure);
-    }
     Array.from(root.querySelectorAll('img')).forEach(function (img) {
       if (img.closest('.wpis-inline-foto') || img.closest('a')) return;
       const existingFigure = img.closest('figure');
@@ -86,15 +60,11 @@
       }
     });
     const figures = root.querySelectorAll('figure.wpis-inline-foto');
-    let previousSide = 'right';
-    figures.forEach(function (figure, index) {
-      let side;
-      if (index === 0 && config && config.inlineSide === 'wide') side = 'wide';
-      else if (index === 0 && config && config.inlineSide === 'right') side = 'right';
-      else side = previousSide === 'left' ? 'right' : 'left';
+    let side = 'right';
+    figures.forEach(function (figure) {
       figure.classList.remove('side-left', 'side-right', 'side-wide');
       figure.classList.add('side-' + side);
-      previousSide = side === 'wide' ? 'right' : side;
+      side = side === 'left' ? 'right' : 'left';
     });
     return root.innerHTML;
   }
@@ -214,9 +184,9 @@
     try{var rows=JSON.parse(sessionStorage.getItem('syg-public-blog-cache-v1')||'[]');return Array.isArray(rows)?rows.find(function(w){return w&&String(w.id)===String(id)&&w.widoczny!==false;}):null;}catch(e){return null;}
   }
   function renderCachedBlogEntry(kontener,w){
-    const cover=okladkaRealizacji(w), parsed=przygotujUkladWpisu(w,odczytajUkladWpisu(w.tresc)), mode=parsed.config.mode;
+    const cover=okladkaRealizacji(w), parsed=odczytajUkladWpisu(w.tresc), mode=parsed.config.mode;
     const gallery='<div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div>';
-    kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header><div class="wpis-uklad" data-layout="'+esc(mode)+'" data-hero-side="'+esc(parsed.config.heroSide)+'"><div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div><div class="blog-tresc">'+wstawIlustracjeWpisu(parsed.html,parsed.config,w.tytul)+'</div></div></article>';
+    kontener.innerHTML='<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a><article class="wpis-artykul"><header class="wpis-naglowek">'+(w.kategoria?'<span class="tag">'+esc(w.kategoria)+'</span>':'')+'<h1>'+esc(w.tytul)+'</h1><p class="sub">'+dzien(w.data)+'</p></header><div class="wpis-uklad" data-layout="'+esc(mode)+'" data-hero-side="'+esc(parsed.config.heroSide)+'"><div class="wpis-galeria"><div class="wpis-media-glowny" data-current="0">'+(cover?'<figure class="wpis-okladka"><img src="'+esc(cover)+'" alt="'+esc(w.tytul)+'" loading="eager" fetchpriority="high" decoding="async"></figure>':'')+'</div></div><div class="blog-tresc">'+wstawIlustracjeWpisu(parsed.html)+'</div></div></article>';
   }
   async function wpis(kontener) {
     const id = SYG.param('id');
@@ -316,10 +286,10 @@
         '</div></div>';
     }
 
-    const parsedBody = przygotujUkladWpisu(w, odczytajUkladWpisu(w.tresc));
+    const parsedBody = odczytajUkladWpisu(w.tresc);
     const layoutHtml = '<div class="wpis-uklad" data-layout="' + esc(parsedBody.config.mode) +
       '" data-hero-side="' + esc(parsedBody.config.heroSide) + '">' + galeria +
-      '<div class="blog-tresc">' + wstawIlustracjeWpisu(parsedBody.html, parsedBody.config, w.tytul) + '</div></div>';
+      '<div class="blog-tresc">' + wstawIlustracjeWpisu(parsedBody.html) + '</div></div>';
     kontener.innerHTML =
       '<a class="powrot wpis-powrot" href="realizacje.html">← wszystkie realizacje</a>' +
       '<article class="wpis-artykul"><header class="wpis-naglowek">' +
