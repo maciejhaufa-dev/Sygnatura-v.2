@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="assets/admin-landing-editor.css?v=landing-editor-2">
 <link rel="stylesheet" href="assets/interior-refresh.css?v=brand-split-2">
 <link rel="stylesheet" href="assets/blog-entry-layout.css?v=11">
-<link rel="stylesheet" href="assets/blog-editor.css?v=4">
+<link rel="stylesheet" href="assets/blog-editor.css?v=5">
 </head>
 <body data-strona="" class="admin-page">
 <div id="naglowek"></div>
@@ -428,8 +428,9 @@
           <div class="forma" id="blog-podglad" style="margin-top:10px"></div>
           <!-- TRYB EDYCJI -->
           <div class="forma" id="blog-form" style="display:none;margin-top:10px">
+            <div class="bf-settings-grid">
             <h3 id="blog-form-tytul">Nowy wpis</h3>
-            <div class="pole" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
+            <div class="pole bf-setting-options" style="border:1px solid rgba(107,69,48,.35);background:var(--krem-2);padding:12px 14px">
               <b style="display:block;margin-bottom:8px;color:var(--butelkowa)">Opcje wpisu</b>
               <label style="cursor:pointer;display:block;margin-bottom:6px">
                 <input type="checkbox" id="bf-widoczny"> Widoczny na stronie
@@ -472,20 +473,22 @@
                 </div>
               </div>
             </div>
-            <div class="pole">
+            <div class="pole bf-setting-title">
               <label for="bf-tytul">Tytuł wpisu *</label>
               <input type="text" id="bf-tytul" placeholder="np. Szopka warstwowa z podświetleniem">
             </div>
-            <div class="pole">
+            <div class="pole bf-setting-note">
               <label for="bf-zajawka">Podpis zdjęcia / krótka notka na kafelku</label>
               <textarea id="bf-zajawka" rows="2" placeholder="Krótki podpis zdjęcia widoczny pod fotografią…"></textarea>
             </div>
-            <div class="pole">
+            <div class="pole bf-setting-photos">
               <label>Zdjęcia wpisu (maks. 10) — kliknij w miniaturę, aby ustawić zdjęcie główne</label>
               <div class="bf-mini" id="bf-mini"></div>
               <label class="btn outline" for="bf-pliki" style="margin-top:8px">+ Dodaj zdjęcia</label>
               <input type="file" id="bf-pliki" accept="image/*" multiple style="display:none">
-              <div class="blog-uklad-opcje" style="display:grid;gap:8px;margin-top:12px">
+            </div>
+            <div class="pole bf-setting-layout">
+              <div class="blog-uklad-opcje">
                 <label>Układ zdjęcia głównego i tekstu
                   <select id="bf-layout-mode"><option value="newspaper">Tekst opływa zdjęcie i przechodzi pod nim</option><option value="stacked">Zdjęcie nad tekstem bez opływania</option></select>
                 </label>
@@ -503,9 +506,10 @@
                 </label>
               </div>
             </div>
-            <div class="pole">
+            <div class="pole bf-setting-video">
               <label for="bf-video">Film (link YouTube — opcjonalnie)</label>
               <input type="text" id="bf-video" placeholder="https://www.youtube.com/watch?v=…">
+            </div>
             </div>
             <div class="pole bf-editor-pole">
               <label>Treść wpisu — edytuj bezpośrednio na podglądzie strony</label>
